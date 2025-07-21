@@ -48,14 +48,41 @@
             </div>
         </div>
     </nav>
+    <div class="card mt-4 border-0"></div>
+    <div class="card mt-4 border-0"></div>
+<style>
+    .breadcrumb .breadcrumb-item a {
+      color: #97144D;
+      text-decoration: none;
+    }
+
+    .breadcrumb .breadcrumb-item a:hover {
+      text-decoration: underline;
+    }
+
+    .breadcrumb .breadcrumb-item {
+      color: #97144D;
+    }
+  </style>  
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+    <li class="breadcrumb-item"><a href="accounts.html">Accounts</a></li>
+    <li class="breadcrumb-item"><a href="saving.html">Saving Account</a></li>
+   
+   
+  </ol>
+</nav>
 
     <img src="ss2.png" class="img-fluid mt-4" alt="...">
 
     <div class="card mt-4 border-0">
         <div class="card-body" style="margin-left: 0.5in;">
-            <h3>
-                <b>Saving Account </b>
-            </h3><br>
+            
+             <h3>
+                <span style="color: #97144D; font-style: italic;">Axis Bank</span> Saving Account
+            </h3>   
+            <br>
             <p>
                 A savings account is a secure deposit account offered by banks that allows you to save money while
                 earning interest. It provides you easy access to funds for daily expenses and transactions, while
@@ -74,8 +101,7 @@
 
     <!-- <div class="card mt-4 border-0"> -->
     <div class="card-body" style="margin-left: 0.5in;">
-        <h3>
-            <b>Eligibility and Document Required for Saving Account</b>
+        <h3>Eligibility and Document Required for Saving Account.
         </h3><br>
         <p>
             A savings account is a secure deposit account offered by banks that allows you to save money while
@@ -123,40 +149,56 @@
       color: #97144D;
     }
   </style>
-  <!-- d-flex justify-content-center
-  card-body mx-auto" style="width: fit-content; -->
+  
+
+<style>
+      .form-check-input:checked {
+      background-color: #97144D;
+      border-color: #97144D;
+    }
+
+    /* Custom submit button color */
+    .btn-primary {
+      background-color: #97144D;
+      border-color: #97144D;
+    }
+</style>
+
 <div class="d-flex justify-content-center align-items-center min-vh-100">
-  <div style="border: 2px solid #97144D; padding: 30px; border-radius: 12px; width: 80%;">
+  <div style="border: 2px solid #97144D; padding: 30px; border-radius: 12px; width: 60%;">
     <form class="row g-3">
-      <div class="col-md-4">
+      <div class="col-12">
         <label for="validationDefault01" class="form-label">First name</label>
         <input type="text" class="form-control" id="validationDefault01" placeholder="Enter first name" required>
       </div>
-      <div class="col-md-4">
+      <div class="col-12">
         <label for="validationDefault02" class="form-label">Last name</label>
         <input type="text" class="form-control" id="validationDefault02" placeholder="Enter last name" required>
       </div>
-      <div class="col-md-4">
+      <div class="col-12">
         <label for="validationDefaultUsername" class="form-label">Username</label>
         <div class="input-group">
           <span class="input-group-text" id="inputGroupPrepend2">@</span>
           <input type="text" class="form-control" id="validationDefaultUsername" placeholder="Enter username" aria-describedby="inputGroupPrepend2" required>
         </div>
       </div>
-      <div class="col-md-6">
+      <div class="col-12">
         <label for="validationDefault03" class="form-label">City</label>
         <input type="text" class="form-control" id="validationDefault03" placeholder="Enter city" required>
       </div>
-      <div class="col-md-3">
+      <div class="col-12">
         <label for="validationDefault04" class="form-label">State</label>
         <select class="form-select" id="validationDefault04" required>
           <option selected disabled value="">Choose...</option>
           <option>Maharashtra</option>
+          <option>Uttar Pradesh</option>
+          <option>Madhya Pradesh</option>
+          <option>Assam</option>
         </select>
       </div>
-      <div class="col-md-3">
-        <label for="validationDefault05" class="form-label">Zip</label>
-        <input type="text" class="form-control" id="validationDefault05" placeholder="Enter zip code" required>
+      <div class="col-12">
+        <label for="validationDefault05" class="form-label">PIN</label>
+        <input type="text" class="form-control" id="validationDefault05" placeholder="Enter Pin Code" required>
       </div>
       <div class="col-12">
         <div class="form-check">
@@ -166,13 +208,12 @@
           </label>
         </div>
       </div>
-      <div class="col-12">
+      <div class="col-12 text-end">
         <button class="btn btn-primary" type="submit">Submit form</button>
       </div>
     </form>
   </div>
 </div>
-
 
 
 
