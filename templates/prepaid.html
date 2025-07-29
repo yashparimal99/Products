@@ -24,10 +24,10 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="ExploreP.html">Explore Products</a>
+                        <a class="nav-link" href="{{ url_for('exploreproduct') }}">Explore Products</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Grab Deals</a>
@@ -69,26 +69,72 @@
 
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-            <li class="breadcrumb-item"><a href="ExploreP.html">Explore Products</a></li>
-            <li class="breadcrumb-item"><a href="cards.html">Cards</a></li>
-            <li class="breadcrumb-item"><a href="prepaid.html"> Prepaid Cards</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('cards') }}">Cards</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('prepaid') }}"> Prepaid Cards</a></li>
 
         </ol>
     </nav>
 
     <img src="prepc.png" class="img-fluid mt-4" alt="...">
-<!-- Cards -->
-<div class="card mt-4 border-0">
+    <!-- Cards -->
+    <div class="card mt-4 border-0">
         <div class="card-body" style="margin-left: 0.5in;">
             <h3>
                 <span style="color: #97144D; font-style: italic;">Axis Bank</span> Pre-paid Card
             </h3><br>
             <p style="inline-size: height 2;">
-            
-                <span style="color: #97144D; font-style: italic;"><b>AXIS GO</b></span> Axis Bank offers a range of pre-paid cards by which one can gift, reward and motivate either your loved ones or your employees in an easy and convenient way. One can choose between Meal Cards, Gift Cardsand Smart Pay Card. There are a number of benefits of pre-paid cards which include being able to load any amount between Rs. 500 and 1,00,000 in the Meal Card, being able to make purchases instantly with Gift Card! The Smart Pay Card offers daily POS transaction limit of Rs.1,00,000.
-            </p>
 
+                <span style="color: #97144D; font-style: italic;"><b>AXIS GO</b></span> Axis Bank offers a range of
+                pre-paid cards by which one can gift, reward and motivate either your loved ones or your employees in an
+                easy and convenient way. One can choose between Meal Cards, Gift Cardsand Smart Pay Card. There are a
+                number of benefits of pre-paid cards which include being able to load any amount between Rs. 500 and
+                1,00,000 in the Meal Card, being able to make purchases instantly with Gift Card! The Smart Pay Card
+                offers daily POS transaction limit of Rs.1,00,000.
+            </p>
+            <style>
+                .step-circle {
+                    width: 80px;
+                    height: 80px;
+                    margin: 0 auto;
+                    border: 2px dotted #97144D;
+                    border-radius: 50%;
+                    background-color: #97144D;
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 32px;
+                }
+
+                .step-circle i {
+                    font-size: 32px;
+                }
+
+                .btn {
+                    background-color: white;
+                    color: #800020;
+
+                }
+
+                .custom-btn {
+                    background-color: #800020;
+                    color: white;
+                    color: white;
+                    border: 2px solid white;
+                    border-radius: 5px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+                    padding: 10px 25px;
+                }
+
+                .custom-btn a {
+                    color: #800020;
+                }
+            </style>
+            <div class="text-start mt-4">
+                <a href="apply.html" class="btn custom-btn me-2">Apply Now</a>
+            </div>
 
         </div>
     </div>
@@ -96,7 +142,7 @@
 
 
 
-    
+
 
     <!-- Optional JavaScript; choose one of the two! -->
 

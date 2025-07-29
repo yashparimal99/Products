@@ -24,10 +24,10 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="ExploreP.html">Explore Products</a>
+                        <a class="nav-link" href="{{ url_for('exploreproduct') }}">Explore Products</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Grab Deals</a>
@@ -69,32 +69,82 @@
 
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-            <li class="breadcrumb-item"><a href="ExploreP.html">Explore Products</a></li>
-            <li class="breadcrumb-item"><a href="cards.html">Cards</a></li>
-            <li class="breadcrumb-item"><a href="Debitcard.html"> Debit Cards</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('cards') }}">Cards</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('Debitcard') }}"> Debit Cards</a></li>
 
         </ol>
     </nav>
 
     <img src="dc.png" class="img-fluid mt-4" alt="...">
-<!-- Cards -->
-<div class="card mt-4 border-0">
+    <!-- Cards -->
+    <div class="card mt-4 border-0">
         <div class="card-body" style="margin-left: 0.5in;">
             <h3>
-                <span style="color: #97144D; font-style: italic;">Axis Bank</span> Dedit Card
+                <span style="color: #97144D; font-style: italic;">Axis Bank</span> Debit Card
             </h3><br>
             <p style="inline-size: height 2;">
-            
-                <span style="color: #97144D; font-style: italic;"><b>AXIS GO</b></span> A Debit Card also functions as an ATM card, allowing you to withdraw money from any bank's ATM. It can also be used for making payments by swiping at a merchant’s point-of-sales machine and for online transactions.<br>
 
- When swiping your Debit Card, you need to key in the PIN. Similarly, when using it for online transactions, you need to key in the OTP that is delivered to your mobile number registered with the bank. This ensures your Debit Card is secure and safe to use.<br>
+                <span style="color: #97144D; font-style: italic;"><b>AXIS GO</b></span> A Debit Card also functions as
+                an ATM card, allowing you to withdraw money from any bank's ATM. It can also be used for making payments
+                by swiping at a merchant’s point-of-sales machine and for online transactions.<br>
 
- All International card transactions are not OTP based. The Reserve Bank of India (RBI) has enforced OTP authentication only for domestic transactions, and International transactions do not come under this purview.<br>
+                When swiping your Debit Card, you need to key in the PIN. Similarly, when using it for online
+                transactions, you need to key in the OTP that is delivered to your mobile number registered with the
+                bank. This ensures your Debit Card is secure and safe to use.<br>
 
-Make sure your linked Savings Account has sufficient funds, and then use your Debit Card freely to meet all your needs. Set daily and monthly transaction limits on your Debit Card as per your needs. There is no charge or fee for spending money using your Debit Card.<br>
+                All International card transactions are not OTP based. The Reserve Bank of India (RBI) has enforced OTP
+                authentication only for domestic transactions, and International transactions do not come under this
+                purview.<br>
+
+                Make sure your linked Savings Account has sufficient funds, and then use your Debit Card freely to meet
+                all your needs. Set daily and monthly transaction limits on your Debit Card as per your needs. There is
+                no charge or fee for spending money using your Debit Card.<br>
             </p>
+            
+           <style>
+        .step-circle {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+            border: 2px dotted #97144D;
+            border-radius: 50%;
+            background-color: #97144D;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
 
+        .step-circle i {
+            font-size: 32px;
+        }
+
+        .btn {
+            background-color: white;
+            color: #800020;
+
+        }
+
+        .custom-btn {
+            background-color: #800020;
+            color: white;
+            color: white;
+            border: 2px solid white;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            padding: 10px 25px;
+        }
+
+        .custom-btn a {
+            color: #800020;
+        }
+    </style>
+            <div class="text-start mt-4">
+                <a href="apply.html" class="btn custom-btn me-2">Apply Now</a>
+            </div>
 
         </div>
     </div>
@@ -102,7 +152,7 @@ Make sure your linked Savings Account has sufficient funds, and then use your De
 
 
 
-    
+
 
     <!-- Optional JavaScript; choose one of the two! -->
 

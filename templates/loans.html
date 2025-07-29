@@ -24,10 +24,10 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="ExploreP.html">Explore Products</a>
+                        <a class="nav-link" href="{{ url_for('exploreproduct') }}">Explore Products</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Grab Deals</a>
@@ -67,9 +67,9 @@
     <div class="card mt-4 border-0"></div>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-            <li class="breadcrumb-item"><a href="ExploreP.html">Explore Products</a></li>
-            <li class="breadcrumb-item"><a href="loans.html">Loans</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('loans') }}">Loans</a></li>
 
         </ol>
     </nav>
@@ -189,9 +189,9 @@
                         <div class="loan-card" style="width: 100%; border: 2px solid #97144D";>
                             <h5><strong>Home</strong> Loan</h5>
                             <p>Explore a diverse array of home loan options tailored to meet your specific needs.</p>
-                            <a href="loan-cards.html" class="text-danger">Explore More</a>
+                            <a href="{{ url_for('loanscards') }}" class="text-danger">Explore More</a>
                             <div class="loan-buttons">
-                                <a href="home_loan_form.html" class="btn btn-maroon w-100">Apply Online</a>
+                                <a href="{{ url_for('homeloanform') }}" class="btn btn-maroon w-100">Apply Online</a>
                             </div>
                         </div>
                     </div>
@@ -203,7 +203,7 @@
                             <p>Secure a personal loan for holidays, home renovations, or weddings.</p>
                             <a href="#" class="text-danger">Explore More</a>
                             <div class="loan-buttons mt-2">
-                                <a href="loan_personal.html" class="btn btn-maroon w-100">Apply Online</a>
+                                <a href="{{ url_for('loanpersonal') }}" class="btn btn-maroon w-100">Apply Online</a>
                             </div>
                         </div>
                     </div>
@@ -215,7 +215,7 @@
                             <p>Expand your business with minimal paperwork and rapid approval.</p>
                             <a href="#" class="text-danger">Explore More</a>
                             <div class="loan-buttons mt-2">
-                                <a href="Business_Loan.html" class="btn btn-maroon w-100">Apply Online</a>
+                                <a href="{{ url_for('business_loans') }}" class="btn btn-maroon w-100">Apply Online</a>
                             </div>
                         </div>
                     </div>

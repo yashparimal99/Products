@@ -41,10 +41,10 @@
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+            <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="ExploreP.html">Explore Products</a>
+            <a class="nav-link" href="{{ url_for('exploreproduct') }}">Explore Products</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">Grab Deals</a>
@@ -86,14 +86,14 @@
 
  <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-      <li class="breadcrumb-item"><a href="ExploreP.html">Explore Products</a></li>
-      <li class="breadcrumb-item"><a href="forex.html">Forex</a></li>
-      <li class="breadcrumb-item"><a href="currency-exchange.html"> Foregin Currency Exchange</a></li>
-      <li class="breadcrumb-item"><a href="currency-exchange-form.html"> Apply for Foregin Currency Exchange</a></li>
-      
-      
-
+      <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('forex') }}">Forex</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('currency_exchange') }}"> Foregin Currency Exchange</a></li>
+     <li class="breadcrumb-item"><a href="{{ url_for('currency_exchange_form') }}"> Foregin Currency Exchange Form</a></li>
+     
+     
+ 
     </ol>
   </nav>
   <div class="container d-flex justify-content-center">

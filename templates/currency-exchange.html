@@ -10,11 +10,11 @@
       background-color: #f8f9fa;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-
+ 
     .main-container {
       padding: 40px 15px;
     }
-
+ 
     .section-title {
       color: #97144D;
       text-align: center;
@@ -22,7 +22,7 @@
       font-size: 2rem;
       font-weight: 600;
     }
-
+ 
     .intro-card {
       background-color: #ffffff;
       padding: 30px;
@@ -32,7 +32,7 @@
       margin: 0 auto 40px auto;
       text-align: center;
     }
-
+ 
     .intro-card img {
       max-width: 100%;
       max-height: 240px;
@@ -40,13 +40,13 @@
       margin-bottom: 20px;
       object-fit: cover;
     }
-
+ 
     .intro-card p {
       font-size: 1.1rem;
       color: #444;
       line-height: 1.6;
     }
-
+ 
     .btn-apply {
       background-color: #97144D;
       color: white;
@@ -57,18 +57,18 @@
       transition: 0.3s ease;
       margin-top: 20px;
     }
-
+ 
     .btn-apply:hover {
       background-color: #7a103c;
     }
-
+ 
     .card-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
       gap: 20px;
       margin-top: 20px;
     }
-
+ 
     .info-card {
       background-color: white;
       border-radius: 12px;
@@ -76,23 +76,23 @@
       box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
       transition: transform 0.3s ease;
     }
-
+ 
     .info-card:hover {
       transform: translateY(-5px);
     }
-
+ 
     .info-card h5 {
       color: #97144D;
       margin-bottom: 10px;
       font-size: 1.2rem;
     }
-
+ 
     .info-card p {
       font-size: 0.95rem;
       color: #555;
       line-height: 1.5;
     }
-
+ 
     .final-apply {
       text-align: center;
       margin-top: 40px;
@@ -103,17 +103,17 @@
 <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-dark"> -->
   <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important;">
     <div class="container-fluid">
-      <img src="axislogo1.png" alt="Axis Bank" height="60" class="my-2">
-
+      <img src="{{ url_for('static', filename='images/axislogo1.png') }}" alt="Axis Bank" height="60" class="my-2">
+ 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <!-- <div class="container-fluid justify-content-center"></div> -->
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
+ 
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+            <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="ExploreP.html">Explore Products</a>
+            <a class="nav-link" href="{{ url_for('exploreproduct') }}">Explore Products</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">Grab Deals</a>
@@ -124,101 +124,103 @@
           <li class="nav-item">
             <a class="nav-link" href="#">Bank Smart</a>
           </li>
-
+ 
         </ul>
         <form class="d-flex">
           <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
           <button class="btn btn-outline-success" type="submit">Search</button>
-
+ 
         </form>
       </div>
     </div>
   </nav>
-
+ 
   <div class="card mt-4 border-0"></div>
   <div class="card mt-4 border-0"></div>
-
+ 
   <style>
     .breadcrumb .breadcrumb-item a {
       color: #97144D;
       text-decoration: none;
     }
-
+ 
     .breadcrumb .breadcrumb-item a:hover {
       text-decoration: underline;
     }
-
+ 
     .breadcrumb .breadcrumb-item {
       color: #97144D;
     }
   </style>
-
+ 
  <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-      <li class="breadcrumb-item"><a href="ExploreP.html">Explore Products</a></li>
-      <li class="breadcrumb-item"><a href="forex.html">Forex</a></li>
-      <li class="breadcrumb-item"><a href="currency-exchange.html"> Foregin Currency Exchange</a></li>
-      
-      
-
+      <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('forex') }}">Forex</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('currency_exchange') }}"> Foregin Currency Exchange</a></li>
+     
+     
+ 
     </ol>
   </nav>
   <div class="main-container">
     <h1 class="section-title">Foreign Currency Exchange</h1>
-
+ 
     <div class="intro-card">
-      <img src="currency-exchange.webp" alt="Currency Exchange">
+      <img src="{{ url_for('static', filename='images/currency-exchange.webp') }}" alt="Currency Exchange">
       <p>Exchange your foreign currency at the best rates. Quick, secure, and hassle-free service for all your travel and business needs.</p>
       <!-- <a href="currency-exchange-form.html" class="btn btn-apply">Apply Now</a> -->
     </div>
-
+ 
     <div class="container">
       <div class="card-grid">
-
+ 
         <div class="info-card">
           <h5>Currency Conversion</h5>
           <p>The core of forex is converting one country's currency into another for trade, travel, or investment.</p>
         </div>
-
+ 
         <div class="info-card">
           <h5>Exchange Rate</h5>
           <p>The exchange rate reflects the value of one currency against another, influenced by supply and demand in global markets.</p>
         </div>
-
+ 
         <div class="info-card">
           <h5>Global Market</h5>
           <p>Forex is a 24/7 decentralized market where currencies are traded internationally by banks, institutions, and individuals.</p>
         </div>
-
+ 
         <div class="info-card">
           <h5>International Trade</h5>
           <p>Businesses rely on currency exchange to pay for international goods and services, ensuring smooth global trade.</p>
         </div>
-
+ 
         <div class="info-card">
           <h5>International Investment</h5>
           <p>Investors convert currency to buy foreign assets, diversify portfolios, and access new markets.</p>
         </div>
-
+ 
         <div class="info-card">
           <h5>Travel Convenience</h5>
           <p>Travelers need to exchange currency to spend abroad. We ensure fast, fair, and transparent conversions.</p>
         </div>
-
+ 
         <div class="info-card">
           <h5>Speculation</h5>
           <p>Traders participate in forex markets to profit from currency fluctuations driven by news, politics, and economics.</p>
         </div>
-
+ 
       </div>
-
+ 
       <!-- Final Apply Now button -->
       <div class="final-apply">
-        <a href="currency-exchange-form.html" class="btn btn-apply">Apply Now</a>
+        <a href="{{url_for('currency_exchange_form')}}" class="btn btn-apply">Apply Now</a>
       </div>
     </div>
   </div>
-
+ 
 </body>
 </html>
+ 
+ 

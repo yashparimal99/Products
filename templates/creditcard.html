@@ -24,10 +24,10 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="ExploreP.html">Explore Products</a>
+                        <a class="nav-link" href="{{ url_for('exploreproduct') }}">Explore Products</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Grab Deals</a>
@@ -68,10 +68,10 @@
 
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-            <li class="breadcrumb-item"><a href="ExploreP.html">Explore Products</a></li>
-            <li class="breadcrumb-item"><a href="cards.html">Cards</a></li>
-            <li class="breadcrumb-item"><a href="creditcard.html"> Credit Card</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('cards') }}">Cards</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('creditcard') }}"> Credit Card</a></li>
 
         </ol>
     </nav>

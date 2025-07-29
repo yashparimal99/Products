@@ -14,42 +14,49 @@
 </head>
 
 <body>
-    <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-dark"> -->
+    <style>
+        /* Custom outline style with white border and text*/
+.btn-outline-custom {
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+  background-color: transparent !important;
+}
+
+/* Remove hover, focus, and active changes */
+.btn-outline-custom:hover,
+.btn-outline-custom:focus,
+.btn-outline-custom:active {
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+    </style>
+    
+
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important;">
         <div class="container-fluid">
-            <img src="{{ url_for('static', filename='images/axislogo2.png') }}" alt="Axis Bank" height="60" class="my-2">
-            <!-- "{{ url_for('static', filename='images/your_image.png') }}"
-            "templates/axislogo1.png" -->
-
+            <img src="{{ url_for('static', filename='images/axislogo2.png') }}" alt="Axis Bank" height="60"
+                class="my-2">
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <!-- <div class="container-fluid justify-content-center"></div> -->
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+                    <li class="nav-item"><a class="nav-link active" href="{{ url_for('home') }}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('exploreproduct') }}">Explore Products</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="ExploreP.html">Explore Products</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Grab Deals</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Make Payments</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Bank Smart</a>
-                    </li>
-
+                    <li class="nav-item"><a class="nav-link" href="#">Grab Deals</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Make Payments</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Bank Smart</a></li>
                 </ul>
                 <form class="d-flex">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-
+                    <!-- <button class="btn btn-outline-custom btn-sm me-4" type="submit">Login</button> -->
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-custom btn-sm me-4" role="button">Login</a>
+                    <!-- <button class="btn btn-outline-custom btn-sm" type="submit">Signup</button> -->
+                    <a href="{{ url_for('signup') }}" class="btn btn-outline-custom btn-sm me-4" role="button">Signup</a>
                 </form>
             </div>
         </div>
     </nav>
+
 
     <style>
         .breadcrumb .breadcrumb-item a {
@@ -68,7 +75,7 @@
     <div class="card mt-4 border-0"></div>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
 
         </ol>
     </nav>
@@ -96,20 +103,22 @@
             border-radius: 0.5rem;
             width: 32rem;
             height: 18rem;
-        
+
             /* rounded */
-            transition: background-color 0.3s, color 0.3s;}
-            /* }}
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* }}
 
         .custom-card:hover {
             background-color: #97144D;
             color: white;
         } */
 
-            .custom-card:hover .card-title,
-            .custom-card:hover .card-text {
-                color: white;
-            }
+        .custom-card:hover .card-title,
+        .custom-card:hover .card-text {
+            color: white;
+        }
     </style>
     <div class="card mt-3 border-0">
         <div class="card-body text-center" style="margin-left: 0.5in;">

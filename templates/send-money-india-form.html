@@ -91,13 +91,17 @@
   </style>
 
  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-      <li class="breadcrumb-item"><a href="ExploreP.html">Explore Products</a></li>
-      <li class="breadcrumb-item"><a href="forex.html">Forex</a></li>
-      <li class="breadcrumb-item"><a href="send-money-india.html">Send Money India</a></li>
-      <li class="breadcrumb-item"><a href="send-money-india-form.html">Apply Card to send Money in India</a></li>
-      
+    
+      <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('forex') }}">Forex</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('send_money_india') }}">Send Money India</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('send_money_india_form') }}">Send Money India</a></li>
+     
+ 
+    </ol>
+
 
     </ol>
   </nav>

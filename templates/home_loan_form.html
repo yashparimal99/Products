@@ -24,10 +24,10 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="ExploreP.html">Explore Products</a>
+                        <a class="nav-link" href="{{ url_for('exploreproduct') }}">Explore Products</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Grab Deals</a>
@@ -48,6 +48,33 @@
             </div>
         </div>
     </nav>
+    <div class="card mt-4 border-0"></div>
+  <div class="card mt-4 border-0"></div>
+
+  <style>
+    .breadcrumb .breadcrumb-item a {
+      color: #97144D;
+      text-decoration: none;
+    }
+
+    .breadcrumb .breadcrumb-item a:hover {
+      text-decoration: underline;
+    }
+
+    .breadcrumb .breadcrumb-item {
+      color: #97144D;
+    }
+  </style>
+
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('loans') }}">Loans</a></li>
+       <li class="breadcrumb-item"><a href="{{ url_for('homeloanform') }}">Apply</a></li>
+
+    </ol>
+  </nav>
 
     <img src="ss2.png" class="img-fluid mt-4" alt="...">
 <!DOCTYPE html>

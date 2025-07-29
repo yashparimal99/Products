@@ -24,10 +24,10 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="ExploreP.html">Explore Products</a>
+                        <a class="nav-link" href="{{ url_for('exploreproduct') }}">Explore Products</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Grab Deals</a>
@@ -67,8 +67,8 @@
     <div class="card mt-4 border-0"></div>
     <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-    <li class="breadcrumb-item"><a href="ExploreP.html">Explore Products</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
    
   </ol>
 </nav>
@@ -101,7 +101,7 @@
                         <div class="card-body">
                             <h5 class="card-title">Accounts</h5>
                             <p class="card-text">Card content goes here.</p>
-                            <a href="Accounts.html" class="btn custom-btn">Know More..</a>
+                            <a href="{{ url_for('Accounts') }}" class="btn custom-btn">Know More..</a>
                         </div>
                     </div>
                 </div>
@@ -113,7 +113,7 @@
                         <div class="card-body">
                             <h5 class="card-title">Deposits</h5>
                             <p class="card-text">Card content goes here.</p>
-                            <a href="deposits.html" class="btn custom-btn">Know More..</a>
+                            <a href="{{ url_for('deposits') }}" class="btn custom-btn">Know More..</a>
                         </div>
                     </div>
                 </div>
@@ -125,7 +125,7 @@
                         <div class="card-body">
                             <h5 class="card-title">Cards</h5>
                             <p class="card-text">Card content goes here.</p>
-                            <a href="cards.html" class="btn custom-btn">Know More..</a>
+                            <a href="{{ url_for('cards') }}" class="btn custom-btn">Know More..</a>
                         </div>
                     </div>
                 </div>
@@ -137,7 +137,7 @@
                         <div class="card-body">
                             <h5 class="card-title">Loans</h5>
                             <p class="card-text">Card content goes here.</p>
-                            <a href="loans.html" class="btn custom-btn">Know More..</a>
+                            <a href="{{ url_for('loans') }}" class="btn custom-btn">Know More..</a>
                         </div>
                     </div>
                 </div>
@@ -149,7 +149,7 @@
                         <div class="card-body">
                             <h5 class="card-title">Forex</h5>
                             <p class="card-text">Card content goes here.</p>
-                            <a href="forex.html" class="btn custom-btn">Know More..</a>
+                            <a href="{{ url_for('forex') }}" class="btn custom-btn">Know More..</a>
                         </div>
                     </div>
                 </div>
@@ -161,7 +161,7 @@
                         <div class="card-body">
                             <h5 class="card-title">Investments</h5>
                             <p class="card-text">Card content goes here.</p>
-                            <a href="invest.html" class="btn custom-btn">Know More..</a>
+                            <a href= "{{ url_for('invest') }} " class="btn custom-btn">Know More..</a>
                         </div>
                     </div>
                 </div>

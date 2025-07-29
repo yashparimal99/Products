@@ -23,10 +23,10 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="ExploreP.html">Explore Products</a>
+                        <a class="nav-link" href="{{ url_for('exploreproduct') }}">Explore Products</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Grab Deals</a>
@@ -68,9 +68,9 @@
 
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-    <li class="breadcrumb-item"><a href="ExploreP.html">Explore Products</a></li>
-    <li class="breadcrumb-item"><a href="invest.html">Investments</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('invest') }}">Investments</a></li>
    
   </ol>
 </nav>
@@ -192,7 +192,7 @@
             <!-- <a href="#" style="color: #97144D;">Know More</a> -->
           </p>
           <!-- <a href="pfinvest.html"  class="btn" style="background-color: #97144D; color: white; border-radius: 6px; padding: 5px 14px; font-size: 12px;">Invest Now</button> -->
-          <a href="pfinvest.html" class="btn" style="background-color: #97144D; color: white;">Invest Now</a>
+          <a href="{{ url_for('pfinvest') }}" class="btn" style="background-color: #97144D; color: white;">Invest Now</a>
         </div>
       </div>
     </div>
@@ -207,7 +207,7 @@
             Issued by the RBI, these are safe and offer guaranteed returns. Interest is paid semi-annually.
             <!-- <a href="#" style="color: #97144D;">Know More</a> -->
           </p>
-          <a href="pfinvest.html" class="btn" style="background-color: #97144D; color: white;">Invest Now</a>
+          <a href="{{ url_for('pfinvest') }}" class="btn" style="background-color: #97144D; color: white;">Invest Now</a>
         </div>
       </div>
     </div>
@@ -222,7 +222,7 @@
             Ideal for retirement planning. Secure your income post retirement. Offers tax benefits.
             <!-- <a href="#" style="color: #97144D;">Know More</a> -->
           </p>
-          <a href="pfinvest.html" class="btn" style="background-color: #97144D; color: white;">Invest Now</a>
+          <a href="{{ url_for('pfinvest') }}" class="btn" style="background-color: #97144D; color: white;">Invest Now</a>
         </div>
       </div>
     </div>

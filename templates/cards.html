@@ -24,10 +24,10 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="ExploreP.html">Explore Products</a>
+                        <a class="nav-link" href="{{ url_for('exploreproduct') }}">Explore Products</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Grab Deals</a>
@@ -70,9 +70,9 @@
 
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-            <li class="breadcrumb-item"><a href="ExploreP.html">Explore Products</a></li>
-            <li class="breadcrumb-item"><a href="cards.html">Cards</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('cards') }}">Cards</a></li>
 
         </ol>
     </nav>
@@ -90,7 +90,7 @@
                         <h5 class="card-title" style="color: #97144D;">Credit Cards</h5>
                         <p class="card-text">Credit cards can be a great choice for managing your finances smartly,
                             offering benefits for mindful spending and timely repayment.</p>
-                        <a href="creditcard.html" class="btn btn-sm text-white"
+                        <a href="{{ url_for('creditcard') }}" class="btn btn-sm text-white"
                             style="background-color: #97144D;">Explore more</a>
                     </div>
                 </div>
@@ -103,7 +103,7 @@
                         <h5 class="card-title" style="color: #97144D;">Debit Cards</h5>
                         <p class="card-text">As society moves away from cash, debit cards become essential, eliminating
                             the need to carry cash while offering security and convenience.</p>
-                        <a href="Debitcard.html" class="btn btn-sm text-white"
+                        <a href="{{ url_for('Debitcard') }}" class="btn btn-sm text-white"
                             style="background-color: #97144D;">Explore more</a>
                     </div>
                 </div>
@@ -117,7 +117,7 @@
                         <p class="card-text">Explore a convenient way of gifting, rewarding, and motivating with our
                             range of pre-paid cards.</p>
                             
-                        <a href="prepaid.html" class="btn btn-sm text-white" style="background-color: #97144D;">Explore
+                        <a href="{{ url_for('prepaid') }}" class="btn btn-sm text-white" style="background-color: #97144D;">Explore
                             more</a>
                     </div>
                 </div>

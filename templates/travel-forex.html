@@ -10,7 +10,7 @@
       background-color: #f0f2f5;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-
+ 
     .main-container {
       display: flex;
       justify-content: center;
@@ -18,7 +18,7 @@
       padding: 40px 20px;
       min-height: 100vh;
     }
-
+ 
     .card-custom {
       background-color: #ffffff;
       padding: 30px;
@@ -28,12 +28,12 @@
       width: 100%;
       text-align: center;
     }
-
+ 
     .card-custom h1 {
       color: #97144D;
       margin-bottom: 20px;
     }
-
+ 
     .card-image {
       max-width: 100%;
       max-height: 250px;
@@ -42,13 +42,13 @@
       margin-bottom: 20px;
       object-fit: cover;
     }
-
+ 
     .card-custom p {
       font-size: 1.1rem;
       color: #444;
       margin-bottom: 20px;
     }
-
+ 
     .section-title {
       font-weight: bold;
       color: #97144D;
@@ -56,7 +56,7 @@
       margin-bottom: 10px;
       font-size: 1.3rem;
     }
-
+ 
     .btn-apply {
       background-color: #97144D;
       color: white;
@@ -67,11 +67,11 @@
       transition: 0.3s ease;
       margin-top: 20px;
     }
-
+ 
     .btn-apply:hover {
       background-color: #7a103c;
     }
-
+ 
     .card-types {
       display: flex;
       flex-wrap: wrap;
@@ -79,7 +79,7 @@
       gap: 20px;
       margin-top: 30px;
     }
-
+ 
     .card-box {
       width: 200px;
       background-color: #fafafa;
@@ -89,38 +89,38 @@
       text-align: center;
       padding: 10px;
     }
-
+ 
     .card-box img {
       width: 100%;
       height: 120px;
       object-fit: cover;
       border-radius: 8px;
     }
-
+ 
     .card-box p {
       font-size: 0.95rem;
       margin-top: 10px;
       color: #555;
     }
-
+ 
   </style>
 </head>
 <body>
-
+ 
  <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-dark"> -->
   <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important;">
     <div class="container-fluid">
       <img src="axislogo1.png" alt="Axis Bank" height="60" class="my-2">
-
+ 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <!-- <div class="container-fluid justify-content-center"></div> -->
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
+ 
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+            <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="ExploreP.html">Explore Products</a>
+            <a class="nav-link" href="{{ url_for('exploreproduct') }}">Explore Products</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">Grab Deals</a>
@@ -131,56 +131,56 @@
           <li class="nav-item">
             <a class="nav-link" href="#">Bank Smart</a>
           </li>
-
+ 
         </ul>
         <form class="d-flex">
           <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
           <button class="btn btn-outline-success" type="submit">Search</button>
-
+ 
         </form>
       </div>
     </div>
   </nav>
-
+ 
   <div class="card mt-4 border-0"></div>
   <div class="card mt-4 border-0"></div>
-
+ 
   <style>
     .breadcrumb .breadcrumb-item a {
       color: #97144D;
       text-decoration: none;
     }
-
+ 
     .breadcrumb .breadcrumb-item a:hover {
       text-decoration: underline;
     }
-
+ 
     .breadcrumb .breadcrumb-item {
       color: #97144D;
     }
   </style>
-
+ 
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-      <li class="breadcrumb-item"><a href="ExploreP.html">Explore Products</a></li>
-      <li class="breadcrumb-item"><a href="forex.html">Forex</a></li>
-      <li class="breadcrumb-item"><a href="travel-forex.html">Travel Forex Card</a></li>
-      
-
+      <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('forex') }}">Forex</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('travel_forex') }}">Travel Forex Card</a></li>
+     
+ 
     </ol>
   </nav>
-
+ 
   <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
     <div class="carousel-inner">
       <div class="carousel-item active">
-        <img src="s1.png" class="d-block w-100" alt="...">
+        <img src="{{ url_for('static', filename='images/s1.png') }}" class="d-block w-100" alt="...">
       </div>
       <div class="carousel-item">
-        <img src="s2.png" class="d-block w-100" alt="...">
+        <img src="{{ url_for('static', filename='images/s2.png') }}" class="d-block w-100" alt="...">
       </div>
       <div class="carousel-item">
-        <img src="s3.png" class="d-block w-100" alt="...">
+        <img src="{{ url_for('static', filename='images/s3.png') }} " class="d-block w-100" alt="...">
       </div>
     </div>
     <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
@@ -192,39 +192,41 @@
       <span class="visually-hidden">Next</span>
     </button>
   </div>
-
-
+ 
+ 
 <div class="main-container">
   <div class="card-custom">
     <h1>Welcome to Travel Forex Card</h1>
-    <img src="travel-forex.jpeg" alt="Travel Forex Card" class="card-image">
+    <img src="{{ url_for('static', filename='images/travel-forex.jpeg') }}" alt="Travel Forex Card" class="card-image">
     <p>Explore the world with ease using our secure and multi-currency Travel Forex Card. Perfect for international travelers who need flexibility and reliability while managing finances abroad.</p>
-
+ 
     <p class="section-title">What it is:</p>
     <p>A Forex card is a prepaid card that you can load with foreign currency. It's designed for international travel, allowing you to make payments and withdraw cash in the local currency of your destination. You can use it for various expenses like shopping, dining, hotel bookings, and ATM withdrawals.</p>
-
+ 
     <!-- <p class="section-title">How it works:</p>
     <p>You load the card with the desired amount of foreign currency. You can then use the card to pay for goods and services or withdraw cash from ATMs abroad, just like a regular debit or credit card. The amount you spend is deducted from the balance on your card.</p> -->
-
+ 
     <p class="section-title">Types of Forex Cards:</p>
     <div class="card-types">
       <div class="card-box">
-        <img src="multi-currency-card.jpeg" alt="Multi-currency Card">
+        <img src="{{ url_for('static', filename='images/multi-currency-card.jpeg') }}" alt="Multi-currency Card">
         <p><strong>Multi-currency Card</strong><br>Ideal for travel across multiple countries. Supports multiple currencies on one card.</p>
       </div>
       <div class="card-box">
-        <img src="single-currency-card.jpeg" alt="Single-currency Card">
+        <img src="{{ url_for('static', filename='images/single-currency-card.jpeg') }}" alt="Single-currency Card">
         <p><strong>Single-currency Card</strong><br>Perfect if you’re traveling to a single country and need only one currency loaded.</p>
       </div>
       <div class="card-box">
-        <img src="student-forex-card.jpeg" alt="Student Forex Card">
+        <img src="{{ url_for('static', filename='images/student-forex-card.jpeg') }}" alt="Student Forex Card">
         <p><strong>Student Forex Card</strong><br>Specially designed for students going abroad for studies, with tailored offers and features.</p>
       </div>
     </div>
-
-    <a href="travel-forex-form.html" class="btn btn-apply">Apply Now</a>
+ 
+    <a href="{{url_for('travel_forex_form')}}" class="btn btn-apply">Apply Now</a>
   </div>
 </div>
-
+ 
 </body>
 </html>
+ 
+ 
