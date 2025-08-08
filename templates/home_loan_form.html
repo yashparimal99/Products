@@ -10,14 +10,16 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
-    <title>Axis Bank Products</title>
+    <title>DiGi Bank Products</title>
 </head>
 
 <body>
     <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-dark"> -->
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important;">
         <div class="container-fluid">
-            <img src="axislogo1.png" alt="Axis Bank" height="60" class="my-2">
+            <img src="{{ url_for('static', filename='images/Digilogo.jpg') }}" alt="DiGi Bank" height="60" class="my-2">
+            <!-- "{{ url_for('static', filename='images/your_image.png') }}"
+            "templates/Digilogo.jpg" -->
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <!-- <div class="container-fluid justify-content-center"></div> -->
@@ -48,41 +50,60 @@
             </div>
         </div>
     </nav>
-    <div class="card mt-4 border-0"></div>
-  <div class="card mt-4 border-0"></div>
 
-  <style>
-    .breadcrumb .breadcrumb-item a {
-      color: #97144D;
-      text-decoration: none;
-    }
+<!-- 🔻 Custom Breadcrumb Styling -->
+<style>
+  .custom-breadcrumb {
+    background-color: #fff;
+    border-left: 4px solid #99004D;
+    margin: 0;
+    font-weight: 500;
+  }
 
-    .breadcrumb .breadcrumb-item a:hover {
-      text-decoration: underline;
-    }
+  .custom-breadcrumb .breadcrumb-item a {
+    color: #99004D;
+    text-decoration: none;
+  }
 
-    .breadcrumb .breadcrumb-item {
-      color: #97144D;
-    }
-  </style>
+  .custom-breadcrumb .breadcrumb-item a:hover {
+    text-decoration: underline;
+  }
 
+  .custom-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+    color: #99004D;
+  }
+</style>
+<!-- 🔻 Breadcrumb Section -->
+<div class="card mt-4 border-0">
   <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
+    <ol class="breadcrumb px-3 py-2 custom-breadcrumb">
       <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
       <li class="breadcrumb-item"><a href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
       <li class="breadcrumb-item"><a href="{{ url_for('loans') }}">Loans</a></li>
-       <li class="breadcrumb-item"><a href="{{ url_for('homeloanform') }}">Apply</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('home_loan') }}">Home Loan</a></li>
+    </ol> 
+  </nav>
+</div>
 
-    </ol>
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important;">
+    <!-- your nav content -->
   </nav>
 
-    <img src="ss2.png" class="img-fluid mt-4" alt="...">
+  <!-- ✅ Full-width Ad Banner After Navbar -->
+<div class="container-fluid p-0">
+  <img src="{{ url_for('static', filename='Loan/HomeLoan.jpg') }}"
+       class="img-fluid w-100"
+       style="height: 700px; object-fit: cover;"
+       alt="Advertising Banner">
+</div>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Home Loan Application - DANNY Bank</title>
+  <title>Home Loan Application</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
@@ -130,7 +151,9 @@
       text-decoration: underline;
       margin-left: 10px;
     }
+    
   </style>
+  
 </head>
 <body>
   <div class="container">
@@ -138,7 +161,7 @@
     <div class="row">
       <!-- Left section with image and eligibility -->
       <div class="col-md-6">
-        <img src="home_loan.jpg" alt="Home Loan" class="img-fluid mb-3 rounded">
+        <img src="{{ url_for('static', filename='Loan/home.jpg') }}" alt="Home Loan" class="img-fluid mb-3 rounded">
         <h5>Eligibility criteria</h5>
         <ul>
           <li>Age (21-60) for Salaried and (21-65) for Self Employed</li>
@@ -162,7 +185,7 @@
         </div>
         <div class="form-check mt-2 mb-3">
           <input type="checkbox" class="form-check-input" id="consentCheck">
-          <label class="form-check-label" for="consentCheck">I authorize Danny Bank to contact me.</label>
+          <label class="form-check-label" for="consentCheck">I authorize Digi Bank to contact me.</label>
         </div>
         <button class="btn btn-submit w-100">Submit</button>
       </div>

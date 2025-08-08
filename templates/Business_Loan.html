@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Axis Bank Products</title>
+  <title>DiGi Bank Products</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
   <style>
@@ -68,15 +68,17 @@
 </head>
 
 <body>
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important;">
-    <div class="container-fluid">
-      <img src="axislogo1.png" alt="Axis Bank" height="60" class="my-2">
+    <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-dark"> -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important;">
+        <div class="container-fluid">
+            <img src="{{ url_for('static', filename='images/Digilogo.jpg') }}" alt="DiGi Bank" height="60" class="my-2">
+            <!-- "{{ url_for('static', filename='images/your_image.png') }}"
+            "templates/Digilogo.jpg" -->
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item"><a class="nav-link active" href="index.html">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="ExploreP.html">Explore Products</a></li>
+          <li class="nav-item"><a class="nav-link active" href="{{ url_for('home') }}">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
           <li class="nav-item"><a class="nav-link" href="#">Grab Deals</a></li>
           <li class="nav-item"><a class="nav-link" href="#">Make Payments</a></li>
           <li class="nav-item"><a class="nav-link" href="#">Bank Smart</a></li>
@@ -89,8 +91,70 @@
     </div>
   </nav>
 
+<!-- 🔻 Custom Breadcrumb Styling -->
+<style>
+  .custom-breadcrumb {
+    background-color: #fff;
+    border-left: 4px solid #99004D;
+    margin: 0;
+    font-weight: 500;
+  }
+
+  .custom-breadcrumb .breadcrumb-item a {
+    color: #99004D;
+    text-decoration: none;
+  }
+
+  .custom-breadcrumb .breadcrumb-item a:hover {
+    text-decoration: underline;
+  }
+
+  .custom-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+    color: #99004D;
+  }
+  .btn-apply {
+    background-color: #a40061; /* Magenta */
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 30px; /* Fully rounded look */
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    width: 100%; /* Full width like your image */
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-apply:hover {
+    background-color: #8a0053; /* Darker shade on hover */
+  }
+
+</style>
+<!-- 🔻 Breadcrumb Section -->
+<div class="card mt-4 border-0">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb px-3 py-2 custom-breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('loans') }}">Loans</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('Business_loan') }}">Business_loan</a></li>
+    </ol> 
+  </nav>
+</div>
   <!-- Hero Image -->
-  <img src="ss2.png" class="img-fluid mt-4" alt="...">
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important;">
+    <!-- your nav content -->
+  </nav>
+
+  <!-- ✅ Full-width Ad Banner After Navbar -->
+<div class="container-fluid p-0">
+  <img src="{{ url_for('static', filename='Loan/82525832_9957966.jpg') }}"
+       class="img-fluid w-100"
+       style="height: 600px; object-fit: cover;"
+       alt="Advertising Banner">
+</div>
 
   <!-- Loan Application Section -->
   <div class="container-fluid py-4">
@@ -103,7 +167,7 @@
           </div>
         </div>
 
-        <h4 class="fw-bold">Welcome to Axis Bank</h4>
+        <h4 class="fw-bold">Welcome to DiGi Bank</h4>
         <h5 class="fw-bold mb-5">24x7 Business Loans</h5>
 
         <div class="d-flex align-items-center mb-4">
@@ -167,16 +231,18 @@
               <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#termsAccordion">
                 <div class="accordion-body">
                 <ul>
-                <li>en: I hereby give my consent to and authorise Axis Bank Ltd. ("Bank") to fetch my personal details from UIDAI...</li>
-                <li>hi: मैं यहां अपनी सहमति देता/देती हूं और एक्सिस बैंक लिमिटेड (अर्थात "बैंक") को यूआईडीएआई से मेरी जन कारी जानकारी प्राप्त करने के लिए अधिकृत करता/करती हूं...</li>
-                <li>mr: मी माझी संमती देतो/देते व अ॥क्सिस बँक लिमिटेड (" बँक") ला यूआईडीएआईकडून माझी वैयक्तिक माहिती घेण्यासाठी घेण्यासाठीसाठी घेण्यासाठी...</li>
-                <li>ta: நான் என் ஒப்புதலை வ଴ங்கிறேன் மட்டும் அக்ஸிஸ் ப்பைங்க் லிமிடெட் (பான்பு வாங்கி) என் தனிப்பத்த விவரங்களை UIDAI இலிந்து பெறுக்க...</li>
-                <li>te: నేను నా అంగీకారం ఇచ్ఛిత్తున్నాని మరియు వ్యక్తిగత వివరాలన్ని UIDAI నుండి పొందించటటంనకు అనుమతిస్థిస్థున్నాని...</li>
-                <li>gu: રજૂ કરેલી સહમતિ આપે છે અને Axis Bank Ltd. ("બેંક") ને UIDAI પાસેથી મારી વ્યક્તિગત વિગતો મેળવવા માટે અધિકૃત કરે છે...</li>
-                <li>bn: আমি সম্মতি দিচ্ছি এবং এক্সিস ব্যাংক লিমিটেড (অর্থাতো "ব্যাংক") কে UIDAI থেকে আমার ব্যক্তিগত তথ্য তালিকা নেওয়ার জ্ন্য আবেদন করার...</li>
-                <li>kn: ನಾನು ನನ್ನ ಒಪ್ಪಿಗೆ ನೀಡಿಸುತ್ತೆನ್ನಿ ಮತ್ತು ಆಕ್ಸಿಸ್ ಬ್ಯಾಂಕ್ ಲಿಮಿಟೆಡ್ (ಬ್ಯಾಂಕ್) ಗೆ UIDAI ನಿಂದ ನನ್ನ ಬ್ಯಕ್ತಿಗತ ವಿವರಗಳ್ನು ಪಡೆಯುವಾಗಿಗೆ ಅನುಮತಿ...</li>
-                <li>ml: ഞാന് എന്റെ സമ്മതി നല്കുന്നുന്നും, അക്സിസ് ബാങ്ക് ലിമിടെഡ് (ബാങ്ക്) എന്റെ UIDAI ല്നിന്നുന്നും എന്നെട്ടി വ്യക്തിഗത വിവരങ്ങളും നാല്കു</li>
+                <li>en: I hereby give my consent to and authorise DiGi Bank Ltd. ("Bank") to fetch my personal details from UIDAI.</li>
+                <li>hi: मैं यहां अपनी सहमति देता/देती हूं और DiGi Bank Ltd. ("बैंक") को UIDAI से मेरी व्यक्तिगत जानकारी प्राप्त करने के लिए अधिकृत करता/करती हूं।</li>
+                <li>mr: मी माझी संमती देतो/देते व DiGi Bank Ltd. ("बँक") ला UIDAI कडून माझी वैयक्तिक माहिती प्राप्त करण्याची परवानगी देतो/देते.</li>
+                <li>ta: நான் என் ஒப்புதலை அளிக்கிறேன் மற்றும் DiGi Bank Ltd. ("வங்கி") என் தனிப்பட்ட விவரங்களை UIDAI இலிருந்து பெற அனுமதிக்கிறேன்.</li>
+                <li>te: నేను నా అంగీకారాన్ని ఇస్తున్నాను మరియు DiGi Bank Ltd. ("బ్యాంక్") ను UIDAI నుండి నా వ్యక్తిగత వివరాలను తీసుకునేందుకు అనుమతిస్తున్నాను.</li>
+                <li>gu: હું મારી સંમતિ આપું છું અને DiGi Bank Ltd. ("બેંક") ને UIDAI પાસેથી મારી વ્યક્તિગત વિગતો મેળવવા માટે અધિકૃત કરું છું.</li>
+                <li>bn: আমি আমার সম্মতি দিচ্ছি এবং DiGi Bank Ltd. ("ব্যাংক") কে UIDAI থেকে আমার ব্যক্তিগত তথ্য সংগ্রহ করার অনুমতি দিচ্ছি।</li>
+                <li>kn: ನಾನು ನನ್ನ ಒಪ್ಪಿಗೆ ನೀಡುತ್ತೇನೆ ಮತ್ತು DiGi Bank Ltd. ("ಬ್ಯಾಂಕ್") ಗೆ UIDAI ಯಿಂದ ನನ್ನ ವೈಯಕ್ತಿಕ ಮಾಹಿತಿಯನ್ನು ಸಂಗ್ರಹಿಸಲು ಅಧಿಕೃತಗೊಳಿಸುತ್ತೇನೆ.</li>
+                <li>ml: ഞാൻ എന്റെ സമ്മതം നൽകുന്നു കൂടാതെ DiGi Bank Ltd. ("ബാങ്ക്") എന്നത് UIDAIൽ നിന്ന് എന്റെ വ്യക്തിഗത വിവരങ്ങൾ സ്വീകരിക്കാൻ അനുവദിക്കുന്നു.</li>
+                <li>pa: ਮੈਂ ਆਪਣੀ ਸਹਿਮਤੀ ਦਿੰਦਾ/ਦਿੰਦੀ ਹਾਂ ਅਤੇ DiGi Bank Ltd. ("ਬੈਂਕ") ਨੂੰ UIDAI ਤੋਂ ਮੇਰੀ ਨਿੱਜੀ ਜਾਣਕਾਰੀ ਲੈਣ ਦੀ ਆਗਿਆ ਦਿੰਦਾ/ਦਿੰਦੀ ਹਾਂ।</li>
                 </ul>
+
                   <div class="form-check mt-3">
                     <input class="form-check-input" type="checkbox" id="termsCheck">
                     <label class="form-check-label" for="termsCheck">
@@ -190,9 +256,7 @@
 
           <!-- Proceed Button -->
           <div class="text-center mt-4">
-            <button class="btn btn-maroon text-white" style="background-color: #891145;" id="proceedBtn" disabled>
-              Proceed
-            </button>
+          <button class="btn-apply">Submit</button>
           </div>
         </div>
       </div>

@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, flash,session
 import MySQLdb
+import MySQLdb.cursors
 from flask_mysqldb import MySQL
-
+from collections import defaultdict
+from model import *
 
 app = Flask(__name__)
 app.secret_key = 'a3f5ea2691a8e93c05f4e90e1b8ff123'
@@ -13,12 +15,16 @@ app.config['MYSQL_DB'] = 'banking_products'
 
 
 
-mysql = MySQL(app)
 
+
+mysql = MySQL(app)
+# mysql.init_app(app)
 
 @app.route('/')
 def home():
     return render_template('index.html')
+
+
 
 @app.route('/exploreproduct')
 def exploreproduct():
@@ -54,6 +60,77 @@ def pension():
 def pmjdy():
     return render_template('pmjdy.html')
 
+#view user balance
+
+# @app.route('/viewaccounts')
+# def viewaccounts():
+#     email = session.get('user_email')
+#     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)  # Use DictCursor to access columns by name
+#     cur.execute("SELECT cust_id, name, pan, email, mobile_no FROM users WHERE email = %s", (email,))
+#     user = cur.fetchone()
+#     cur.execute("SELECT * FROM bank_accounts WHERE cust_id = %s", (user['cust_id'],))
+#     account = cur.fetchall()
+#     cur.close()
+
+#     return render_template('viewaccounts.html', account=account,user=user)
+
+@app.route('/viewaccounts')
+def viewaccounts():
+    email = session.get('user_email')
+    if not email:
+        flash('Please login first.', 'danger')
+        return redirect(url_for('login'))
+
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    # Get user details
+    cur.execute("SELECT cust_id, name, pan, email, mobile_no FROM users WHERE email = %s", (email,))
+    user = cur.fetchone()
+    grouped_accounts = defaultdict(list)
+
+    if user:
+        # Get all bank accounts for this user
+        cur.execute("SELECT * FROM bank_accounts WHERE cust_id = %s", (user['cust_id'],))
+        accounts = cur.fetchall()
+        for acc in accounts:
+            grouped_accounts[acc['account_type']].append(acc)
+    else:
+        accounts = []
+
+    cur.close()
+
+    return render_template('viewaccounts.html', accounts=accounts, user=user)
+
+
+
+
+
+
+
+@app.route('/viewdeposits')
+def viewdeposits():
+    email = session.get('user_email')
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)  # Use DictCursor to access columns by name
+    cur.execute("SELECT cust_id, name, pan, email, mobile_no FROM users WHERE email = %s", (email,))
+    user = cur.fetchone()
+    grouped_deposits = defaultdict(list)
+
+    if user:
+         cur.execute("SELECT * FROM bank_deposits WHERE cust_id = %s", (user['cust_id'],))
+         deposits = cur.fetchall()
+         for acc in deposits:
+            grouped_deposits[acc['account_type']].append(acc)
+    else:
+        grouped_deposits = []
+        
+    cur.close()
+
+   
+ 
+    return render_template('viewdeposits.html', grouped_deposits=grouped_deposits,user=user)
+
+
+
 #Deposits
 
 @app.route('/deposits')
@@ -77,6 +154,12 @@ def cards():
 @app.route('/creditcard')
 def creditcard():
     return render_template('creditcard.html')
+@app.route('/cardapply')
+def cardapply():
+    return render_template('cardapply.html')
+@app.route('/comparecards')
+def comparecards():
+    return render_template('comparecards.html')
 
 @app.route('/Debitcard')
 def Debitcard():
@@ -86,28 +169,24 @@ def Debitcard():
 def prepaid():
     return render_template('prepaid.html')
 
+
 #loans
 
 @app.route('/loans')
 def loans():
     return render_template('loans.html')
 
-@app.route('/loanscards')
-def loanscards():
-    return render_template('loan-cards.html')
-
-@app.route('/homeloanform')
-def homeloanform():
+@app.route('/home_loan')
+def home_loan():
     return render_template('home_loan_form.html')
-
-@app.route('/loanpersonal')
-def loanpersonal():
+ 
+@app.route('/personal_loan')
+def personal_loan():
     return render_template('Loan_personal.html')
-
-@app.route('/business_loans')
-def business_loans():
+ 
+@app.route('/Business_loan')
+def Business_loan():
     return render_template('Business_Loan.html')
-
 
 #forex
 
@@ -179,44 +258,144 @@ def login():
     return render_template('login.html')
 
 
+@app.route('/userlogin')
+def userlogin():
+    return render_template('login.html')
 
 
 
-# @app.route('/signup', methods=['GET', 'POST'])
-# def signup():
-#     if request.method == 'POST':
-#         name = request.form['fname']
-#         email = request.form['email']
-#         mobileno = request.form['mn']
-#         password = request.form['password']
 
-#         cur = mysql.connection.cursor()
-
-#         # Check if email or mobile already exists
-#         cur.execute("SELECT * FROM users WHERE email = %s OR mobileno = %s", (email, mobileno))
-#         if cur.fetchone():
-#             flash('Email or mobile number already registered', 'danger')
-#         else:
-#             cur.execute(
-#                 "INSERT INTO users (name, email, mobileno, password) VALUES (%s, %s, %s, %s)",
-#                 (name, email, mobileno, password)
-#             )
-#             mysql.connection.commit()
-#             cur.close()
-            
-#             flash('Account created! Please log in.', 'success')
-#             return redirect(url_for('login'))
-
-#         cur.close()
-
-#     return render_template('signup.html')
 
 import random
 import string
 
+
+
+
+
 def generate_cust_id():
-    """Generate a random 8-character alphanumeric customer ID."""
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+    """
+    Generate a unique customer ID:
+      - Always starts with 'DB'
+      - Followed by 6 random digits
+    """
+    prefix = "DB"
+    suffix = ''.join(random.choice(string.digits) for _ in range(6))
+    return prefix + suffix
+
+
+import random
+
+def generate_unique_account_no(account_type):
+    """
+    Generate a unique deposit account number:
+    - Starts with 'DIGIS' if account_type is 'saving'
+    - Starts with 'DIGIC' if account_type is 'current'
+    """
+    prefix_map = {
+        'saving': 'DIGIS',
+        'current': 'DIGIC',
+        'pension' :'DIGIP',
+        'salary' : 'DIGISL',
+        'safec' : 'DIGISC',
+        'penAcc': 'DIGIP',
+        'pmjdy' : 'DGIPM'
+    }
+
+    prefix = prefix_map.get(account_type.lower())
+    if not prefix:
+        raise ValueError("account_type must be 'saving' or 'current'")
+
+    cur = mysql.connection.cursor()
+    while True:
+        suffix = f"{random.randint(0, 9999999999):010d}"
+        account_number = prefix + suffix
+        cur.execute("SELECT * FROM bank_accounts WHERE account_number = %s", (account_number,))
+        if not cur.fetchone():
+            break
+
+    return account_number
+
+def generate_deposit_account_no(account_type):
+    """
+    Generate a unique deposit account number:
+    - Starts with 'DIGIS' if account_type is 'saving'
+    - Starts with 'DIGIC' if account_type is 'current'
+    """
+    prefix_map = {
+        'digital fixed': 'DIGIDFD',
+        'fixed': 'DIGIFD',
+        'recurring' :'DIGIRD'
+        
+    }
+
+    prefix = prefix_map.get(account_type.lower())
+    if not prefix:
+        raise ValueError("account_type must be 'saving' or 'current'")
+
+    cur = mysql.connection.cursor()
+    while True:
+        suffix = f"{random.randint(0, 9999999999):010d}"
+        account_number = prefix + suffix
+        cur.execute("SELECT * FROM bank_deposits WHERE account_number = %s", (account_number,))
+        if not cur.fetchone():
+            break
+
+    return account_number
+
+def generate_card_number(card_subtype):
+    """
+    Generate a unique card number:
+    - Starts with 'DGVISA' for Visa cards
+    - Starts with 'DGMC' for MasterCard
+    - Starts with 'DGUPI' for UPI-linked cards
+    """
+    prefix_map = {
+        'visa': 'DGVI',
+        'mastercard': 'DGMC',
+        'rupay': 'DGRP'
+    }
+
+    prefix = prefix_map.get(card_subtype.lower())
+    if not prefix:
+        raise ValueError("card_type must be 'visa', 'mastercard', or 'rupay'")
+
+    cur = mysql.connection.cursor()
+    while True:
+        # Generate 10 random digits
+        suffix = f"{random.randint(0, 9999999999):016d}"
+        card_number = prefix + suffix
+        cur.execute("SELECT * FROM bank_ccards WHERE card_number = %s", (card_number,))
+        if not cur.fetchone():
+            break
+
+    return card_number
+
+
+
+
+
+
+    
+    
+     
+   
+    
+
+
+
+
+
+
+# generate unique Deposits Account number
+# def generate_unique_deposit_account_no(account_number):
+#     cur = mysql.connection.cursor()
+#     while True:
+#         account_number = str(random.randint(1000000000, 9999999999))
+#         cur.execute("SELECT * FROM bank_deposits WHERE account_number = %s", (account_number,))
+#         if not cur.fetchone():
+#             break
+#     return account_number
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -250,24 +429,225 @@ def signup():
             mysql.connection.commit()
             cur.close()
             
-            flash('Account created! Please log in.', 'success')
+            flash('Welcome ! Please log in.', 'success')
             return redirect(url_for('login'))
 
         cur.close()
 
     return render_template('signup.html')
 
+@app.route('/savingform')
+def savingform():
+    return render_template('savingform.html')
 
+
+@app.route('/open_account', methods=['GET', 'POST'])
+def open_account():
+    email = session.get('user_email')
+    if not email:
+        flash('Please login first', 'danger')
+        return redirect(url_for('userlogin'))  # consistent redirect
+
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("""
+        SELECT cust_id, name, pan, email, mobile_no
+        FROM users
+        WHERE email = %s
+    """, (email,))
+    user = cur.fetchone()
+
+    if not user:
+        flash('User not found.', 'danger')
+        return redirect(url_for('userlogin'))  # consistent redirect
+
+    cust_id = user['cust_id']
+
+    if request.method == 'POST':
+        first_name = request.form['first_name']
+        middle_name = request.form['middle_name']
+        last_name = request.form['last_name']
+        email = request.form['email']
+        mobile = request.form['mobile']
+        aadhar = request.form['aadhar']
+        account_type = request.form['accountType']
+
+        # Generate unique account number
+        account_number = generate_unique_account_no(account_type)
+
+        cur = mysql.connection.cursor()
+        cur.execute("""
+            INSERT INTO bank_accounts (
+                cust_id, first_name, middle_name, last_name, email,
+                mobile, aadhar, account_type, account_number
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (
+            cust_id, first_name, middle_name, last_name, email,
+            mobile, aadhar, account_type, account_number
+        ))
+        mysql.connection.commit()
+        cur.close()
+
+        flash(f"Savings account created. Account number: {account_number}", "success")
+        return redirect(url_for('dashboard'))
+
+    return render_template('applicationform1.html', user=user)
+
+
+@app.route('/open_deposits', methods=['GET', 'POST'])
+def open_deposits():
+    email = session.get('user_email')
+    if not email:
+        flash('Please login first', 'danger')
+        return redirect(url_for('userlogin'))  # consistent redirect
+
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("""
+        SELECT cust_id, name, pan, email, mobile_no
+        FROM users
+        WHERE email = %s
+    """, (email,))
+    user = cur.fetchone()
+
+    if not user:
+        flash('User not found.', 'danger')
+        return redirect(url_for('login'))
+
+    cust_id = user['cust_id']
+
+    if request.method == 'POST':
+        first_name = request.form['first_name']
+        middle_name = request.form['middle_name']
+        last_name = request.form['last_name']
+        email = request.form['email']
+        mobile = request.form['mobile']
+        aadhar = request.form['aadhar']
+        account_type = request.form['accountType']
+
+        # Generate unique account number
+        account_number = generate_deposit_account_no(account_type)
+
+        cur = mysql.connection.cursor()
+        cur.execute("""
+            INSERT INTO bank_deposits (
+                cust_id, first_name, middle_name, last_name, email,
+                mobile, aadhar, account_type, account_number
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (
+            cust_id, first_name, middle_name, last_name, email,
+            mobile, aadhar, account_type, account_number
+        ))
+        mysql.connection.commit()
+        cur.close()
+
+        flash(f"Deposit account created. Account number: {account_number}", "success")
+        return redirect(url_for('dashboard'))
+
+    return render_template('depositform.html',user=user)
+
+
+
+#User Dashboard
 
 @app.route('/dashboard')
 def dashboard():
-   email = session.get('user_email')
-   if not email:
+    email = session.get('user_email')
+    if not email:
         flash('Please login first', 'danger')
-        return redirect(url_for('login'))
-   return render_template('dashboard.html', email=email)
+        return redirect(url_for('userlogin'))
 
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)  # Use DictCursor to access columns by name
+    cur.execute("SELECT cust_id, name, pan, email, mobile_no FROM users WHERE email = %s", (email,))
+    user = cur.fetchone()
+
+    cur.execute("SELECT * FROM bank_accounts WHERE cust_id = %s", (user['cust_id'],))
+    account = cur.fetchone()
+
+    cur.execute("SELECT * FROM bank_deposits WHERE cust_id = %s", (user['cust_id'],))
+    deposits = cur.fetchone()
+
+
+
+    cur.close()
+
+    if not user:
+        flash("User not found.", "danger")
+        return redirect(url_for('login'))
+
+    return render_template('userdashboard.html', user=user,account=account
+                           ,deposits=deposits)
+
+
+#User Dashboard- cards
+
+@app.route('/open_cards', methods=['GET', 'POST'])
+def open_cards():
+    email = session.get('user_email')
+    if not email:
+        flash('Please login first', 'danger')
+        return redirect(url_for('userlogin'))  # consistent redirect
+
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("""
+        SELECT cust_id, name, pan, email, mobile_no
+        FROM users
+        WHERE email = %s
+    """, (email,))
+    user = cur.fetchone()
+
+    if not user:
+        flash('User not found.', 'danger')
+        return redirect(url_for('userlogin'))
+
+    cust_id = user['cust_id']
+
+    if request.method == 'POST':
+        first_name = request.form['first_name']
+        middle_name = request.form['middle_name']
+        last_name = request.form['last_name']
+        email = request.form['email']
+        mobile = request.form['mobile']
+        Addhar = request.form['Addhar']
+        card_type = request.form['card_type']
+        card_subtype = request.form['card_subtype']
+
+        # Generate unique card number
+        card_number = generate_card_number(card_subtype)
+
+        cur = mysql.connection.cursor()
+        cur.execute("""
+            INSERT INTO bank_ccards (
+    cust_id, first_name, middle_name, last_name, email,
+    mobile, Addhar, card_type, card_subtype, card_number
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (
+            cust_id, first_name, middle_name, last_name, email,
+            mobile, Addhar, card_type,card_subtype, card_number
+        ))
+        mysql.connection.commit()
+        cur.close()
+
+        flash(f"{card_type.capitalize()} card created. Card number: {card_number}", "success")
+        return redirect(url_for('dashboard'))
+
+    return render_template('usercardform.html', user=user)
+
+
+# @app.route('/usercards')
+# def usercards():
+#     return render_template('usercardform.html')
+
+
+
+
+#Dashboard - user->loan
+
+@app.route('/userdashloan')
+def userdashloan():
+    return render_template('userdashloans.html')
    
+
+
+
 
 @app.route('/logout')
 def logout():

@@ -1,0 +1,30 @@
+body {
+  background-color: #f8f9fa;
+}
+.dashboard-icon {
+  font-size: 30px;
+  color: #97144D;
+}
+.card {
+  transition: 0.3s;
+}
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 15px rgba(0,0,0,0.15);
+}
+.navbar-custom {
+  background-color: #97144D;
+}
+.bg-custom {
+    background-color: #97144D;
+}
+.btn-digibank {
+  color: #97144D;
+  border: 1px solid #97144D;
+}
+
+.btn-digibank:hover {
+  background-color: #97144D;
+  color: #fff;
+}
+

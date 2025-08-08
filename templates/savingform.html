@@ -162,30 +162,30 @@
     <form action="#" method="post">
       <div class="mb-3">
         <label for="fName" class="form-label">First Name</label>
-        <input type="text" class="form-control" style="border: 0.5px solid #97144D; margin-right: 1rem; flex: 1;" id="fName" required />
+        <input type="text" class="form-control" style="border: 0.5px solid #97144D; margin-right: 1rem; flex: 1;" id="fName" name="first_name" required />
       </div>
       <div class="mb-3">
         <label for="mName" class="form-label">Middle Name</label>
-        <input type="text" class="form-control" style="border: 0.5px solid #97144D; margin-right: 1rem; flex: 1;"id="mName" required />
+        <input type="text" class="form-control" style="border: 0.5px solid #97144D; margin-right: 1rem; flex: 1;"id="mName"  name="middle_name" required />
       </div>
       <div class="mb-3">
         <label for="lName" class="form-label">Last Name</label>
-        <input type="text" class="form-control" style="border: 0.5px solid #97144D; margin-right: 1rem; flex: 1;" id="lName" required />
+        <input type="text" class="form-control" style="border: 0.5px solid #97144D; margin-right: 1rem; flex: 1;" id="lName" name="last_name" required />
       </div>
 
       <div class="mb-3">
         <label for="emailAddress" class="form-label">Email Address</label>
-        <input type="email" class="form-control" style="border: 0.5px solid #97144D; margin-right: 1rem; flex: 1;" id="emailAddress" required />
+        <input type="email" class="form-control" style="border: 0.5px solid #97144D; margin-right: 1rem; flex: 1;" id="emailAddress" name="email" required />
       </div>
 
       <div class="mb-3">
         <label for="mobileNumber" class="form-label">Mobile Number</label>
-        <input type="tel" class="form-control" style="border: 0.5px solid #97144D; margin-right: 1rem; flex: 1;" id="mobileNumber" required />
+        <input type="tel" class="form-control" style="border: 0.5px solid #97144D; margin-right: 1rem; flex: 1;" id="mobileNumber" name="mobile" required />
       </div>
 
       <div class="mb-3">
         <label for="ANumber" class="form-label">Addhar Number</label>
-        <input type="text" class="form-control" style="border: 0.5px solid #97144D; margin-right: 1rem; flex: 1;" id="ANumber" required />
+        <input type="text" class="form-control" style="border: 0.5px solid #97144D; margin-right: 1rem; flex: 1;" id="ANumber" name="aadhar" required />
       </div>
 
       <!-- New Account Type dropdown -->
@@ -193,11 +193,12 @@
         <label for="accountType" class="form-label" >Account Type</label>
         <select class="form-select"  id="accountType" name="accountType" required>
           <option value="" selected disabled>Select account type</option>
-          <option value="savings" >Savings</option>
-          <!-- <option value="salary">Salary</option>
+          <option value="savings" >Savings Account</option>
+          <option value="salary">Salary Account</option>
+          <option value="current">Current Account</option>
           <option value="safec">Safe Custody</option>
           <option value="penAcc">Pension Account</option>
-          <option value="pmjdy">PMJDY Account</option> -->
+          <option value="pmjdy">PMJDY Account</option>
         </select>
       </div>
 

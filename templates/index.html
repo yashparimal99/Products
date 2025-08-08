@@ -10,52 +10,50 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
-    <title>Axis Bank Products</title>
+    <title>diGi Bank Products</title>
 </head>
 
 <body>
-    <style>
-        /* Custom outline style with white border and text*/
-.btn-outline-custom {
-  color: #ffffff !important;
-  border: 2px solid #ffffff !important;
-  background-color: transparent !important;
-}
-
-/* Remove hover, focus, and active changes */
-.btn-outline-custom:hover,
-.btn-outline-custom:focus,
-.btn-outline-custom:active {
-  color: #ffffff !important;
-  border-color: #ffffff !important;
-  background-color: transparent !important;
-  box-shadow: none !important;
-}
-    </style>
-    
-
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important;">
-        <div class="container-fluid">
-            <img src="{{ url_for('static', filename='images/axislogo2.png') }}" alt="Axis Bank" height="60"
-                class="my-2">
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link active" href="{{ url_for('home') }}">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('exploreproduct') }}">Explore Products</a>
-                    </li>
-                    <li class="nav-item"><a class="nav-link" href="#">Grab Deals</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Make Payments</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Bank Smart</a></li>
-                </ul>
-                <form class="d-flex">
-                    <!-- <button class="btn btn-outline-custom btn-sm me-4" type="submit">Login</button> -->
-                    <a href="{{ url_for('login') }}" class="btn btn-outline-custom btn-sm me-4" role="button">Login</a>
-                    <!-- <button class="btn btn-outline-custom btn-sm" type="submit">Signup</button> -->
-                    <a href="{{ url_for('signup') }}" class="btn btn-outline-custom btn-sm me-4" role="button">Signup</a>
-                </form>
-            </div>
-        </div>
-    </nav>
+  <div class="container-fluid">
+    <img src="{{ url_for('static', filename='images/Digilogo.jpg') }}"
+         alt="DiGi Bank" height="60" class="my-2">
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+            aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <!-- your existing nav items -->
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page"
+             href="{{ url_for('home') }}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link"
+             href="{{ url_for('exploreproduct') }}">Explore Products</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="#">Grab Deals</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Make Payments</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Bank Smart</a></li>
+      </ul>
+
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="btn btn-outline-light me-2 navbar-btn"
+             href="{{ url_for('login') }}">Login</a>
+        </li>
+        <li class="nav-item">
+          <a class="btn btn-light navbar-btn"
+             href="{{ url_for('signup') }}">Sign Up</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
 
 
     <style>
@@ -79,17 +77,53 @@
 
         </ol>
     </nav>
-    <img src="s1.png" class="img-fluid mt-4" alt="...">
+<!-- ✅ Rotating Ad Banners with Navigation Arrows -->
+<div id="adBannerCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="600">
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="{{ url_for('static', filename='Index page/39763026_8744861.jpg') }}"
+           class="d-block w-100"
+           style="height: 600px; object-fit: cover;"
+           alt="Ad 1">
+    </div>
+    <div class="carousel-item">
+      <img src="{{ url_for('static', filename='Index page/82525834_9957963.jpg') }}"
+           class="d-block w-100"
+           style="height: 600px; object-fit: cover;"
+           alt="Ad 2">
+    </div>
+    <div class="carousel-item">
+      <img src="{{ url_for('static', filename='Index page/82526223_9957982.jpg') }}"
+           class="d-block w-100"
+           style="height: 600px; object-fit: cover;"
+           alt="Ad 3">
+    </div>
+  </div>
+
+  <!-- 🔽 Carousel Controls (Arrows) -->
+  <button class="carousel-control-prev" type="button" data-bs-target="#adBannerCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true" style="background-color: rgba(0,0,0,0.8); border-radius: 100%;"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+
+  <button class="carousel-control-next" type="button" data-bs-target="#adBannerCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true" style="background-color: rgba(0,0,0,0.8); border-radius: 100%;"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+
+
+
 
     <div class="card mt-4 border-0">
         <div class="card-body" style="margin-left: 0.5in;">
             <h3>
-                <span style="color: #97144D; font-style: italic;">Axis Go</span> Easy and Secure Mobile Banking
+                <span style="color: #97144D; font-style: italic;">DiGi Go</span> Easy and Secure Mobile Banking
             </h3><br>
             <p>
-                <span style="color: #97144D; font-style: italic;"><b>AXIS GO</b></span> is a mobile application designed
+                <span style="color: #97144D; font-style: italic;"><b>DiGi GO</b></span> is a mobile application designed
                 exclusively for a hassle-free banking and onboarding experience
-                without having to visit an Axis Bank branch. It provides seamless access to all the Axis Bank products,
+                without having to visit an DiGi Bank branch. It provides seamless access to all the DiGi Bank products,
                 financial solutions, advanced EMI calculators, offers & more.
             </p>
 
@@ -103,22 +137,20 @@
             border-radius: 0.5rem;
             width: 32rem;
             height: 18rem;
-
+        
             /* rounded */
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        /* }}
+            transition: background-color 0.3s, color 0.3s;}
+            /* }}
 
         .custom-card:hover {
             background-color: #97144D;
             color: white;
         } */
 
-        .custom-card:hover .card-title,
-        .custom-card:hover .card-text {
-            color: white;
-        }
+            .custom-card:hover .card-title,
+            .custom-card:hover .card-text {
+                color: white;
+            }
     </style>
     <div class="card mt-3 border-0">
         <div class="card-body text-center" style="margin-left: 0.5in;">
@@ -131,26 +163,26 @@
     <div class="d-flex justify-content-center gap-4 mt-4">
         <div class="card custom-card">
             <div class="card-body">
-                <h5 class="card-title"><b>Download </b><span style="color: #97144D; font-style: italic;">AXIS GO </span>
+                <h5 class="card-title"><b>Download </b><span style="color: #97144D; font-style: italic;">DiGi GO </span>
                 </h5>
-                <p class="card-text">Getting started with the <span style="color: #97144D; font-style: italic;">AXIS GO
+                <p class="card-text">Getting started with the <span style="color: #97144D; font-style: italic;">DiGi GO
                     </span> app is effortless and quick.
                     You can easily download it from the Google Play Store or Apple App Store.</p>
                 <p> In case of any queries or concerns, please write to us at </p>
-                <p><span style="color: #97144D;">axisgo.helpdesk@axisbank.com
+                <p><span style="color: #97144D;">digigo.helpdesk@digibank.com
                     </span></p>
 
-                <p>Download the <span style="color: #97144D;">Axis Go
+                <p>Download the <span style="color: #97144D;">DiGi Go
                     </span></p>
             </div>
         </div>
 
         <div class="card custom-card">
             <div class="card-body">
-                <h5 class="card-title"> <b>Register on </b><span style="color: #97144D; font-style: italic;"> AXIS GO
+                <h5 class="card-title"> <b>Register on </b><span style="color: #97144D; font-style: italic;"> DiGi GO
                 </h5>
                 <p class="card-text">
-                    After downloading and installing the AXIS GO app, begin your onboarding journey in just a few simple
+                    After downloading and installing the DiGi GO app, begin your onboarding journey in just a few simple
                     steps.</p>
 
                 <p>Click on "Get Started"</p>
