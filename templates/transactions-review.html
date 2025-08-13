@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transaction Review - DigiBank Manager</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+   <style>
+  body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+  }
+  h1, h2 {
+    color: #97144D;
+    font-weight: 700;
+  }
+  .section-title {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #97144D;
+    padding-bottom: 0.3rem;
+    text-align: center;
+  }
+  .card {
+    border: 2px solid #97144D;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 3px 10px rgb(151 20 77 / 0.1);
+    height: 280px; /* fixed equal height */
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+  }
+  .card-body {
+    flex-grow: 1;
+    padding: 0;
+    margin-bottom: 1rem;
+  }
+  ul {
+    padding-left: 1rem;
+    margin-bottom: 0;
+    font-size: 0.9rem;
+  }
+  ul li {
+    margin-bottom: 0.3rem;
+  }
+  h3.card-title {
+    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+    text-align: center;
+    color: #97144D;
+  }
+  .btn-apply {
+    background-color: #97144D;
+    color: white;
+    font-weight: 600;
+    border-radius: 8px;
+    align-self: center;
+    width: 120px;
+    transition: background-color 0.3s ease;
+  }
+  .btn-apply:hover {
+    background-color: #7a0f39;
+    color: #fff;
+  }
+  .disclaimer {
+    font-size: 0.85rem;
+    color: #555;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #ddd;
+  }
+</style>
+</head>
+<body>
+  <!-- Same header/sidebar as manager dashboard -->
+  
+  <div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Transaction Review</h2>
+      <div>
+        <button class="btn btn-outline-primary">Export</button>
+        <button class="btn btn-primary">Fraud Dashboard</button>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <input type="date" class="form-control">
+          </div>
+          <div class="col-md-3">
+            <input type="date" class="form-control">
+          </div>
+          <div class="col-md-3">
+            <select class="form-select">
+              <option>All Statuses</option>
+              <option>Flagged</option>
+              <option>Cleared</option>
+              <option>Pending Review</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <button class="btn btn-primary w-100">Filter</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Date</th>
+                <th>Transaction ID</th>
+                <th>From Account</th>
+                <th>To Account</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="suspicious flagged">
+                <td>2023-11-15</td>
+                <td>TXN78945612</td>
+                <td>1000234567</td>
+                <td>9876543210 (External)</td>
+                <td class="text-danger">₹1,25,000.00</td>
+                <td><span class="badge bg-warning">Flagged</span></td>
+                <td>
+                  <button class="btn btn-sm btn-outline-primary">Review</button>
+                  <button class="btn btn-sm btn-outline-success">Approve</button>
+                </td>
+              </tr>
+              <!-- More transaction rows would go here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Same footer as manager dashboard -->
+</body>
+</html>

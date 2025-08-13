@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Manager Dashboard - DigiBank</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Bootstrap CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px 0 0 0;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    /* Sidebar Offcanvas */
+    #sidebarMenu.offcanvas-start {
+      width: 250px;
+    }
+    #sidebarMenu .offcanvas-body {
+      padding: 0.5rem 1rem;
+    }
+    #sidebarMenu .nav-link {
+      font-size: 0.9rem;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #333;
+      transition: color 0.3s;
+    }
+    #sidebarMenu .nav-link i {
+      font-size: 1.1rem;
+    }
+    #sidebarMenu .nav-link.active {
+      font-weight: 700;
+      color: #97144D !important;
+      background-color: #f0d7e0;
+      border-radius: 4px;
+    }
+    #sidebarMenu .nav-link:hover {
+      color: #7a0f3e;
+      background-color: #f9e5ef;
+      border-radius: 4px;
+    }
+
+    .top-bar button.btn-outline-light {
+      border: 1.5px solid white;
+      color: white;
+      background: transparent;
+      padding: 4px 10px;
+      font-size: 1.3rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+    }
+    .top-bar button.btn-outline-light:hover {
+      background-color: white;
+      color: #97144D;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      background-color: #97144D;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      user-select: none;
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+    }
+    .top-bar h5 {
+      margin: 0;
+      font-weight: 700;
+      flex-grow: 1;
+      text-align: center;
+      color: white;
+    }
+    .logout-btn {
+      background: transparent;
+      border: 1.5px solid white;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+      flex-shrink: 0;
+    }
+    .logout-btn:hover {
+      background-color: white;
+      color: #97144D;
+    }
+
+    /* Search Bar Row with Sidebar Toggle & Chatbot */
+    .search-chatbar {
+      max-width: 900px;
+      margin: 15px auto 40px auto;
+      padding: 0 15px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    /* Sidebar toggle button */
+    .search-chatbar .btn-toggle-sidebar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 5px;
+      border: 1.5px solid #ccc;
+      color: #444;
+      background: white;
+      transition: border-color 0.3s, color 0.3s;
+      cursor: pointer;
+      flex-shrink: 0;
+      min-width: 42px;
+      padding: 6px 8px;
+      font-size: 1.3rem;
+    }
+    .search-chatbar .btn-toggle-sidebar:hover {
+      border-color: #97144D;
+      color: #97144D;
+    }
+    /* Search input centered and wide */
+    .search-chatbar input[type="text"] {
+      flex-grow: 1;
+      padding: 10px 14px;
+      border-radius: 5px;
+      border: 1.5px solid #ccc;
+      font-size: 1rem;
+      outline-offset: 0;
+      transition: border-color 0.3s;
+      width: 9000px; 
+      margin: 0 auto;
+      display: block;
+    }
+    .search-chatbar input[type="text"]:focus {
+      border-color: #97144D;
+      box-shadow: 0 0 5px rgba(151, 20, 77, 0.5);
+    }
+    /* Chatbot button right aligned */
+    .search-chatbar .chatbot-btn {
+      background-color: #97144D;
+      border: none;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .search-chatbar .chatbot-btn:hover {
+      background-color: #7a0f3e;
+    }
+
+    /* Dashboard Cards */
+    .dashboard-card {
+      transition: 0.3s;
+      height: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 20px 30px 20px;
+      text-align: center;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+    }
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+    }
+    .dashboard-icon {
+      font-size: 32px;
+      color: #97144D;
+      margin-bottom: 15px;
+    }
+    .dashboard-card h5 {
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .dashboard-card p {
+      flex-grow: 1;
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 15px;
+    }
+    .btn-manager {
+      background-color: #97144D;
+      color: #fff;
+      border: none;
+      padding: 8px 18px;
+      font-size: 0.9rem;
+      border-radius: 25px;
+      transition: background-color 0.3s ease;
+    }
+    .btn-manager:hover {
+      background-color: #7a0f3e;
+      color: white;
+    }
+
+    /* Stats Cards */
+    .stats-card {
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+      margin-bottom: 20px;
+    }
+    .stats-card h6 {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+    .stats-card .value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #97144D;
+    }
+    .stats-card .change {
+      font-size: 0.8rem;
+      margin-top: 5px;
+    }
+    .positive {
+      color: #198754;
+    }
+    .negative {
+      color: #dc3545;
+    }
+
+    /* Additional manager-specific styles */
+    .table-responsive {
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .suspicious {
+      background-color: #fff3cd;
+    }
+    .flagged {
+      border-left: 4px solid #dc3545;
+    }
+    .loan-card {
+      border-left: 4px solid #97144D;
+    }
+    .badge-pending {
+      background-color: #ffc107;
+      color: #000;
+    }
+    .chart-container {
+      height: 300px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+    .report-card {
+      transition: all 0.3s;
+    }
+    .report-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .staff-card {
+      border-radius: 10px;
+      transition: all 0.3s;
+    }
+    .staff-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: #e9ecef;
+    }
+    .kpi-card {
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+    .kpi-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .kpi-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+    .performance-chart {
+      height: 350px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+
+    /* Footer */
+    footer.bg-custom {
+      background-color: #97144D;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="sidebarMenuLabel">Manager</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark active" href="managerdashboard.html">
+            <i class="bi bi-speedometer2 me-2"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="manageaccounts.html">
+            <i class="bi bi-people-fill me-2"></i> Manage Accounts
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="loan-approvals.html">
+            <i class="bi bi-file-earmark-check me-2"></i> Loan Approvals
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="transactions-review.html">
+            <i class="bi bi-list-check me-2"></i> Transaction Review
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="reports.html">
+            <i class="bi bi-graph-up me-2"></i> Reports & Analytics
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="staff-management.html">
+            <i class="bi bi-person-badge me-2"></i> Staff Management
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="branch-performance.html">
+            <i class="bi bi-building me-2"></i> Branch Performance
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="fraud-detection.html">
+            <i class="bi bi-shield-exclamation me-2"></i> Fraud Detection
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="settings.html">
+            <i class="bi bi-gear-fill me-2"></i> Manager Settings
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <button class="btn btn-outline-light btn-sm me-3" 
+          data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-label="Toggle sidebar">
+    <i class="bi bi-list"></i>
+    </button>
+    <h5>DigiBank Manager Dashboard</h5>
+    <p>Welcome, {{ user.name }} !  ({{user.role}})</p>
+     <button class="logout-btn" onclick="logout()">Logout</button>
+    <!-- <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button> -->
+    </div>
+    
+  </div>
+
+  <!-- Search Bar and Chatbot with Sidebar Toggle -->
+  <div class="search-chatbar">
+    <input type="text" placeholder="Search customers, accounts..." aria-label="Search" />
+    <button class="chatbot-btn" aria-label="Chatbot">
+      <i class="bi bi-chat-dots-fill"></i>
+    </button>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div class="container my-4 flex-grow-1">
+    <!-- Quick Stats Row -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="stats-card">
+          <h6>Total Customers</h6>
+          <div class="value">1,842</div>
+          <div class="change positive">+12 this week</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stats-card">
+          <h6>Pending Approvals</h6>
+          <div class="value">23</div>
+          <div class="change negative">+5 since yesterday</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stats-card">
+          <h6>Branch Deposits</h6>
+          <div class="value">₹8.2M</div>
+          <div class="change positive">+2.1% from last month</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stats-card">
+          <h6>Fraud Alerts</h6>
+          <div class="value">4</div>
+          <div class="change negative">+1 today</div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="mb-4 text-center">Management Tools</h3>
+    <div class="row g-4 justify-content-center">
+
+      <!-- Manage Accounts -->
+      <div class="col-md-4 col-sm-6">
+        <div class="card dashboard-card p-4 text-center">
+          <i class="bi bi-people-fill dashboard-icon mb-2"></i>
+          <h5>Manage Accounts</h5>
+          <p>View, edit, and manage customer accounts and profiles.</p>
+          <a href="{{ url_for('manageaccounts') }}" class="btn btn-manager">Manage Accounts</a>
+        </div>
+      </div>
+
+      <!-- Loan Approvals -->
+      <div class="col-md-4 col-sm-6">
+        <div class="card dashboard-card p-4 text-center">
+          <i class="bi bi-file-earmark-check dashboard-icon mb-2"></i>
+          <h5>manager Approvals</h5>
+          <p>Review and approve pending applications.</p>
+          <a href="{{ url_for('managerapprovals') }}" class="btn btn-manager">View Applications</a>
+        </div>
+      </div>
+
+      <!-- Transaction Review -->
+      <div class="col-md-4 col-sm-6">
+        <div class="card dashboard-card p-4 text-center">
+          <i class="bi bi-list-check dashboard-icon mb-2"></i>
+          <h5>Transaction Review</h5>
+          <p>Monitor and review suspicious transactions.</p>
+          <a href="{{ url_for('transactions_review') }}" class="btn btn-manager">Review Transactions</a>
+        </div>
+      </div>
+
+      <!-- Reports & Analytics -->
+      <div class="col-md-4 col-sm-6">
+        <div class="card dashboard-card p-4 text-center">
+          <i class="bi bi-graph-up dashboard-icon mb-2"></i>
+          <h5>Reports & Analytics</h5>
+          <p>Generate financial reports and view branch analytics.</p>
+          <a href="reports.html" class="btn btn-manager">View Reports</a>
+        </div>
+      </div>
+
+      <!-- Staff Management -->
+      <div class="col-md-4 col-sm-6">
+        <div class="card dashboard-card p-4 text-center">
+          <i class="bi bi-person-badge dashboard-icon mb-2"></i>
+          <h5>Staff Management</h5>
+          <p>Manage staff accounts, roles, and permissions.</p>
+          <a href="staff-management.html" class="btn btn-manager">Manage Staff</a>
+        </div>
+      </div>
+
+      <!-- Branch Performance -->
+      <div class="col-md-4 col-sm-6">
+        <div class="card dashboard-card p-4 text-center">
+          <i class="bi bi-building dashboard-icon mb-2"></i>
+          <h5>Branch Performance</h5>
+          <p>Track KPIs and performance metrics for your branch.</p>
+          <a href="branch-performance.html" class="btn btn-manager">View Performance</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-custom text-white text-center py-3 mt-auto">
+    © 2025 DigiBank. Manager Dashboard. All rights reserved.
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    function logout() {
+      alert("Manager logout clicked! Implement logout logic here.");
+      // e.g. window.location.href = "manager-login.html";
+    }
+  </script>
+</body>
+</html>

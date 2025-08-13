@@ -2,160 +2,362 @@
 <html lang="en">
 
 <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DiGi Bank Products</title>
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
-    <title>Axis Bank Products</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
     <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-dark"> -->
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important;">
-        <div class="container-fluid">
-            <img src="axislogo1.png" alt="Axis Bank" height="60" class="my-2">
+   <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important;">
+  <div class="container-fluid">
+    <img src="{{ url_for('static', filename='images/Digilogo.jpg') }}"
+         alt="DiGi Bank" height="60" class="my-2">
+ 
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+            aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+ 
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <!-- your existing nav items -->
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page"
+             href="{{ url_for('home') }}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link"
+             href="{{ url_for('exploreproduct') }}">Explore Products</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="#">Grab Deals</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Make Payments</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Bank Smart</a></li>
+      </ul>
+ 
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="btn btn-outline-light me-2 navbar-btn"
+             href="{{ url_for('login') }}">Login</a>
+        </li>
+        <li class="nav-item">
+          <a class="btn btn-light navbar-btn"
+             href="{{ url_for('signup') }}">Sign Up</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
 
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <!-- <div class="container-fluid justify-content-center"></div> -->
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+  <style>
+    .breadcrumb .breadcrumb-item a {
+      color: #97144D;
+      text-decoration: none;
+    }
 
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('exploreproduct') }}">Explore Products</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Grab Deals</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Make Payments</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Bank Smart</a>
-                    </li>
+    .breadcrumb .breadcrumb-item a:hover {
+      text-decoration: underline;
+    }
 
-                </ul>
-                <form class="d-flex">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
+    .breadcrumb .breadcrumb-item {
+      color: #97144D;
+    }
 
-                </form>
+    .custom-btn {
+      background-color: #97144D;
+      color: white;
+      border: none;
+      transition: all 0.3s ease;
+    }
+
+    .custom-btn:hover {
+      background-color: #7b1040;
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .card {
+      transition: transform 0.3s ease;
+      height: 100%;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(151, 20, 77, 0.15);
+    }
+
+    .card-img-top {
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .product-title {
+      color: #97144D;
+      font-weight: bold;
+      text-align: center;
+      margin: 40px 0;
+    }
+  </style>
+
+  <nav aria-label="breadcrumb" class="mt-3 ms-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('cards') }}">Cards</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('prepaid') }}">Prepaid card</a></li>
+    </ol>
+  </nav>
+
+    <!-- Hero Image -->
+    <div class="container mt-4">
+        <img src="{{ url_for('static', filename='Cards/cardbanner3.png') }}" class="img-fluid hero-image" alt="Digi Bank Prepaid Cards" style="max-width: 400px;">
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="mb-4">
+                    <span style="color: #97144D; font-style: italic;">Digi Bank</span> Prepaid Cards
+                </h1>
+                <p class="lead">
+                    The perfect solution for <span style="color: #97144D; font-style: italic; font-weight: 600;">Digi GO</span> gifting, rewards, and convenient payments
+                </p>
             </div>
         </div>
-    </nav>
-
-    <div class="card mt-4 border-0"></div>
-    <div class="card mt-4 border-0"></div>
-
-    <style>
-        .breadcrumb .breadcrumb-item a {
-            color: #97144D;
-            text-decoration: none;
-        }
-
-        .breadcrumb .breadcrumb-item a:hover {
-            text-decoration: underline;
-        }
-
-        .breadcrumb .breadcrumb-item {
-            color: #97144D;
-        }
-    </style>
-
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
-            <li class="breadcrumb-item"><a href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
-            <li class="breadcrumb-item"><a href="{{ url_for('cards') }}">Cards</a></li>
-            <li class="breadcrumb-item"><a href="{{ url_for('prepaid') }}"> Prepaid Cards</a></li>
-
-        </ol>
-    </nav>
-
-    <img src="prepc.png" class="img-fluid mt-4" alt="...">
-    <!-- Cards -->
-    <div class="card mt-4 border-0">
-        <div class="card-body" style="margin-left: 0.5in;">
-            <h3>
-                <span style="color: #97144D; font-style: italic;">Axis Bank</span> Pre-paid Card
-            </h3><br>
-            <p style="inline-size: height 2;">
-
-                <span style="color: #97144D; font-style: italic;"><b>AXIS GO</b></span> Axis Bank offers a range of
-                pre-paid cards by which one can gift, reward and motivate either your loved ones or your employees in an
-                easy and convenient way. One can choose between Meal Cards, Gift Cardsand Smart Pay Card. There are a
-                number of benefits of pre-paid cards which include being able to load any amount between Rs. 500 and
-                1,00,000 in the Meal Card, being able to make purchases instantly with Gift Card! The Smart Pay Card
-                offers daily POS transaction limit of Rs.1,00,000.
-            </p>
-            <style>
-                .step-circle {
-                    width: 80px;
-                    height: 80px;
-                    margin: 0 auto;
-                    border: 2px dotted #97144D;
-                    border-radius: 50%;
-                    background-color: #97144D;
-                    color: white;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 32px;
-                }
-
-                .step-circle i {
-                    font-size: 32px;
-                }
-
-                .btn {
-                    background-color: white;
-                    color: #800020;
-
-                }
-
-                .custom-btn {
-                    background-color: #800020;
-                    color: white;
-                    color: white;
-                    border: 2px solid white;
-                    border-radius: 5px;
-                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-                    padding: 10px 25px;
-                }
-
-                .custom-btn a {
-                    color: #800020;
-                }
-            </style>
-            <div class="text-start mt-4">
-                <a href="apply.html" class="btn custom-btn me-2">Apply Now</a>
+        
+        <div class="row mt-4">
+            <div class="col-md-8 mx-auto">
+                <div class="card border-0">
+                    <div class="card-body">
+                        <p class="card-text">
+                            Digi Bank Prepaid Cards offer a flexible and secure way to manage your expenses, reward employees,
+                            or gift your loved ones. With options ranging from Meal Cards to Gift Cards and Smart Pay Cards,
+                            you can choose the perfect prepaid solution for every occasion. Enjoy the convenience of cashless
+                            payments without the need for a bank account or credit check.
+                        </p>
+                    </div>
+                </div>
             </div>
-
         </div>
     </div>
 
+    <!-- Card Types Section -->
+    <div class="container features-section mt-5">
+        <h2 class="text-center mb-5">Our Prepaid Card Variants</h2>
+        
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card-type shadow-sm" style="background-color: #fff5f7;">
+                    <div class="text-center">
+                        <i class="bi bi-egg-fried card-icon"></i>
+                        <h4>Meal Cards</h4>
+                    </div>
+                    <ul class="mt-3">
+                        <li>Load amount between ₹500 to ₹1,00,000</li>
+                        <li>Accepted at restaurants and food outlets</li>
+                        <li>Tax-beneficial solution for employee meals</li>
+                        <li>Easy online reload options</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card-type shadow-sm" style="background-color: #f0f7ff;">
+                    <div class="text-center">
+                        <i class="bi bi-gift card-icon"></i>
+                        <h4>Gift Cards</h4>
+                    </div>
+                    <ul class="mt-3">
+                        <li>Instant purchases with pre-loaded value</li>
+                        <li>Wide acceptance at retail partners</li>
+                        <li>Customizable designs for special occasions</li>
+                        <li>No expiration date (subject to terms)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card-type shadow-sm" style="background-color: #f5fff0;">
+                    <div class="text-center">
+                        <i class="bi bi-wallet2 card-icon"></i>
+                        <h4>Smart Pay Cards</h4>
+                    </div>
+                    <ul class="mt-3">
+                        <li>Daily POS transaction limit of ₹1,00,000</li>
+                        <li>Use anywhere debit cards are accepted</li>
+                        <li>Ideal for travel and expense management</li>
+                        <li>Secure chip-and-PIN technology</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Key Benefits -->
+    <div class="container mt-5">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h2 class="mb-4">Key Benefits of Digi Bank Prepaid Cards</h2>
+                <div class="mt-4">
+                    <span class="benefit-badge">
+                        <i class="bi bi-currency-exchange"></i> No credit check required
+                    </span>
+                    <span class="benefit-badge">
+                        <i class="bi bi-shield-lock"></i> Secure transactions
+                    </span>
+                    <span class="benefit-badge">
+                        <i class="bi bi-calendar-check"></i> No expiry (Gift Cards)
+                    </span>
+                    <span class="benefit-badge">
+                        <i class="bi bi-arrow-repeat"></i> Easy reload options
+                    </span>
+                    <span class="benefit-badge">
+                        <i class="bi bi-cash-stack"></i> Budget control
+                    </span>
+                    <span class="benefit-badge">
+                        <i class="bi bi-globe"></i> Domestic & international use
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <img src="{{ url_for('static', filename='Cards/prepaidcard.png') }}"
+                     class="img-fluid rounded shadow"
+                     alt="Prepaid Card Benefits">
+            </div>
+ 
+        </div>
+    </div>
 
+    <!-- How It Works -->
+    <div class="container mt-5">
+        <h2 class="text-center mb-5">How To Get & Use Your Prepaid Card</h2>
+        
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card shadow">
+                    <div class="card-header text-white" style="background-color: #97144D;">
+                        <i class="bi bi-cart-plus me-2"></i> Getting Your Card
+                    </div>
+                    <div class="card-body">
+                        <ol>
+                            <li class="mb-2">Choose the prepaid card type that suits your needs</li>
+                            <li class="mb-2">Apply online or visit any Digi Bank branch</li>
+                            <li class="mb-2">Complete minimal KYC documentation</li>
+                            <li class="mb-2">Load funds onto your card (varies by card type)</li>
+                            <li>Receive your activated card within 3-5 business days</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-4">
+                <div class="card shadow">
+                    <div class="card-header text-white" style="background-color: #97144D;">
+                        <i class="bi bi-credit-card me-2"></i> Using Your Card
+                    </div>
+                    <div class="card-body">
+                        <ol>
+                            <li class="mb-2">Check your available balance online or via SMS</li>
+                            <li class="mb-2">Swipe/insert at merchant locations (enter PIN when prompted)</li>
+                            <li class="mb-2">For online purchases, enter card details and complete transaction</li>
+                            <li class="mb-2">Reload your card as needed (where applicable)</li>
+                            <li>Track all transactions through your account statements</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- CTA Section -->
+    <div class="container mt-5 text-center">
+        <div class="card border-0 shadow">
+            <div class="card-body py-5">
+                <h3 class="mb-4">Ready to Get Your Digi Bank Debit Card?</h3>
+                <p class="mb-4">Experience the convenience of secure and instant access to your funds</p>
+               <a href="{{ url_for('login') }}"class="btn custom-btn me-2">
+                <i class="bi bi-credit-card me-2"></i>Apply Now
+            </a>
+            <a href="{{url_for('login')}}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Compare Cards
+            </a>
+            </div>
+        </div>
+    </div>
 
+    <!-- FAQ Section -->
+    <div class="container mt-5 mb-5">
+        <h2 class="text-center mb-4">Frequently Asked Questions</h2>
+        
+        <div class="accordion" id="faqAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="faqHeading1">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1">
+                        What is the difference between prepaid, debit, and credit cards?
+                    </button>
+                </h2>
+                <div id="faqCollapse1" class="accordion-collapse collapse show" aria-labelledby="faqHeading1">
+                    <div class="accordion-body">
+                        <ul>
+                            <li><b>Prepaid Cards:</b> Loaded with funds in advance, no bank account needed, no credit facility</li>
+                            <li><b>Debit Cards:</b> Linked to your bank account, spends directly from your balance</li>
+                            <li><b>Credit Cards:</b> Borrow money up to a limit, repay later with possible interest</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="faqHeading2">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2">
+                        Can I reload my Digi Bank Prepaid Card?
+                    </button>
+                </h2>
+                <div id="faqCollapse2" class="accordion-collapse collapse" aria-labelledby="faqHeading2">
+                    <div class="accordion-body">
+                        Reload options vary by card type:
+                        <ul>
+                            <li><b>Meal Cards:</b> Can be reloaded by the employer/organization</li>
+                            <li><b>Gift Cards:</b> Typically non-reloadable (single-use)</li>
+                            <li><b>Smart Pay Cards:</b> Can be reloaded multiple times through net banking or bank branches</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="faqHeading3">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3">
+                        Are there any fees associated with prepaid cards?
+                    </button>
+                </h2>
+                <div id="faqCollapse3" class="accordion-collapse collapse" aria-labelledby="faqHeading3">
+                    <div class="accordion-body">
+                        Digi Bank Prepaid Cards may have:
+                        <ul>
+                            <li>One-time issuance fees (varies by card type)</li>
+                            <li>Reload fees for Smart Pay Cards</li>
+                            <li>Inactivity fees after prolonged non-use</li>
+                            <li>ATM withdrawal charges (if applicable)</li>
+                            <li>No fees for regular POS transactions</li>
+                        </ul>
+                        Specific fee details are provided at the time of application.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <!-- Optional JavaScript; choose one of the two! -->
+    
 
-    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
-
-    <!-- Option 2: Separate Popper and Bootstrap JS -->
-    <!--
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
-    -->
 </body>
 
 </html>

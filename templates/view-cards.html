@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Cards - DigiBank Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Bootstrap CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+ <script src="https://cdn.sheetjs.com/xlsx-0.18.5/package/dist/xlsx.full.min.js"></script>
+
+    <style>
+        /* General Styles */
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Sidebar Styles */
+        #sidebarMenu.offcanvas-start {
+            width: 250px;
+        }
+
+        #sidebarMenu .offcanvas-body {
+            padding: 0.5rem 1rem;
+        }
+
+        #sidebarMenu .nav-link {
+            font-size: 0.9rem;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #333;
+            transition: color 0.3s;
+        }
+
+        #sidebarMenu .nav-link i {
+            font-size: 1.1rem;
+        }
+
+        #sidebarMenu .nav-link.active {
+            font-weight: 700;
+            color: #97144D !important;
+            background-color: #f0d7e0;
+            border-radius: 4px;
+        }
+
+        #sidebarMenu .nav-link:hover {
+            color: #7a0f3e;
+            background-color: #f9e5ef;
+            border-radius: 4px;
+        }
+
+        /* Top Bar Styles */
+        .top-bar {
+            background-color: #97144D;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            user-select: none;
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+        }
+
+        .top-bar h5 {
+            margin: 0;
+            font-weight: 700;
+            flex-grow: 1;
+            text-align: center;
+            color: white;
+        }
+
+        .top-bar button.btn-outline-light {
+            border: 1.5px solid white;
+            color: white;
+            background: transparent;
+            padding: 4px 10px;
+            font-size: 1.3rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .top-bar button.btn-outline-light:hover {
+            background-color: white;
+            color: #97144D;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1.5px solid white;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            flex-shrink: 0;
+        }
+
+        .logout-btn:hover {
+            background-color: white;
+            color: #97144D;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        /* Card Styles */
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: #97144D;
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+        }
+
+        /* Button Styles */
+        .btn-primary {
+            background-color: #97144D;
+            border-color: #97144D;
+        }
+
+        /* Table Styles */
+        .table th {
+            background-color: #f1f1f1;
+        }
+
+        /* Search Bar Styles */
+        .search-chatbar {
+            max-width: 900px;
+            margin: 15px auto 40px auto;
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .search-chatbar input[type="text"] {
+            flex-grow: 1;
+            padding: 10px 14px;
+            border-radius: 5px;
+            border: 1.5px solid #ccc;
+            font-size: 1rem;
+            outline-offset: 0;
+            transition: border-color 0.3s;
+            width: 9000px; 
+            margin: 0 auto;
+            display: block;
+        }
+
+        .search-chatbar input[type="text"]:focus {
+            border-color: #97144D;
+            box-shadow: 0 0 5px rgba(151, 20, 77, 0.5);
+        }
+
+        .search-chatbar .chatbot-btn {
+            background-color: #97144D;
+            border: none;
+            color: white;
+            padding: 10px 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .search-chatbar .chatbot-btn:hover {
+            background-color: #7a0f3e;
+        }
+
+        /* Status Badges */
+        .badge-pending {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .badge-approved {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .badge-rejected {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        /* Summary Cards */
+        .summary-card {
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .summary-card .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .summary-card .label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        export-alert {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Offcanvas -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="sidebarMenuLabel">Manager</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="nav flex-column">
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark" href="{{ url_for('dashboard') }}">
+                        <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark" href="{{ url_for('manage_accounts') }}">
+                        <i class="bi bi-people-fill me-2"></i> Manage Accounts
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark" href="{{ url_for('manview_deposits') }}">
+                        <i class="bi bi-cash-stack me-2"></i> View Deposits
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark" href="{{ url_for('manage_loans') }}">
+                        <i class="bi bi-file-earmark-check me-2"></i> Manage Loans
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark" href="{{ url_for('view_investments') }}">
+                        <i class="bi bi-graph-up me-2"></i> Investments
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark active" href="{{ url_for('view_cards') }}">
+                        <i class="bi bi-credit-card me-2"></i> Cards
+                    </a>
+                </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <button class="btn btn-outline-light btn-sm me-3" 
+                data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-label="Toggle sidebar">
+            <i class="bi bi-list"></i>
+        </button>
+        <h5>DigiBank Card Management</h5>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <!-- Search Bar and Chatbot with Sidebar Toggle -->
+    <div class="search-chatbar">
+        <input type="text" placeholder="Search cards, customers..." aria-label="Search">
+        <button class="chatbot-btn" aria-label="Chatbot">
+            <i class="bi bi-chat-dots-fill"></i>
+        </button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h2 class="mb-4"><i class="bi bi-credit-card"></i> View Cards</h2>
+        
+        <!-- Card Summary Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="summary-card bg-white">
+                    <div class="value text-primary">1,245</div>
+                    <div class="label">Active Cards</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="summary-card bg-white">
+                    <div class="value text-success">87</div>
+                    <div class="label">Pending Approvals</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="summary-card bg-white">
+                    <div class="value text-info">32</div>
+                    <div class="label">Blocked Cards</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Requests Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Card Requests</h5>
+            </div>
+            <div class="card-body">
+                <p>Approve or reject card-related requests submitted by customers or branch staff.</p>
+                
+                <!-- Filter Controls -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <label for="cardTypeFilter" class="form-label">Request Type</label>
+                        <select class="form-select" id="cardTypeFilter" onchange="filterCards()">
+                            <option value="all">All Types</option>
+                            <option value="New Card">New Card Issuance</option>
+                            <option value="Limit Increase">Credit Limit Increase</option>
+                            <option value="Replacement">Card Replacement</option>
+                            <option value="Block">Card Block Request</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="cardStatusFilter" class="form-label">Status</label>
+                        <select class="form-select" id="cardStatusFilter" onchange="filterCards()">
+                            <option value="all">All Statuses</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end justify-content-end">
+        <div class="dropdown">
+            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-download"></i> Export Data
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                <li><a class="dropdown-item" href="#" onclick="exportCards('current')">Current View</a></li>
+                <li><a class="dropdown-item" href="#" onclick="exportCards('all')">All Card Requests</a></li>
+                <li><a class="dropdown-item" href="#" onclick="exportCards('active')">Active Cards</a></li>
+                <li><a class="dropdown-item" href="#" onclick="exportCards('pending')">Pending Requests</a></li>
+            </ul>
+        </div>
+    </div>
+                
+                <!-- Card Requests Table -->
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Request ID</th>
+                                <th>Customer</th>
+                                <th>Request Type</th>
+                                <th>Account</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cardTableBody"></tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <nav aria-label="Card pagination">
+                    <ul class="pagination justify-content-center mt-4">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1">Previous</a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Active Cards Card -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Active Cards</h5>
+            </div>
+            <div class="card-body">
+                <p>View and manage currently active cards.</p>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Card Number</th>
+                                <th>Customer</th>
+                                <th>Card Type</th>
+                                <th>Account</th>
+                                <th>Expiry</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activeCardsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card Details Modal -->
+    <div class="modal fade" id="cardDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cardModalTitle">Card Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="cardModalBody">
+                    <!-- Content will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="printCardBtn">
+                        <i class="bi bi-printer"></i> Print Details
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Data initialization
+        const cardRequests = [
+            { 
+                id: 'CR1001', 
+                customer: 'Ravi Kumar', 
+                type: 'New Card Issuance Approval', 
+                account: 'AC1002345',
+                date: '2025-08-10', 
+                status: 'Pending',
+                details: {
+                    cardType: 'Platinum Credit Card',
+                    requestedLimit: '₹1,50,000',
+                    reason: 'New customer application',
+                    documents: ['KYC', 'PAN', 'Income Proof']
+                }
+            },
+            { 
+                id: 'CR1002', 
+                customer: 'Anjali Sharma', 
+                type: 'Credit Limit Increase Approval', 
+                account: 'AC1006789',
+                date: '2025-08-09', 
+                status: 'Approved',
+                details: {
+                    cardType: 'Gold Credit Card',
+                    currentLimit: '₹75,000',
+                    requestedLimit: '₹1,25,000',
+                    approvedLimit: '₹1,00,000'
+                }
+            },
+            { 
+                id: 'CR1003', 
+                customer: 'Vikram Singh', 
+                type: 'Card Replacement Approval', 
+                account: 'AC1003456',
+                date: '2025-08-08', 
+                status: 'Pending',
+                details: {
+                    cardType: 'Titanium Debit Card',
+                    reason: 'Lost card',
+                    deliveryAddress: '123 Main St, Mumbai'
+                }
+            }
+        ];
+
+        const activeCards = [
+            { 
+                maskedNumber: '•••• •••• •••• 1234', 
+                customer: 'Priya Sharma', 
+                type: 'Platinum Credit Card', 
+                account: 'AC1002345',
+                expiry: '05/2026', 
+                status: 'Active',
+                details: {
+                    creditLimit: '₹1,50,000',
+                    availableLimit: '₹87,450',
+                    lastPayment: '2025-08-01',
+                    paymentDue: '2025-08-25'
+                }
+            },
+            { 
+                maskedNumber: '•••• •••• •••• 5678', 
+                customer: 'Raj Patel', 
+                type: 'Gold Debit Card', 
+                account: 'AC1006789',
+                expiry: '08/2027', 
+                status: 'Active',
+                details: {
+                    dailyLimit: '₹50,000',
+                    lastTransaction: '2025-08-10',
+                    linkedAccount: 'Salary Account'
+                }
+            }
+        ];
+
+        // DOM Elements
+        const cardTableBody = document.getElementById('cardTableBody');
+        const activeCardsTableBody = document.getElementById('activeCardsTableBody');
+        const cardDetailsModal = new bootstrap.Modal(document.getElementById('cardDetailsModal'));
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            renderCardRequests();
+            renderActiveCards();
+        });
+
+        // Render Card Requests Table
+        function renderCardRequests(filteredData = cardRequests) {
+            cardTableBody.innerHTML = '';
+            
+            if (filteredData.length === 0) {
+                cardTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center py-4">No card requests found matching your criteria</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            filteredData.forEach((request, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${request.id}</td>
+                    <td>${request.customer}</td>
+                    <td>${request.type}</td>
+                    <td>${request.account}</td>
+                    <td>${request.date}</td>
+                    <td><span class="badge ${getStatusBadgeClass(request.status)}">${request.status}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-primary me-1" onclick="viewCardRequestDetails(${index})">
+                            <i class="bi bi-eye"></i> View
+                        </button>
+                        ${request.status === 'Pending' ? `
+                        <button class="btn btn-sm btn-success me-1" onclick="approveCardRequest(${index})">
+                            <i class="bi bi-check-circle"></i> Approve
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="rejectCardRequest(${index})">
+                            <i class="bi bi-x-circle"></i> Reject
+                        </button>
+                        ` : ''}
+                    </td>
+                `;
+                cardTableBody.appendChild(row);
+            });
+        }
+
+        // Render Active Cards Table
+        function renderActiveCards() {
+            activeCardsTableBody.innerHTML = '';
+            
+            activeCards.forEach((card, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${card.maskedNumber}</td>
+                    <td>${card.customer}</td>
+                    <td>${card.type}</td>
+                    <td>${card.account}</td>
+                    <td>${card.expiry}</td>
+                    <td><span class="badge ${card.status === 'Active' ? 'bg-success' : 'bg-danger'}">${card.status}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-primary me-1" onclick="viewActiveCardDetails(${index})">
+                            <i class="bi bi-eye"></i> View
+                        </button>
+                        <button class="btn btn-sm btn-warning" onclick="blockCard(${index})">
+                            <i class="bi bi-lock"></i> Block
+                        </button>
+                    </td>
+                `;
+                activeCardsTableBody.appendChild(row);
+            });
+        }
+
+        // Get appropriate badge class for status
+        function getStatusBadgeClass(status) {
+            switch(status) {
+                case 'Approved': return 'badge-approved';
+                case 'Rejected': return 'badge-rejected';
+                case 'Pending': return 'badge-pending';
+                default: return 'bg-secondary';
+            }
+        }
+
+        // Filter cards based on type and status
+        function filterCards() {
+            const typeFilter = document.getElementById('cardTypeFilter').value;
+            const statusFilter = document.getElementById('cardStatusFilter').value;
+            
+            let filtered = cardRequests;
+            
+            // Filter by card type
+            if (typeFilter !== 'all') {
+                filtered = filtered.filter(request => request.type.includes(typeFilter));
+            }
+            
+            // Filter by status
+            if (statusFilter !== 'all') {
+                filtered = filtered.filter(request => request.status === statusFilter);
+            }
+            
+            renderCardRequests(filtered);
+        }
+
+        // View card request details
+        function viewCardRequestDetails(index) {
+            const request = cardRequests[index];
+            document.getElementById('cardModalTitle').textContent = `Card Request - ${request.id}`;
+            
+            let detailsHtml = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Request ID:</strong> ${request.id}</p>
+                        <p><strong>Customer:</strong> ${request.customer}</p>
+                        <p><strong>Account:</strong> ${request.account}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Request Type:</strong> ${request.type}</p>
+                        <p><strong>Date:</strong> ${request.date}</p>
+                        <p><strong>Status:</strong> <span class="badge ${getStatusBadgeClass(request.status)}">${request.status}</span></p>
+                    </div>
+                </div>
+                <hr>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <h6>Request Details</h6>
+            `;
+
+            // Add specific details based on request type
+            if (request.type.includes('New Card')) {
+                detailsHtml += `
+                    <p><strong>Card Type:</strong> ${request.details.cardType}</p>
+                    <p><strong>Requested Limit:</strong> ${request.details.requestedLimit}</p>
+                    <p><strong>Reason:</strong> ${request.details.reason}</p>
+                `;
+            } else if (request.type.includes('Limit Increase')) {
+                detailsHtml += `
+                    <p><strong>Card Type:</strong> ${request.details.cardType}</p>
+                    <p><strong>Current Limit:</strong> ${request.details.currentLimit}</p>
+                    <p><strong>Requested Limit:</strong> ${request.details.requestedLimit}</p>
+                    ${request.status === 'Approved' ? `<p><strong>Approved Limit:</strong> ${request.details.approvedLimit}</p>` : ''}
+                `;
+            } else if (request.type.includes('Replacement')) {
+                detailsHtml += `
+                    <p><strong>Card Type:</strong> ${request.details.cardType}</p>
+                    <p><strong>Reason:</strong> ${request.details.reason}</p>
+                    <p><strong>Delivery Address:</strong> ${request.details.deliveryAddress}</p>
+                `;
+            }
+
+            detailsHtml += `
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Documents</h6>
+                        <ul>
+            `;
+
+            if (request.details.documents) {
+                request.details.documents.forEach(doc => {
+                    detailsHtml += `<li>${doc}</li>`;
+                });
+            } else {
+                detailsHtml += `<li>No additional documents required</li>`;
+            }
+
+            detailsHtml += `
+                        </ul>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('cardModalBody').innerHTML = detailsHtml;
+            cardDetailsModal.show();
+        }
+
+        // View active card details
+        function viewActiveCardDetails(index) {
+            const card = activeCards[index];
+            document.getElementById('cardModalTitle').textContent = `Card Details - ${card.maskedNumber}`;
+            
+            let detailsHtml = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Card Number:</strong> ${card.maskedNumber}</p>
+                        <p><strong>Customer:</strong> ${card.customer}</p>
+                        <p><strong>Account:</strong> ${card.account}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Card Type:</strong> ${card.type}</p>
+                        <p><strong>Expiry Date:</strong> ${card.expiry}</p>
+                        <p><strong>Status:</strong> <span class="badge ${card.status === 'Active' ? 'bg-success' : 'bg-danger'}">${card.status}</span></p>
+                    </div>
+                </div>
+                <hr>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <h6>Card Details</h6>
+            `;
+
+            if (card.type.includes('Credit')) {
+                detailsHtml += `
+                    <p><strong>Credit Limit:</strong> ${card.details.creditLimit}</p>
+                    <p><strong>Available Limit:</strong> ${card.details.availableLimit}</p>
+                    <p><strong>Last Payment:</strong> ${card.details.lastPayment}</p>
+                    <p><strong>Payment Due:</strong> ${card.details.paymentDue}</p>
+                `;
+            } else {
+                detailsHtml += `
+                    <p><strong>Daily Limit:</strong> ${card.details.dailyLimit}</p>
+                    <p><strong>Last Transaction:</strong> ${card.details.lastTransaction}</p>
+                    <p><strong>Linked Account:</strong> ${card.details.linkedAccount}</p>
+                `;
+            }
+
+            detailsHtml += `
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Quick Actions</h6>
+                        <button class="btn btn-outline-primary mb-2 w-100">View Transactions</button>
+                        <button class="btn btn-outline-secondary mb-2 w-100">Generate Statement</button>
+                        <button class="btn btn-outline-danger w-100" onclick="blockCard(${index})">
+                            <i class="bi bi-lock"></i> Block Card
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('cardModalBody').innerHTML = detailsHtml;
+            cardDetailsModal.show();
+        }
+
+        // Approve a card request
+        function approveCardRequest(index) {
+            if (confirm(`Are you sure you want to approve card request ${cardRequests[index].id}?`)) {
+                cardRequests[index].status = 'Approved';
+                
+                // If this was a new card request, add to active cards
+                if (cardRequests[index].type.includes('New Card')) {
+                    const newCard = {
+                        maskedNumber: '•••• •••• •••• ' + Math.floor(1000 + Math.random() * 9000),
+                        customer: cardRequests[index].customer,
+                        type: cardRequests[index].details.cardType,
+                        account: cardRequests[index].account,
+                        expiry: new Date(new Date().setFullYear(new Date().getFullYear() + 3)).toLocaleDateString('en-US', {month: '2-digit', year: '2-digit'}),
+                        status: 'Active',
+                        details: {
+                            creditLimit: cardRequests[index].details.requestedLimit,
+                            availableLimit: cardRequests[index].details.requestedLimit,
+                            lastPayment: 'N/A',
+                            paymentDue: 'N/A'
+                        }
+                    };
+                    activeCards.push(newCard);
+                }
+                
+                renderCardRequests();
+                renderActiveCards();
+                alert(`Card request ${cardRequests[index].id} has been approved.`);
+            }
+        }
+
+        // Reject a card request
+        function rejectCardRequest(index) {
+            const reason = prompt(`Please enter reason for rejecting card request ${cardRequests[index].id}:`);
+            if (reason !== null) {
+                cardRequests[index].status = 'Rejected';
+                cardRequests[index].rejectionReason = reason;
+                renderCardRequests();
+                alert(`Card request ${cardRequests[index].id} has been rejected.`);
+            }
+        }
+
+        // Block a card
+        function blockCard(index) {
+            if (confirm(`Are you sure you want to block card ${activeCards[index].maskedNumber}?`)) {
+                activeCards[index].status = 'Blocked';
+                renderActiveCards();
+                alert(`Card ${activeCards[index].maskedNumber} has been blocked.`);
+            }
+        }
+
+       // Enhanced export function for card data
+        function exportCards(type = 'current') {
+            try {
+                let dataToExport = [];
+                let fileName = 'DigiBank_Cards_Export';
+                let sheetName = "Card Data";
+                
+                if (type === 'current') {
+                    // Get filtered data
+                    const typeFilter = document.getElementById('cardTypeFilter').value;
+                    const statusFilter = document.getElementById('cardStatusFilter').value;
+                    
+                    dataToExport = cardRequests.filter(card => {
+                        const typeMatch = typeFilter === 'all' || card.type.includes(typeFilter);
+                        const statusMatch = statusFilter === 'all' || card.status === statusFilter;
+                        return typeMatch && statusMatch;
+                    });
+                    fileName = 'DigiBank_Filtered_Cards_' + formatDate(new Date());
+                } 
+                else if (type === 'all') {
+                    dataToExport = cardRequests;
+                    fileName = 'DigiBank_All_Card_Requests_' + formatDate(new Date());
+                }
+                else if (type === 'active') {
+                    dataToExport = activeCards;
+                    sheetName = "Active Cards";
+                    fileName = 'DigiBank_Active_Cards_' + formatDate(new Date());
+                }
+                else if (type === 'pending') {
+                    dataToExport = cardRequests.filter(card => card.status === 'Pending');
+                    fileName = 'DigiBank_Pending_Card_Requests_' + formatDate(new Date());
+                }
+
+                if (dataToExport.length === 0) {
+                    showExportAlert('No data to export!', 'warning');
+                    return;
+                }
+
+                // Prepare the worksheet
+                let wsData = [];
+                
+                if (type === 'active') {
+                    // Active cards export format
+                    wsData = [
+                        // Headers
+                        ['Card Number', 'Customer', 'Card Type', 'Linked Account', 'Expiry Date', 'Status', 'Credit Limit', 'Available Limit'],
+                        // Data rows
+                        ...dataToExport.map(card => [
+                            card.maskedNumber,
+                            card.customer,
+                            card.type,
+                            card.account,
+                            card.expiry,
+                            card.status,
+                            card.details.creditLimit || 'N/A',
+                            card.details.availableLimit || 'N/A'
+                        ])
+                    ];
+                } else {
+                    // Card requests export format
+                    wsData = [
+                        // Headers
+                        ['Request ID', 'Customer', 'Request Type', 'Account', 'Date', 'Status', 'Card Type', 'Requested Limit'],
+                        // Data rows
+                        ...dataToExport.map(card => [
+                            card.id,
+                            card.customer,
+                            card.type,
+                            card.account,
+                            card.date,
+                            card.status,
+                            card.details.cardType || 'N/A',
+                            card.details.requestedLimit || card.details.currentLimit || 'N/A'
+                        ])
+                    ];
+                }
+
+                const ws = XLSX.utils.aoa_to_sheet(wsData);
+                
+                // Create workbook
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, sheetName);
+                
+                // Try the standard method first
+                try {
+                    XLSX.writeFile(wb, `${fileName}.xlsx`);
+                    showExportAlert('Export started successfully!', 'success');
+                } catch (e) {
+                    // Fallback method if standard export fails
+                    fallbackExport(wb, fileName);
+                }
+
+            } catch (error) {
+                console.error('Export error:', error);
+                showExportAlert('Failed to export data. Please try again.', 'danger');
+            }
+        }
+
+        // Fallback export method
+        function fallbackExport(wb, fileName) {
+            try {
+                // Generate base64 string
+                const base64 = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
+                
+                // Create download link
+                const link = document.createElement('a');
+                link.href = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${base64}`;
+                link.download = `${fileName}.xlsx`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showExportAlert('Export started using fallback method!', 'info');
+            } catch (fallbackError) {
+                console.error('Fallback export error:', fallbackError);
+                showExportAlert('Both export methods failed. Please check console for details.', 'danger');
+            }
+        }
+
+        // Helper function to format date
+        function formatDate(date) {
+            return date.toISOString().split('T')[0].replace(/-/g, '');
+        }
+
+        // Helper function to show export alerts
+        function showExportAlert(message, type) {
+            // Remove any existing alerts first
+            const existingAlert = document.querySelector('.export-alert');
+            if (existingAlert) existingAlert.remove();
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show export-alert`;
+            alertDiv.role = 'alert';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // In a real application, this would redirect to logout endpoint
+                alert('Logged out successfully!');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Print card details handler
+        document.getElementById('printCardBtn').addEventListener('click', function() {
+            alert('Printing card details...');
+            cardDetailsModal.hide();
+        });
+    </script>
+</body>
+</html>

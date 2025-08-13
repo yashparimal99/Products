@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Deposits - DigiBank Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Bootstrap CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<!-- SheetJS for Excel export -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.18.5/package/dist/xlsx.full.min.js"></script>
+
+    <style>
+        /* General Styles */
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Sidebar Styles */
+        #sidebarMenu.offcanvas-start {
+            width: 250px;
+        }
+
+        #sidebarMenu .offcanvas-body {
+            padding: 0.5rem 1rem;
+        }
+
+        #sidebarMenu .nav-link {
+            font-size: 0.9rem;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #333;
+            transition: color 0.3s;
+        }
+
+        #sidebarMenu .nav-link i {
+            font-size: 1.1rem;
+        }
+
+        #sidebarMenu .nav-link.active {
+            font-weight: 700;
+            color: #97144D !important;
+            background-color: #f0d7e0;
+            border-radius: 4px;
+        }
+
+        #sidebarMenu .nav-link:hover {
+            color: #7a0f3e;
+            background-color: #f9e5ef;
+            border-radius: 4px;
+        }
+
+        /* Top Bar Styles */
+        .top-bar {
+            background-color: #97144D;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            user-select: none;
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+        }
+
+        .top-bar h5 {
+            margin: 0;
+            font-weight: 700;
+            flex-grow: 1;
+            text-align: center;
+            color: white;
+        }
+
+        .top-bar button.btn-outline-light {
+            border: 1.5px solid white;
+            color: white;
+            background: transparent;
+            padding: 4px 10px;
+            font-size: 1.3rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .top-bar button.btn-outline-light:hover {
+            background-color: white;
+            color: #97144D;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1.5px solid white;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            flex-shrink: 0;
+        }
+
+        .logout-btn:hover {
+            background-color: white;
+            color: #97144D;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        /* Card Styles */
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: #97144D;
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+        }
+
+        /* Button Styles */
+        .btn-primary {
+            background-color: #97144D;
+            border-color: #97144D;
+        }
+
+        /* Table Styles */
+        .table th {
+            background-color: #f1f1f1;
+        }
+
+        /* Search Bar Styles */
+        .search-chatbar {
+            max-width: 900px;
+            margin: 15px auto 40px auto;
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .search-chatbar input[type="text"] {
+            flex-grow: 1;
+            padding: 10px 14px;
+            border-radius: 5px;
+            border: 1.5px solid #ccc;
+            font-size: 1rem;
+            outline-offset: 0;
+            transition: border-color 0.3s;
+            width: 9000px; 
+            margin: 0 auto;
+            display: block;
+        }
+
+        .search-chatbar input[type="text"]:focus {
+            border-color: #97144D;
+            box-shadow: 0 0 5px rgba(151, 20, 77, 0.5);
+        }
+
+        .search-chatbar .chatbot-btn {
+            background-color: #97144D;
+            border: none;
+            color: white;
+            padding: 10px 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .search-chatbar .chatbot-btn:hover {
+            background-color: #7a0f3e;
+        }
+        .export-alert {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Offcanvas -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="sidebarMenuLabel">Manager</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="nav flex-column">
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark" href="{{ url_for('dashboard') }}">
+                        <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark" href="{{ url_for('manage_accounts') }}">
+                        <i class="bi bi-people-fill me-2"></i> Manage Accounts
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark active" href="{{ url_for('manview_deposits') }}">
+                        <i class="bi bi-cash-stack me-2"></i> View Deposits
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark" href="{{ url_for('manage_loans') }}">
+                        <i class="bi bi-file-earmark-check me-2"></i> Loan Approvals
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark" href="{{ url_for('view_investments') }}">
+                        <i class="bi bi-graph-up me-2"></i> Investments
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark" href="{{ url_for('view_cards') }}">
+                        <i class="bi bi-credit-card me-2"></i> Cards
+                    </a>
+                </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <button class="btn btn-outline-light btn-sm me-3" 
+                data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-label="Toggle sidebar">
+            <i class="bi bi-list"></i>
+        </button>
+        <h5>DigiBank Deposit Management</h5>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <!-- Search Bar and Chatbot with Sidebar Toggle -->
+    <div class="search-chatbar">
+        <input type="text" placeholder="Search deposits, customers..." aria-label="Search">
+        <button class="chatbot-btn" aria-label="Chatbot">
+            <i class="bi bi-chat-dots-fill"></i>
+        </button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h2 class="mb-4"><i class="bi bi-cash-stack"></i> View Deposits</h2>
+        
+        <!-- Deposit Records Card -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Deposit Records</h5>
+            </div>
+            <div class="card-body">
+                <p>View, approve, or reject customer deposit transactions.</p>
+                
+                <!-- Date Filter Controls -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <label for="fromDate" class="form-label">From Date</label>
+                        <input type="date" class="form-control" id="fromDate">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="toDate" class="form-label">To Date</label>
+                        <input type="date" class="form-control" id="toDate">
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button class="btn btn-primary" onclick="filterDeposits()">Filter</button>
+                        <button class="btn btn-outline-secondary ms-2" onclick="resetFilters()">Reset</button>
+                    </div>
+                </div>
+                
+                <!-- Status Filter -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <label for="statusFilter" class="form-label">Status</label>
+                        <select class="form-select" id="statusFilter" onchange="filterDeposits()">
+                            <option value="all">All Statuses</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="col-md-8 d-flex align-items-end justify-content-end">
+                      <div class="dropdown">
+                        <button class="btn btn-outline-primary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                         <i class="bi bi-download"></i> Export Data
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                            <li><a class="dropdown-item" href="#" onclick="exportDeposits('current')">Current View</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="exportDeposits('all')">All Deposits</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="exportDeposits('approved')">Approved Deposits</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="exportDeposits('pending')">Pending Deposits</a></li>
+                        </ul>
+                      </div>
+                    </div>
+                </div>
+                
+                <!-- Deposits Table -->
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Deposit ID</th>
+                                <th>Customer Name</th>
+                                <th>Deposit Type</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="depositTableBody"></tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <nav aria-label="Deposit pagination">
+                    <ul class="pagination justify-content-center mt-4">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1">Previous</a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deposit Details Modal -->
+    <div class="modal fade" id="depositDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="depositModalTitle">Deposit Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="depositModalBody">
+                    <!-- Content will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="printDepositBtn">
+                        <i class="bi bi-printer"></i> Print Receipt
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Data initialization
+        const deposits = [
+            { id: 'DEP1001', name: 'John Smith', type: 'Fixed Deposit', amount: '₹50,000.00', date: '2025-08-01', status: 'Pending', 
+              details: '1 year term at 6.5% interest', account: 'AC1001' },
+            { id: 'DEP1002', name: 'Sarah Johnson', type: 'Recurring Deposit', amount: '₹10,000.00', date: '2025-08-03', status: 'Approved',
+              details: 'Monthly deposit for 12 months at 5.8% interest', account: 'AC1002' },
+            { id: 'DEP1003', name: 'Michael Brown', type: 'Savings Deposit', amount: '₹5,000.00', date: '2025-08-05', status: 'Pending',
+              details: 'Regular savings account deposit', account: 'AC1003' },
+            { id: 'DEP1004', name: 'Emma Davis', type: 'Fixed Deposit', amount: '₹25,000.00', date: '2025-08-02', status: 'Approved',
+              details: '2 year term at 7.2% interest', account: 'AC1004' },
+            { id: 'DEP1005', name: 'David Wilson', type: 'Recurring Deposit', amount: '₹15,000.00', date: '2025-08-04', status: 'Rejected',
+              details: 'Monthly deposit for 24 months at 6.0% interest', account: 'AC1005', rejectionReason: 'Insufficient documentation' }
+        ];
+
+        // DOM Elements
+        const depositTableBody = document.getElementById('depositTableBody');
+        const depositDetailsModal = new bootstrap.Modal(document.getElementById('depositDetailsModal'));
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            renderDepositsTable();
+            setDefaultDates();
+        });
+
+        // Set default date range (last 30 days)
+        function setDefaultDates() {
+            const today = new Date();
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(today.getDate() - 30);
+            
+            document.getElementById('toDate').valueAsDate = today;
+            document.getElementById('fromDate').valueAsDate = thirtyDaysAgo;
+        }
+
+        // Render Deposits Table
+        function renderDepositsTable(filteredData = deposits) {
+            depositTableBody.innerHTML = '';
+            
+            if (filteredData.length === 0) {
+                depositTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center py-4">No deposits found matching your criteria</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            filteredData.forEach((deposit, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${deposit.id}</td>
+                    <td>${deposit.name}</td>
+                    <td>${deposit.type}</td>
+                    <td>${deposit.amount}</td>
+                    <td>${deposit.date}</td>
+                    <td><span class="badge ${getStatusBadgeClass(deposit.status)}">${deposit.status}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-primary me-1" onclick="viewDepositDetails(${index})">
+                            <i class="bi bi-eye"></i> View
+                        </button>
+                        ${deposit.status === 'Pending' ? `
+                        <button class="btn btn-sm btn-success me-1" onclick="approveDeposit(${index})">
+                            <i class="bi bi-check-circle"></i> Approve
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="rejectDeposit(${index})">
+                            <i class="bi bi-x-circle"></i> Reject
+                        </button>
+                        ` : ''}
+                    </td>
+                `;
+                depositTableBody.appendChild(row);
+            });
+        }
+
+        // Get appropriate badge class for status
+        function getStatusBadgeClass(status) {
+            switch(status) {
+                case 'Approved': return 'bg-success';
+                case 'Rejected': return 'bg-danger';
+                case 'Pending': return 'bg-warning text-dark';
+                default: return 'bg-secondary';
+            }
+        }
+
+        // Filter deposits based on date range and status
+        function filterDeposits() {
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            let filtered = deposits;
+            
+            // Filter by date range
+            if (fromDate && toDate) {
+                filtered = filtered.filter(deposit => {
+                    return deposit.date >= fromDate && deposit.date <= toDate;
+                });
+            }
+            
+            // Filter by status
+            if (statusFilter !== 'all') {
+                filtered = filtered.filter(deposit => deposit.status === statusFilter);
+            }
+            
+            renderDepositsTable(filtered);
+        }
+
+        // Reset all filters
+        function resetFilters() {
+            document.getElementById('fromDate').value = '';
+            document.getElementById('toDate').value = '';
+            document.getElementById('statusFilter').value = 'all';
+            renderDepositsTable(deposits);
+        }
+
+        // View deposit details
+        function viewDepositDetails(index) {
+            const deposit = deposits[index];
+            document.getElementById('depositModalTitle').textContent = `Deposit Details - ${deposit.id}`;
+            
+            let detailsHtml = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Deposit ID:</strong> ${deposit.id}</p>
+                        <p><strong>Customer Name:</strong> ${deposit.name}</p>
+                        <p><strong>Account Number:</strong> ${deposit.account}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Deposit Type:</strong> ${deposit.type}</p>
+                        <p><strong>Amount:</strong> ${deposit.amount}</p>
+                        <p><strong>Date:</strong> ${deposit.date}</p>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <p><strong>Details:</strong> ${deposit.details}</p>
+                        <p><strong>Status:</strong> <span class="badge ${getStatusBadgeClass(deposit.status)}">${deposit.status}</span></p>
+            `;
+            
+            if (deposit.status === 'Rejected' && deposit.rejectionReason) {
+                detailsHtml += `<p><strong>Rejection Reason:</strong> ${deposit.rejectionReason}</p>`;
+            }
+            
+            detailsHtml += `</div></div>`;
+            
+            document.getElementById('depositModalBody').innerHTML = detailsHtml;
+            depositDetailsModal.show();
+        }
+
+        // Approve a deposit
+        function approveDeposit(index) {
+            if (confirm(`Are you sure you want to approve deposit ${deposits[index].id}?`)) {
+                deposits[index].status = 'Approved';
+                renderDepositsTable();
+                alert(`Deposit ${deposits[index].id} has been approved.`);
+            }
+        }
+
+        // Reject a deposit
+        function rejectDeposit(index) {
+            const reason = prompt(`Please enter reason for rejecting deposit ${deposits[index].id}:`);
+            if (reason !== null) {
+                deposits[index].status = 'Rejected';
+                deposits[index].rejectionReason = reason;
+                renderDepositsTable();
+                alert(`Deposit ${deposits[index].id} has been rejected.`);
+            }
+        }
+
+        // Enhanced export function with better error handling
+        function exportDeposits(type = 'current') {
+            try {
+                let dataToExport = [];
+                let fileName = 'DigiBank_Deposits_Export';
+                
+                if (type === 'current') {
+                    // Get filtered data
+                    const fromDate = document.getElementById('fromDate').value;
+                    const toDate = document.getElementById('toDate').value;
+                    const statusFilter = document.getElementById('statusFilter').value;
+                    
+                    dataToExport = deposits.filter(deposit => {
+                        const dateMatch = (!fromDate || !toDate) || 
+                                          (deposit.date >= fromDate && deposit.date <= toDate);
+                        const statusMatch = statusFilter === 'all' || deposit.status === statusFilter;
+                        return dateMatch && statusMatch;
+                    });
+                    fileName = 'DigiBank_Filtered_Deposits_' + formatDate(new Date());
+                } 
+                else if (type === 'all') {
+                    dataToExport = deposits;
+                    fileName = 'DigiBank_All_Deposits_' + formatDate(new Date());
+                }
+                else if (type === 'approved') {
+                    dataToExport = deposits.filter(deposit => deposit.status === 'Approved');
+                    fileName = 'DigiBank_Approved_Deposits_' + formatDate(new Date());
+                }
+                else if (type === 'pending') {
+                    dataToExport = deposits.filter(deposit => deposit.status === 'Pending');
+                    fileName = 'DigiBank_Pending_Deposits_' + formatDate(new Date());
+                }
+
+                if (dataToExport.length === 0) {
+                    showExportAlert('No data to export!', 'warning');
+                    return;
+                }
+
+                // Prepare the worksheet
+                const wsData = [
+                    // Headers
+                    ['Deposit ID', 'Customer Name', 'Account Number', 'Deposit Type', 'Amount', 'Date', 'Status', 'Details'],
+                    // Data rows
+                    ...dataToExport.map(deposit => [
+                        deposit.id,
+                        deposit.name,
+                        deposit.account,
+                        deposit.type,
+                        deposit.amount,
+                        deposit.date,
+                        deposit.status,
+                        deposit.details
+                    ])
+                ];
+
+                const ws = XLSX.utils.aoa_to_sheet(wsData);
+                
+                // Create workbook
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Deposit Data");
+                
+                // Try the standard method first
+                try {
+                    XLSX.writeFile(wb, `${fileName}.xlsx`);
+                    showExportAlert('Export started successfully!', 'success');
+                } catch (e) {
+                    // Fallback method if standard export fails
+                    fallbackExport(wb, fileName);
+                }
+
+            } catch (error) {
+                console.error('Export error:', error);
+                showExportAlert('Failed to export data. Please try again.', 'danger');
+            }
+        }
+
+        // Fallback export method
+        function fallbackExport(wb, fileName) {
+            try {
+                // Generate base64 string
+                const base64 = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
+                
+                // Create download link
+                const link = document.createElement('a');
+                link.href = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${base64}`;
+                link.download = `${fileName}.xlsx`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showExportAlert('Export started using fallback method!', 'info');
+            } catch (fallbackError) {
+                console.error('Fallback export error:', fallbackError);
+                showExportAlert('Both export methods failed. Please check console for details.', 'danger');
+            }
+        }
+
+        // Helper function to format date
+        function formatDate(date) {
+            return date.toISOString().split('T')[0].replace(/-/g, '');
+        }
+
+        // Helper function to show export alerts
+        function showExportAlert(message, type) {
+            // Remove any existing alerts first
+            const existingAlert = document.querySelector('.export-alert');
+            if (existingAlert) existingAlert.remove();
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show export-alert`;
+            alertDiv.role = 'alert';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        // Remove the old exportToExcel function and replace with the new exportDeposits functio
+
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // In a real application, this would redirect to logout endpoint
+                alert('Logged out successfully!');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Print receipt handler
+        document.getElementById('printDepositBtn').addEventListener('click', function() {
+            alert('Printing deposit receipt...');
+            depositDetailsModal.hide();
+        });
+    </script>
+</body>
+</html>

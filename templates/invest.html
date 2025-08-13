@@ -11,69 +11,91 @@
 
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important;">
-    <div class="container-fluid">
-      <img src="{{ url_for('static', filename='investimg/digilogo2.jpg') }}" alt="Digi Bank" height="60" class="my-2">
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('exploreproduct') }}">Explore Products</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Grab Deals</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Make Payments</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Bank Smart</a>
-          </li>
-        </ul>
-        <form class="d-flex">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form>
-      </div>
+  <div class="container-fluid">
+    <img src="{{ url_for('static', filename='images/Digilogo.jpg') }}"
+         alt="DiGi Bank" height="60" class="my-2">
+ 
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+            aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+ 
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <!-- your existing nav items -->
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page"
+             href="{{ url_for('home') }}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link"
+             href="{{ url_for('exploreproduct') }}">Explore Products</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="#">Grab Deals</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Make Payments</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Bank Smart</a></li>
+      </ul>
+ 
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="btn btn-outline-light me-2 navbar-btn"
+             href="{{ url_for('login') }}">Login</a>
+        </li>
+        <li class="nav-item">
+          <a class="btn btn-light navbar-btn"
+             href="{{ url_for('signup') }}">Sign Up</a>
+        </li>
+      </ul>
     </div>
+  </div>
+</nav>
+ 
+
+    <style>
+        .breadcrumb .breadcrumb-item a {
+            color: #97144D;
+            text-decoration: none;
+        }
+
+        .breadcrumb .breadcrumb-item a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb .breadcrumb-item {
+            color: #97144D;
+        }
+    </style>
+
+    <div class="card mt-4 border-0"></div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('invest') }}">Investment</a></li>
+
+        </ol>
+    </nav>
+      <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important;">
+    <!-- your nav content -->
   </nav>
 
-  <div class="card mt-4 border-0"></div>
-  <div class="card mt-4 border-0"></div>
-
-  <style>
-    .breadcrumb .breadcrumb-item a {
-      color: #97144D;
-      text-decoration: none;
-    }
-
-    .breadcrumb .breadcrumb-item a:hover {
-      text-decoration: underline;
-    }
-
-    .breadcrumb .breadcrumb-item {
-      color: #97144D;
-    }
-  </style>
-
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
-      <li class="breadcrumb-item"><a href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
-      <li class="breadcrumb-item"><a href="{{ url_for('invest') }}">Investments</a></li>
-    </ol>
-  </nav>
-
-  <img src="{{ url_for('static', filename='investimg/investbanner.png') }}" class="img-fluid mt-4" alt="Financial Freedom Banner">
+  < <!-- ✅ Full-width Ad Banner After Navbar -->
+<div class="container-fluid p-0">
+  <img src="{{ url_for('static', filename='investment/investment28.jpg') }}"
+       class="img-fluid w-100"
+       style="height: 600px; object-fit: cover;"
+       alt="Advertising Banner">
+</div>
 
   <div class="container my-4">
     <div class="row">
       <div class="col-md-6 mb-3" style="border: 2px solid #97144D; margin-right: 1rem; flex: 1;">
-        <img src="{{ url_for('static', filename='investimg/investbanner2.png') }}" class="img-fluid rounded shadow-sm" alt="Small Banner 1">
+        <img src="{{ url_for('static', filename='investment/investment24.jpg') }}" class="img-fluid rounded shadow-sm" alt="Small Banner 1">
       </div>
       <div class="col-md-6 mb-3" style="border: 2px solid #97144D; margin-right: 1rem; flex: 1;">
-        <img src="{{ url_for('static', filename='investimg/investbanner2.png') }}" class="img-fluid rounded shadow-sm" alt="Small Banner 2">
+        <img src="{{ url_for('static', filename='investment/investment26.jpg') }}" class="img-fluid rounded shadow-sm" alt="Small Banner 2">
       </div>
     </div>
   </div>
@@ -93,12 +115,12 @@
               <div class="row">
                 <div class="col-md-6 mb-3">
                   <div class="card border-0 shadow-sm">
-                    <img src="{{ url_for('static', filename='investimg/equityfund1.png') }}" class="card-img-top rounded" alt="Equity Fund 1" style="height: 250px; object-fit: cover;">
+                    <img src="{{ url_for('static', filename='investment/investment4.jpg') }}" class="card-img-top rounded" alt="Equity Fund 1" style="height: 250px; object-fit: cover;">
                   </div>
                 </div>
                 <div class="col-md-6 mb-3">
                   <div class="card border-0 shadow-sm">
-                    <img src="{{ url_for('static', filename='investimg/equityfund2.png') }}" class="card-img-top rounded" alt="Equity Fund 2" style="height: 250px; object-fit: cover;">
+                    <img src="{{ url_for('static', filename='investment/investment5.jpg') }}" class="card-img-top rounded" alt="Equity Fund 2" style="height: 250px; object-fit: cover;">
                   </div>
                 </div>
               </div>
@@ -107,12 +129,12 @@
               <div class="row">
                 <div class="col-md-6 mb-3">
                   <div class="card border-0 shadow-sm">
-                    <img src="{{ url_for('static', filename='investimg/equityfund3.png') }}" class="card-img-top rounded" alt="Equity Fund 3" style="height: 250px; object-fit: cover;">
+                    <img src="{{ url_for('static', filename='investment/investment6.jpg') }}" class="card-img-top rounded" alt="Equity Fund 3" style="height: 250px; object-fit: cover;">
                   </div>
                 </div>
                 <div class="col-md-6 mb-3">
                   <div class="card border-0 shadow-sm">
-                    <img src="{{ url_for('static', filename='investimg/equityfund4.png') }}" class="card-img-top rounded" alt="Equity Fund 4" style="height: 250px; object-fit: cover;">
+                    <img src="{{ url_for('static', filename='investment/investment7.jpg') }}" class="card-img-top rounded" alt="Equity Fund 4" style="height: 250px; object-fit: cover;">
                   </div>
                 </div>
               </div>
@@ -137,12 +159,12 @@
       <div class="row">
         <div class="col-md-6 mb-4">
           <div class="card shadow-sm" style="border: 2px solid #97144D;">
-            <img src="{{ url_for('static', filename='investimg/investbigcard1.png') }}" class="card-img-top rounded" alt="New Card 1" style="height: 400px;">
+            <img src="{{ url_for('static', filename='investment/investment29.jpg') }}" class="card-img-top rounded" alt="New Card 1" style="height: 400px;">
           </div>
         </div>
         <div class="col-md-6 mb-4">
           <div class="card shadow-sm" style="border: 2px solid #97144D;">
-            <img src="{{ url_for('static', filename='investimg/investbigcard2.png') }}" class="card-img-top rounded" alt="New Card 2" style="height: 400px;">
+            <img src="{{ url_for('static', filename='investment/30.jpeg') }}" class="card-img-top rounded" alt="New Card 2" style="height: 400px;">
           </div>
         </div>
       </div>
@@ -154,40 +176,40 @@
     <div class="row justify-content-center px-3">
       <div class="col-md-6 col-lg-4 mb-3">
         <div class="card shadow-sm h-100" style="border: 2px solid #97144D;">
-          <img src="{{ url_for('static', filename='investimg/investcard1.png') }}" class="card-img-top rounded-top" alt="Card 1" style="height: 150px; object-fit: cover;">
+          <img src="{{ url_for('static', filename='investment/investment14.jpg') }}" class="card-img-top rounded-top" alt="Card 1" style="width: 100%; height: 325px; border-bottom: 1px solid #ccc;">
           <div class="card-body p-3">
             <h5 class="card-title mb-2" style="font-weight: 600; font-size: 15px;">Public Provident Fund</h5>
             <p class="card-text mb-2" style="font-size: 13px; line-height: 1.4;">A safe and stable investment option offering fixed returns. Ideal for long-term goals planning.</p>
-            <a href="{{ url_for('pfinvest') }}" class="btn" style="background-color: #97144D; color: white;">Invest Now</a>
+            <a href="{{ url_for('login') }}" class="btn" style="background-color: #97144D; color: white;">Invest Now</a>
           </div>
         </div>
       </div>
 
       <div class="col-md-6 col-lg-4 mb-3">
         <div class="card shadow-sm h-100" style="border: 2px solid #97144D;">
-          <img src="{{ url_for('static', filename='investimg/investcard2.png') }}" class="card-img-top rounded-top" alt="Card 2" style="height: 150px; object-fit: cover;">
+          <img src="{{ url_for('static', filename='investment/investment15.jpg') }}" class="card-img-top rounded-top" alt="Card 2" style="width: 100%; height: 325px; border-bottom: 1px solid #ccc;">
           <div class="card-body p-3">
             <h5 class="card-title mb-2" style="font-weight: 600; font-size: 15px;">Floating Rate Saving Bonds</h5>
             <p class="card-text mb-2" style="font-size: 13px; line-height: 1.4;">Issued by the RBI, these are safe and offer guaranteed returns. Interest is paid semi-annually.</p>
-            <a href="{{ url_for('pfinvest') }}" class="btn" style="background-color: #97144D; color: white;">Invest Now</a>
+            <a href="{{ url_for('login') }}" class="btn" style="background-color: #97144D; color: white;">Invest Now</a>
           </div>
         </div>
       </div>
 
       <div class="col-md-6 col-lg-4 mb-3">
         <div class="card shadow-sm h-100" style="border: 2px solid #97144D;">
-          <img src="{{ url_for('static', filename='investimg/investcard3.png') }}" class="card-img-top rounded-top" alt="Card 3" style="height: 150px; object-fit: cover;">
+          <img src="{{ url_for('static', filename='investment/investment16.jpg') }}" class="card-img-top rounded-top" alt="Card 3" style="width: 100%; height: 325px; border-bottom: 1px solid #ccc;">
           <div class="card-body p-3">
             <h5 class="card-title mb-2" style="font-weight: 600; font-size: 15px;">National Pension System</h5>
             <p class="card-text mb-2" style="font-size: 13px; line-height: 1.4;">Ideal for retirement planning. Secure your income post retirement. Offers tax benefits.</p>
-            <a href="{{ url_for('pfinvest') }}" class="btn" style="background-color: #97144D; color: white;">Invest Now</a>
+            <a href="{{ url_for('login') }}" class="btn" style="background-color: #97144D; color: white;">Invest Now</a>
           </div>
         </div>
       </div>
     </div>
 
     <div class="position-relative mt-3">
-      <img src="{{ url_for('static', filename='investimg/investopenacc.png') }}" class="img-fluid rounded" alt="Financial Freedom Banner" style="width: 100%; max-height: 270px; object-fit: cover;">
+      <img src="{{ url_for('static', filename='investment/investment22.jpg') }}" class="img-fluid rounded" alt="Financial Freedom Banner" style="width: 100%; max-height: 270px; object-fit: cover;">
       <button class="btn position-absolute" data-bs-toggle="modal" data-bs-target="#openAccountModal" style="bottom: 15px; right: 20px; background-color: #97144D; color: white; border-radius: 6px; padding: 5px 14px; font-size: 12px;">Open Now</button>
     </div>
 
@@ -195,7 +217,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="openAccountModalLabel">Open Account</h5>
+            <h5 class="modal-title" id="openAccountModalLabel">Share Details</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -204,14 +226,39 @@
                 <label for="nameInput" class="form-label">Full Name</label>
                 <input type="text" class="form-control" id="nameInput" required>
               </div>
-              <div class="mb-3">
-                <label for="emailInput" class="form-label">Email address</label>
-                <input type="email" class="form-control" id="emailInput" required>
-              </div>
-              <div class="mb-3">
-                <label for="phoneInput" class="form-label">Phone Number</label>
-                <input type="tel" class="form-control" id="phoneInput" required>
-              </div>
+<div class="mb-3">
+  <label for="emailInput" class="form-label">Email address</label>
+  <input type="email"
+         class="form-control"
+         id="emailInput"
+         name="email"
+         placeholder="e.g. name@example.com"
+         pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+         title="Enter a valid email address"
+         required />
+</div>
+
+<div class="mb-3">
+  <label for="phoneInput" class="form-label">Phone Number</label>
+  <input type="tel"
+         class="form-control"
+         id="phoneInput"
+         name="phone"
+         placeholder="e.g. 9876543210"
+         pattern="[6-9]{1}[0-9]{9}"
+         title="Enter a valid 10-digit Indian mobile number starting with 6–9"
+         maxlength="10"
+         minlength="10"
+         required />
+</div>
+
+<!-- JS to prevent symbols and letters in phone number -->
+<script>
+  document.getElementById('phoneInput').addEventListener('input', function () {
+    this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
+  });
+</script>
+
               <button type="submit" class="btn btn-primary w-100" style="background-color: #97144D; border: none;">Submit</button>
             </form>
           </div>
@@ -225,7 +272,7 @@
     <div class="row justify-content-center px-3">
       <div class="col-md-6 col-lg-4 mb-3">
         <div class="card shadow-sm h-100" style="border: 2px solid #97144D;">
-          <img src="{{ url_for('static', filename='investimg/investlearn1.png') }}" class="card-img-top rounded-top" alt="Card 1" style="height: 150px; object-fit: cover;">
+          <img src="{{ url_for('static', filename='investment/investment20.jpg') }}" class="card-img-top rounded-top" alt="Card 1" style="height: 150px; object-fit: cover;">
           <div class="card-body p-3">
             <h5 class="card-title mb-2" style="font-weight: 600; font-size: 15px;">Received your first paycheck? Start saving and investing soon.</h5>
           </div>
@@ -234,7 +281,7 @@
 
       <div class="col-md-6 col-lg-4 mb-3">
         <div class="card shadow-sm h-100" style="border: 2px solid #97144D;">
-          <img src="{{ url_for('static', filename='investimg/investlearn2.png') }}" class="card-img-top rounded-top" alt="Card 2" style="height: 150px; object-fit: cover;">
+          <img src="{{ url_for('static', filename='investment/investment21.jpg') }}" class="card-img-top rounded-top" alt="Card 2" style="height: 150px; object-fit: cover;">
           <div class="card-body p-3">
             <h5 class="card-title mb-2" style="font-weight: 600; font-size: 15px;">Tips to learn maximum interest on PPF.</h5>
           </div>
@@ -243,7 +290,7 @@
 
       <div class="col-md-6 col-lg-4 mb-3">
         <div class="card shadow-sm h-100" style="border: 2px solid #97144D;">
-          <img src="{{ url_for('static', filename='investimg/investlearn3.png') }}" class="card-img-top rounded-top" alt="Card 3" style="height: 150px; object-fit: cover;">
+          <img src="{{ url_for('static', filename='investment/investment17.jpg') }}" class="card-img-top rounded-top" alt="Card 3" style="height: 150px; object-fit: cover;">
           <div class="card-body p-3">
             <h5 class="card-title mb-2" style="font-weight: 600; font-size: 15px;">Smart investing at your fingertips.</h5>
           </div>

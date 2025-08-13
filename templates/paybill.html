@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pay Bill - DigiBank</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Bootstrap CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+    }
+
+    .card-custom {
+      border: 1px solid #97144D;
+      border-radius: 12px;
+      padding: 20px;
+      position: relative;
+      height: 150px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      background-color: #fff;
+    }
+    .card-custom h6 {
+      font-weight: 700;
+      color: #97144D;
+    }
+    .card-custom p {
+      font-size: 0.9rem;
+      color: #555;
+    }
+    .card-custom i.arrow {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 1.2rem;
+      color: #97144D;
+    }
+    .card-custom i.icon {
+      position: absolute;
+      bottom: 15px;
+      right: 15px;
+      font-size: 1.5rem;
+      color: #97144D;
+    }
+
+    .banner-box {
+      display: flex;
+      align-items: center;
+      background-color: #fff;
+      border: 1px solid #97144D;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      position: relative;
+    }
+    .banner-box i {
+      font-size: 2rem;
+      color: #97144D;
+      margin-right: 15px;
+    }
+    .banner-box .arrow-btn {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.5rem;
+      color: #97144D;
+      cursor: pointer;
+    }
+
+    .label-box {
+      background-color: #fff;
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: #444;
+    }
+  </style>
+  <style>
+  .btn-custom {
+    background-color: #97144D;
+    color: #fff;
+    border: none;
+  }
+  .btn-custom:hover {
+    background-color: #7b103e; /* slightly darker on hover */
+    color: #fff;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- First Row: Transfers -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <div class="card-custom">
+          <h6>Quick Transfer</h6>
+          <p>Up to ₹50,000</p>
+          <!-- <button class="btn btn-primary btn-sm btn-custom">Transfer Now</button> -->
+          <a href="{{ url_for('quicktransfer') }}" class="btn btn-primary btn-sm btn-custom">Transfer Now</a>
+          <i class="bi bi-arrow-right-circle-fill arrow"></i>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="card-custom">
+          <h6>Bank Transfer</h6>
+          <p>To own/other account</p>
+          <a href="{{ url_for('banktransfer') }}" class="btn btn-primary btn-sm btn-custom">Transfer Now</a>
+          
+          <i class="bi bi-arrow-right-circle-fill arrow"></i>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card-custom">
+          <h6>International Fund Transfer</h6>
+          <p>Transfer fund outside india</p>
+          <button class="btn btn-primary btn-sm btn-custom">Transfer Now</button>
+          <i class="bi bi-arrow-right-circle-fill arrow"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Second Row: Bill Payments -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <div class="card-custom">
+          <h6>Bill Payments</h6>
+          <p>Make Bill Payments</p>
+          <button class="btn btn-primary btn-sm btn-custom">Transfer Now</button>
+          <i class="bi bi-receipt icon"></i>
+          <i class="bi bi-arrow-right-circle-fill arrow"></i>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card-custom">
+          <h6>Credit Card Bills</h6>
+          <p>Any card Payments</p>
+          <button class="btn btn-primary btn-sm btn-custom">Transfer Now</button>
+          <i class="bi bi-credit-card icon"></i>
+          <i class="bi bi-arrow-right-circle-fill arrow"></i>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card-custom">
+          <h6>NPS Contribution</h6>
+          <p></p>
+          <i class="bi bi-graph-up-arrow icon"></i>
+          <i class="bi bi-arrow-right-circle-fill arrow"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Donation Banner -->
+    <div class="banner-box">
+      <i class="bi bi-heart-fill"></i>
+      <div>
+        <h5>Donations</h5>
+        <p>Donate and create impact that lasts a lifetime</p>
+      </div>
+    </div>
+
+    <!-- Manage Transaction Limit Banner -->
+    <div class="banner-box">
+      <div>
+        <h5>Manage Transaction Limit</h5>
+        <p>Set secure limits for efficient transactions</p>
+      </div>
+      <i class="bi bi-arrow-right-circle-fill arrow-btn"></i>
+    </div>
+
+    <!-- Label Box -->
+    <div class="label-box">
+      For a hassle-free transactions experience, please make sure your total limit per day for third-party transfer transactions is sufficiently set for all your transactions planned through the day. You can reach TPT limit anytime from above Manage Transaction Limit.
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

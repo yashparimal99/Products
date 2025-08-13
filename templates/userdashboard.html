@@ -249,7 +249,7 @@
   <!-- Sidebar Offcanvas -->
   <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
     <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="sidebarMenuLabel">User</h5>
+      <h5 class="offcanvas-title" id="sidebarMenuLabel">Welcome, {{ user.name }} !  ({{user.role}})</h5>
       <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
@@ -285,7 +285,7 @@
           </a>
         </li>
         <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="paybill.html">
+          <a class="nav-link text-dark" href="{{ url_for('paybill') }}">
             <i class="bi bi-credit-card me-2"></i> Pay Bill
           </a>
         </li>
@@ -342,8 +342,8 @@
             </li>
             <!-- Deposits Dropdown -->
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Deposits</a>
+              <button class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Deposits</button>
               <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
                 <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Digital Fixed
                     Deposits</a></li>
@@ -355,50 +355,50 @@
             </li>
             <!-- Deposits Dropdown -->
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
+              <a class="nav-link dropdown-toggle" href="#" id="loanDropdown" role="button" data-bs-toggle="dropdown"
                 aria-expanded="false">Loans</a>
-              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Home Loan</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Personal Loan</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Busniness Loan</a></li>
+              <ul class="dropdown-menu" aria-labelledby="loanDropdown">
+                <li><a class="dropdown-item" href="#">Home Loan</a></li>
+                <li><a class="dropdown-item" href="#">Personal Loan</a></li>
+                <li><a class="dropdown-item" href="#">Busniness Loan</a></li>
 
 
               </ul>
             </li>
             <!-- Deposits Dropdown -->
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Cards</a>
-              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
+              <button class="nav-link dropdown-toggle" id="cardDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false" type="button">Cards</button>
+              <ul class="dropdown-menu" aria-labelledby="cardDropdown">
                 <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Credit Cards</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Debit Cards</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Prepaid Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('userdebitform') }}">Debit Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('userprepaidform') }}">Prepaid Cards</a></li>
               </ul>
             </li>
             <!-- Deposits Dropdown -->
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
+              <a class="nav-link dropdown-toggle" href="#" id="forexDropdown" role="button" data-bs-toggle="dropdown"
                 aria-expanded="false">Forex</a>
-              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Travel Forex Cards</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Send Money Abroad</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Send Money India</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Foregin Currency Exchange</a></li>
+              <ul class="dropdown-menu" aria-labelledby="forexDropdown">
+                <li><a class="dropdown-item" href="#">Travel Forex Cards</a></li>
+                <li><a class="dropdown-item" href="#">Send Money Abroad</a></li>
+                <li><a class="dropdown-item" href="#">Send Money India</a></li>
+                <li><a class="dropdown-item" href="#">Foregin Currency Exchange</a></li>
               </ul>
             </li>
             <!-- Deposits Dropdown -->
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
+              <a class="nav-link dropdown-toggle" href="#" id="investDropdown" role="button" data-bs-toggle="dropdown"
                 aria-expanded="false">Investments</a>
-              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Public Provident Fund</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Floating Rate Saving Bonds</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">National Pension System</a></li>
+              <ul class="dropdown-menu" aria-labelledby="investDropdown">
+                <li><a class="dropdown-item" href="#">Public Provident Fund</a></li>
+                <li><a class="dropdown-item" href="#">Floating Rate Saving Bonds</a></li>
+                <li><a class="dropdown-item" href="#">National Pension System</a></li>
               </ul>
             </li>
           </ul>
           <div class="d-flex align-items-center">
-            <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name }} !</h5>
+            <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name }} !  ({{user.role}})</h5>
             <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">
               Logout
             </a>
@@ -503,7 +503,7 @@
           <i class="bi bi-receipt dashboard-icon mb-2"></i>
           <h5>Pay Bills</h5>
           <p>Pay utility bills, credit card bills, and more.</p>
-          <a href="paybill.html" class="btn btn-digibank">Pay Now</a>
+          <a href="{{ url_for('paybill') }}" class="btn btn-digibank">Pay Now</a>
         </div>
       </div>
 

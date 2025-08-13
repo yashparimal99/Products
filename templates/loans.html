@@ -17,38 +17,46 @@
 <body>
     <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-dark"> -->
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important;">
-        <div class="container-fluid">
-            <img src="{{ url_for('static', filename='images/Digilogo.jpg') }}" alt="Digi Bank" height="60" class="my-2">
-
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <!-- <div class="container-fluid justify-content-center"></div> -->
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('exploreproduct') }}">Explore Products</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Grab Deals</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Make Payments</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Bank Smart</a>
-                    </li>
-
-                </ul>
-                <form class="d-flex">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-
-                </form>
-            </div>
-        </div>
-    </nav>
+  <div class="container-fluid">
+    <img src="{{ url_for('static', filename='images/Digilogo.jpg') }}"
+         alt="DiGi Bank" height="60" class="my-2">
+ 
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+            aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+ 
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <!-- your existing nav items -->
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page"
+             href="{{ url_for('home') }}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link"
+             href="{{ url_for('exploreproduct') }}">Explore Products</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="#">Grab Deals</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Make Payments</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Bank Smart</a></li>
+      </ul>
+ 
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="btn btn-outline-light me-2 navbar-btn"
+             href="{{ url_for('login') }}">Login</a>
+        </li>
+        <li class="nav-item">
+          <a class="btn btn-light navbar-btn"
+             href="{{ url_for('signup') }}">Sign Up</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+ 
 
     <style>
         .breadcrumb .breadcrumb-item a {
@@ -198,11 +206,12 @@
                     <!-- Home Loan -->
                     <div class="col">
                         <div class="loan-card" style="width: 100%; border: 2px solid #97144D";>
+                            <img src="{{ url_for('static', filename='Loan/2148793806.jpg') }}" alt="Home Loan" style="width: 100%; height: auto; border-bottom: 1px solid #ccc;">
                             <h5><strong>Home</strong> Loan</h5>
                             <p>Explore a diverse array of home loan options tailored to meet your specific needs.</p>
-                            <a href="{{ url_for('home_loan') }}" class="text-danger">Explore More</a>
+                            <a href="{{ url_for('login') }}" class="text-danger">Explore More</a>
                             <div class="loan-buttons">
-                            <a href="{{ url_for('home_loan') }}" class="btn btn-maroon w-100">Apply Online</a>
+                            <a href="{{ url_for('login') }}" class="btn btn-maroon w-100">Apply Online</a>
                             </div>
                         </div>
                     </div>
@@ -210,11 +219,12 @@
                     <!-- Personal Loan -->
                     <div class="col">
                         <div class="loan-card" style="width: 100%; border: 2px solid #97144D";>
+                            <img src="{{ url_for('static', filename='Loan/2148738291.jpg') }}" alt="Personal Loan" style="width: 100%; height: auto; border-bottom: 1px solid #ccc;">
                             <h5><strong>Personal</strong> Loan</h5>
                             <p>Secure a personal loan for holidays, home renovations, or weddings.</p>
-                            <a href="{{ url_for('personal_loan') }}" class="text-danger">Explore More</a>
+                            <a href="{{ url_for('login') }}" class="text-danger">Explore More</a>
                             <div class="loan-buttons">
-                            <a href="{{ url_for('personal_loan') }}" class="btn btn-maroon w-100">Apply Online</a>
+                            <a href="{{ url_for('login') }}" class="btn btn-maroon w-100">Apply Online</a>
                             </div>
                         </div>
                     </div>
@@ -222,11 +232,12 @@
                     <!-- Business Loan -->
                     <div class="col">
                         <div class="loan-card" style="width: 100%; border: 2px solid #97144D";>
+                            <img src="{{ url_for('static', filename='Loan/37745.jpg') }}" alt="Business Loan" style="width: 100%; height: auto; border-bottom: 1px solid #ccc;">
                             <h5><strong>Business</strong> Loan</h5>
                             <p>Expand your business with minimal paperwork and rapid approval.</p>
-                            <a href="{{ url_for('Business_loan') }}" class="text-danger">Explore More</a>
+                            <a href="{{ url_for('login') }}" class="text-danger">Explore More</a>
                             <div class="loan-buttons mt-2">
-                                <a href="{{ url_for('Business_loan') }}" class="btn btn-maroon w-100">Apply Online</a>
+                                <a href="{{ url_for('login') }}" class="btn btn-maroon w-100">Apply Online</a>
                             </div>
                         </div>
                     </div>

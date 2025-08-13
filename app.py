@@ -149,17 +149,17 @@ def fixeddeposits():
 
 @app.route('/cards')
 def cards():
-    return render_template('cards.html')
+    return render_template('cards_main.html')
 
 @app.route('/creditcard')
 def creditcard():
     return render_template('creditcard.html')
-@app.route('/cardapply')
-def cardapply():
-    return render_template('cardapply.html')
-@app.route('/comparecards')
-def comparecards():
-    return render_template('comparecards.html')
+# @app.route('/cardapply')
+# def cardapply():
+#     return render_template('cardapply.html')
+# @app.route('/comparecards')
+# def comparecards():
+#     return render_template('comparecards.html')
 
 @app.route('/Debitcard')
 def Debitcard():
@@ -196,7 +196,7 @@ def forex():
  
 @app.route('/travel_forex')
 def travel_forex():
-    return render_template('travel-forex.html')
+    return render_template('travel_forex.html')
  
 @app.route('/travel_forex_form')
 def travel_forex_form():
@@ -204,7 +204,7 @@ def travel_forex_form():
  
 @app.route('/send_money_abroad')
 def send_money_abroad():
-    return render_template('send-money-abroad.html')
+    return render_template('send_money_abroad.html')
  
 @app.route('/send_money_abroad_form')
 def send_money_abroad_form():
@@ -212,7 +212,7 @@ def send_money_abroad_form():
  
 @app.route('/send_money_india')
 def send_money_india():
-    return render_template('send-money-india.html')  
+    return render_template('send_money_india.html')  
  
 @app.route('/send_money_india_form')
 def send_money_india_form():
@@ -220,7 +220,7 @@ def send_money_india_form():
  
 @app.route('/currency_exchange')
 def currency_exchange():
-    return render_template('currency-exchange.html')
+    return render_template('currency_exchange.html')
  
 @app.route('/currency_exchange_form')
 def currency_exchange_form():
@@ -239,28 +239,52 @@ def pfinvest():
 
 
 
+#this is working route for login
+# @app.route('/login', methods=['GET', 'POST'])
+# def login():
+#     if request.method == 'POST':
+#         email = request.form['email']
+#         password = request.form['password']
+#         cur = mysql.connection.cursor()
+#         cur.execute("SELECT * FROM users WHERE email = %s AND password = %s", (email, password))
+#         user = cur.fetchone()
+#         cur.close()
+#         if user:
+#             session['user_email'] = email
+            
+#             flash('Logged in successfully!', 'success')
+#             return redirect(url_for('dashboard'))
+#         else:
+#             flash('Invalid email or password', 'danger')
+#     return render_template('login.html')
+
+from MySQLdb.cursors import DictCursor
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
-        cur = mysql.connection.cursor()
+
+        cur = mysql.connection.cursor(DictCursor)  
         cur.execute("SELECT * FROM users WHERE email = %s AND password = %s", (email, password))
         user = cur.fetchone()
         cur.close()
+
         if user:
-            session['user_email'] = email
+            session['user_email'] = user['email']
+            session['user_role'] = user['role']  
             flash('Logged in successfully!', 'success')
             return redirect(url_for('dashboard'))
         else:
             flash('Invalid email or password', 'danger')
+
     return render_template('login.html')
 
 
-@app.route('/userlogin')
-def userlogin():
-    return render_template('login.html')
+# @app.route('/userlogin')
+# def userlogin():
+#     return render_template('login.html')
 
 
 
@@ -548,33 +572,92 @@ def open_deposits():
 
 #User Dashboard
 
+# @app.route('/dashboard')
+# def dashboard():
+#     email = session.get('user_email')
+#     if not email:
+#         flash('Please login first', 'danger')
+#         return redirect(url_for('userlogin'))
+
+#     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)  # Use DictCursor to access columns by name
+#     cur.execute("SELECT cust_id, name, pan, email, mobile_no FROM users WHERE email = %s", (email,))
+#     user = cur.fetchone()
+
+    # cur.execute("SELECT * FROM bank_accounts WHERE cust_id = %s", (user['cust_id'],))
+    # account = cur.fetchone()
+
+    # cur.execute("SELECT * FROM bank_deposits WHERE cust_id = %s", (user['cust_id'],))
+    # deposits = cur.fetchone()
+
+
+
+    # cur.close()
+
+    # if not user:
+    #     flash("User not found.", "danger")
+    #     return redirect(url_for('login'))
+
+    # return render_template('userdashboard.html', user=user)
 @app.route('/dashboard')
 def dashboard():
+    role = session.get('user_role')
     email = session.get('user_email')
-    if not email:
+
+    if not role or not email:
         flash('Please login first', 'danger')
-        return redirect(url_for('userlogin'))
-
-    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)  # Use DictCursor to access columns by name
-    cur.execute("SELECT cust_id, name, pan, email, mobile_no FROM users WHERE email = %s", (email,))
-    user = cur.fetchone()
-
-    cur.execute("SELECT * FROM bank_accounts WHERE cust_id = %s", (user['cust_id'],))
-    account = cur.fetchone()
-
-    cur.execute("SELECT * FROM bank_deposits WHERE cust_id = %s", (user['cust_id'],))
-    deposits = cur.fetchone()
-
-
-
-    cur.close()
-
-    if not user:
-        flash("User not found.", "danger")
         return redirect(url_for('login'))
 
-    return render_template('userdashboard.html', user=user,account=account
-                           ,deposits=deposits)
+    # Fetch the full user details
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM users WHERE email = %s", (email,))
+    user = cur.fetchone()
+    cur.close()
+
+    templates = {
+        'user': 'userdashboard.html',
+        'tl': 'TLdashboard.html',
+        'manager': 'managerdashboard.html'
+    }
+
+    return render_template(templates.get(role, 'login.html'), user=user)
+
+
+#Manager Dasboard Routes
+
+@app.route('/manageaccounts')
+def manageaccounts():
+    return render_template('manageaccounts.html')
+
+@app.route('/managerapprovals')
+def managerapprovals():
+    return render_template('managerapprove.html')
+
+@app.route('/manage_accounts')
+def manage_accounts():
+    return render_template('manage-accounts.html')
+
+@app.route('/manview_deposits')
+def manview_deposits():
+    return render_template('manviewdeposits.html')
+
+@app.route('/manage_loans')
+def manage_loans():
+    return render_template('manage-loans.html')
+
+@app.route('/view_investments')
+def view_investments():
+    return render_template('view-investments.html')
+
+@app.route('/view_cards')
+def view_cards():
+    return render_template('view-cards.html')
+
+@app.route('/transactions_review')
+def transactions_review():
+    return render_template('transactions-review.html')
+
+
+
 
 
 #User Dashboard- cards
@@ -632,9 +715,26 @@ def open_cards():
     return render_template('usercardform.html', user=user)
 
 
-# @app.route('/usercards')
-# def usercards():
-#     return render_template('usercardform.html')
+@app.route('/userdebitform')
+def userdebitform():
+    return render_template('userdebitform.html')
+
+@app.route('/userprepaidform')
+def userprepaidform():
+    return render_template('userprepaidform.html')
+
+
+@app.route('/paybill')
+def paybill():
+    return render_template('paybill.html')
+
+@app.route('/quicktransfer')
+def quicktransfer():
+    return render_template('quicktransfer.html')
+
+@app.route('/banktransfer')
+def banktransfer():
+    return render_template('banktransfer.html')
 
 
 

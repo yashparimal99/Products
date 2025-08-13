@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Manager Dashboard - DigiBank</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Bootstrap CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <style>
+
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .sidebar { background-color: #97144D; color: white; height: 100vh; position: fixed; width: 250px; }
+        .main-content { margin-left: 250px; padding: 20px; }
+        .card { border: none; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        .card-header { background-color: #97144D; color: white; border-radius: 10px 10px 0 0 !important; }
+        .btn-primary { background-color: #97144D; border-color: #97144D; }
+        .table th { background-color: #f1f1f1; }
+        /* Sidebar Offcanvas */
+    #sidebarMenu.offcanvas-start {
+      width: 250px;
+    }
+    #sidebarMenu .offcanvas-body {
+      padding: 0.5rem 1rem;
+    }
+    #sidebarMenu .nav-link {
+      font-size: 0.9rem;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #333;
+      transition: color 0.3s;
+    }
+    #sidebarMenu .nav-link i {
+      font-size: 1.1rem;
+    }
+    #sidebarMenu .nav-link.active {
+      font-weight: 700;
+      color: #97144D !important;
+      background-color: #f0d7e0;
+      border-radius: 4px;
+    }
+    #sidebarMenu .nav-link:hover {
+      color: #7a0f3e;
+      background-color: #f9e5ef;
+      border-radius: 4px;
+    }
+
+    .top-bar button.btn-outline-light {
+      border: 1.5px solid white;
+      color: white;
+      background: transparent;
+      padding: 4px 10px;
+      font-size: 1.3rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+    }
+    .top-bar button.btn-outline-light:hover {
+      background-color: white;
+      color: #97144D;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      background-color: #97144D;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      user-select: none;
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+    }
+    .top-bar h5 {
+      margin: 0;
+      font-weight: 700;
+      flex-grow: 1;
+      text-align: center;
+      color: white;
+    }
+    .logout-btn {
+      background: transparent;
+      border: 1.5px solid white;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+      flex-shrink: 0;
+    }
+    .logout-btn:hover {
+      background-color: white;
+      color: #97144D;
+    }
+
+    /* Search Bar Row with Sidebar Toggle & Chatbot */
+    .search-chatbar {
+      max-width: 900px;
+      margin: 15px auto 40px auto;
+      padding: 0 15px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    /* Sidebar toggle button */
+    .search-chatbar .btn-toggle-sidebar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 5px;
+      border: 1.5px solid #ccc;
+      color: #444;
+      background: white;
+      transition: border-color 0.3s, color 0.3s;
+      cursor: pointer;
+      flex-shrink: 0;
+      min-width: 42px;
+      padding: 6px 8px;
+      font-size: 1.3rem;
+    }
+    .search-chatbar .btn-toggle-sidebar:hover {
+      border-color: #97144D;
+      color: #97144D;
+    }
+    /* Search input centered and wide */
+    .search-chatbar input[type="text"] {
+      flex-grow: 1;
+      padding: 10px 14px;
+      border-radius: 5px;
+      border: 1.5px solid #ccc;
+      font-size: 1rem;
+      outline-offset: 0;
+      transition: border-color 0.3s;
+      width: 9000px; 
+      margin: 0 auto;
+      display: block;
+    }
+    .search-chatbar input[type="text"]:focus {
+      border-color: #97144D;
+      box-shadow: 0 0 5px rgba(151, 20, 77, 0.5);
+    }
+    /* Chatbot button right aligned */
+    .search-chatbar .chatbot-btn {
+      background-color: #97144D;
+      border: none;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .search-chatbar .chatbot-btn:hover {
+      background-color: #7a0f3e;
+    }
+
+    /* Dashboard Cards */
+    .dashboard-card {
+      transition: 0.3s;
+      height: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 20px 30px 20px;
+      text-align: center;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+    }
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+    }
+    .dashboard-icon {
+      font-size: 32px;
+      color: #97144D;
+      margin-bottom: 15px;
+    }
+    .dashboard-card h5 {
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .dashboard-card p {
+      flex-grow: 1;
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 15px;
+    }
+    .btn-manager {
+      background-color: #97144D;
+      color: #fff;
+      border: none;
+      padding: 8px 18px;
+      font-size: 0.9rem;
+      border-radius: 25px;
+      transition: background-color 0.3s ease;
+    }
+    .btn-manager:hover {
+      background-color: #7a0f3e;
+      color: white;
+    }
+    </style>
+</head>
+<body>
+
+  <!-- Sidebar Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="sidebarMenuLabel">Manager</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark active" href="{{ url_for('dashboard') }}">
+            <i class="bi bi-speedometer2 me-2"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('manage_accounts') }}">
+            <i class="bi bi-people-fill me-2"></i> Manage Accounts
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('manage_loans') }}">
+            <i class="bi bi-file-earmark-check me-2"></i> Loan Approvals
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('manview_deposits') }}">
+            <i class="bi bi-list-check me-2"></i> Deposits
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="view-investments.html">
+            <i class="bi bi-graph-up me-2"></i> Investments
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="view-cards.html">
+            <i class="bi bi-person-badge me-2"></i> Cards
+          </a>
+        </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <button class="btn btn-outline-light btn-sm me-3" 
+          data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-label="Toggle sidebar">
+    <i class="bi bi-list"></i>
+    </button>
+    <h5>DigiBank Manager Approvals</h5>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+
+  <!-- Search Bar and Chatbot with Sidebar Toggle -->
+  <div class="search-chatbar">
+    <input type="text" placeholder="Search customers, accounts..." aria-label="Search" />
+    <button class="chatbot-btn" aria-label="Chatbot">
+      <i class="bi bi-chat-dots-fill"></i>
+    </button>
+  </div>
+
+    <div class="main-content">
+        <h2 class="mb-4"><i class="bi bi-people-fill"></i> Manage Accounts</h2>
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Customer Accounts</h5>
+            </div>
+            <div class="card-body">
+                <p>View and manage customer accounts, profiles, and personal information.</p>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Account ID</th>
+                                <th>Customer Name</th>
+                                <th>Account Type</th>
+                                <th>Balance</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- Manager Approvals -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Manager Approvals</h5>
+            </div>
+            <div class="card-body">
+                <p>Approve or reject requests from customers and branch staff.</p>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Request ID</th>
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>Request Type</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="approvalTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Modal -->
+    <div class="modal fade" id="accountModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Account Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalBody"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="modalSaveBtn">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let accounts = [
+            { id: 'AC1001', name: 'John Smith', type: 'Savings', balance: '₹5,245.00', status: 'Active' },
+            { id: 'AC1002', name: 'Sarah Johnson', type: 'Checking', balance: '₹12,876.50', status: 'Active' }
+        ];
+
+        let approvals = [
+            { id: 'REQ001', name: 'Michael Brown', role: 'Customer', type: 'New Account Opening' },
+            { id: 'REQ002', name: 'Emma Davis', role: 'Customer', type: 'Account Upgrade' },
+            { id: 'REQ003', name: 'David Wilson', role: 'Branch Staff', type: 'Account Closure' },
+            { id: 'REQ004', name: 'Sophia Taylor', role: 'Branch Staff', type: 'KYC Verification' }
+        ];
+
+        const tbody = document.querySelector('table tbody');
+        const approvalTable = document.getElementById('approvalTable');
+        const accountModal = new bootstrap.Modal(document.getElementById('accountModal'));
+        let editIndex = null;
+
+        function renderTable() {
+            tbody.innerHTML = '';
+            accounts.forEach((acc, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${acc.id}</td>
+                    <td>${acc.name}</td>
+                    <td>${acc.type}</td>
+                    <td>${acc.balance}</td>
+                    <td><span class="badge ${acc.status === 'Active' ? 'bg-success' : 'bg-secondary'}">${acc.status}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="viewAccount(${index})">View</button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="editAccount(${index})">Edit</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteAccount(${index})">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function renderApprovals() {
+            approvalTable.innerHTML = '';
+            approvals.forEach((req, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${req.id}</td>
+                    <td>${req.name}</td>
+                    <td>${req.role}</td>
+                    <td>${req.type}</td>
+                    <td>
+                        <button class="btn btn-sm btn-success" onclick="approveRequest(${index})">Approve</button>
+                        <button class="btn btn-sm btn-danger" onclick="rejectRequest(${index})">Reject</button>
+                    </td>
+                `;
+                approvalTable.appendChild(row);
+            });
+        }
+
+        function approveRequest(index) {
+            alert(`Request ${approvals[index].id} approved!`);
+            approvals.splice(index, 1);
+            renderApprovals();
+        }
+
+        function rejectRequest(index) {
+            alert(`Request ${approvals[index].id} rejected!`);
+            approvals.splice(index, 1);
+            renderApprovals();
+        }
+
+        function viewAccount(index) {
+            const acc = accounts[index];
+            document.getElementById('modalTitle').textContent = `View Account ${acc.id}`;
+            document.getElementById('modalBody').innerHTML = `
+                <p><strong>Account ID:</strong> ${acc.id}</p>
+                <p><strong>Customer Name:</strong> ${acc.name}</p>
+                <p><strong>Account Type:</strong> ${acc.type}</p>
+                <p><strong>Balance:</strong> ${acc.balance}</p>
+                <p><strong>Status:</strong> <span class="badge ${acc.status === 'Active' ? 'bg-success' : 'bg-secondary'}">${acc.status}</span></p>
+            `;
+            document.getElementById('modalSaveBtn').style.display = 'none';
+            accountModal.show();
+        }
+
+        function editAccount(index) {
+            const acc = accounts[index];
+            editIndex = index;
+            document.getElementById('modalTitle').textContent = `Edit Account ${acc.id}`;
+            document.getElementById('modalBody').innerHTML = `
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Customer Name</label>
+                        <input type="text" class="form-control" value="${acc.name}" id="editName">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Account Type</label>
+                        <select class="form-select" id="editType">
+                            <option ${acc.type === 'Savings' ? 'selected' : ''}>Savings</option>
+                            <option ${acc.type === 'Checking' ? 'selected' : ''}>Checking</option>
+                            <option ${acc.type === 'Current' ? 'selected' : ''}>Current</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Balance</label>
+                        <input type="text" class="form-control" value="${acc.balance}" id="editBalance">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" id="editStatus">
+                            <option ${acc.status === 'Active' ? 'selected' : ''}>Active</option>
+                            <option ${acc.status === 'Inactive' ? 'selected' : ''}>Inactive</option>
+                            <option ${acc.status === 'Suspended' ? 'selected' : ''}>Suspended</option>
+                        </select>
+                    </div>
+                </form>
+            `;
+            document.getElementById('modalSaveBtn').style.display = 'block';
+            accountModal.show();
+        }
+
+        function addNewAccount() {
+            editIndex = null;
+            document.getElementById('modalTitle').textContent = 'Add New Account';
+            document.getElementById('modalBody').innerHTML = `
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Customer Name</label>
+                        <input type="text" class="form-control" id="newName" placeholder="Enter customer name">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Account Type</label>
+                        <select class="form-select" id="newType">
+                            <option>Savings</option>
+                            <option>Checking</option>
+                            <option>Current</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Initial Balance</label>
+                        <input type="text" class="form-control" id="newBalance" placeholder="₹0.00">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" id="newStatus">
+                            <option selected>Active</option>
+                            <option>Inactive</option>
+                        </select>
+                    </div>
+                </form>
+            `;
+            document.getElementById('modalSaveBtn').style.display = 'block';
+            accountModal.show();
+        }
+
+        function deleteAccount(index) {
+            if (confirm('Are you sure you want to delete this account?')) {
+                accounts.splice(index, 1);
+                renderTable();
+            }
+        }
+
+        document.getElementById('modalSaveBtn').addEventListener('click', function () {
+            const modalTitle = document.getElementById('modalTitle').textContent;
+
+            if (modalTitle.includes('Add')) {
+                const newAcc = {
+                    id: 'AC' + Math.floor(Math.random() * 9000 + 1000),
+                    name: document.getElementById('newName').value,
+                    type: document.getElementById('newType').value,
+                    balance: document.getElementById('newBalance').value,
+                    status: document.getElementById('newStatus').value
+                };
+                accounts.push(newAcc);
+                alert('New account created successfully!');
+            } else if (modalTitle.includes('Edit')) {
+                accounts[editIndex].name = document.getElementById('editName').value;
+                accounts[editIndex].type = document.getElementById('editType').value;
+                accounts[editIndex].balance = document.getElementById('editBalance').value;
+                accounts[editIndex].status = document.getElementById('editStatus').value;
+                alert('Account changes saved successfully!');
+            }
+
+            renderTable();
+            accountModal.hide();
+        });
+
+        renderTable();
+        renderApprovals();
+    </script>
+</body>
+</html>
