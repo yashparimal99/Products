@@ -3,6 +3,12 @@ import MySQLdb
 import MySQLdb.cursors
 from flask_mysqldb import MySQL
 from collections import defaultdict
+from datetime import datetime
+from werkzeug.security import generate_password_hash
+import os
+from flask import send_file
+import openpyxl
+from io import BytesIO
 from model import *
 
 app = Flask(__name__)
@@ -12,6 +18,8 @@ app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'Yash@123'
 app.config['MYSQL_DB'] = 'banking_products'
+app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'uploads')
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 
 
@@ -628,6 +636,10 @@ def dashboard():
 def manageaccounts():
     return render_template('manageaccounts.html')
 
+@app.route('/manprofile')
+def manprofile():
+    return render_template('manprofile.html')
+
 @app.route('/managerapprovals')
 def managerapprovals():
     return render_template('managerapprove.html')
@@ -657,8 +669,200 @@ def transactions_review():
     return render_template('transactions-review.html')
 
 
+# TL Dashboard Routes
 
 
+# Generate department-based Agent ID
+def generate_agent_id(department):
+    prefixes = {
+        "Cards": "CA",
+        "Loans": "LN",
+        "Investment": "IV",
+        "Forex": "FX"
+    }
+    prefix = prefixes.get(department, "AG")
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT MAX(id) AS max_id FROM agents WHERE department=%s", (department,))
+    result = cur.fetchone()
+    next_id = (result['max_id'] or 0) + 1
+    return f"{prefix}{next_id:03d}"
+
+
+# Cards Page
+@app.route('/tlcards')
+def tlcards():
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("""
+        SELECT agent_id, first_name, last_name, department, onboarding_date 
+        FROM agents 
+        WHERE status='active' AND department='Cards'
+    """)
+    agents = cur.fetchall()
+    return render_template("tlcards.html", agents=agents)
+
+# Add User Page
+@app.route('/tladduser', methods=['GET', 'POST'])
+def tladduser():
+    if request.method == 'POST':
+        data = request.form
+        hashed_pw = generate_password_hash(data['password'])
+        agent_id = generate_agent_id(data['department'])
+
+        # Handle file upload
+        photo = request.files['photo']
+        photo_path = ''
+        if photo and photo.filename:
+            filename = f"{agent_id}_{photo.filename}"
+            photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+            photo.save(photo_path)
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cur.execute("""
+            INSERT INTO agents (
+                agent_id, first_name, last_name, dob, gender, pan, aadhaar,
+                date_of_joining, country, state, city, department, photo_path, 
+                password_hash, status, onboarding_date
+            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'active',%s)
+        """, (
+            agent_id, data['first_name'], data['last_name'], data['dob'], data['gender'],
+            data['pan'], data['aadhaar'], data['date_of_joining'], data['country'], 
+            data['state'], data['city'], data['department'], photo_path, hashed_pw, datetime.now()
+        ))
+        mysql.connection.commit()
+        return redirect(url_for('tlcards'))
+    return render_template("tladduser.html")
+
+
+@app.route('/download_excel')
+def download_excel():
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM agents")
+    members = cur.fetchall()
+
+    workbook = openpyxl.Workbook()
+    sheet = workbook.active
+    sheet.title = "Agent Details"
+
+    sheet.append([
+        "ID", "Agent Id", "First Name", "Last Name", "Dob", "Gender", "Pan Card",
+        "Aadhaar Card", "Date of Joining", "Country", "State", "City", "Department", 
+        "Status", "Onboarding Date", "Deleted Date"
+    ])
+
+    for member in members:
+        sheet.append([
+            member["id"],
+            member["agent_id"],
+            member["first_name"],
+            member["last_name"],
+            member["dob"],
+            member["gender"],
+            member["pan"],
+            member["aadhaar"],
+            member["date_of_joining"],
+            member["country"],
+            member["state"],
+            member["city"],
+            member["department"],
+            member["status"],
+            member["onboarding_date"].strftime("%Y-%m-%d %H:%M:%S") if member["onboarding_date"] else "",
+            member["deleted_date"].strftime("%Y-%m-%d %H:%M:%S") if member["deleted_date"] else ""
+        ])
+
+    file_stream = BytesIO()
+    workbook.save(file_stream)
+    file_stream.seek(0)
+
+    return send_file(
+        file_stream,
+        download_name='agents.xlsx',
+        as_attachment=True,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+
+# Delete User Page
+# @app.route('/tldeleteuser', methods=['GET', 'POST'])
+# def tldeleteuser():
+#     if request.method == 'POST':
+#         ids = request.form.getlist('selected_ids')
+#         for id in ids:
+#             cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#             cur.execute("UPDATE agents SET status='deleted', deleted_date=%s WHERE agent_id=%s", (datetime.now(), id))
+#         mysql.connection.commit()
+#         return redirect(url_for('list_agents'))
+    
+#     cur.execute("""
+#         SELECT agent_id, first_name, last_name, department, onboarding_date 
+#         FROM agents WHERE status='active'
+#     """)
+#     agents = cur.fetchall()
+#     return render_template("tldeleteuser.html", agents=agents)
+
+@app.route('/tldeleteuser', methods=['GET', 'POST'])
+def tldeleteuser():
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)   
+    
+    if request.method == 'POST':
+        ids = request.form.getlist('selected_ids')
+        for id in ids:
+            cur.execute(
+                "UPDATE agents SET status='deleted', deleted_date=%s WHERE agent_id=%s",
+                (datetime.now(), id)
+            )
+        mysql.connection.commit()
+        cur.close()
+        return redirect(url_for('tlcards'))
+
+    # ✅ for GET request
+    cur.execute("""
+        SELECT agent_id, first_name, last_name, department, onboarding_date 
+        FROM agents WHERE status='active'
+    """)
+    agents = cur.fetchall()
+    cur.close()
+    return render_template("tldeleteuser.html", agents=agents)
+
+
+# Loan Page
+@app.route('/tlloan')
+def tlloan():
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("""
+        SELECT agent_id, first_name, last_name, department, onboarding_date 
+        FROM agents 
+        WHERE status='active' AND department='Loans'
+    """)
+    agents = cur.fetchall()
+    return render_template("tlloan.html", agents=agents)
+
+# Invest Page
+@app.route('/tlinvest')
+def tlinvest():
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("""
+        SELECT agent_id, first_name, last_name, department, onboarding_date 
+        FROM agents 
+        WHERE status='active' AND department='Investment'
+    """)
+    agents = cur.fetchall()
+    return render_template("tlinvest.html", agents=agents)
+
+# Forex Page
+@app.route('/tlforex')
+def tlforex():
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("""
+        SELECT agent_id, first_name, last_name, department, onboarding_date 
+        FROM agents 
+        WHERE status='active' AND department='Forex'
+    """)
+    agents = cur.fetchall()
+    return render_template("tlforex.html", agents=agents)
+
+# Team Analysis Page
+@app.route('/teamanalysis')
+def teamanalysis():
+    return render_template("teamanalysis.html")
 
 #User Dashboard- cards
 
@@ -735,6 +939,14 @@ def quicktransfer():
 @app.route('/banktransfer')
 def banktransfer():
     return render_template('banktransfer.html')
+
+@app.route('/Txnhistory')
+def Txnhistory():
+    return render_template('transactions.html')
+
+@app.route('/accountbal')
+def accountbal():
+    return render_template('balance.html')
 
 
 

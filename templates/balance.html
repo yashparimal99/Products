@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Check Balance - DigiBank</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Bootstrap CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+    }
+
+    #sidebarMenu.offcanvas-start {
+      width: 250px;
+    }
+    #sidebarMenu .offcanvas-body {
+      padding: 0.5rem 1rem;
+    }
+    #sidebarMenu .nav-link {
+      font-size: 0.9rem;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #333;
+      transition: color 0.3s;
+    }
+    #sidebarMenu .nav-link i {
+      font-size: 1.1rem;
+    }
+    #sidebarMenu .nav-link.active {
+      font-weight: 700;
+      color: #97144D !important;
+      background-color: #f0d7e0;
+      border-radius: 4px;
+    }
+    #sidebarMenu .nav-link:hover {
+      color: #7a0f3e;
+      background-color: #f9e5ef;
+      border-radius: 4px;
+    }
+
+    .balance-box {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      text-align: center;
+      max-width: 500px;
+      margin: 40px auto;
+    }
+
+    .account-number {
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: #333;
+    }
+
+    .divider {
+      height: 1px;
+      background-color: #ccc;
+      margin: 20px 0;
+    }
+
+    .balance-label {
+      font-size: 0.95rem;
+      color: #555;
+    }
+
+    .balance-amount {
+      font-size: 1.6rem;
+      color: #97144D;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .btn-transact {
+      background-color: #97144D;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 14px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+
+    .btn-transact:hover {
+      background-color: #7e103f;
+    }
+    /* Breadcrumb */
+    .breadcrumb {
+      background-color: #f8f9fa;
+      padding: 8px 15px;
+      margin: 0 20px 15px 20px;
+      border-radius: 6px;
+    }
+
+    .breadcrumb-item a {
+      color: #97144D;
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .breadcrumb-item a:hover {
+      text-decoration: underline;
+      color: #7a0f3e;
+    }
+
+    .breadcrumb-item.active {
+      color: #97144D;
+      font-weight: 700;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+ <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="sidebarMenuLabel">DigiBank</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <ul class="nav flex-column">
+      <li class="nav-item mb-2">
+        <a class="nav-link text-dark" href="userdashboard.html"><i class="bi bi-speedometer2 me-2"></i> Home</a>
+      </li>
+      <li class="nav-item mb-2">
+        <a class="nav-link text-dark" href="account.html"><i class="bi bi-person-lines-fill me-2"></i> View Accounts</a>
+      </li>
+      <li class="nav-item mb-2">
+        <a class="nav-link text-dark active" href="transactions.html"><i class="bi bi-clock-history me-2"></i> Transaction History</a>
+      </li>
+      <li class="nav-item mb-2">
+        <a class="nav-link text-dark" href="checkbalance.html"><i class="bi bi-wallet2 me-2"></i> Check Balance</a>
+      </li>
+      <li class="nav-item mb-2">
+        <a class="nav-link text-dark" href="rewards.html"><i class="bi bi-gift-fill me-2"></i> Rewards</a>
+      </li>
+      <li class="nav-item mb-2">
+        <a class="nav-link text-dark" href="loans.html"><i class="bi bi-cash-coin me-2"></i> Loans</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-dark" href="paybill.html"><i class="bi bi-credit-card me-2"></i> Pay Bill</a>
+      </li>
+      <li class="nav-item mb-2">
+        <a class="nav-link text-dark" href="#">
+          <i class="bi bi-person-rolodex me-2"></i> Get Contact
+        </a>
+      </li>
+      <li class="nav-item mb-2">
+        <a class="nav-link text-dark" href="#">
+          <i class="bi bi-shield-lock-fill me-2"></i> Privacy & Security
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+  <!-- Top Bar -->
+  <div class="top-bar d-flex align-items-center px-3" 
+       style="background-color: #97144D; color: white; height: 50px;">
+    <button class="btn btn-outline-light btn-sm me-3" 
+            data-bs-toggle="offcanvas" 
+            data-bs-target="#sidebarMenu"
+            aria-controls="sidebarMenu" 
+            aria-label="Toggle sidebar">
+      <i class="bi bi-list"></i>
+    </button>
+
+    <h5 class="m-0 flex-grow-1 text-center text-white">DigiBank Transaction Dashboard</h5>
+
+    <div class="d-flex align-items-center">
+      <h5 class="m-0 me-2 fs-6 text-white">Welcome, !</h5>
+      <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">
+        Logout
+      </a>
+    </div>
+  </div>
+ 
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" style="background-color:#f8f9fa; padding: 8px 15px; border-radius: 4px; margin-bottom: 15px;">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="loandashboard.html" style="color:#97144D;">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page" style="color:#97144D; font-weight:bold;">Balance</li>
+      </ol>
+    </nav>
+
+<!-- Balance Display -->
+<div class="balance-box">
+  <div class="account-number">Account No: 9876 5432 2100</div>
+
+  <div class="divider"></div>
+
+  <div class="balance-label">Book Balance</div>
+  <div class="balance-amount">₹ 1,45,200.00</div>
+
+  <div class="divider"></div>
+
+  <div class="balance-label">Available Balance</div>
+  <div class="balance-amount">₹ 1,40,750.50</div>
+
+  <a href="transactions.html" class="btn btn-transact">View Transactions</a>
+</div>
+
+<!-- Footer -->
+<footer class="text-white text-center py-3 mt-5" style="background-color: #97144D;">
+  © 2025 DigiBank. All rights reserved.
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

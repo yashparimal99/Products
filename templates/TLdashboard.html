@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Digi Bank TeamLead Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .dashboard-card {
+      transition: 0.3s;
+    }
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 15px rgba(0,0,0,0.15);
+    }
+    .dashboard-icon {
+      font-size: 30px;
+      color: #97144D;
+    }
+    footer {
+      background-color: #97144D;
+    }
+    .btn-digibank {
+    background-color: #97144D;
+    color: white;
+  }
+  .btn-digibank:hover {
+    background-color: #7a103f;
+    color: white;
+  }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D;">
+  <div class="container-fluid">
+    <!-- Left: Bank Logo -->
+    <a class="navbar-brand d-flex align-items-center" href="#">
+      <img src="{{ url_for('static', filename='images/Digilogo.jpg') }}" alt="Bank Logo" style="height: 40px; margin-right: 10px;">
+    </a>
+
+    <!-- Center: Title -->
+    <div class="mx-auto text-white fw-bold fs-5">
+      Teamlead Dashboard<br>
+      Welcome, {{ user.name }} !  ({{user.role}})
+    </div>
+
+    <!-- Right: Login Button -->
+    <!-- <div class="d-flex">
+      <a href="#" class="btn btn-light btn-sm">Logout</a>
+    </div>
+  </div> -->
+
+  <div class="d-flex align-items-center">
+            
+            <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">
+              Logout
+            </a>
+          </div>
+
+</nav>
+
+<!-- Dashboard Content -->
+<div class="container my-5">
+  <h3 class="mb-4 text-center">User Dashboard</h3>
+  <div class="row g-4">
+
+    <!-- Profile -->
+    <div class="col-md-4">
+      <div class="card dashboard-card p-4 text-center">
+        <i class="bi bi-person-circle dashboard-icon mb-2"></i>
+        <h5>Profile</h5>
+        <p>Manage your personal information, contact details, and preferences.</p>
+        <a href="accounts.html" class="btn btn-digibank btn-sm">View Profile</a>
+      </div>
+    </div>
+
+    <!-- Cards -->
+    <div class="col-md-4">
+      <div class="card dashboard-card p-4 text-center">
+        <i class="bi bi-credit-card-2-front dashboard-icon mb-2"></i>
+        <h5>Cards Team</h5>
+        <p>View your debit/credit cards, check limits, and request new cards.</p>
+        <a href="{{ url_for('tlcards') }}" class="btn btn-digibank btn-sm">Manage Cards</a>
+      </div>
+    </div>
+
+    <!-- Loans -->
+    <div class="col-md-4">
+      <div class="card dashboard-card p-4 text-center">
+        <i class="bi bi-cash-stack dashboard-icon mb-2"></i>
+        <h5>Loans Team</h5>
+        <p>Check existing loans, EMI schedules, and apply for new loans.</p>
+        <a href="{{ url_for('tlloan') }}" class="btn btn-digibank btn-sm">Loan Details</a>
+      </div>
+    </div>
+
+    <!-- Investment -->
+    <div class="col-md-4">
+      <div class="card dashboard-card p-4 text-center">
+        <i class="bi bi-graph-up-arrow dashboard-icon mb-2"></i>
+        <h5>Investments Team</h5>
+        <p>Track your investments, portfolio performance, and market trends.</p>
+        <a href="{{ url_for('tlinvest') }}" class="btn btn-digibank btn-sm">View Investments</a>
+      </div>
+    </div>
+
+    <!-- Forex -->
+    <div class="col-md-4">
+      <div class="card dashboard-card p-4 text-center">
+        <i class="bi bi-currency-exchange dashboard-icon mb-2"></i>
+        <h5>Forex Team</h5>
+        <p>View live currency exchange rates and make forex transactions.</p>
+        <a href="{{ url_for('tlforex') }}" class="btn btn-digibank btn-sm">Forex Services</a>
+      </div>
+    </div>
+
+    <!-- Team Analysis -->
+    <div class="col-md-4">
+      <div class="card dashboard-card p-4 text-center">
+        <i class="bi bi-people-fill dashboard-icon mb-2"></i>
+        <h5>Team Analysis</h5>
+        <p>Analyze team performance, sales reports, and productivity metrics.</p>
+        <a href="teamanalysis.html" class="btn btn-digibank btn-sm">View Analysis</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+<footer class="bg-custom text-light pt-4 pb-3 mt-5">
+  <div class="container">
+    <div class="row small">
+      <!-- Links Row -->
+      <div class="col-md-12 mb-3">
+        <nav class="d-flex flex-wrap justify-content-center gap-2" style="font-size: larger;">
+          <a href="#" class="text-light text-decoration-none">About Us</a>
+          <span class="text-secondary">|</span>
+          <a href="#" class="text-light text-decoration-none">Contact Us</a>
+          <span class="text-secondary">|</span>
+          <a href="#" class="text-light text-decoration-none">Careers</a>
+          <span class="text-secondary">|</span>
+          <a href="#" class="text-light text-decoration-none">Disclaimer</a>
+        </nav>
+      </div>
+
+      <!-- Sub Links -->
+      <div class="col-md-12 mb-3 d-flex flex-wrap justify-content-center gap-3 small">
+        <a href="#" class="text-light text-decoration-none">Home</a>
+        <a href="#" class="text-light text-decoration-none">Forex Card Rates</a>
+        <a href="#" class="text-light text-decoration-none">Interest Rates</a>
+        <a href="#" class="text-light text-decoration-none">Download Forms</a>
+        <a href="#" class="text-light text-decoration-none">Cards</a>
+        <a href="#" class="text-light text-decoration-none">Digital</a>
+        <a href="#" class="text-light text-decoration-none">Information</a>
+        <a href="#" class="text-light text-decoration-none">Wealth Management</a>
+        <a href="#" class="text-light text-decoration-none">DigiBank Wealth</a>
+        <a href="#" class="text-light text-decoration-none">Products</a>
+      </div>
+
+      <!-- Important Notice -->
+      <div class="col-md-12 text-center small text-secondary mb-3">
+        <p class="mb-1">
+          <strong>IMPORTANT:</strong> DigiBank never asks for your user id / password / pin no. through phone call / SMSes / e-mails.
+          Any such phone call / SMSes / e-mails asking you to reveal credentials or One Time Password through SMS could be an attempt to withdraw money from your account.
+          <br />
+          NEVER share these details to anyone. 
+        </p>
+      </div>
+
+      <!-- Copyright -->
+      <div class="col-md-12 text-center small text-secondary">
+        <p class="mb-0" style="color: white;">&copy; Copyright DigiBank</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</html>

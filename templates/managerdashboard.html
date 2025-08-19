@@ -378,7 +378,10 @@
     </button>
     <h5>DigiBank Manager Dashboard</h5>
     <p>Welcome, {{ user.name }} !  ({{user.role}})</p>
-     <button class="logout-btn" onclick="logout()">Logout</button>
+     <!-- <button class="logout-btn" onclick="logout()">Logout</button> -->
+     <a href="{{ url_for('logout') }}" class="logout-btn">
+              Logout
+            </a>
     <!-- <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button> -->
     </div>
     
@@ -433,9 +436,9 @@
       <div class="col-md-4 col-sm-6">
         <div class="card dashboard-card p-4 text-center">
           <i class="bi bi-people-fill dashboard-icon mb-2"></i>
-          <h5>Manage Accounts</h5>
-          <p>View, edit, and manage customer accounts and profiles.</p>
-          <a href="{{ url_for('manageaccounts') }}" class="btn btn-manager">Manage Accounts</a>
+          <h5>Profile</h5>
+          <p>View  profiles.</p>
+          <a href="{{ url_for('manprofile') }}" class="btn btn-manager">Manage Accounts</a>
         </div>
       </div>
 
@@ -443,7 +446,7 @@
       <div class="col-md-4 col-sm-6">
         <div class="card dashboard-card p-4 text-center">
           <i class="bi bi-file-earmark-check dashboard-icon mb-2"></i>
-          <h5>manager Approvals</h5>
+          <h5>Manage Approvals</h5>
           <p>Review and approve pending applications.</p>
           <a href="{{ url_for('managerapprovals') }}" class="btn btn-manager">View Applications</a>
         </div>

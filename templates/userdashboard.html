@@ -473,7 +473,7 @@
           <i class="bi bi-clock-history dashboard-icon mb-2"></i>
           <h5>Transaction History</h5>
           <p>Review all past transactions and download statements.</p>
-          <a href="transactions.html" class="btn btn-digibank">View History</a>
+          <a href="{{ url_for('Txnhistory') }}" class="btn btn-digibank">View History</a>
         </div>
       </div>
 
@@ -483,7 +483,7 @@
           <i class="bi bi-currency-rupee dashboard-icon mb-2"></i>
           <h5>Check Balance</h5>
           <p>Get real-time account balance updates.</p>
-          <a href="balance.html" class="btn btn-digibank">Check Now</a>
+          <a href="{{ url_for('accountbal') }}" class="btn btn-digibank">Check Now</a>
         </div>
       </div>
 

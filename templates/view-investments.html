@@ -239,32 +239,32 @@
         <div class="offcanvas-body">
             <ul class="nav flex-column">
                 <li class="nav-item mb-2">
-                    <a class="nav-link text-dark" href="managerapprove.html">
+                    <a class="nav-link text-dark" href="{{ url_for('dashboard') }}">
                         <i class="bi bi-speedometer2 me-2"></i> Dashboard
                     </a>
                 </li>
                 <li class="nav-item mb-2">
-                    <a class="nav-link text-dark" href="manage-accounts.html">
+                    <a class="nav-link text-dark" href="{{ url_for('manage_accounts') }}">
                         <i class="bi bi-people-fill me-2"></i> Manage Accounts
                     </a>
                 </li>
                 <li class="nav-item mb-2">
-                    <a class="nav-link text-dark" href="view-deposits.html">
+                    <a class="nav-link text-dark" href="{{ url_for('manview_deposits') }}">
                         <i class="bi bi-cash-stack me-2"></i> View Deposits
                     </a>
                 </li>
                 <li class="nav-item mb-2">
-                    <a class="nav-link text-dark" href="manage-loans.html">
+                    <a class="nav-link text-dark" href="{{ url_for('manage_loans') }}">
                         <i class="bi bi-file-earmark-check me-2"></i> Manage Loans
                     </a>
                 </li>
                 <li class="nav-item mb-2">
-                    <a class="nav-link text-dark active" href="view-investments.html">
+                    <a class="nav-link text-dark active" href="{{ url_for('manage_loans') }}">
                         <i class="bi bi-graph-up me-2"></i> View Investments
                     </a>
                 </li>
                 <li class="nav-item mb-2">
-                    <a class="nav-link text-dark" href="view-cards.html">
+                    <a class="nav-link text-dark" href="{{ url_for('view_cards') }}">
                         <i class="bi bi-credit-card me-2"></i> Cards
                     </a>
                 </li>
