@@ -68,19 +68,6 @@ def pension():
 def pmjdy():
     return render_template('pmjdy.html')
 
-#view user balance
-
-# @app.route('/viewaccounts')
-# def viewaccounts():
-#     email = session.get('user_email')
-#     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)  # Use DictCursor to access columns by name
-#     cur.execute("SELECT cust_id, name, pan, email, mobile_no FROM users WHERE email = %s", (email,))
-#     user = cur.fetchone()
-#     cur.execute("SELECT * FROM bank_accounts WHERE cust_id = %s", (user['cust_id'],))
-#     account = cur.fetchall()
-#     cur.close()
-
-#     return render_template('viewaccounts.html', account=account,user=user)
 
 @app.route('/viewaccounts')
 def viewaccounts():
@@ -92,13 +79,13 @@ def viewaccounts():
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
     # Get user details
-    cur.execute("SELECT cust_id, name, pan, email, mobile_no FROM users WHERE email = %s", (email,))
+    cur.execute("SELECT user_id, name, pan, email, mobile_no FROM bank_users WHERE email = %s", (email,))
     user = cur.fetchone()
     grouped_accounts = defaultdict(list)
 
     if user:
         # Get all bank accounts for this user
-        cur.execute("SELECT * FROM bank_accounts WHERE cust_id = %s", (user['cust_id'],))
+        cur.execute("SELECT * FROM accounts WHERE user_id = %s", (user['user_id'],))
         accounts = cur.fetchall()
         for acc in accounts:
             grouped_accounts[acc['account_type']].append(acc)
@@ -119,12 +106,12 @@ def viewaccounts():
 def viewdeposits():
     email = session.get('user_email')
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)  # Use DictCursor to access columns by name
-    cur.execute("SELECT cust_id, name, pan, email, mobile_no FROM users WHERE email = %s", (email,))
+    cur.execute("SELECT user_id, name, pan, email, mobile_no FROM bank_users WHERE email = %s", (email,))
     user = cur.fetchone()
     grouped_deposits = defaultdict(list)
 
     if user:
-         cur.execute("SELECT * FROM bank_deposits WHERE cust_id = %s", (user['cust_id'],))
+         cur.execute("SELECT * FROM deposits WHERE user_id = %s", (user['user_id'],))
          deposits = cur.fetchall()
          for acc in deposits:
             grouped_deposits[acc['account_type']].append(acc)
@@ -245,27 +232,6 @@ def pfinvest():
     return render_template('pfinvest.html')
 
 
-
-
-#this is working route for login
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#     if request.method == 'POST':
-#         email = request.form['email']
-#         password = request.form['password']
-#         cur = mysql.connection.cursor()
-#         cur.execute("SELECT * FROM users WHERE email = %s AND password = %s", (email, password))
-#         user = cur.fetchone()
-#         cur.close()
-#         if user:
-#             session['user_email'] = email
-            
-#             flash('Logged in successfully!', 'success')
-#             return redirect(url_for('dashboard'))
-#         else:
-#             flash('Invalid email or password', 'danger')
-#     return render_template('login.html')
-
 from MySQLdb.cursors import DictCursor
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -275,13 +241,14 @@ def login():
         password = request.form['password']
 
         cur = mysql.connection.cursor(DictCursor)  
-        cur.execute("SELECT * FROM users WHERE email = %s AND password = %s", (email, password))
+        cur.execute("SELECT * FROM bank_users WHERE email = %s AND password = %s", (email, password))
         user = cur.fetchone()
         cur.close()
 
         if user:
             session['user_email'] = user['email']
-            session['user_role'] = user['role']  
+            session['user_role'] = user['role'] 
+            session['user_id'] = user['user_id']  
             flash('Logged in successfully!', 'success')
             return redirect(url_for('dashboard'))
         else:
@@ -290,22 +257,11 @@ def login():
     return render_template('login.html')
 
 
-# @app.route('/userlogin')
-# def userlogin():
-#     return render_template('login.html')
-
-
-
-
-
 import random
 import string
 
 
-
-
-
-def generate_cust_id():
+def generate_user_id():
     """
     Generate a unique customer ID:
       - Always starts with 'DB'
@@ -342,7 +298,7 @@ def generate_unique_account_no(account_type):
     while True:
         suffix = f"{random.randint(0, 9999999999):010d}"
         account_number = prefix + suffix
-        cur.execute("SELECT * FROM bank_accounts WHERE account_number = %s", (account_number,))
+        cur.execute("SELECT * FROM accounts WHERE account_number = %s", (account_number,))
         if not cur.fetchone():
             break
 
@@ -369,7 +325,7 @@ def generate_deposit_account_no(account_type):
     while True:
         suffix = f"{random.randint(0, 9999999999):010d}"
         account_number = prefix + suffix
-        cur.execute("SELECT * FROM bank_deposits WHERE account_number = %s", (account_number,))
+        cur.execute("SELECT * FROM deposits WHERE account_number = %s", (account_number,))
         if not cur.fetchone():
             break
 
@@ -404,32 +360,6 @@ def generate_card_number(card_subtype):
     return card_number
 
 
-
-
-
-
-    
-    
-     
-   
-    
-
-
-
-
-
-
-# generate unique Deposits Account number
-# def generate_unique_deposit_account_no(account_number):
-#     cur = mysql.connection.cursor()
-#     while True:
-#         account_number = str(random.randint(1000000000, 9999999999))
-#         cur.execute("SELECT * FROM bank_deposits WHERE account_number = %s", (account_number,))
-#         if not cur.fetchone():
-#             break
-#     return account_number
-
-
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -442,21 +372,21 @@ def signup():
         cur = mysql.connection.cursor()
 
         # Check if email or mobile already exists
-        cur.execute("SELECT * FROM users WHERE email = %s OR mobile_no = %s", (email, mobile_no))
+        cur.execute("SELECT * FROM bank_users WHERE email = %s OR mobile_no = %s", (email, mobile_no))
         if cur.fetchone():
             flash('Email or mobile number already registered', 'danger')
         else:
             # Generate a unique cust_id
             while True:
-                cust_id = generate_cust_id()
-                cur.execute("SELECT * FROM users WHERE cust_id = %s", (cust_id,))
+                user_id = generate_user_id()
+                cur.execute("SELECT * FROM bank_users WHERE user_id = %s", (user_id,))
                 if not cur.fetchone():  # If not found, it's unique
                     break
 
             # Insert user with the generated cust_id
             cur.execute(
-                "INSERT INTO users (cust_id, name,pan, email, mobile_no, password) VALUES (%s, %s,%s, %s, %s, %s)",
-                (cust_id, name,pan, email, mobile_no, password)
+                "INSERT INTO bank_users (user_id, name,pan, email, mobile_no, password) VALUES (%s, %s,%s, %s, %s, %s)",
+                (user_id, name,pan, email, mobile_no, password)
             )
             mysql.connection.commit()
             cur.close()
@@ -472,6 +402,20 @@ def signup():
 def savingform():
     return render_template('savingform.html')
 
+@app.route('/profile')
+def profile():
+    user_id = session.get('user_id')
+    # session['cust_id'] = user['cust_id']
+    # print("Logged in cust_id:", cust_id)   # debug
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT user_id, name, pan, mobile_no, email,department,aadhar FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    print("Fetched user:", user)   # debug
+    return render_template("profile.html", user=user)
+
+
+from datetime import datetime
 
 @app.route('/open_account', methods=['GET', 'POST'])
 def open_account():
@@ -482,8 +426,8 @@ def open_account():
 
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("""
-        SELECT cust_id, name, pan, email, mobile_no
-        FROM users
+        SELECT user_id, name, pan, email, mobile_no
+        FROM bank_users
         WHERE email = %s
     """, (email,))
     user = cur.fetchone()
@@ -492,7 +436,7 @@ def open_account():
         flash('User not found.', 'danger')
         return redirect(url_for('userlogin'))  # consistent redirect
 
-    cust_id = user['cust_id']
+    user_id = user['user_id']
 
     if request.method == 'POST':
         first_name = request.form['first_name']
@@ -507,14 +451,15 @@ def open_account():
         account_number = generate_unique_account_no(account_type)
 
         cur = mysql.connection.cursor()
+        date_of_opening = datetime.now()
         cur.execute("""
-            INSERT INTO bank_accounts (
-                cust_id, first_name, middle_name, last_name, email,
-                mobile, aadhar, account_type, account_number
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO accounts (
+                user_id, first_name, middle_name, last_name, email,
+                mobile, aadhar, account_type, account_number,date_of_opening
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s,%s)
         """, (
-            cust_id, first_name, middle_name, last_name, email,
-            mobile, aadhar, account_type, account_number
+            user_id, first_name, middle_name, last_name, email,
+            mobile, aadhar, account_type, account_number,date_of_opening
         ))
         mysql.connection.commit()
         cur.close()
@@ -534,8 +479,8 @@ def open_deposits():
 
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("""
-        SELECT cust_id, name, pan, email, mobile_no
-        FROM users
+        SELECT user_id, name, pan, email, mobile_no
+        FROM bank_users
         WHERE email = %s
     """, (email,))
     user = cur.fetchone()
@@ -544,7 +489,7 @@ def open_deposits():
         flash('User not found.', 'danger')
         return redirect(url_for('login'))
 
-    cust_id = user['cust_id']
+    user_id = user['user_id']
 
     if request.method == 'POST':
         first_name = request.form['first_name']
@@ -559,14 +504,15 @@ def open_deposits():
         account_number = generate_deposit_account_no(account_type)
 
         cur = mysql.connection.cursor()
+        date_of_opening = datetime.now()
         cur.execute("""
-            INSERT INTO bank_deposits (
-                cust_id, first_name, middle_name, last_name, email,
-                mobile, aadhar, account_type, account_number
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO deposits (
+                user_id, first_name, middle_name, last_name, email,
+                mobile, aadhar, account_type, account_number,date_of_opening
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s,%s)
         """, (
-            cust_id, first_name, middle_name, last_name, email,
-            mobile, aadhar, account_type, account_number
+            user_id, first_name, middle_name, last_name, email,
+            mobile, aadhar, account_type, account_number,date_of_opening
         ))
         mysql.connection.commit()
         cur.close()
@@ -578,34 +524,6 @@ def open_deposits():
 
 
 
-#User Dashboard
-
-# @app.route('/dashboard')
-# def dashboard():
-#     email = session.get('user_email')
-#     if not email:
-#         flash('Please login first', 'danger')
-#         return redirect(url_for('userlogin'))
-
-#     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)  # Use DictCursor to access columns by name
-#     cur.execute("SELECT cust_id, name, pan, email, mobile_no FROM users WHERE email = %s", (email,))
-#     user = cur.fetchone()
-
-    # cur.execute("SELECT * FROM bank_accounts WHERE cust_id = %s", (user['cust_id'],))
-    # account = cur.fetchone()
-
-    # cur.execute("SELECT * FROM bank_deposits WHERE cust_id = %s", (user['cust_id'],))
-    # deposits = cur.fetchone()
-
-
-
-    # cur.close()
-
-    # if not user:
-    #     flash("User not found.", "danger")
-    #     return redirect(url_for('login'))
-
-    # return render_template('userdashboard.html', user=user)
 @app.route('/dashboard')
 def dashboard():
     role = session.get('user_role')
@@ -617,12 +535,12 @@ def dashboard():
 
     # Fetch the full user details
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute("SELECT * FROM users WHERE email = %s", (email,))
+    cur.execute("SELECT * FROM bank_users WHERE email = %s", (email,))
     user = cur.fetchone()
     cur.close()
 
     templates = {
-        'user': 'userdashboard.html',
+        'User': 'userdashboard.html',
         'tl': 'TLdashboard.html',
         'manager': 'managerdashboard.html'
     }
@@ -667,6 +585,18 @@ def view_cards():
 @app.route('/transactions_review')
 def transactions_review():
     return render_template('transactions-review.html')
+
+@app.route('/manreport')
+def manreport():
+    return render_template('manreports.html')
+
+@app.route('/manstaff')
+def manstaff():
+    return render_template('staff-management.html')
+
+@app.route('/branchperformance')
+def branchperformance():
+    return render_template('branch-performance.html')
 
 
 # TL Dashboard Routes
@@ -780,23 +710,6 @@ def download_excel():
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
 
-# Delete User Page
-# @app.route('/tldeleteuser', methods=['GET', 'POST'])
-# def tldeleteuser():
-#     if request.method == 'POST':
-#         ids = request.form.getlist('selected_ids')
-#         for id in ids:
-#             cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-#             cur.execute("UPDATE agents SET status='deleted', deleted_date=%s WHERE agent_id=%s", (datetime.now(), id))
-#         mysql.connection.commit()
-#         return redirect(url_for('list_agents'))
-    
-#     cur.execute("""
-#         SELECT agent_id, first_name, last_name, department, onboarding_date 
-#         FROM agents WHERE status='active'
-#     """)
-#     agents = cur.fetchall()
-#     return render_template("tldeleteuser.html", agents=agents)
 
 @app.route('/tldeleteuser', methods=['GET', 'POST'])
 def tldeleteuser():
@@ -965,8 +878,6 @@ def userdashloan():
 def logout():
     return render_template('index.html')
 
-
-
-    
+   
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Branch Performance - DigiBank</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px 0 0 0;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    #sidebarMenu.offcanvas-start { width: 250px; }
+    #sidebarMenu .offcanvas-body { padding: 0.5rem 1rem; }
+    #sidebarMenu .nav-link {
+      font-size: 0.9rem;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #333;
+      transition: color 0.3s;
+    }
+    #sidebarMenu .nav-link i { font-size: 1.1rem; }
+    #sidebarMenu .nav-link.active {
+      font-weight: 700;
+      color: #97144D !important;
+      background-color: #f0d7e0;
+      border-radius: 4px;
+    }
+    #sidebarMenu .nav-link:hover {
+      color: #7a0f3e;
+      background-color: #f9e5ef;
+      border-radius: 4px;
+    }
+
+    .top-bar button.btn-outline-light {
+      border: 1.5px solid white;
+      color: white;
+      background: transparent;
+      padding: 4px 10px;
+      font-size: 1.3rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+    }
+    .top-bar button.btn-outline-light:hover {
+      background-color: white;
+      color: #97144D;
+    }
+
+    .top-bar {
+      background-color: #97144D;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      user-select: none;
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+    }
+    .top-bar h5 {
+      margin: 0;
+      font-weight: 700;
+      flex-grow: 1;
+      text-align: center;
+      color: white;
+    }
+    .logout-btn {
+      background: transparent;
+      border: 1.5px solid white;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+      flex-shrink: 0;
+    }
+    .logout-btn:hover {
+      background-color: white;
+      color: #97144D;
+    }
+
+    .search-chatbar {
+      max-width: 900px;
+      margin: 15px auto 40px auto;
+      padding: 0 15px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .search-chatbar input[type="text"] {
+      flex-grow: 1;
+      padding: 10px 14px;
+      border-radius: 5px;
+      border: 1.5px solid #ccc;
+      font-size: 1rem;
+      outline-offset: 0;
+      transition: border-color 0.3s;
+      width: 9000px; 
+      margin: 0 auto;
+      display: block;
+    }
+    .search-chatbar input[type="text"]:focus {
+      border-color: #97144D;
+      box-shadow: 0 0 5px rgba(151, 20, 77, 0.5);
+    }
+    .search-chatbar .chatbot-btn {
+      background-color: #97144D;
+      border: none;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .search-chatbar .chatbot-btn:hover {
+      background-color: #7a0f3e;
+    }
+
+    /* Branch Performance Specific Styles */
+    .performance-card {
+      transition: 0.3s;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+      margin-bottom: 20px;
+    }
+    .performance-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+    }
+    .performance-card-header {
+      background-color: #97144D;
+      color: white;
+      border-radius: 8px 8px 0 0 !important;
+      padding: 15px 20px;
+    }
+    .kpi-card {
+      border-radius: 8px;
+      padding: 15px;
+      background-color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin-bottom: 15px;
+    }
+    .kpi-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #97144D;
+    }
+    .chart-container {
+      height: 250px;
+      position: relative;
+    }
+    .performance-badge {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    footer.bg-custom {
+      background-color: #97144D;
+      color: white;
+      text-align: center;
+      padding: 15px 0;
+      margin-top: auto;
+    }
+    
+    /* Time period selector */
+    .btn-period {
+      border: 1px solid #dee2e6;
+    }
+    .btn-period.active {
+      background-color: #97144D;
+      color: white;
+      border-color: #97144D;
+    }
+    .btn-primary  {
+      background-color: #97144D;
+      color: white;
+      border-color: #97144D;
+    }
+    
+    /* Toast notification */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+    }
+    
+    /* Progress bar styling */
+    .progress {
+      height: 20px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Toast notification container -->
+  <div class="toast-container"></div>
+
+  <!-- Sidebar Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="sidebarMenuLabel">Manager</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('dashboard') }}">
+            <i class="bi bi-speedometer2 me-2"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('manage_accounts') }}">
+            <i class="bi bi-people-fill me-2"></i> Manage Accounts
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('managerapprovals') }}">
+            <i class="bi bi-file-earmark-check me-2"></i> Manage Approvals
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('transactions_review') }}">
+            <i class="bi bi-list-check me-2"></i> Transaction Review
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('manreport') }}">
+            <i class="bi bi-graph-up me-2"></i> Reports & Analytics
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('manstaff') }}">
+            <i class="bi bi-person-badge me-2"></i> Staff Management
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark active" href="{{ url_for('branchperformance') }}">
+            <i class="bi bi-building me-2"></i> Branch Performance
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Top Bar -->
+  <div class="top-bar d-flex align-items-center">
+  <button class="btn btn-outline-light btn-sm me-3"
+          data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
+          aria-controls="sidebarMenu" aria-label="Toggle sidebar">
+    <i class="bi bi-list"></i>
+  </button>
+
+  <h5 class="me-auto mb-0">DigiBank Manager Dashboard</h5>
+
+  <div class="d-flex align-items-center">
+    <p class="navbar-text text-white mb-0">
+      Welcome, <strong>{{ user.name }}</strong>
+    </p>
+  </div>
+
+  <!-- Ensuring contrast with .text-white -->
+  <a href="{{ url_for('logout') }}" class="logout-btn ms-3">
+    Logout
+  </a>
+</div>
+
+  <!-- Search Bar and Chatbot with Sidebar Toggle -->
+  <div class="search-chatbar">
+    <input type="text" placeholder="Search performance metrics..." aria-label="Search" id="performanceSearchInput" />
+    <button class="chatbot-btn" aria-label="Chatbot">
+      <i class="bi bi-chat-dots-fill"></i>
+    </button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container my-4 flex-grow-1">
+    <!-- Time Period Selector -->
+    <div class="card performance-card mb-4">
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col-md-3">
+            <h6 class="mb-0">Performance Period</h6>
+          </div>
+          <div class="col-md-6">
+            <div class="btn-group w-100" id="periodSelector">
+              <button class="btn btn-period" data-period="day">Day</button>
+              <button class="btn btn-period active" data-period="week">Week</button>
+              <button class="btn btn-period" data-period="month">Month</button>
+              <button class="btn btn-period" data-period="quarter">Quarter</button>
+              <button class="btn btn-period" data-period="year">Year</button>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <button class="btn btn-primary w-100" id="exportPerformanceBtn">
+              <i class="bi bi-download me-1"></i> Export
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Performance Indicators -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <h6 class="text-muted">New Customers</h6>
+          <div class="kpi-value">42</div>
+          <div class="text-success">+8% from last month</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <h6 class="text-muted">Total Deposits</h6>
+          <div class="kpi-value">₹8.2M</div>
+          <div class="text-success">+5.4% from last month</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <h6 class="text-muted">Loan Disbursed</h6>
+          <div class="kpi-value">₹3.5M</div>
+          <div class="text-danger">-2.1% from last month</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <h6 class="text-muted">Customer Satisfaction</h6>
+          <div class="kpi-value">4.7/5</div>
+          <div class="text-success">+0.2 from last month</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Performance Charts -->
+    <div class="row mb-4">
+      <div class="col-md-8">
+        <div class="card performance-card h-100">
+          <div class="performance-card-header">
+            <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i> Financial Performance</h5>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="financialPerformanceChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card performance-card h-100">
+          <div class="performance-card-header">
+            <h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i> Product Mix</h5>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="productMixChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Secondary Performance Metrics -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="card performance-card h-100">
+          <div class="performance-card-header">
+            <h5 class="mb-0"><i class="bi bi-people me-2"></i> Customer Metrics</h5>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="customerMetricsChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card performance-card h-100">
+          <div class="performance-card-header">
+            <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i> Operational Efficiency</h5>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="efficiencyChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Branch Comparison -->
+    <div class="card performance-card mb-4">
+      <div class="performance-card-header">
+        <h5 class="mb-0"><i class="bi bi-building me-2"></i> Branch Comparison</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover" id="branchComparisonTable">
+            <thead>
+              <tr>
+                <th>Branch</th>
+                <th>New Accounts</th>
+                <th>Deposits (₹)</th>
+                <th>Loans (₹)</th>
+                <th>Transactions</th>
+                <th>Satisfaction</th>
+                <th>Rank</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-branch-id="1">
+                <td><strong>Mumbai Main</strong></td>
+                <td>42</td>
+                <td>8,200,000</td>
+                <td>3,500,000</td>
+                <td>1,245</td>
+                <td>4.7/5</td>
+                <td><span class="performance-badge bg-success">1st</span></td>
+                <td>
+                  <button class="btn btn-sm btn-outline-primary view-branch-btn">View</button>
+                </td>
+              </tr>
+              <tr data-branch-id="2">
+                <td>Delhi Central</td>
+                <td>38</td>
+                <td>7,800,000</td>
+                <td>3,200,000</td>
+                <td>1,180</td>
+                <td>4.6/5</td>
+                <td><span class="performance-badge bg-primary">2nd</span></td>
+                <td>
+                  <button class="btn btn-sm btn-outline-primary view-branch-btn">View</button>
+                </td>
+              </tr>
+              <tr data-branch-id="3">
+                <td>Bangalore South</td>
+                <td>35</td>
+                <td>7,500,000</td>
+                <td>3,000,000</td>
+                <td>1,120</td>
+                <td>4.5/5</td>
+                <td><span class="performance-badge bg-primary">3rd</span></td>
+                <td>
+                  <button class="btn btn-sm btn-outline-primary view-branch-btn">View</button>
+                </td>
+              </tr>
+              <tr data-branch-id="4">
+                <td>Chennai East</td>
+                <td>32</td>
+                <td>7,200,000</td>
+                <td>2,800,000</td>
+                <td>1,050</td>
+                <td>4.4/5</td>
+                <td><span class="performance-badge bg-secondary">4th</span></td>
+                <td>
+                  <button class="btn btn-sm btn-outline-primary view-branch-btn">View</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Performance Targets -->
+    <div class="card performance-card">
+      <div class="performance-card-header">
+        <h5 class="mb-0"><i class="bi bi-bullseye me-2"></i> Performance Targets</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-4">
+              <h6>Monthly Targets</h6>
+              <div class="progress mb-2">
+                <div class="progress-bar bg-success" role="progressbar" style="width: 85%;" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100">New Accounts (85%)</div>
+              </div>
+              <div class="progress mb-2">
+                <div class="progress-bar bg-success" role="progressbar" style="width: 92%;" aria-valuenow="92" aria-valuemin="0" aria-valuemax="100">Deposits (92%)</div>
+              </div>
+              <div class="progress mb-2">
+                <div class="progress-bar bg-warning" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100">Loans (65%)</div>
+              </div>
+              <div class="progress mb-2">
+                <div class="progress-bar bg-success" role="progressbar" style="width: 95%;" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100">Satisfaction (95%)</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-4">
+              <h6>Quarterly Goals</h6>
+              <div class="list-group">
+                <div class="list-group-item">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h6 class="mb-1">Increase customer base by 15%</h6>
+                    <span class="badge bg-success">On Track</span>
+                  </div>
+                  <small>Current: +12%</small>
+                </div>
+                <div class="list-group-item">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h6 class="mb-1">Grow deposits by ₹2M</h6>
+                    <span class="badge bg-success">On Track</span>
+                  </div>
+                  <small>Current: +₹1.5M</small>
+                </div>
+                <div class="list-group-item">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h6 class="mb-1">Improve satisfaction to 4.8/5</h6>
+                    <span class="badge bg-warning text-dark">Needs Work</span>
+                  </div>
+                  <small>Current: 4.7/5</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-custom text-white text-center py-3 mt-auto">
+    © 2025 DigiBank. Manager Dashboard. All rights reserved.
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Chart instances
+    let charts = {};
+    
+    // Sample data for branches
+    const branchData = {
+      1: {
+        name: "Mumbai Main",
+        newAccounts: 42,
+        deposits: 8200000,
+        loans: 3500000,
+        transactions: 1245,
+        satisfaction: 4.7,
+        rank: 1,
+        location: "Mumbai, Maharashtra",
+        manager: "Amit Gupta",
+        employees: 24,
+        established: "2015-03-15"
+      },
+      2: {
+        name: "Delhi Central",
+        newAccounts: 38,
+        deposits: 7800000,
+        loans: 3200000,
+        transactions: 1180,
+        satisfaction: 4.6,
+        rank: 2,
+        location: "Delhi",
+        manager: "Rajiv Mehta",
+        employees: 22,
+        established: "2016-08-22"
+      },
+      3: {
+        name: "Bangalore South",
+        newAccounts: 35,
+        deposits: 7500000,
+        loans: 3000000,
+        transactions: 1120,
+        satisfaction: 4.5,
+        rank: 3,
+        location: "Bangalore, Karnataka",
+        manager: "Priya Sharma",
+        employees: 20,
+        established: "2017-01-10"
+      },
+      4: {
+        name: "Chennai East",
+        newAccounts: 32,
+        deposits: 7200000,
+        loans: 2800000,
+        transactions: 1050,
+        satisfaction: 4.4,
+        rank: 4,
+        location: "Chennai, Tamil Nadu",
+        manager: "Arun Kumar",
+        employees: 18,
+        established: "2018-05-30"
+      }
+    };
+    
+    // Initialize charts
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize all charts
+      initCharts();
+      
+      // Add event listeners
+      document.querySelectorAll('#periodSelector .btn-period').forEach(btn => {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('#periodSelector .btn-period').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          updateCharts(this.dataset.period);
+        });
+      });
+      
+      document.getElementById('exportPerformanceBtn').addEventListener('click', function() {
+        exportPerformanceReport();
+      });
+      
+      // Add event listeners for branch view buttons
+      document.querySelectorAll('.view-branch-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const branchId = this.closest('tr').dataset.branchId;
+          viewBranchDetails(branchId);
+        });
+      });
+      
+      // Add search functionality
+      document.getElementById('performanceSearchInput').addEventListener('keyup', function() {
+        const searchText = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#branchComparisonTable tbody tr');
+        
+        rows.forEach(row => {
+          const branchName = row.cells[0].textContent.toLowerCase();
+          if (branchName.includes(searchText)) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      });
+    });
+    
+    // Initialize all charts
+    function initCharts() {
+      // Financial Performance Chart
+      const financialCtx = document.getElementById('financialPerformanceChart').getContext('2d');
+      charts.financialPerformance = new Chart(financialCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          datasets: [{
+            label: 'Deposits',
+            data: [12000000, 11000000, 13000000, 12500000, 14000000, 15000000],
+            backgroundColor: 'rgba(151, 20, 77, 0.7)'
+          }, {
+            label: 'Loans',
+            data: [5000000, 5500000, 6000000, 5800000, 6200000, 6500000],
+            backgroundColor: 'rgba(33, 150, 243, 0.7)'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return '₹' + (value / 1000000) + 'M';
+                }
+              }
+            }
+          }
+        }
+      });
+
+      // Product Mix Chart
+      const productCtx = document.getElementById('productMixChart').getContext('2d');
+      charts.productMix = new Chart(productCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Savings', 'Current', 'Fixed Deposit', 'Loans'],
+          datasets: [{
+            data: [45, 25, 15, 15],
+            backgroundColor: [
+              'rgba(151, 20, 77, 0.7)',
+              'rgba(33, 150, 243, 0.7)',
+              'rgba(255, 193, 7, 0.7)',
+              'rgba(25, 135, 84, 0.7)'
+            ]
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
+
+      // Customer Metrics Chart
+      const customerCtx = document.getElementById('customerMetricsChart').getContext('2d');
+      charts.customerMetrics = new Chart(customerCtx, {
+        type: 'line',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          datasets: [{
+            label: 'New Customers',
+            data: [35, 40, 38, 42, 45, 42],
+            borderColor: 'rgba(151, 20, 77, 1)',
+            backgroundColor: 'rgba(151, 20, 77, 0.1)',
+            tension: 0.3,
+            fill: true
+          }, {
+            label: 'Satisfaction Score',
+            data: [4.5, 4.6, 4.5, 4.7, 4.7, 4.7],
+            borderColor: 'rgba(33, 150, 243, 1)',
+            backgroundColor: 'rgba(33, 150, 243, 0.1)',
+            tension: 0.3,
+            fill: true,
+            yAxisID: 'y1'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'New Customers'
+              }
+            },
+            y1: {
+              position: 'right',
+              min: 4,
+              max: 5,
+              title: {
+                display: true,
+                text: 'Satisfaction Score'
+              },
+              grid: {
+                drawOnChartArea: false
+              }
+            }
+          }
+        }
+      });
+
+      // Efficiency Chart
+      const efficiencyCtx = document.getElementById('efficiencyChart').getContext('2d');
+      charts.efficiency = new Chart(efficiencyCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          datasets: [{
+            label: 'Transactions per Employee',
+            data: [52, 54, 56, 58, 60, 62],
+            backgroundColor: 'rgba(151, 20, 77, 0.7)'
+          }, {
+            label: 'Cost per Transaction',
+            data: [45, 43, 42, 40, 38, 36],
+            backgroundColor: 'rgba(33, 150, 243, 0.7)',
+            yAxisID: 'y1'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Transactions per Employee'
+              }
+            },
+            y1: {
+              position: 'right',
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Cost per Transaction (₹)'
+              },
+              grid: {
+                drawOnChartArea: false
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    // Update charts based on selected period
+    function updateCharts(period) {
+      // In a real application, this would fetch new data based on the period
+      // For this example, we'll just simulate with different data
+      
+      const periods = {
+        day: ['9 AM', '12 PM', '3 PM', '6 PM', '9 PM'],
+        week: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        month: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+        quarter: ['Month 1', 'Month 2', 'Month 3'],
+        year: ['Q1', 'Q2', 'Q3', 'Q4']
+      };
+      
+      const labels = periods[period] || periods.month;
+      
+      // Update financial performance chart
+      charts.financialPerformance.data.labels = labels;
+      charts.financialPerformance.data.datasets[0].data = Array(labels.length).fill().map(() => Math.floor(Math.random() * 10000000) + 5000000);
+      charts.financialPerformance.data.datasets[1].data = Array(labels.length).fill().map(() => Math.floor(Math.random() * 5000000) + 2000000);
+      charts.financialPerformance.update();
+      
+      // Update customer metrics chart
+      charts.customerMetrics.data.labels = labels;
+      charts.customerMetrics.data.datasets[0].data = Array(labels.length).fill().map(() => Math.floor(Math.random() * 50) + 20);
+      charts.customerMetrics.data.datasets[1].data = Array(labels.length).fill().map(() => 4 + Math.random());
+      charts.customerMetrics.update();
+      
+      showToast(`Charts updated for ${period} period`, 'success');
+    }
+    
+    // Export performance report
+    function exportPerformanceReport() {
+      const period = document.querySelector('#periodSelector button.active').dataset.period;
+      
+      // Create report data
+      const reportData = [
+        ['Branch Performance Metrics', '', '', ''],
+        ['Period', period.toUpperCase(), '', ''],
+        ['', '', '', ''],
+        ['Metric', 'Value', 'Target', 'Status'],
+        ['New Customers', 42, 50, '85%'],
+        ['Total Deposits', '₹8.2M', '₹9M', '92%'],
+        ['Loan Disbursed', '₹3.5M', '₹5M', '65%'],
+        ['Customer Satisfaction', '4.7/5', '4.8/5', '95%']
+      ];
+      
+      exportToExcel(reportData, `Branch_Performance_${period}_Report_${formatDate(new Date())}`);
+      showToast(`Exported ${period} performance report`, 'success');
+    }
+    
+    // View branch details
+    function viewBranchDetails(branchId) {
+      const branch = branchData[branchId];
+      
+      if (branch) {
+        // In a real application, this would open a modal or navigate to a detailed page
+        // For this example, we'll show an alert with branch details
+        const message = `
+          Branch: ${branch.name}
+          Location: ${branch.location}
+          Manager: ${branch.manager}
+          Employees: ${branch.employees}
+          Established: ${formatDisplayDate(branch.established)}
+          New Accounts: ${branch.newAccounts}
+          Deposits: ₹${branch.deposits.toLocaleString()}
+          Loans: ₹${branch.loans.toLocaleString()}
+          Transactions: ${branch.transactions}
+          Satisfaction: ${branch.satisfaction}/5
+          Rank: ${branch.rank}
+        `;
+        
+        alert(message);
+      }
+    }
+    
+    // Export to Excel function
+    function exportToExcel(data, filename) {
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Performance Report");
+      XLSX.writeFile(wb, `${filename}.xlsx`);
+    }
+    
+    // Format date for filename
+    function formatDate(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}${month}${day}`;
+    }
+    
+    // Format date for display
+    function formatDisplayDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+    
+    // Show toast notification
+    function showToast(message, type = 'info') {
+      const toastContainer = document.querySelector('.toast-container');
+      const toastId = 'toast-' + Date.now();
+      
+      const toast = document.createElement('div');
+      toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'warning' ? 'warning' : type === 'error' ? 'danger' : 'info'} border-0`;
+      toast.setAttribute('role', 'alert');
+      toast.setAttribute('aria-live', 'assertive');
+      toast.setAttribute('aria-atomic', 'true');
+      toast.id = toastId;
+      
+      toast.innerHTML = `
+        <div class="d-flex">
+          <div class="toast-body">
+            ${message}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      `;
+      
+      toastContainer.appendChild(toast);
+      
+      const bsToast = new bootstrap.Toast(toast, {
+        autohide: true,
+        delay: 3000
+      });
+      
+      bsToast.show();
+      
+      // Remove toast from DOM after it's hidden
+      toast.addEventListener('hidden.bs.toast', function() {
+        toast.remove();
+      });
+    }
+    
+    function logout() {
+      alert("Manager logout clicked! Implement logout logic here.");
+    }
+  </script>
+</body>
+</html>

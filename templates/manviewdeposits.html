@@ -205,7 +205,7 @@
         <div class="offcanvas-body">
             <ul class="nav flex-column">
                 <li class="nav-item mb-2">
-                    <a class="nav-link text-dark" href="{{ url_for('dashboard') }}">
+                    <a class="nav-link text-dark" href="{{ url_for('managerapprovals') }}">
                         <i class="bi bi-speedometer2 me-2"></i> Dashboard
                     </a>
                 </li>
@@ -220,17 +220,17 @@
                     </a>
                 </li>
                 <li class="nav-item mb-2">
-                    <a class="nav-link text-dark" href="{{ url_for('manage_loans') }}">
+                    <a class="nav-link text-dark" href="manage-loans.html">
                         <i class="bi bi-file-earmark-check me-2"></i> Loan Approvals
                     </a>
                 </li>
                 <li class="nav-item mb-2">
-                    <a class="nav-link text-dark" href="{{ url_for('view_investments') }}">
+                    <a class="nav-link text-dark" href="view-investments.html">
                         <i class="bi bi-graph-up me-2"></i> Investments
                     </a>
                 </li>
                 <li class="nav-item mb-2">
-                    <a class="nav-link text-dark" href="{{ url_for('view_cards') }}">
+                    <a class="nav-link text-dark" href="view-cards.html">
                         <i class="bi bi-credit-card me-2"></i> Cards
                     </a>
                 </li>
@@ -240,14 +240,26 @@
     </div>
 
     <!-- Top Bar -->
-    <div class="top-bar">
-        <button class="btn btn-outline-light btn-sm me-3" 
-                data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-label="Toggle sidebar">
-            <i class="bi bi-list"></i>
-        </button>
-        <h5>DigiBank Deposit Management</h5>
-        <button class="logout-btn" onclick="logout()">Logout</button>
-    </div>
+    <div class="top-bar d-flex align-items-center">
+  <button class="btn btn-outline-light btn-sm me-3"
+          data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
+          aria-controls="sidebarMenu" aria-label="Toggle sidebar">
+    <i class="bi bi-list"></i>
+  </button>
+
+  <h5 class="me-auto mb-0">DigiBank Manager Dashboard</h5>
+
+  <div class="d-flex align-items-center">
+    <p class="navbar-text text-white mb-0">
+      Welcome, <strong>{{ user.name }}</strong>
+    </p>
+  </div>
+
+  <!-- Ensuring contrast with .text-white -->
+  <a href="{{ url_for('logout') }}" class="logout-btn ms-3">
+    Logout
+  </a>
+</div>
 
     <!-- Search Bar and Chatbot with Sidebar Toggle -->
     <div class="search-chatbar">

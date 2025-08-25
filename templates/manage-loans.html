@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Manage Loans - DigiBank Manager</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+
     <!-- Bootstrap CSS & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
@@ -158,7 +159,7 @@
             font-size: 1rem;
             outline-offset: 0;
             transition: border-color 0.3s;
-            width: 9000px; 
+            width: 9000px;
             margin: 0 auto;
             display: block;
         }
@@ -204,6 +205,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <!-- Sidebar Offcanvas -->
@@ -215,7 +217,7 @@
         <div class="offcanvas-body">
             <ul class="nav flex-column">
                 <li class="nav-item mb-2">
-                    <a class="nav-link text-dark" href="{{ url_for('dashboard') }}">
+                    <a class="nav-link text-dark" href="{{ url_for('managerapprovals') }}">
                         <i class="bi bi-speedometer2 me-2"></i> Dashboard
                     </a>
                 </li>
@@ -244,19 +246,21 @@
                         <i class="bi bi-credit-card me-2"></i> Cards
                     </a>
                 </li>
-                
+
             </ul>
         </div>
     </div>
 
     <!-- Top Bar -->
     <div class="top-bar">
-        <button class="btn btn-outline-light btn-sm me-3" 
-                data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-label="Toggle sidebar">
+        <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
+            aria-controls="sidebarMenu" aria-label="Toggle sidebar">
             <i class="bi bi-list"></i>
         </button>
         <h5>DigiBank Loan Management</h5>
-        <button class="logout-btn" onclick="logout()">Logout</button>
+        <a href="{{ url_for('logout') }}" class="logout-btn">
+              Logout
+            </a>
     </div>
 
     <!-- Search Bar and Chatbot with Sidebar Toggle -->
@@ -270,7 +274,7 @@
     <!-- Main Content -->
     <div class="main-content">
         <h2 class="mb-4"><i class="bi bi-file-earmark-check"></i> Manage Loans</h2>
-        
+
         <!-- Loan Requests Card -->
         <div class="card mb-4">
             <div class="card-header">
@@ -278,7 +282,7 @@
             </div>
             <div class="card-body">
                 <p>Approve or reject loan applications and modifications submitted by customers or branch staff.</p>
-                
+
                 <!-- Filter Controls -->
                 <div class="row mb-4">
                     <div class="col-md-4">
@@ -300,209 +304,215 @@
                             <option value="Rejected">Rejected</option>
                         </select>
                     </div>
+
                     <div class="col-md-4 d-flex align-items-end justify-content-end">
-        <div class="dropdown">
-            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-download"></i> Export Data
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="exportDropdown">
-                <li><a class="dropdown-item" href="#" onclick="exportLoanData('current')">Current View</a></li>
-                <li><a class="dropdown-item" href="#" onclick="exportLoanData('all')">All Loan Applications</a></li>
-                <li><a class="dropdown-item" href="#" onclick="exportLoanData('active')">Active Loans</a></li>
-            </ul>
-        </div>
-    </div>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="exportDropdown"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-download"></i> Export Data
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                                <li><a class="dropdown-item" href="#" onclick="exportLoanData('current')">Current
+                                        View</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="exportLoanData('all')">All Loan
+                                        Applications</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="exportLoanData('active')">Active
+                                        Loans</a></li>
+                            </ul>
+                        </div>
+                    </div>
 
-                
-                <!-- Loans Table -->
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Loan ID</th>
-                                <th>Customer</th>
-                                <th>Loan Type</th>
-                                <th>Amount</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="loanTableBody"></tbody>
-                    </table>
+
+
+                    <!-- Loans Table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Loan ID</th>
+                                    <th>Customer</th>
+                                    <th>Loan Type</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="loanTableBody"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav aria-label="Loan pagination">
+                        <ul class="pagination justify-content-center mt-4">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1">Previous</a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
-                
-                <!-- Pagination -->
-                <nav aria-label="Loan pagination">
-                    <ul class="pagination justify-content-center mt-4">
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#" tabindex="-1">Previous</a>
-                        </li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">Next</a>
-                        </li>
-                    </ul>
-                </nav>
+            </div>
+
+            <!-- Approved Loans Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Active Loans</h5>
+                </div>
+                <div class="card-body">
+                    <p>View and manage currently active loans.</p>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Loan ID</th>
+                                    <th>Customer</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Disbursed</th>
+                                    <th>EMI</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activeLoansTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Approved Loans Card -->
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Active Loans</h5>
-            </div>
-            <div class="card-body">
-                <p>View and manage currently active loans.</p>
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Loan ID</th>
-                                <th>Customer</th>
-                                <th>Type</th>
-                                <th>Amount</th>
-                                <th>Disbursed</th>
-                                <th>EMI</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="activeLoansTableBody"></tbody>
-                    </table>
+        <!-- Loan Details Modal -->
+        <div class="modal fade" id="loanDetailsModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="loanModalTitle">Loan Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="loanModalBody">
+                        <!-- Content will be loaded here -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="printLoanBtn">
+                            <i class="bi bi-printer"></i> Print Details
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Loan Details Modal -->
-    <div class="modal fade" id="loanDetailsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="loanModalTitle">Loan Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="loanModalBody">
-                    <!-- Content will be loaded here -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="printLoanBtn">
-                        <i class="bi bi-printer"></i> Print Details
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+        <!-- Bootstrap JS Bundle with Popper -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Bootstrap JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        // Data initialization
-        const loanApplications = [
-            { 
-                id: 'LN1001', 
-                customer: 'Rajesh Kumar', 
-                type: 'Home Loan', 
-                amount: '₹25,00,000', 
-                date: '2025-08-05', 
-                status: 'Pending',
-                details: {
-                    tenure: '20 years',
-                    interestRate: '8.4%',
-                    purpose: 'Purchase of new apartment',
-                    documents: ['Aadhaar', 'PAN', 'Salary Slips', 'Property Documents']
+        <script>
+            // Data initialization
+            const loanApplications = [
+                {
+                    id: 'LN1001',
+                    customer: 'Rajesh Kumar',
+                    type: 'Home Loan',
+                    amount: '₹25,00,000',
+                    date: '2025-08-05',
+                    status: 'Pending',
+                    details: {
+                        tenure: '20 years',
+                        interestRate: '8.4%',
+                        purpose: 'Purchase of new apartment',
+                        documents: ['Aadhaar', 'PAN', 'Salary Slips', 'Property Documents']
+                    }
+                },
+                {
+                    id: 'LN1002',
+                    customer: 'Sneha Kapoor',
+                    type: 'Personal Loan',
+                    amount: '₹5,00,000',
+                    date: '2025-08-07',
+                    status: 'Approved',
+                    details: {
+                        tenure: '5 years',
+                        interestRate: '12.5%',
+                        purpose: 'Medical emergency',
+                        documents: ['Aadhaar', 'PAN', 'Bank Statements']
+                    }
+                },
+                {
+                    id: 'LN1003',
+                    customer: 'Arjun Mehta',
+                    type: 'Car Loan',
+                    amount: '₹8,00,000',
+                    date: '2025-08-09',
+                    status: 'Pending',
+                    details: {
+                        tenure: '7 years',
+                        interestRate: '9.2%',
+                        purpose: 'New car purchase',
+                        documents: ['Aadhaar', 'PAN', 'Driving License', 'Quotation']
+                    }
                 }
-            },
-            { 
-                id: 'LN1002', 
-                customer: 'Sneha Kapoor', 
-                type: 'Personal Loan', 
-                amount: '₹5,00,000', 
-                date: '2025-08-07', 
-                status: 'Approved',
-                details: {
-                    tenure: '5 years',
-                    interestRate: '12.5%',
-                    purpose: 'Medical emergency',
-                    documents: ['Aadhaar', 'PAN', 'Bank Statements']
-                }
-            },
-            { 
-                id: 'LN1003', 
-                customer: 'Arjun Mehta', 
-                type: 'Car Loan', 
-                amount: '₹8,00,000', 
-                date: '2025-08-09', 
-                status: 'Pending',
-                details: {
-                    tenure: '7 years',
-                    interestRate: '9.2%',
-                    purpose: 'New car purchase',
-                    documents: ['Aadhaar', 'PAN', 'Driving License', 'Quotation']
-                }
-            }
-        ];
+            ];
 
-        const activeLoans = [
-            { 
-                id: 'LN2023-001', 
-                customer: 'Priya Sharma', 
-                type: 'Home Loan', 
-                amount: '₹35,00,000', 
-                disbursed: '2023-05-15',
-                emi: '₹32,450',
-                details: {
-                    remainingAmount: '₹28,75,000',
-                    nextDue: '2025-09-05',
-                    paymentsMade: '28/240'
+            const activeLoans = [
+                {
+                    id: 'LN2023-001',
+                    customer: 'Priya Sharma',
+                    type: 'Home Loan',
+                    amount: '₹35,00,000',
+                    disbursed: '2023-05-15',
+                    emi: '₹32,450',
+                    details: {
+                        remainingAmount: '₹28,75,000',
+                        nextDue: '2025-09-05',
+                        paymentsMade: '28/240'
+                    }
+                },
+                {
+                    id: 'LN2024-005',
+                    customer: 'Vikram Singh',
+                    type: 'Business Loan',
+                    amount: '₹15,00,000',
+                    disbursed: '2024-02-20',
+                    emi: '₹18,750',
+                    details: {
+                        remainingAmount: '₹12,30,000',
+                        nextDue: '2025-09-20',
+                        paymentsMade: '18/60'
+                    }
                 }
-            },
-            { 
-                id: 'LN2024-005', 
-                customer: 'Vikram Singh', 
-                type: 'Business Loan', 
-                amount: '₹15,00,000', 
-                disbursed: '2024-02-20',
-                emi: '₹18,750',
-                details: {
-                    remainingAmount: '₹12,30,000',
-                    nextDue: '2025-09-20',
-                    paymentsMade: '18/60'
-                }
-            }
-        ];
+            ];
 
-        // DOM Elements
-        const loanTableBody = document.getElementById('loanTableBody');
-        const activeLoansTableBody = document.getElementById('activeLoansTableBody');
-        const loanDetailsModal = new bootstrap.Modal(document.getElementById('loanDetailsModal'));
+            // DOM Elements
+            const loanTableBody = document.getElementById('loanTableBody');
+            const activeLoansTableBody = document.getElementById('activeLoansTableBody');
+            const loanDetailsModal = new bootstrap.Modal(document.getElementById('loanDetailsModal'));
 
-        // Initialize the page
-        document.addEventListener('DOMContentLoaded', function() {
-            renderLoanApplications();
-            renderActiveLoans();
-        });
+            // Initialize the page
+            document.addEventListener('DOMContentLoaded', function () {
+                renderLoanApplications();
+                renderActiveLoans();
+            });
 
-        // Render Loan Applications Table
-        function renderLoanApplications(filteredData = loanApplications) {
-            loanTableBody.innerHTML = '';
-            
-            if (filteredData.length === 0) {
-                loanTableBody.innerHTML = `
+            // Render Loan Applications Table
+            function renderLoanApplications(filteredData = loanApplications) {
+                loanTableBody.innerHTML = '';
+
+                if (filteredData.length === 0) {
+                    loanTableBody.innerHTML = `
                     <tr>
                         <td colspan="7" class="text-center py-4">No loan applications found matching your criteria</td>
                     </tr>
                 `;
-                return;
-            }
-            
-            filteredData.forEach((loan, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
+                    return;
+                }
+
+                filteredData.forEach((loan, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
                     <td>${loan.id}</td>
                     <td>${loan.customer}</td>
                     <td>${loan.type}</td>
@@ -523,17 +533,17 @@
                         ` : ''}
                     </td>
                 `;
-                loanTableBody.appendChild(row);
-            });
-        }
+                    loanTableBody.appendChild(row);
+                });
+            }
 
-        // Render Active Loans Table
-        function renderActiveLoans() {
-            activeLoansTableBody.innerHTML = '';
-            
-            activeLoans.forEach((loan, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
+            // Render Active Loans Table
+            function renderActiveLoans() {
+                activeLoansTableBody.innerHTML = '';
+
+                activeLoans.forEach((loan, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
                     <td>${loan.id}</td>
                     <td>${loan.customer}</td>
                     <td>${loan.type}</td>
@@ -546,46 +556,46 @@
                         </button>
                     </td>
                 `;
-                activeLoansTableBody.appendChild(row);
-            });
-        }
-
-        // Get appropriate badge class for status
-        function getStatusBadgeClass(status) {
-            switch(status) {
-                case 'Approved': return 'badge-approved';
-                case 'Rejected': return 'badge-rejected';
-                case 'Pending': return 'badge-pending';
-                default: return 'bg-secondary';
+                    activeLoansTableBody.appendChild(row);
+                });
             }
-        }
 
-        // Filter loans based on type and status
-        function filterLoans() {
-            const typeFilter = document.getElementById('loanTypeFilter').value;
-            const statusFilter = document.getElementById('loanStatusFilter').value;
-            
-            let filtered = loanApplications;
-            
-            // Filter by loan type
-            if (typeFilter !== 'all') {
-                filtered = filtered.filter(loan => loan.type === typeFilter);
+            // Get appropriate badge class for status
+            function getStatusBadgeClass(status) {
+                switch (status) {
+                    case 'Approved': return 'badge-approved';
+                    case 'Rejected': return 'badge-rejected';
+                    case 'Pending': return 'badge-pending';
+                    default: return 'bg-secondary';
+                }
             }
-            
-            // Filter by status
-            if (statusFilter !== 'all') {
-                filtered = filtered.filter(loan => loan.status === statusFilter);
-            }
-            
-            renderLoanApplications(filtered);
-        }
 
-        // View loan application details
-        function viewLoanDetails(index) {
-            const loan = loanApplications[index];
-            document.getElementById('loanModalTitle').textContent = `Loan Application - ${loan.id}`;
-            
-            let detailsHtml = `
+            // Filter loans based on type and status
+            function filterLoans() {
+                const typeFilter = document.getElementById('loanTypeFilter').value;
+                const statusFilter = document.getElementById('loanStatusFilter').value;
+
+                let filtered = loanApplications;
+
+                // Filter by loan type
+                if (typeFilter !== 'all') {
+                    filtered = filtered.filter(loan => loan.type === typeFilter);
+                }
+
+                // Filter by status
+                if (statusFilter !== 'all') {
+                    filtered = filtered.filter(loan => loan.status === statusFilter);
+                }
+
+                renderLoanApplications(filtered);
+            }
+
+            // View loan application details
+            function viewLoanDetails(index) {
+                const loan = loanApplications[index];
+                document.getElementById('loanModalTitle').textContent = `Loan Application - ${loan.id}`;
+
+                let detailsHtml = `
                 <div class="row">
                     <div class="col-md-6">
                         <p><strong>Loan ID:</strong> ${loan.id}</p>
@@ -610,27 +620,27 @@
                         <h6>Documents Submitted</h6>
                         <ul>
             `;
-            
-            loan.details.documents.forEach(doc => {
-                detailsHtml += `<li>${doc}</li>`;
-            });
-            
-            detailsHtml += `
+
+                loan.details.documents.forEach(doc => {
+                    detailsHtml += `<li>${doc}</li>`;
+                });
+
+                detailsHtml += `
                         </ul>
                     </div>
                 </div>
             `;
-            
-            document.getElementById('loanModalBody').innerHTML = detailsHtml;
-            loanDetailsModal.show();
-        }
 
-        // View active loan details
-        function viewActiveLoanDetails(index) {
-            const loan = activeLoans[index];
-            document.getElementById('loanModalTitle').textContent = `Active Loan - ${loan.id}`;
-            
-            let detailsHtml = `
+                document.getElementById('loanModalBody').innerHTML = detailsHtml;
+                loanDetailsModal.show();
+            }
+
+            // View active loan details
+            function viewActiveLoanDetails(index) {
+                const loan = activeLoans[index];
+                document.getElementById('loanModalTitle').textContent = `Active Loan - ${loan.id}`;
+
+                let detailsHtml = `
                 <div class="row">
                     <div class="col-md-6">
                         <p><strong>Loan ID:</strong> ${loan.id}</p>
@@ -658,103 +668,104 @@
                     </div>
                 </div>
             `;
-            
-            document.getElementById('loanModalBody').innerHTML = detailsHtml;
-            loanDetailsModal.show();
-        }
 
-        // Approve a loan
-        function approveLoan(index) {
-            if (confirm(`Are you sure you want to approve loan ${loanApplications[index].id}?`)) {
-                loanApplications[index].status = 'Approved';
-                renderLoanApplications();
-                alert(`Loan ${loanApplications[index].id} has been approved.`);
-            }
-        }
-
-        // Reject a loan
-        function rejectLoan(index) {
-            const reason = prompt(`Please enter reason for rejecting loan ${loanApplications[index].id}:`);
-            if (reason !== null) {
-                loanApplications[index].status = 'Rejected';
-                loanApplications[index].rejectionReason = reason;
-                renderLoanApplications();
-                alert(`Loan ${loanApplications[index].id} has been rejected.`);
-            }
-        }
-
-       
-        // Enhanced export function
-        function exportLoanData(type = 'current') {
-            let dataToExport = [];
-            let fileName = 'DigiBank_Loans_Export';
-            
-            if (type === 'current') {
-                // Get filtered data
-                const typeFilter = document.getElementById('loanTypeFilter').value;
-                const statusFilter = document.getElementById('loanStatusFilter').value;
-                
-                dataToExport = loanApplications.filter(loan => {
-                    return (typeFilter === 'all' || loan.type === typeFilter) && 
-                           (statusFilter === 'all' || loan.status === statusFilter);
-                });
-                fileName = 'DigiBank_Filtered_Loans_' + new Date().toISOString().split('T')[0];
-            } 
-            else if (type === 'all') {
-                dataToExport = loanApplications;
-                fileName = 'DigiBank_All_Loan_Applications_' + new Date().toISOString().split('T')[0];
-            }
-            else if (type === 'active') {
-                dataToExport = activeLoans;
-                fileName = 'DigiBank_Active_Loans_' + new Date().toISOString().split('T')[0];
+                document.getElementById('loanModalBody').innerHTML = detailsHtml;
+                loanDetailsModal.show();
             }
 
-            if (dataToExport.length === 0) {
-                alert('No data to export!');
-                return;
+            // Approve a loan
+            function approveLoan(index) {
+                if (confirm(`Are you sure you want to approve loan ${loanApplications[index].id}?`)) {
+                    loanApplications[index].status = 'Approved';
+                    renderLoanApplications();
+                    alert(`Loan ${loanApplications[index].id} has been approved.`);
+                }
             }
 
-            // Prepare the worksheet
-            const wsData = [
-                // Headers
-                ['Loan ID', 'Customer Name', 'Loan Type', 'Amount', 'Date', 'Status', 'Tenure', 'Interest Rate'],
-                // Data rows
-                ...dataToExport.map(loan => [
-                    loan.id,
-                    loan.customer,
-                    loan.type,
-                    loan.amount,
-                    loan.date,
-                    loan.status,
-                    loan.details?.tenure || 'N/A',
-                    loan.details?.interestRate || 'N/A'
-                ])
-            ];
-
-            const ws = XLSX.utils.aoa_to_sheet(wsData);
-            
-            // Create workbook
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Loan Data");
-            
-            // Generate and download the file
-            XLSX.writeFile(wb, `${fileName}.xlsx`);
-        }
-
-        // Logout function
-        function logout() {
-            if (confirm('Are you sure you want to logout?')) {
-                // In a real application, this would redirect to logout endpoint
-                alert('Logged out successfully!');
-                window.location.href = 'login.html';
+            // Reject a loan
+            function rejectLoan(index) {
+                const reason = prompt(`Please enter reason for rejecting loan ${loanApplications[index].id}:`);
+                if (reason !== null) {
+                    loanApplications[index].status = 'Rejected';
+                    loanApplications[index].rejectionReason = reason;
+                    renderLoanApplications();
+                    alert(`Loan ${loanApplications[index].id} has been rejected.`);
+                }
             }
-        }
 
-        // Print loan details handler
-        document.getElementById('printLoanBtn').addEventListener('click', function() {
-            alert('Printing loan details...');
-            loanDetailsModal.hide();
-        });
-    </script>
+
+            // Enhanced export function
+            function exportLoanData(type = 'current') {
+                let dataToExport = [];
+                let fileName = 'DigiBank_Loans_Export';
+
+                if (type === 'current') {
+                    // Get filtered data
+                    const typeFilter = document.getElementById('loanTypeFilter').value;
+                    const statusFilter = document.getElementById('loanStatusFilter').value;
+
+                    dataToExport = loanApplications.filter(loan => {
+                        return (typeFilter === 'all' || loan.type === typeFilter) &&
+                            (statusFilter === 'all' || loan.status === statusFilter);
+                    });
+                    fileName = 'DigiBank_Filtered_Loans_' + new Date().toISOString().split('T')[0];
+                }
+                else if (type === 'all') {
+                    dataToExport = loanApplications;
+                    fileName = 'DigiBank_All_Loan_Applications_' + new Date().toISOString().split('T')[0];
+                }
+                else if (type === 'active') {
+                    dataToExport = activeLoans;
+                    fileName = 'DigiBank_Active_Loans_' + new Date().toISOString().split('T')[0];
+                }
+
+                if (dataToExport.length === 0) {
+                    alert('No data to export!');
+                    return;
+                }
+
+                // Prepare the worksheet
+                const wsData = [
+                    // Headers
+                    ['Loan ID', 'Customer Name', 'Loan Type', 'Amount', 'Date', 'Status', 'Tenure', 'Interest Rate'],
+                    // Data rows
+                    ...dataToExport.map(loan => [
+                        loan.id,
+                        loan.customer,
+                        loan.type,
+                        loan.amount,
+                        loan.date,
+                        loan.status,
+                        loan.details?.tenure || 'N/A',
+                        loan.details?.interestRate || 'N/A'
+                    ])
+                ];
+
+                const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+                // Create workbook
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Loan Data");
+
+                // Generate and download the file
+                XLSX.writeFile(wb, `${fileName}.xlsx`);
+            }
+
+            // Logout function
+            function logout() {
+                if (confirm('Are you sure you want to logout?')) {
+                    // In a real application, this would redirect to logout endpoint
+                    alert('Logged out successfully!');
+                    window.location.href = 'login.html';
+                }
+            }
+
+            // Print loan details handler
+            document.getElementById('printLoanBtn').addEventListener('click', function () {
+                alert('Printing loan details...');
+                loanDetailsModal.hide();
+            });
+        </script>
 </body>
+
 </html>

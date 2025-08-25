@@ -2,145 +2,1235 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Transaction Review - DigiBank Manager</title>
+  <title>Transaction Review - DigiBank</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-   <style>
-  body {
-    background-color: #f8f9fa;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #333;
-  }
-  h1, h2 {
-    color: #97144D;
-    font-weight: 700;
-  }
-  .section-title {
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    border-bottom: 2px solid #97144D;
-    padding-bottom: 0.3rem;
-    text-align: center;
-  }
-  .card {
-    border: 2px solid #97144D;
-    border-radius: 12px;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 3px 10px rgb(151 20 77 / 0.1);
-    height: 280px; /* fixed equal height */
-    display: flex;
-    flex-direction: column;
-    padding: 1rem;
-  }
-  .card-body {
-    flex-grow: 1;
-    padding: 0;
-    margin-bottom: 1rem;
-  }
-  ul {
-    padding-left: 1rem;
-    margin-bottom: 0;
-    font-size: 0.9rem;
-  }
-  ul li {
-    margin-bottom: 0.3rem;
-  }
-  h3.card-title {
-    font-size: 1.2rem;
-    margin-bottom: 0.75rem;
-    text-align: center;
-    color: #97144D;
-  }
-  .btn-apply {
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px 0 0 0;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    #sidebarMenu.offcanvas-start { width: 250px; }
+    #sidebarMenu .offcanvas-body { padding: 0.5rem 1rem; }
+    #sidebarMenu .nav-link {
+      font-size: 0.9rem;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #333;
+      transition: color 0.3s;
+    }
+    #sidebarMenu .nav-link i { font-size: 1.1rem; }
+    #sidebarMenu .nav-link.active {
+      font-weight: 700;
+      color: #97144D !important;
+      background-color: #f0d7e0;
+      border-radius: 4px;
+    }
+    #sidebarMenu .nav-link:hover {
+      color: #7a0f3e;
+      background-color: #f9e5ef;
+      border-radius: 4px;
+    }
+
+    .top-bar button.btn-outline-light {
+      border: 1.5px solid white;
+      color: white;
+      background: transparent;
+      padding: 4px 10px;
+      font-size: 1.3rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+    }
+    .top-bar button.btn-outline-light:hover {
+      background-color: white;
+      color: #97144D;
+    }
+
+    .top-bar {
+      background-color: #97144D;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      user-select: none;
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+    }
+    .top-bar h5 {
+      margin: 0;
+      font-weight: 700;
+      flex-grow: 1;
+      text-align: center;
+      color: white;
+    }
+    .logout-btn {
+      background: transparent;
+      border: 1.5px solid white;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+      flex-shrink: 0;
+    }
+    .logout-btn:hover {
+      background-color: white;
+      color: #97144D;
+    }
+
+    .search-chatbar {
+      max-width: 900px;
+      margin: 15px auto 40px auto;
+      padding: 0 15px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .search-chatbar input[type="text"] {
+      flex-grow: 1;
+      padding: 10px 14px;
+      border-radius: 5px;
+      border: 1.5px solid #ccc;
+      font-size: 1rem;
+      outline-offset: 0;
+      transition: border-color 0.3s;
+      width: 9000px; 
+      margin: 0 auto;
+      display: block;
+    }
+    .search-chatbar input[type="text"]:focus {
+      border-color: #97144D;
+      box-shadow: 0 0 5px rgba(151, 20, 77, 0.5);
+    }
+    .search-chatbar .chatbot-btn {
+      background-color: #97144D;
+      border: none;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .search-chatbar .chatbot-btn:hover {
+      background-color: #7a0f3e;
+    }
+
+    /* Transaction Review Specific Styles */
+    .performance-card {
+      transition: 0.3s;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+      margin-bottom: 20px;
+    }
+    .performance-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+    }
+    .performance-card-header {
+      background-color: #97144D;
+      color: white;
+      border-radius: 8px 8px 0 0 !important;
+      padding: 15px 20px;
+    }
+    .kpi-card {
+      border-radius: 8px;
+      padding: 15px;
+      background-color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin-bottom: 15px;
+    }
+    .kpi-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #97144D;
+    }
+    .chart-container {
+      height: 250px;
+      position: relative;
+    }
+    .performance-badge {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    .transaction-badge {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    .suspicious-transaction {
+      background-color: #fff3cd;
+    }
+    .high-risk {
+      border-left: 4px solid #dc3545;
+    }
+    .medium-risk {
+      border-left: 4px solid #ffc107;
+    }
+    .low-risk {
+      border-left: 4px solid #198754;
+    }
+    .btn-clear {
+      background-color: #198754;
+      color: white;
+    }
+    .btn-flag {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    footer.bg-custom {
+      background-color: #97144D;
+      color: white;
+      text-align: center;
+      padding: 15px 0;
+      margin-top: auto;
+    }
+    
+    /* Time period selector */
+    .btn-period {
+      border: 1px solid #dee2e6;
+    }
+    .btn-period.active {
+      background-color: #97144D;
+      color: white;
+      border-color: #97144D;
+    }
+    .btn-primary  {
     background-color: #97144D;
-    color: white;
-    font-weight: 600;
-    border-radius: 8px;
-    align-self: center;
-    width: 120px;
-    transition: background-color 0.3s ease;
-  }
-  .btn-apply:hover {
-    background-color: #7a0f39;
-    color: #fff;
-  }
-  .disclaimer {
-    font-size: 0.85rem;
-    color: #555;
-    margin-top: 2rem;
-    padding-top: 1rem;
-    border-top: 1px solid #ddd;
-  }
-</style>
+   }
+    
+    /* Toast notification */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+    }
+    
+    /* Progress bar styling */
+    .progress {
+      height: 20px;
+    }
+    
+    /* Transaction details styling */
+    .transaction-detail-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    .transaction-detail-label {
+      font-weight: 600;
+      color: #6c757d;
+    }
+    .transaction-detail-value {
+      text-align: right;
+    }
+    .risk-meter {
+      height: 10px;
+      background-color: #e9ecef;
+      border-radius: 5px;
+      margin: 15px 0;
+      overflow: hidden;
+    }
+    .risk-meter-fill {
+      height: 100%;
+      border-radius: 5px;
+    }
+    .risk-indicator {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+      font-size: 0.8rem;
+      color: #6c757d;
+    }
+    .risk-factor {
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      border-radius: 4px;
+      background-color: #f8f9fa;
+    }
+    .risk-high {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .risk-medium {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    .risk-low {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .selected-transaction {
+      background-color: #e8f4f8 !important;
+    }
+   
+  </style>
 </head>
 <body>
-  <!-- Same header/sidebar as manager dashboard -->
-  
-  <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2>Transaction Review</h2>
-      <div>
-        <button class="btn btn-outline-primary">Export</button>
-        <button class="btn btn-primary">Fraud Dashboard</button>
+  <!-- Toast notification container -->
+  <div class="toast-container"></div>
+
+  <!-- Sidebar Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="sidebarMenuLabel">Manager</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="managerdashboard.html">
+            <i class="bi bi-speedometer2 me-2"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="manageaccounts.html">
+            <i class="bi bi-people-fill me-2"></i> Manage Accounts
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="managerapprove.html">
+            <i class="bi bi-file-earmark-check me-2"></i> Manage Approvals
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark active" href="transactions-review.html">
+            <i class="bi bi-list-check me-2"></i> Transaction Review
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="reports.html">
+            <i class="bi bi-graph-up me-2"></i> Reports & Analytics
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="staff-management.html">
+            <i class="bi bi-person-badge me-2"></i> Staff Management
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="branch-performance.html">
+            <i class="bi bi-building me-2"></i> Branch Performance
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <button class="btn btn-outline-light btn-sm me-3" 
+          data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-label="Toggle sidebar">
+    <i class="bi bi-list"></i>
+    </button>
+    <h5>DigiBank - Transaction Review</h5>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+
+  <!-- Search Bar and Chatbot with Sidebar Toggle -->
+  <div class="search-chatbar">
+    <input type="text" placeholder="Search transactions..." aria-label="Search" id="transactionSearchInput" />
+    <button class="chatbot-btn" aria-label="Chatbot">
+      <i class="bi bi-chat-dots-fill"></i>
+    </button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container my-4 flex-grow-1">
+    <!-- Time Period Selector -->
+    <div class="card performance-card mb-4">
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col-md-3">
+            <h6 class="mb-0">Review Period</h6>
+          </div>
+          <div class="col-md-6">
+            <div class="btn-group w-100" id="periodSelector">
+              <button class="btn btn-period" data-period="day">Today</button>
+              <button class="btn btn-period active" data-period="week">Week</button>
+              <button class="btn btn-period" data-period="month">Month</button>
+              <button class="btn btn-period" data-period="quarter">Quarter</button>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <button class="btn btn-primary w-100" id="exportTransactionsBtn">
+              <i class="bi bi-download me-1"></i> Export
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="card mb-4">
+    <!-- Transaction Statistics Cards -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <h6 class="text-muted">Pending Review</h6>
+          <div class="kpi-value">12</div>
+          <div class="text-warning">+3 from yesterday</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <h6 class="text-muted">Flagged Today</h6>
+          <div class="kpi-value">5</div>
+          <div class="text-danger">+2 from yesterday</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <h6 class="text-muted">Cleared Today</h6>
+          <div class="kpi-value">8</div>
+          <div class="text-success">+4 from yesterday</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="kpi-card">
+          <h6 class="text-muted">Avg. Review Time</h6>
+          <div class="kpi-value">2.1h</div>
+          <div class="text-success">-0.3h from last week</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transaction Charts -->
+    <div class="row mb-4">
+      <div class="col-md-8">
+        <div class="card performance-card h-100">
+          <div class="performance-card-header">
+            <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i> Transaction Trends</h5>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="transactionTrendsChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card performance-card h-100">
+          <div class="performance-card-header">
+            <h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i> Risk Distribution</h5>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="riskDistributionChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transaction Filters -->
+    <div class="card performance-card mb-4">
+      <div class="performance-card-header">
+        <h5 class="mb-0"><i class="bi bi-funnel me-2"></i> Filter Transactions</h5>
+      </div>
       <div class="card-body">
-        <div class="row mb-3">
+        <div class="row g-3">
           <div class="col-md-3">
-            <input type="date" class="form-control">
-          </div>
-          <div class="col-md-3">
-            <input type="date" class="form-control">
-          </div>
-          <div class="col-md-3">
-            <select class="form-select">
-              <option>All Statuses</option>
-              <option>Flagged</option>
-              <option>Cleared</option>
-              <option>Pending Review</option>
+            <label class="form-label">Amount Range</label>
+            <select class="form-select" id="amountFilter">
+              <option value="all">Any amount</option>
+              <option value="50000">Above ₹50,000</option>
+              <option value="100000">Above ₹1,00,000</option>
+              <option value="500000">Above ₹5,00,000</option>
             </select>
           </div>
           <div class="col-md-3">
-            <button class="btn btn-primary w-100">Filter</button>
+            <label class="form-label">Transaction Type</label>
+            <select class="form-select" id="typeFilter">
+              <option value="all">All types</option>
+              <option value="transfer">Transfer</option>
+              <option value="withdrawal">Withdrawal</option>
+              <option value="deposit">Deposit</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Status</label>
+            <select class="form-select" id="statusFilter">
+              <option value="all">All statuses</option>
+              <option value="pending">Pending review</option>
+              <option value="flagged">Flagged</option>
+              <option value="cleared">Cleared</option>
+              <option value="blocked">Blocked</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Risk Level</label>
+            <select class="form-select" id="riskFilter">
+              <option value="all">All risk levels</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
           </div>
         </div>
+      </div>
+    </div>
 
+    <!-- Transactions Table -->
+    <div class="card performance-card mb-4">
+      <div class="performance-card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-list-check me-2"></i> Suspicious Transactions</h5>
+        <span class="badge bg-light text-dark" id="transactionCount">4 transactions found</span>
+      </div>
+      <div class="card-body">
         <div class="table-responsive">
-          <table class="table table-hover">
-            <thead class="table-light">
+          <table class="table table-hover" id="transactionsTable">
+            <thead>
               <tr>
-                <th>Date</th>
                 <th>Transaction ID</th>
+                <th>Date/Time</th>
                 <th>From Account</th>
                 <th>To Account</th>
                 <th>Amount</th>
                 <th>Status</th>
+                <th>Risk Level</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr class="suspicious flagged">
-                <td>2023-11-15</td>
-                <td>TXN78945612</td>
-                <td>1000234567</td>
-                <td>9876543210 (External)</td>
-                <td class="text-danger">₹1,25,000.00</td>
-                <td><span class="badge bg-warning">Flagged</span></td>
+              <tr class="suspicious-transaction high-risk" data-id="1" data-amount="125000" data-type="transfer" data-status="pending" data-risk="high">
+                <td>TRX20230517-1245</td>
+                <td>Today, 12:45 PM</td>
+                <td>SAV78945612 (Rahul Sharma)</td>
+                <td>CUR12345678 (Unknown Recipient)</td>
+                <td class="fw-bold">₹1,25,000.00</td>
+                <td><span class="transaction-badge bg-warning text-dark">Pending</span></td>
+                <td><span class="transaction-badge bg-danger">High</span></td>
                 <td>
-                  <button class="btn btn-sm btn-outline-primary">Review</button>
-                  <button class="btn btn-sm btn-outline-success">Approve</button>
+                  <button class="btn btn-sm btn-clear me-1" onclick="clearTransaction(event, '1')">Clear</button>
+                  <button class="btn btn-sm btn-flag me-1" onclick="flagTransaction(event, '1')">Flag</button>
+                  <button class="btn btn-sm btn-outline-primary" onclick="showDetails(event, '1')">Details</button>
                 </td>
               </tr>
-              <!-- More transaction rows would go here -->
+              <tr class="suspicious-transaction medium-risk" data-id="2" data-amount="75000" data-type="transfer" data-status="pending" data-risk="medium">
+                <td>TRX20230517-0930</td>
+                <td>Today, 9:30 AM</td>
+                <td>CUR98765432 (Neha Gupta)</td>
+                <td>EXT87654321 (International)</td>
+                <td class="fw-bold">₹75,000.00</td>
+                <td><span class="transaction-badge bg-warning text-dark">Pending</span></td>
+                <td><span class="transaction-badge bg-warning text-dark">Medium</span></td>
+                <td>
+                  <button class="btn btn-sm btn-clear me-1" onclick="clearTransaction(event, '2')">Clear</button>
+                  <button class="btn btn-sm btn-flag me-1" onclick="flagTransaction(event, '2')">Flag</button>
+                  <button class="btn btn-sm btn-outline-primary" onclick="showDetails(event, '2')">Details</button>
+                </td>
+              </tr>
+              <tr class="suspicious-transaction low-risk" data-id="3" data-amount="25000" data-type="transfer" data-status="pending" data-risk="low">
+                <td>TRX20230516-1545</td>
+                <td>Yesterday, 3:45 PM</td>
+                <td>SAV32165498 (Arjun Mehta)</td>
+                <td>SAV78945612 (Rahul Sharma)</td>
+                <td class="fw-bold">₹25,000.00</td>
+                <td><span class="transaction-badge bg-warning text-dark">Pending</span></td>
+                <td><span class="transaction-badge bg-success">Low</span></td>
+                <td>
+                  <button class="btn btn-sm btn-clear me-1" onclick="clearTransaction(event, '3')">Clear</button>
+                  <button class="btn btn-sm btn-flag me-1" onclick="flagTransaction(event, '3')">Flag</button>
+                  <button class="btn btn-sm btn-outline-primary" onclick="showDetails(event, '3')">Details</button>
+                </td>
+              </tr>
+              <tr data-id="4" data-amount="50000" data-type="transfer" data-status="cleared" data-risk="reviewed">
+                <td>TRX20230516-1120</td>
+                <td>Yesterday, 11:20 AM</td>
+                <td>CUR12345678 (Priya Patel)</td>
+                <td>SAV32165498 (Arjun Mehta)</td>
+                <td class="fw-bold">₹50,000.00</td>
+                <td><span class="transaction-badge bg-success">Cleared</span></td>
+                <td><span class="transaction-badge bg-secondary">Reviewed</span></td>
+                <td>
+                  <button class="btn btn-sm btn-outline-secondary me-1">Edit</button>
+                  <button class="btn btn-sm btn-outline-primary" onclick="showDetails(event, '4')">Details</button>
+                </td>
+              </tr>
             </tbody>
           </table>
+        </div>
+        
+        <!-- Pagination -->
+        <nav aria-label="Page navigation" class="mt-4">
+          <ul class="pagination justify-content-center">
+            <li class="page-item disabled">
+              <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+              <a class="page-link" href="#">Next</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Transaction Details and Risk Analysis -->
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card performance-card">
+          <div class="performance-card-header">
+            <h5 class="mb-0"><i class="bi bi-receipt me-2"></i> Transaction Details</h5>
+          </div>
+          <div class="card-body" id="transactionDetails">
+            <div class="text-center py-4" id="noTransactionSelected">
+              <i class="bi bi-credit-card" style="font-size: 3rem; color: #97144D;"></i>
+              <p class="mt-2 text-muted">Select a transaction to view details</p>
+            </div>
+            
+            <!-- Transaction details content (hidden by default) -->
+            <div id="transactionDetailsContent" style="display: none;">
+              <div class="transaction-detail-item">
+                <span class="transaction-detail-label">Transaction ID:</span>
+                <span class="transaction-detail-value" id="detail-id">TRX20230517-1245</span>
+              </div>
+              <div class="transaction-detail-item">
+                <span class="transaction-detail-label">Date & Time:</span>
+                <span class="transaction-detail-value" id="detail-date">Today, 12:45 PM</span>
+              </div>
+              <div class="transaction-detail-item">
+                <span class="transaction-detail-label">Amount:</span>
+                <span class="transaction-detail-value fw-bold" id="detail-amount">₹1,25,000.00</span>
+              </div>
+              <div class="transaction-detail-item">
+                <span class="transaction-detail-label">Status:</span>
+                <span class="transaction-detail-value" id="detail-status"><span class="transaction-badge bg-warning text-dark">Pending</span></span>
+              </div>
+              <div class="transaction-detail-item">
+                <span class="transaction-detail-label">From Account:</span>
+                <span class="transaction-detail-value" id="detail-from">SAV78945612 (Rahul Sharma)</span>
+              </div>
+              <div class="transaction-detail-item">
+                <span class="transaction-detail-label">To Account:</span>
+                <span class="transaction-detail-value" id="detail-to">CUR12345678 (Unknown Recipient)</span>
+              </div>
+              <div class="transaction-detail-item">
+                <span class="transaction-detail-label">Transaction Type:</span>
+                <span class="transaction-detail-value" id="detail-type">Inter-bank Transfer</span>
+              </div>
+              <div class="transaction-detail-item">
+                <span class="transaction-detail-label">Location:</span>
+                <span class="transaction-detail-value" id="detail-location">Mumbai, India → Singapore</span>
+              </div>
+              <div class="transaction-detail-item">
+                <span class="transaction-detail-label">Initiated Via:</span>
+                <span class="transaction-detail-value" id="detail-channel">Mobile App</span>
+              </div>
+              <div class="transaction-detail-item">
+                <span class="transaction-detail-label">IP Address:</span>
+                <span class="transaction-detail-value" id="detail-ip">182.65.78.123</span>
+              </div>
+              <div class="transaction-detail-item">
+                <span class="transaction-detail-label">Device:</span>
+                <span class="transaction-detail-value" id="detail-device">iPhone 13 Pro (iOS 16.4.1)</span>
+              </div>
+              <div class="transaction-detail-item">
+                <span class="transaction-detail-label">Previous Transactions:</span>
+                <span class="transaction-detail-value" id="detail-history">2 transactions to this recipient</span>
+              </div>
+              <div class="d-flex justify-content-end mt-3">
+                <button class="btn btn-sm btn-outline-secondary me-2">View Full History</button>
+                <button class="btn btn-sm btn-outline-primary">Contact Customer</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card performance-card">
+          <div class="performance-card-header">
+            <h5 class="mb-0"><i class="bi bi-shield-exclamation me-2"></i> Risk Analysis</h5>
+          </div>
+          <div class="card-body" id="riskAnalysis">
+            <div class="text-center py-4" id="noRiskAnalysis">
+              <i class="bi bi-graph-up" style="font-size: 3rem; color: #97144D;"></i>
+              <p class="mt-2 text-muted">Risk assessment will appear here</p>
+            </div>
+            
+            <!-- Risk analysis content (hidden by default) -->
+            <div id="riskAnalysisContent" style="display: none;">
+              <h6 class="mb-3">Overall Risk Score</h6>
+              <div class="risk-meter">
+                <div class="risk-meter-fill bg-danger" id="risk-meter-fill" style="width: 85%"></div>
+              </div>
+              <div class="risk-indicator">
+                <span>Low</span>
+                <span>Medium</span>
+                <span>High</span>
+              </div>
+              
+              <h6 class="mt-4 mb-3">Risk Factors</h6>
+              <div id="riskFactorsContainer">
+                <!-- Risk factors will be inserted here -->
+              </div>
+              
+              <h6 class="mt-4 mb-3">AI Recommendations</h6>
+              <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <span id="recommendation-text">Recommendation will appear here</span>
+              </div>
+              
+              <div class="d-grid gap-2 mt-4">
+                <button class="btn btn-danger" onclick="flagTransaction(null, 'current')">
+                  <i class="bi bi-flag-fill me-2"></i>Flag as Suspicious
+                </button>
+                <button class="btn btn-success" onclick="clearTransaction(null, 'current')">
+                  <i class="bi bi-check-circle-fill me-2"></i>Clear Transaction
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Same footer as manager dashboard -->
+  <!-- Footer -->
+  <footer class="bg-custom text-white text-center py-3 mt-auto">
+    © 2025 DigiBank. Manager Dashboard. All rights reserved.
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Chart instances
+    let charts = {};
+    
+    // Transaction data
+    const transactionData = {
+      '1': {
+        id: 'TRX20230517-1245',
+        date: 'Today, 12:45 PM',
+        amount: '₹1,25,000.00',
+        status: 'Pending',
+        from: 'SAV78945612 (Rahul Sharma)',
+        to: 'CUR12345678 (Unknown Recipient)',
+        type: 'Inter-bank Transfer',
+        location: 'Mumbai, India → Singapore',
+        channel: 'Mobile App',
+        ip: '182.65.78.123',
+        device: 'iPhone 13 Pro (iOS 16.4.1)',
+        history: '2 transactions to this recipient',
+        riskScore: 85,
+        riskFactors: [
+          { factor: 'Large Amount', risk: 'High', description: 'Transaction amount is significantly higher than customer\'s average' },
+          { factor: 'Unknown Recipient', risk: 'High', description: 'First transaction to this recipient with no prior relationship' },
+          { factor: 'International Transfer', risk: 'Medium', description: 'Transfer to a high-risk jurisdiction' },
+          { factor: 'Device Recognition', risk: 'Low', description: 'Transaction initiated from recognized device' }
+        ],
+        recommendation: 'Flag for manual review and contact customer for verification'
+      },
+      '2': {
+        id: 'TRX20230517-0930',
+        date: 'Today, 9:30 AM',
+        amount: '₹75,000.00',
+        status: 'Pending',
+        from: 'CUR98765432 (Neha Gupta)',
+        to: 'EXT87654321 (International)',
+        type: 'International Wire Transfer',
+        location: 'Delhi, India → USA',
+        channel: 'Online Banking',
+        ip: '203.145.89.76',
+        device: 'Windows PC (Chrome Browser)',
+        history: '5 international transactions this month',
+        riskScore: 65,
+        riskFactors: [
+          { factor: 'International Transfer', risk: 'Medium', description: 'Frequent international transactions pattern detected' },
+          { factor: 'Amount', risk: 'Medium', description: 'Slightly above customer\'s typical transaction range' },
+          { factor: 'Recipient Country', risk: 'Medium', description: 'Recipient located in medium-risk jurisdiction' },
+          { factor: 'Time of Transaction', risk: 'Low', description: 'Unusual time for this customer' }
+        ],
+        recommendation: 'Verify source of funds and transaction purpose'
+      },
+      '3': {
+        id: 'TRX20230516-1545',
+        date: 'Yesterday, 3:45 PM',
+        amount: '₹25,000.00',
+        status: 'Pending',
+        from: 'SAV32165498 (Arjun Mehta)',
+        to: 'SAV78945612 (Rahul Sharma)',
+        type: 'Domestic Transfer',
+        location: 'Bangalore, India → Mumbai, India',
+        channel: 'Mobile App',
+        ip: '112.133.89.45',
+        device: 'Samsung Galaxy S21 (Android 13)',
+        history: 'Regular transactions to this recipient',
+        riskScore: 25,
+        riskFactors: [
+          { factor: 'Known Recipient', risk: 'Low', description: 'Frequent transactions to this recipient' },
+          { factor: 'Amount', risk: 'Low', description: 'Within customer\'s normal transaction range' },
+          { factor: 'Location', risk: 'Low', description: 'Transaction from usual location' }
+        ],
+        recommendation: 'Low risk - likely can be cleared'
+      },
+      '4': {
+        id: 'TRX20230516-1120',
+        date: 'Yesterday, 11:20 AM',
+        amount: '₹50,000.00',
+        status: 'Cleared',
+        from: 'CUR12345678 (Priya Patel)',
+        to: 'SAV32165498 (Arjun Mehta)',
+        type: 'Domestic Transfer',
+        location: 'Chennai, India → Bangalore, India',
+        channel: 'Branch Transaction',
+        ip: 'N/A',
+        device: 'In-branch terminal',
+        history: 'First transaction to this recipient',
+        riskScore: 40,
+        riskFactors: [
+          { factor: 'New Recipient', risk: 'Medium', description: 'First transaction to this recipient' },
+          { factor: 'Branch Verification', risk: 'Low', description: 'Transaction performed in-branch with ID verification' },
+          { factor: 'Amount', risk: 'Low', description: 'Moderate amount for this customer' }
+        ],
+        recommendation: 'Already cleared - no action needed'
+      }
+    };
+
+    let selectedTransactionId = null;
+
+    // Initialize charts and event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize all charts
+      initCharts();
+      
+            // Add event listeners for period selector
+      document.querySelectorAll('#periodSelector .btn-period').forEach(btn => {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('#periodSelector .btn-period').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          updateCharts(this.dataset.period);
+        });
+      });
+
+      // Add event listener for search input
+      document.getElementById('transactionSearchInput').addEventListener('input', filterTransactions);
+
+      // Add event listeners for filter dropdowns
+      document.getElementById('amountFilter').addEventListener('change', filterTransactions);
+      document.getElementById('typeFilter').addEventListener('change', filterTransactions);
+      document.getElementById('statusFilter').addEventListener('change', filterTransactions);
+      document.getElementById('riskFilter').addEventListener('change', filterTransactions);
+
+      // Add event listener for export button
+      document.getElementById('exportTransactionsBtn').addEventListener('click', exportTransactions);
+
+      // Initialize with week view
+      updateCharts('week');
+    });
+
+    // Initialize charts
+    function initCharts() {
+      // Transaction Trends Chart
+      const trendsCtx = document.getElementById('transactionTrendsChart').getContext('2d');
+      charts.trends = new Chart(trendsCtx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: 'Suspicious Transactions',
+              data: [],
+              borderColor: '#dc3545',
+              backgroundColor: 'rgba(220, 53, 69, 0.1)',
+              tension: 0.3,
+              fill: true
+            },
+            {
+              label: 'Cleared Transactions',
+              data: [],
+              borderColor: '#198754',
+              backgroundColor: 'rgba(25, 135, 84, 0.1)',
+              tension: 0.3,
+              fill: true
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Number of Transactions'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Date'
+              }
+            }
+          }
+        }
+      });
+
+      // Risk Distribution Chart
+      const riskCtx = document.getElementById('riskDistributionChart').getContext('2d');
+      charts.risk = new Chart(riskCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['High Risk', 'Medium Risk', 'Low Risk', 'Reviewed'],
+          datasets: [{
+            data: [0, 0, 0, 0],
+            backgroundColor: [
+              '#dc3545',
+              '#ffc107',
+              '#198754',
+              '#6c757d'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+            }
+          }
+        }
+      });
+    }
+
+    // Update charts based on selected period
+    function updateCharts(period) {
+      // Mock data for different periods
+      const data = {
+        day: {
+          labels: ['9 AM', '10 AM', '11 AM', '12 PM', '1 PM', '2 PM', '3 PM'],
+          suspicious: [2, 3, 5, 7, 4, 6, 3],
+          cleared: [1, 2, 4, 3, 5, 4, 6],
+          risk: [3, 5, 2, 4] // [high, medium, low, reviewed]
+        },
+        week: {
+          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          suspicious: [12, 18, 15, 22, 17, 9, 5],
+          cleared: [8, 12, 10, 15, 13, 7, 4],
+          risk: [12, 18, 15, 25] // [high, medium, low, reviewed]
+        },
+        month: {
+          labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+          suspicious: [45, 52, 48, 38],
+          cleared: [32, 40, 35, 30],
+          risk: [45, 52, 48, 85] // [high, medium, low, reviewed]
+        },
+        quarter: {
+          labels: ['Month 1', 'Month 2', 'Month 3'],
+          suspicious: [150, 165, 142],
+          cleared: [120, 135, 125],
+          risk: [150, 165, 142, 300] // [high, medium, low, reviewed]
+        }
+      };
+
+      // Update trends chart
+      charts.trends.data.labels = data[period].labels;
+      charts.trends.data.datasets[0].data = data[period].suspicious;
+      charts.trends.data.datasets[1].data = data[period].cleared;
+      charts.trends.update();
+
+      // Update risk distribution chart
+      charts.risk.data.datasets[0].data = data[period].risk;
+      charts.risk.update();
+    }
+
+    // Filter transactions based on search and filters
+    function filterTransactions() {
+      const searchText = document.getElementById('transactionSearchInput').value.toLowerCase();
+      const amountFilter = document.getElementById('amountFilter').value;
+      const typeFilter = document.getElementById('typeFilter').value;
+      const statusFilter = document.getElementById('statusFilter').value;
+      const riskFilter = document.getElementById('riskFilter').value;
+      
+      const rows = document.querySelectorAll('#transactionsTable tbody tr');
+      let visibleCount = 0;
+      
+      rows.forEach(row => {
+        const id = row.dataset.id;
+        const amount = parseFloat(row.dataset.amount);
+        const type = row.dataset.type;
+        const status = row.dataset.status;
+        const risk = row.dataset.risk;
+        
+        const textMatch = row.textContent.toLowerCase().includes(searchText);
+        const amountMatch = amountFilter === 'all' || amount >= parseInt(amountFilter);
+        const typeMatch = typeFilter === 'all' || type === typeFilter;
+        const statusMatch = statusFilter === 'all' || status === statusFilter;
+        const riskMatch = riskFilter === 'all' || risk === riskFilter;
+        
+        if (textMatch && amountMatch && typeMatch && statusMatch && riskMatch) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+      
+      document.getElementById('transactionCount').textContent = `${visibleCount} transactions found`;
+    }
+
+    // Show transaction details
+    function showDetails(event, transactionId) {
+      // Prevent default if event exists
+      if (event) event.preventDefault();
+      
+      // Remove selected class from all rows
+      document.querySelectorAll('#transactionsTable tbody tr').forEach(row => {
+        row.classList.remove('selected-transaction');
+      });
+      
+      // Add selected class to current row
+      const selectedRow = document.querySelector(`#transactionsTable tbody tr[data-id="${transactionId}"]`);
+      if (selectedRow) {
+        selectedRow.classList.add('selected-transaction');
+      }
+      
+      // Update selected transaction ID
+      selectedTransactionId = transactionId;
+      
+      // Get transaction data
+      const transaction = transactionData[transactionId];
+      
+      // Update transaction details
+      document.getElementById('detail-id').textContent = transaction.id;
+      document.getElementById('detail-date').textContent = transaction.date;
+      document.getElementById('detail-amount').textContent = transaction.amount;
+      
+      // Update status badge
+      let statusBadge = '';
+      if (transaction.status === 'Pending') {
+        statusBadge = '<span class="transaction-badge bg-warning text-dark">Pending</span>';
+      } else if (transaction.status === 'Cleared') {
+        statusBadge = '<span class="transaction-badge bg-success">Cleared</span>';
+      }
+      document.getElementById('detail-status').innerHTML = statusBadge;
+      
+      document.getElementById('detail-from').textContent = transaction.from;
+      document.getElementById('detail-to').textContent = transaction.to;
+      document.getElementById('detail-type').textContent = transaction.type;
+      document.getElementById('detail-location').textContent = transaction.location;
+      document.getElementById('detail-channel').textContent = transaction.channel;
+      document.getElementById('detail-ip').textContent = transaction.ip;
+      document.getElementById('detail-device').textContent = transaction.device;
+      document.getElementById('detail-history').textContent = transaction.history;
+      
+      // Show transaction details and hide placeholder
+      document.getElementById('noTransactionSelected').style.display = 'none';
+      document.getElementById('transactionDetailsContent').style.display = 'block';
+      
+      // Update risk analysis
+      document.getElementById('risk-meter-fill').style.width = `${transaction.riskScore}%`;
+      
+      // Update risk factors
+      const riskFactorsContainer = document.getElementById('riskFactorsContainer');
+      riskFactorsContainer.innerHTML = '';
+      
+      transaction.riskFactors.forEach(factor => {
+        let riskClass = '';
+        if (factor.risk === 'High') riskClass = 'risk-high';
+        else if (factor.risk === 'Medium') riskClass = 'risk-medium';
+        else if (factor.risk === 'Low') riskClass = 'risk-low';
+        
+        const factorElement = document.createElement('div');
+        factorElement.className = `risk-factor ${riskClass}`;
+        factorElement.innerHTML = `
+          <strong>${factor.factor}</strong> (${factor.risk} Risk)
+          <div class="small">${factor.description}</div>
+        `;
+        riskFactorsContainer.appendChild(factorElement);
+      });
+      
+      // Update recommendation
+      document.getElementById('recommendation-text').textContent = transaction.recommendation;
+      
+      // Show risk analysis and hide placeholder
+      document.getElementById('noRiskAnalysis').style.display = 'none';
+      document.getElementById('riskAnalysisContent').style.display = 'block';
+    }
+
+    // Clear transaction
+    function clearTransaction(event, transactionId) {
+      if (event) event.preventDefault();
+      
+      const id = transactionId === 'current' ? selectedTransactionId : transactionId;
+      
+      // Update UI
+      const row = document.querySelector(`#transactionsTable tbody tr[data-id="${id}"]`);
+      if (row) {
+        row.querySelector('.transaction-badge.bg-warning').className = 'transaction-badge bg-success';
+        row.querySelector('.transaction-badge.bg-warning').textContent = 'Cleared';
+        row.dataset.status = 'cleared';
+        
+        // Update action buttons
+        const actionCell = row.querySelector('td:last-child');
+        actionCell.innerHTML = `
+          <button class="btn btn-sm btn-outline-secondary me-1">Edit</button>
+          <button class="btn btn-sm btn-outline-primary" onclick="showDetails(event, '${id}')">Details</button>
+        `;
+      }
+      
+      // Show success notification
+      showToast('Transaction cleared successfully', 'success');
+      
+      // Update stats
+      updateStats();
+    }
+
+    // Flag transaction
+    function flagTransaction(event, transactionId) {
+      if (event) event.preventDefault();
+      
+      const id = transactionId === 'current' ? selectedTransactionId : transactionId;
+      
+      // Update UI
+      const row = document.querySelector(`#transactionsTable tbody tr[data-id="${id}"]`);
+      if (row) {
+        row.querySelector('.transaction-badge.bg-warning').className = 'transaction-badge bg-danger';
+        row.querySelector('.transaction-badge.bg-danger').textContent = 'Flagged';
+        row.dataset.status = 'flagged';
+        
+        // Update action buttons
+        const actionCell = row.querySelector('td:last-child');
+        actionCell.innerHTML = `
+          <button class="btn btn-sm btn-outline-secondary me-1">Edit</button>
+          <button class="btn btn-sm btn-outline-primary" onclick="showDetails(event, '${id}')">Details</button>
+        `;
+      }
+      
+      // Show warning notification
+      showToast('Transaction flagged for review', 'warning');
+      
+      // Update stats
+      updateStats();
+    }
+
+    // Update statistics
+    function updateStats() {
+      // In a real application, this would recalculate based on actual data
+      // For this demo, we'll just simulate updates
+      const pendingCount = document.querySelectorAll('#transactionsTable tr[data-status="pending"]').length;
+      const flaggedCount = document.querySelectorAll('#transactionsTable tr[data-status="flagged"]').length;
+      const clearedCount = document.querySelectorAll('#transactionsTable tr[data-status="cleared"]').length;
+      
+      document.querySelectorAll('.kpi-card .kpi-value')[0].textContent = pendingCount;
+      document.querySelectorAll('.kpi-card .kpi-value')[1].textContent = flaggedCount;
+      document.querySelectorAll('.kpi-card .kpi-value')[2].textContent = clearedCount;
+    }
+
+    // Export transactions
+    function exportTransactions() {
+      // Create workbook
+      const wb = XLSX.utils.book_new();
+      
+      // Prepare data
+      const data = [['Transaction ID', 'Date/Time', 'From Account', 'To Account', 'Amount', 'Status', 'Risk Level']];
+      
+      document.querySelectorAll('#transactionsTable tbody tr').forEach(row => {
+        if (row.style.display !== 'none') {
+          const cells = row.querySelectorAll('td');
+          data.push([
+            cells[0].textContent,
+            cells[1].textContent,
+            cells[2].textContent,
+            cells[3].textContent,
+            cells[4].textContent,
+            cells[5].textContent,
+            cells[6].textContent
+          ]);
+        }
+      });
+      
+      // Create worksheet
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      
+      // Add worksheet to workbook
+      XLSX.utils.book_append_sheet(wb, ws, 'Suspicious Transactions');
+      
+      // Export to file
+      XLSX.writeFile(wb, `suspicious_transactions_${new Date().toISOString().split('T')[0]}.xlsx`);
+      
+      // Show success notification
+      showToast('Transactions exported successfully', 'success');
+    }
+
+    // Show toast notification
+    function showToast(message, type = 'info') {
+      const toastContainer = document.querySelector('.toast-container');
+      
+      const toast = document.createElement('div');
+      toast.className = `toast align-items-center text-bg-${type} border-0`;
+      toast.setAttribute('role', 'alert');
+      toast.setAttribute('aria-live', 'assertive');
+      toast.setAttribute('aria-atomic', 'true');
+      
+      toast.innerHTML = `
+        <div class="d-flex">
+          <div class="toast-body">
+            ${message}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      `;
+      
+      toastContainer.appendChild(toast);
+      
+      const bsToast = new bootstrap.Toast(toast);
+      bsToast.show();
+      
+      // Remove toast after it's hidden
+      toast.addEventListener('hidden.bs.toast', () => {
+        toastContainer.removeChild(toast);
+      });
+    }
+
+    // Logout function
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        // In a real application, this would clear session and redirect to login
+        window.location.href = 'login.html';
+      }
+    }
+  </script>
 </body>
 </html>
