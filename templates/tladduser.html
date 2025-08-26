@@ -29,12 +29,12 @@
             <div class="col-md-6">
               <div class="mb-3">
                 <label class="form-label">First Name</label>
-                <input type="text" class="form-control" name="first_name" placeholder="Enter first name" required>
+                <input type="text" class="form-control" name="name" placeholder="Enter first name" required>
               </div>
-              <div class="mb-3">
+              <!-- <div class="mb-3">
                 <label class="form-label">Last Name</label>
                 <input type="text" class="form-control" name="last_name" placeholder="Enter last name" required>
-              </div>
+              </div> -->
               <div class="mb-3">
                 <label class="form-label">Date of Birth</label>
                 <input type="date" class="form-control" name="dob" required>
@@ -57,6 +57,10 @@
               <div class="mb-3">
                 <label class="form-label">Aadhar Number</label>
                 <input type="text" class="form-control" name="aadhaar" placeholder="Enter Aadhar number" required>
+              </div>
+              <div class="mb-3">
+                <label>Password</label>
+                <input type="password" id="password" class="form-control" name="password" placeholder="Enter password" required>
               </div>
             </div>
 
@@ -95,6 +99,10 @@
                   <option>Delhi</option>
                 </select>
               </div>
+               <div class="mb-3">
+                <label class="form-label">Mobile Number</label>
+                <input type="text" class="form-control" name="mobile" placeholder="Enter mobile number" required>
+              </div>
               <div class="mb-3">
                 <label class="form-label">Department</label>
                 <select class="form-select" name="department" required>
@@ -109,10 +117,14 @@
                 <label class="form-label">Passport Photo</label>
                 <input type="file" class="form-control" name="photo" accept="image/*" required>
               </div>
+              <div class="mb-3">
+                <label>Confirm Password</label>
+                <input type="password" id="confirm_password" class="form-control" name="confirm_password" placeholder="Confirm password" required>
+              </div>
             </div>
           </div>
 
-          <!-- Password Fields -->
+          <!-- Password Fields 
           <div class="row">    
           <div class="mb-3">
         <label>Password</label>
@@ -122,7 +134,7 @@
       <div class="mb-3">
         <label>Confirm Password</label>
         <input type="password" id="confirm_password" class="form-control" name="confirm_password" placeholder="Confirm password" required>
-      </div>
+      </div> -->
  
       <button type="submit" class="btn btn-digibank">Submit</button>
     </form>

@@ -603,7 +603,34 @@ def branchperformance():
 
 
 # Generate department-based Agent ID
-def generate_agent_id(department):
+# def generate_user_id(department):
+#     prefixes = {
+#         "Cards": "CA",
+#         "Loans": "LN",
+#         "Investment": "IV",
+#         "Forex": "FX"
+#     }
+#     prefix = prefixes.get(department, "AG")
+#     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#     cur.execute("SELECT MAX(id) AS max_id FROM agents WHERE department=%s", (department,))
+#     result = cur.fetchone()
+#     next_id = (result['max_id'] or 0) + 1
+#     return f"{prefix}{next_id:03d}"
+
+
+# Cards Page
+# @app.route('/tlcards')
+# def tlcards():
+#     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#     cur.execute("""
+#         SELECT user_id, name, department, onboarding_date 
+#         FROM agents 
+#         WHERE status='active' AND department='Cards'
+#     """)
+#     agents = cur.fetchall()
+#     return render_template("tlcards.html", agents=agents)
+
+def generate_user_id(department):
     prefixes = {
         "Cards": "CA",
         "Loans": "LN",
@@ -617,49 +644,91 @@ def generate_agent_id(department):
     next_id = (result['max_id'] or 0) + 1
     return f"{prefix}{next_id:03d}"
 
-
-# Cards Page
+    # Cards Page
 @app.route('/tlcards')
 def tlcards():
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("""
-        SELECT agent_id, first_name, last_name, department, onboarding_date 
-        FROM agents 
+        SELECT user_id, name, department, onboarding_date
+        FROM agents
         WHERE status='active' AND department='Cards'
     """)
     agents = cur.fetchall()
     return render_template("tlcards.html", agents=agents)
 
-# Add User Page
+ # Add User Page
 @app.route('/tladduser', methods=['GET', 'POST'])
 def tladduser():
     if request.method == 'POST':
         data = request.form
-        hashed_pw = generate_password_hash(data['password'])
-        agent_id = generate_agent_id(data['department'])
-
+        plain_pw = data['password']
+        user_id = generate_user_id(data['department'])
+ 
+        # Auto-generate email
+        email = f"{user_id}@digibank.com"
+ 
+        # Assign role based on department
+        roles = {
+            "Cards": "Card_Agent",
+            "Loans": "Loan_Agent",
+            "Investment": "Investment_Agent",
+            "Forex": "Forex_Agent"
+        }
+        role = roles.get(data['department'], "agent")
+ 
         # Handle file upload
         photo = request.files['photo']
         photo_path = ''
         if photo and photo.filename:
-            filename = f"{agent_id}_{photo.filename}"
+            filename = f"{user_id}_{photo.filename}"
             photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
             photo.save(photo_path)
+ 
+        # Insert into agents
         cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cur.execute("""
             INSERT INTO agents (
-                agent_id, first_name, last_name, dob, gender, pan, aadhaar,
-                date_of_joining, country, state, city, department, photo_path, 
-                password_hash, status, onboarding_date
-            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'active',%s)
+                user_id, name, dob, gender, pan, aadhaar, mobile, email,
+                date_of_joining, country, state, city, department, photo_path,
+                password, role, status, onboarding_date
+            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
         """, (
-            agent_id, data['first_name'], data['last_name'], data['dob'], data['gender'],
-            data['pan'], data['aadhaar'], data['date_of_joining'], data['country'], 
-            data['state'], data['city'], data['department'], photo_path, hashed_pw, datetime.now()
+            user_id, data['name'], data['dob'], data['gender'],
+            data['pan'], data['aadhaar'], data['mobile'], email,
+            data['date_of_joining'], data['country'], data['state'], data['city'],
+            data['department'], photo_path, plain_pw, role, "active", datetime.now()
         ))
+ 
+        # Insert into users
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cur.execute("""
+            INSERT INTO bank_users (
+                user_id, name, dob, gender, pan, aadhaar, mobile, email,
+                 country, state, city, department, 
+                password, role, status, onboarding_date
+            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        """, (
+            user_id, data['name'], data['dob'], data['gender'],
+            data['pan'], data['aadhaar'], data['mobile'], email,
+            data['country'], data['state'], data['city'],
+            data['department'], plain_pw, role, "active", datetime.now()
+        ))
+ 
         mysql.connection.commit()
-        return redirect(url_for('tlcards'))
+ 
+        # Redirect to department page
+        if data['department'] == "Cards":
+            return redirect(url_for('tlcards'))
+        elif data['department'] == "Loans":
+            return redirect(url_for('tlloan'))
+        elif data['department'] == "Investment":
+            return redirect(url_for('tlinvest'))
+        elif data['department'] == "Forex":
+            return redirect(url_for('tlforex'))
+        else:
+            return redirect(url_for('dashboard'))
+ 
     return render_template("tladduser.html")
 
 
@@ -682,9 +751,9 @@ def download_excel():
     for member in members:
         sheet.append([
             member["id"],
-            member["agent_id"],
-            member["first_name"],
-            member["last_name"],
+            member["user_id"],
+            member["name"],
+            
             member["dob"],
             member["gender"],
             member["pan"],
@@ -711,29 +780,40 @@ def download_excel():
     )
 
 
+# @app.route('/tldeleteuser', methods=['GET', 'POST'])
+# def tldeleteuser():
+#     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)   
+    
+#     if request.method == 'POST':
+#         ids = request.form.getlist('selected_ids')
+#         for id in ids:
+#             cur.execute(
+#                 "UPDATE agents SET status='deleted', deleted_date=%s WHERE user_id=%s",
+#                 (datetime.now(), id)
+#             )
+#         mysql.connection.commit()
+#         cur.close()
+#         return redirect(url_for('tlcards'))
 @app.route('/tldeleteuser', methods=['GET', 'POST'])
 def tldeleteuser():
-    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)   
-    
     if request.method == 'POST':
         ids = request.form.getlist('selected_ids')
         for id in ids:
-            cur.execute(
-                "UPDATE agents SET status='deleted', deleted_date=%s WHERE agent_id=%s",
-                (datetime.now(), id)
-            )
+            cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cur.execute("UPDATE agents SET status='deleted', deleted_date=%s WHERE user_id=%s", (datetime.now(), id))
+            cur.execute("UPDATE bank_users SET status='deleted', deleted_date=%s WHERE user_id=%s", (datetime.now(), id))
         mysql.connection.commit()
-        cur.close()
-        return redirect(url_for('tlcards'))
-
-    # ✅ for GET request
+        # Go back to home page after delete
+        return redirect(url_for('dashboard'))
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("""
-        SELECT agent_id, first_name, last_name, department, onboarding_date 
+        SELECT user_id, name, department, onboarding_date
         FROM agents WHERE status='active'
     """)
     agents = cur.fetchall()
-    cur.close()
     return render_template("tldeleteuser.html", agents=agents)
+
+   
 
 
 # Loan Page
@@ -741,7 +821,7 @@ def tldeleteuser():
 def tlloan():
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("""
-        SELECT agent_id, first_name, last_name, department, onboarding_date 
+        SELECT user_id,name, department, onboarding_date 
         FROM agents 
         WHERE status='active' AND department='Loans'
     """)
@@ -753,7 +833,7 @@ def tlloan():
 def tlinvest():
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("""
-        SELECT agent_id, first_name, last_name, department, onboarding_date 
+        SELECT user_id, name, department, onboarding_date 
         FROM agents 
         WHERE status='active' AND department='Investment'
     """)
@@ -765,7 +845,7 @@ def tlinvest():
 def tlforex():
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("""
-        SELECT agent_id, first_name, last_name, department, onboarding_date 
+        SELECT user_id, name, department, onboarding_date 
         FROM agents 
         WHERE status='active' AND department='Forex'
     """)
