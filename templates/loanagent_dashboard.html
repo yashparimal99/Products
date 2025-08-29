@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Agent Dashboard - DigiBank</title>
+  <title>Loan Agent Dashboard - DigiBank</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Bootstrap CSS & Icons -->
@@ -88,7 +88,7 @@
        style="height: 40px; width:auto; background-color:#fff; border-radius:5px; padding:2px;" class="me-3">
 
   <!-- Title -->
-  <h5 class="flex-grow-1 text-center m-0">Welcome To Cards Agent Dashboard - DigiBank</h5>
+  <h5 class="flex-grow-1 text-center m-0">Welcome To Loan Agent Dashboard - DigiBank</h5>
 
   <!-- Logout Button -->
   <div class="d-flex align-items-center">
@@ -99,13 +99,19 @@
 </div>
 </div>
 
+<!-- <div class="d-flex align-items-center">
+            <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name }} !  ({{user.role}})</h5>
+            <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">
+              Logout
+            </a>
+          </div> -->
 
 
   <!-- Breadcrumb -->
   <nav aria-label="breadcrumb" class="bg-light px-3 py-2">
     <ol class="breadcrumb mb-0">
       <li class="breadcrumb-item"><a href="{{ url_for('login') }}">Login</a></li>
-      <li class="breadcrumb-item active" aria-current="page"><a href="{{ url_for('dashboard') }}">Cards_Dashboard</a></li>
+      <li class="breadcrumb-item active" aria-current="page"><a href="{{ url_for('dashboard') }}">Loans_Dashboard</a></li>
     </ol>
   </nav>
 
@@ -124,7 +130,7 @@
               <p class="card-text text-muted">View and update your personal information and account settings.</p>
             </div>
             <div class="card-footer bg-transparent border-0 d-grid">
-              <a href="{{ url_for('agentprofile') }}" class="btn nav-btn">View Profile</a>
+              <a href="{{ url_for('loanagentprofile') }}" class="btn nav-btn">View Profile</a>
             </div>
           </div>
         </div>
@@ -134,11 +140,11 @@
           <div class="card dashboard-card h-100 p-3">
             <div class="card-body">
               <i class="bi bi-file-earmark-text display-4 icon-color mb-3"></i>
-              <h5 class="card-title">Applications</h5>
+              <h5 class="card-title"> Loan Applications</h5>
               <p class="card-text text-muted">View all submitted card applications and their current status.</p>
             </div>
             <div class="card-footer bg-transparent border-0 d-grid">
-              <a href="{{ url_for('cardapplications') }}" class="btn nav-btn">View Applications</a>
+              <a href="{{ url_for('agentloanapproval') }}" class="btn nav-btn">View Applications</a>
             </div>
           </div>
         </div>
@@ -148,11 +154,11 @@
           <div class="card dashboard-card h-100 p-3">
             <div class="card-body">
               <i class="bi bi-file-earmark-plus display-4 icon-color mb-3"></i>
-              <h5 class="card-title">Apply Card</h5>
-              <p class="card-text text-muted">Submit a new credit, debit, or international card application for a customer.</p>
+              <h5 class="card-title">Apply Loan</h5>
+              <p class="card-text text-muted">Submit Loan application for a Customer.</p>
             </div>
             <div class="card-footer bg-transparent border-0 d-grid">
-              <a href="{{ url_for('applycardagent') }}" class="btn nav-btn">Apply for Card</a>
+              <a href="{{ url_for('agentapplyloan') }}" class="btn nav-btn">Apply for Loan</a>
             </div>
           </div>
         </div>
@@ -166,7 +172,7 @@
               <p class="card-text text-muted">Track your submission performance, approvals, and key metrics.</p>
             </div>
             <div class="card-footer bg-transparent border-0 d-grid">
-              <a href="{{ url_for('cardperformance') }}" class="btn nav-btn">View Performance</a>
+              <a href="{{ url_for('loanperformance') }}" class="btn nav-btn">View Performance</a>
             </div>
           </div>
         </div>

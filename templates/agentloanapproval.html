@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Loan Approvals - DigiBank Agent</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 0;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Sidebar */
+    #sidebarMenu.offcanvas-start {
+      width: 250px;
+    }
+
+    #sidebarMenu .nav-link {
+      font-size: 0.9rem;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #333;
+      transition: 0.3s;
+    }
+
+    #sidebarMenu .nav-link.active {
+      font-weight: 700;
+      color: #97144D !important;
+      background-color: #f0d7e0;
+      border-radius: 4px;
+    }
+
+    #sidebarMenu .nav-link:hover {
+      color: #7a0f3e;
+      background-color: #f9e5ef;
+      border-radius: 4px;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      background-color: #97144D;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+    }
+
+    .top-bar h5 {
+      margin: 0;
+      font-weight: 700;
+      text-align: center;
+      flex-grow: 1;
+    }
+
+    .logout-btn {
+      background: transparent;
+      border: 1.5px solid white;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .logout-btn:hover {
+      background-color: white;
+      color: #97144D;
+    }
+
+    /* Search + Filter Row */
+    .filter-bar {
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 0 15px;
+    }
+
+    .filter-bar input,
+    .filter-bar select {
+      border-radius: 5px;
+      border: 1.5px solid #ccc;
+      transition: border-color 0.3s;
+    }
+
+    .filter-bar input:focus,
+    .filter-bar select:focus {
+      border-color: #97144D;
+      box-shadow: 0 0 5px rgba(151, 20, 77, 0.5);
+    }
+
+    /* Cards / Tables */
+    .card-custom {
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+      border: none;
+    }
+
+    .table thead {
+      background-color: #97144D;
+      color: white;
+    }
+
+    /* Breadcrumb Alignment Fix */
+    .breadcrumb {
+      margin: 0;
+    }
+
+    .breadcrumb-container {
+      display: flex;
+      justify-content: flex-start;
+      padding: 10px 15px;
+    }
+
+    /* Footer */
+    footer.bg-custom {
+      background-color: #97144D;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Sidebar -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">Welcome, Danish Ahemad</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-people-fill"></i> Manage Users</a></li>
+        <li class="nav-item"><a class="nav-link " href="#"><i class="bi bi-check-circle"></i> Loan Approvals</a></li>
+        <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-cash-coin"></i> Transactions</a></li>
+        <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-bar-chart-line"></i> Reports</a></li>
+        <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-chat-dots"></i> Customer Queries</a></li>
+        <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-gear"></i> Settings</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Top Bar -->
+  <div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#8B0A50; color:white;">
+    <!-- Sidebar Toggle Button -->
+    <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
+      <i class="bi bi-list"></i>
+    </button>
+
+    <!-- Logo / Image -->
+    <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo" 
+         style="height: 40px; width:auto; background-color:#fff; border-radius:5px; padding:2px;" class="me-3">
+
+    <!-- Title -->
+    <h5 class="flex-grow-1 text-center m-0">Welcome To Loan Agent Dashboard - DigiBank</h5>
+
+    
+
+    <!-- Logout Button -->
+    <div class="d-flex align-items-center">
+    <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }}</h5>
+    <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-2">
+      Logout
+    </a>
+  </div>
+  </div>
+
+  
+
+  <!-- Breadcrumb (Now Left Aligned) -->
+  <div class="breadcrumb-container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="{{ url_for('dashboard') }}" style="color: #97144D; font-weight: bold;">Dashboard</a>
+        </li>
+        <li class="breadcrumb-item">
+          <a href="{{ url_for('agentloanapproval') }}" style="color: #97144D; font-weight: bold;">Loan_Approvals</a>
+        </li>
+      </ol>
+    </nav>
+  </div>
+
+  <!-- Page Content -->
+  <div class="container my-4 flex-grow-1">
+    <h3 class="mb-4 text-center">🏦 Loan Approvals (My Customers)</h3>
+
+    <!-- Search + Filter -->
+    <div class="row filter-bar mb-3">
+      <div class="col-md-5">
+        <input type="text" class="form-control" placeholder="Search by Customer Name or Loan ID" />
+      </div>
+      <div class="col-md-3">
+        <select class="form-select">
+          <option selected>Filter by Loan Type</option>
+          <option value="home">Home Loan</option>
+          <option value="car">Car Loan</option>
+          <option value="personal">Personal Loan</option>
+          <option value="education">Education Loan</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-digibank w-100"><i class="bi bi-funnel"></i> Apply</button>
+      </div>
+    </div>
+
+    <!-- Loan Applications Table -->
+    <div class="card card-custom">
+      <div class="card-body">
+        <h5 class="fw-bold mb-3">Loan Applications Assigned</h5>
+        <div class="table-responsive">
+          <table class="table table-striped align-middle">
+            <thead>
+              <tr>
+                <th>Loan ID</th>
+                <th>Customer</th>
+                <th>Loan Type</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Date Applied</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>LN1001</td>
+                <td>Arjun Mehta</td>
+                <td>Home Loan</td>
+                <td>₹12,00,000</td>
+                <td><span class="badge bg-warning text-dark">Pending</span></td>
+                <td>2025-08-15</td>
+                <td>
+                  <button class="btn btn-success btn-sm" onclick="openConfirmModal('approve','LN1001')"><i class="bi bi-check-circle"></i> Approve</button>
+                  <button class="btn btn-danger btn-sm" onclick="openConfirmModal('reject','LN1001')"><i class="bi bi-x-circle"></i> Reject</button>
+                </td>
+              </tr>
+              <tr>
+                <td>LN1004</td>
+                <td>Neha Singh</td>
+                <td>Education Loan</td>
+                <td>₹4,00,000</td>
+                <td><span class="badge bg-warning text-dark">Pending</span></td>
+                <td>2025-08-12</td>
+                <td>
+                  <button class="btn btn-success btn-sm" onclick="openConfirmModal('approve','LN1004')"><i class="bi bi-check-circle"></i> Approve</button>
+                  <button class="btn btn-danger btn-sm" onclick="openConfirmModal('reject','LN1004')"><i class="bi bi-x-circle"></i> Reject</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-custom text-white text-center py-3 mt-auto">
+    © 2025 DigiBank. All rights reserved.
+  </footer>
+
+  <!-- Confirmation Modal -->
+  <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold" id="confirmTitle">Confirm Action</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="confirmMessage">Are you sure you want to proceed?</div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn" id="confirmBtn">Yes, Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let actionType = "", loanId = "";
+
+    function openConfirmModal(action, id) {
+      actionType = action;
+      loanId = id;
+
+      const title = document.getElementById("confirmTitle");
+      const message = document.getElementById("confirmMessage");
+      const confirmBtn = document.getElementById("confirmBtn");
+
+      if (action === "approve") {
+        title.innerText = "Approve Loan";
+        message.innerHTML = `Are you sure you want to <b class="text-success">approve</b> Loan <b>${id}</b>?`;
+        confirmBtn.className = "btn btn-success";
+        confirmBtn.innerHTML = '<i class="bi bi-check-circle"></i> Yes, Approve';
+      } else {
+        title.innerText = "Reject Loan";
+        message.innerHTML = `Are you sure you want to <b class="text-danger">reject</b> Loan <b>${id}</b>?`;
+        confirmBtn.className = "btn btn-danger";
+        confirmBtn.innerHTML = '<i class="bi bi-x-circle"></i> Yes, Reject';
+      }
+
+      const modal = new bootstrap.Modal(document.getElementById("confirmModal"));
+      modal.show();
+
+      confirmBtn.onclick = function () {
+        alert(`Loan ${loanId} has been ${actionType}d successfully!`);
+        modal.hide();
+      };
+    }
+  </script>
+</body>
+</html>

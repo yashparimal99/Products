@@ -79,7 +79,7 @@
   <h5 class="flex-grow-1 text-center m-0">Welcome To Cards Agent Dashboard - DigiBank</h5>
 
   <!-- Logout Button -->
-  <div class="d-flex align-items-center">
+<div class="d-flex align-items-center">
   <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }}</h5>
   <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
     Logout
@@ -88,18 +88,21 @@
 </div>
 
 
-
+<!-- <div class="d-flex align-items-center">
+      <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }}</h5>
+      <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">Logout</a>
+  </div> -->
 
       <!-- Breadcrumb -->
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
-        <li class="breadcrumb-item active" aria-current="page"><a href="{{ url_for('cardperformance') }}">Agent Performance</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="{{ url_for('loanperformance') }}">Agent Performance</a></li>
       </nav>
   <!-- Main Container -->
   <div class="container my-5">
     <div class="card p-4">
-      <h4 class="mb-4 text-center">Agent Performance</h4>
+      <h4 class="mb-4 text-center"> Loan Agent Performance</h4>
 
 
 
@@ -107,13 +110,13 @@
       <div class="d-flex justify-content-center mb-4">
         <div class="dropdown me-3">
           <button class="btn nav-btn dropdown-toggle" type="button" id="cardTypeFilter" data-bs-toggle="dropdown" aria-expanded="false">
-            All Cards
+            All Loans
           </button>
           <ul class="dropdown-menu" aria-labelledby="cardTypeFilter">
-            <li><a class="dropdown-item" href="#" data-card-type="all">All Cards</a></li>
-            <li><a class="dropdown-item" href="#" data-card-type="Credit Card">Credit Card</a></li>
-            <li><a class="dropdown-item" href="#" data-card-type="Debit Card">Debit Card</a></li>
-            <li><a class="dropdown-item" href="#" data-card-type="International Card">International Card</a></li>
+            <li><a class="dropdown-item" href="#" data-card-type="all">All Loans</a></li>
+            <li><a class="dropdown-item" href="#" data-card-type="Credit Card">Home Loan</a></li>
+            <li><a class="dropdown-item" href="#" data-card-type="Debit Card">Busniess Loan</a></li>
+            <li><a class="dropdown-item" href="#" data-card-type="International Card">Personal Loan</a></li>
           </ul>
         </div>
         <div class="dropdown">
@@ -124,8 +127,8 @@
             <li><a class="dropdown-item" href="#" data-status="all">All Statuses</a></li>
             <li><a class="dropdown-item" href="#" data-status="Approved">Approved</a></li>
             <li><a class="dropdown-item" href="#" data-status="Pending">Pending</a></li>
-            <li><a class="dropdown-item" href="#" data-status="Issued">Issued</a></li>
-            <li><a class="dropdown-item" href="#" data-status="Declined">Declined</a></li>
+            <li><a class="dropdown-item" href="#" data-status="Issued">Disbursed</a></li>
+            
           </ul>
         </div>
       </div>
@@ -152,7 +155,7 @@
           <div class="card metric-card">
             <h6>Applications Submitted</h6>
             <div id="applicationsSubmitted" class="metric-value">22</div>
-            <small>Successful card applications</small>
+            <small>Successful loan applications</small>
           </div>
         </div>
       </div>
@@ -164,7 +167,7 @@
             <h6>Sales Target Progress</h6>
             <p>
               <strong>Target:</strong> <span id="targetValue">120</span> | 
-              <strong>Sold:</strong> <span id="soldValue">75</span> | 
+              <strong>Disbursed:</strong> <span id="soldValue">75</span> | 
               <strong>Remaining:</strong> <span id="remainingValue">45</span>
             </p>
             <div class="progress">
@@ -196,7 +199,7 @@
           <p><span id="submittedCount">21</span> Customers | Conversion: <span id="submittedConv">95</span>% → Approved</p>
         </div>
         <div class="funnel-stage">
-          <strong>Stage 4: Card Issued</strong>
+          <strong>Stage 4: Loan Issued</strong>
           <p><span id="issuedCount">20</span> Customers</p>
         </div>
       </div>
@@ -226,6 +229,7 @@
     let myChart;
     let currentCardType = 'all';
     let currentStatus = 'all';
+    
 
     // Update dashboard
     function updateDashboard(cardType, status) {

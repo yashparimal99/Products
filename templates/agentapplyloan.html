@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Loan Registration - DigiBank Agent</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 0;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #sidebarMenu.offcanvas-start {
+      width: 250px;
+    }
+
+    #sidebarMenu .nav-link {
+      font-size: 0.9rem;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #333;
+      transition: 0.3s;
+    }
+
+    #sidebarMenu .nav-link.active {
+      font-weight: 700;
+      color: #97144D !important;
+      background-color: #f0d7e0;
+      border-radius: 4px;
+    }
+
+    #sidebarMenu .nav-link:hover {
+      color: #7a0f3e;
+      background-color: #f9e5ef;
+      border-radius: 4px;
+    }
+
+    .top-bar {
+      background-color: #97144D;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+    }
+
+    .top-bar h5 {
+      margin: 0;
+      font-weight: 700;
+      text-align: center;
+      flex-grow: 1;
+    }
+
+    .logout-btn {
+      background: transparent;
+      border: 1.5px solid white;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .logout-btn:hover {
+      background-color: white;
+      color: #97144D;
+    }
+
+    .breadcrumb-container {
+      display: flex;
+      justify-content: flex-start;
+      padding: 10px 15px;
+    }
+
+    .card-custom {
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+      border: none;
+      margin-top: 20px;
+    }
+
+    .form-label {
+      font-weight: 600;
+    }
+
+    .btn-digibank {
+      background-color: #97144D;
+      color: white;
+      border: none;
+    }
+
+    .btn-digibank:hover {
+      background-color: #7a0f3e;
+      color: white;
+    }
+
+    footer.bg-custom {
+      background-color: #97144D;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Sidebar -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">Welcome, Danish Ahemad</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-people-fill"></i> Manage Users</a></li>
+        <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-check-circle"></i> Loan Approvals</a></li>
+        <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-cash-coin"></i> Transactions</a></li>
+        <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-bar-chart-line"></i> Reports</a></li>
+        <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-chat-dots"></i> Customer Queries</a></li>
+        <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-gear"></i> Settings</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Top Bar -->
+  <div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#8B0A50; color:white;">
+    <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
+      <i class="bi bi-list"></i>
+    </button>
+
+    <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo"
+      style="height: 40px; width:auto; background-color:#fff; border-radius:5px; padding:2px;" class="me-3">
+
+    <h5 class="flex-grow-1 text-center m-0">Loan Registration - DigiBank</h5>
+
+    <div class="d-flex align-items-center">
+      <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }} </h5>
+      <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">Logout</a>
+    </div>
+  </div>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb-container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="{{ url_for('dashboard') }}" style="color: #97144D; font-weight: bold;">Dashboard</a>
+        </li>
+        
+        <li class="breadcrumb-item">
+          <a href="{{ url_for('agentapplyloan') }}" style="color: #97144D; font-weight: bold;">Loan Registration</a>
+        </li>
+      </ol>
+    </nav>
+  </div>
+
+  <!-- Loan Registration Form -->
+  <div class="container my-4 flex-grow-1">
+    <div class="card card-custom">
+      <div class="card-body">
+        <h4 class="fw-bold mb-3 text-center">📝 Loan Registration Form</h4>
+
+        <form id="loanForm">
+          <!-- Agent ID -->
+          <div class="mb-3">
+            <label class="form-label">Agent ID</label>
+            <input type="text" class="form-control" placeholder="Enter Agent ID" required>
+          </div>
+
+          <!-- Basic Info -->
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Full Name</label>
+              <input type="text" class="form-control" placeholder="Enter customer full name" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email Address</label>
+              <input type="email" class="form-control" placeholder="Enter email address" required>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Phone Number</label>
+              <input type="text" class="form-control" placeholder="Enter phone number" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Date of Birth</label>
+              <input type="date" class="form-control" required>
+            </div>
+          </div>
+
+          <!-- Extra Info -->
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Gender</label>
+              <select class="form-select" required>
+                <option disabled selected>Select Gender</option>
+                <option>Male</option>
+                <option>Female</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Marital Status</label>
+              <select class="form-select" required>
+                <option disabled selected>Select Status</option>
+                <option>Single</option>
+                <option>Married</option>
+                <option>Divorced</option>
+                <option>Widowed</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Occupation</label>
+              <input type="text" class="form-control" placeholder="Enter occupation" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Annual Income (₹)</label>
+              <input type="number" class="form-control" placeholder="Enter annual income" required>
+            </div>
+          </div>
+
+          <!-- Loan Info -->
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Loan Type</label>
+              <select class="form-select" required>
+                <option selected disabled>Select Loan Type</option>
+                <option value="home">Home Loan</option>
+                <option value="car">Car Loan</option>
+                <option value="personal">Personal Loan</option>
+                <option value="education">Education Loan</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Loan Amount (₹)</label>
+              <input type="number" class="form-control" placeholder="Enter loan amount" required>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Loan Tenure (Years)</label>
+              <input type="number" class="form-control" placeholder="Enter tenure" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Existing Loans</label>
+              <select class="form-select" required>
+                <option disabled selected>Do you have existing loans?</option>
+                <option>Yes</option>
+                <option>No</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Address -->
+          <div class="mb-3">
+            <label class="form-label">Address</label>
+            <textarea class="form-control" rows="2" placeholder="Enter full address" required></textarea>
+          </div>
+
+          <!-- Actions -->
+          <div class="text-center">
+            <button type="submit" class="btn btn-digibank px-3">
+              <i class="bi bi-save"></i> Submit Application
+            </button>
+            <button type="reset" class="btn btn-secondary px-4 ms-2">
+              Reset
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
+  <div class="modal fade" id="successModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content text-center">
+        <div class="modal-body">
+          <h5>Your details Successfully Added</h5>
+          <button type="button" class="btn btn-digibank mt-3" id="okBtn">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-custom text-white text-center py-3 mt-auto">
+    © 2025 DigiBank. All rights reserved.
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    document.getElementById("loanForm").addEventListener("submit", function (e) {
+      e.preventDefault(); // Stop actual submit
+      var successModal = new bootstrap.Modal(document.getElementById('successModal'));
+      successModal.show();
+    });
+
+    document.getElementById("okBtn").addEventListener("click", function () {
+      window.location.href = "loanapprovals";
+    });
+  </script>
+</body>
+
+</html>

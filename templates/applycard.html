@@ -54,19 +54,42 @@
 <body>
 
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg px-3">
+  <!-- <nav class="navbar navbar-expand-lg px-3">
     <a class="navbar-brand" href="#">DigiBank</a>
     <div class="mx-auto">
       <span class="navbar-text text-white h5 me-4">Apply for a New Card</span>
+      <div class="d-flex align-items-center">
+      <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }}</h5>
+      <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">Logout</a>
+  </div>
     </div>
-  </nav>
+  </nav> -->
+  <!-- Top Bar -->
+<div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#8B0A50; color:white;">
+  
+
+  <!-- Logo / Image -->
+  <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo" 
+       style="height: 40px; width:auto; background-color:#fff; border-radius:5px; padding:2px;" class="me-3">
+
+  <!-- Title -->
+  <h5 class="flex-grow-1 text-center m-0">Welcome To Cards Agent Dashboard - DigiBank</h5>
+
+  <!-- Logout Button -->
+   <div class="d-flex align-items-center">
+  <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }}</h5>
+  <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
+    Logout
+  </a>
+</div>
+</div>
 
   <!-- Breadcrumb -->
   <div class="container my-4">
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
-          <a href="cards_dashboard.html">Dashboard</a>
+          <a href="{{ url_for('dashboard') }}">Dashboard</a>
         </li>
         <li class="breadcrumb-item active" aria-current="page" style="color: #97144D; font-weight: bold;">
           Card Application Form

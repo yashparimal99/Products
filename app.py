@@ -849,7 +849,8 @@ def dashboard():
         'User': 'userdashboard.html',
         'tl': 'TLdashboard.html',
         'manager': 'managerdashboard.html',
-        'Card_Agent': 'cardagent_dashboard.html'
+        'Card_Agent': 'cardagent_dashboard.html',
+        'Loan_Agent': 'loanagent_dashboard.html'
     }
 
     return render_template(templates.get(role, 'login.html'), user=user)
@@ -1273,14 +1274,70 @@ def updateprofile():
 
 @app.route('/cardapplications')
 def cardapplications():
-    return render_template('cardapplications.html')
+    user_id = session.get('user_id')
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT user_id, name, pan,dob, mobile, email,city,state,country,gender,department,status,role,password,aadhaar,deleted_date FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    return render_template('cardapplications.html',user=user)
 @app.route('/applycardagent')
 def applycardagent():
-    return render_template('applycard.html')
+    user_id = session.get('user_id')
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT user_id, name, pan,dob, mobile, email,city,state,country,gender,department,status,role,password,aadhaar,deleted_date FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    return render_template('applycard.html',user=user)
 
 @app.route('/cardperformance')
 def cardperformance():
-    return render_template('cardperformance.html')
+    user_id = session.get('user_id')
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT email FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    return render_template('cardperformance.html',user=user)
+
+
+#Loan Agent Dashboard
+
+@app.route('/loanagentprofile')
+def loanagentprofile():
+    user_id = session.get('user_id')
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT user_id, name, pan,dob, mobile, email,city,state,country,gender,department,status,role,password,aadhaar,deleted_date FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+
+    return render_template('agentprofile.html',user=user)
+
+@app.route('/agentapplyloan')
+def agentapplyloan():
+
+    user_id = session.get('user_id')
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT email FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    return render_template('agentapplyloan.html',user=user)
+
+@app.route('/agentloanapproval')
+def agentloanapproval():
+    user_id = session.get('user_id')
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT email FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    return render_template('agentloanapproval.html',user=user)
+
+@app.route('/loanperformance')
+def loanperformance():
+    user_id = session.get('user_id')
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT email FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    return render_template('loanperformance.html',user=user)
 
    
 if __name__ == '__main__':

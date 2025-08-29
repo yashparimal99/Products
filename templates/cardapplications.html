@@ -68,15 +68,20 @@
   <h5 class="flex-grow-1 text-center m-0">Welcome To Cards Agent Dashboard - DigiBank</h5>
 
   <!-- Logout Button -->
+   <div class="d-flex align-items-center">
+  <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }}</h5>
   <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
     Logout
   </a>
 </div>
+</div>
+
+
       <!-- Breadcrumb -->
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="cards_dashboard">Dashboard</a></li>
-        <li class="breadcrumb-item active" aria-current="page"><a href="cardapplications">Cards Application</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="{{ url_for('cardapplications') }}">Cards Application</a></li>
       </nav>
   <!-- Page Content -->
   <div class="container my-4">
