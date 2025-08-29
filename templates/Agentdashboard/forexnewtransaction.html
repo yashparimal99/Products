@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Forex Transactions - DigiBank</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            background-color: #97144D;
+        }
+        .navbar-brand, .navbar-text, .logout-btn {
+            color: white !important;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .logout-btn {
+            border: 1px solid white;
+            transition: 0.3s;
+        }
+        .logout-btn:hover {
+            background-color: white;
+            color: #97144D !important;
+        }
+        .table-responsive {
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .breadcrumb-item a {
+            color: #97144D;
+        }
+        .breadcrumb-item a:hover {
+            color: #7a103e;
+            text-decoration: underline;
+        }
+        .breadcrumb .active {
+            color: #97144D;
+            font-weight: 500;
+        }
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        footer {
+            background-color: #97144D;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#8B0A50; color:white;">
+  
+
+  <!-- Logo / Image -->
+  <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo" 
+       style="height: 40px; width:auto; background-color:#fff; border-radius:5px; padding:2px;" class="me-3">
+
+  <!-- Title -->
+  <h5 class="flex-grow-1 text-center m-0">Welcome To Forex Agent Dashboard - DigiBank</h5>
+
+  <!-- Logout Button -->
+  <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
+    Logout
+  </a>
+</div>
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="bg-light px-3 py-2">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="forex_dashboard">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="forexnewtransaction">Transactions</a>
+      </ol>
+    </nav>
+    <!-- Main Content -->
+    <div class="container my-5">
+        <div class="card p-4">
+            <h4 class="mb-4">Recent Transactions
+                <!-- Dropdown Filter for Status -->
+                <select id="statusFilter" class="form-select form-select-sm d-inline-block w-auto ms-3">
+                    <option value="all" selected>All</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Failed">Failed</option>
+                </select>
+                <!-- Add Transaction Button -->
+                <a href="addtransaction.html" class="btn btn-primary btn-sm ms-2" style="background-color: #97144D; border-color: #97144D;">Add Transaction</a>
+            </h4>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="bg-light">
+                        <tr>
+                            <th scope="col">Transaction ID</th>
+                            <th scope="col">Customer Name</th>
+                            <th scope="col">Currency Pair</th>
+                            <th scope="col">Amount</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionTableBody">
+                        <!-- Dummy transaction rows -->
+                        <tr data-status="Completed">
+                            <td>TXN-12345</td>
+                            <td>John Doe</td>
+                            <td>USD/EUR</td>
+                            <td>$1,500.00</td>
+                            <td>2024-08-20</td>
+                            <td class="text-success">Completed</td>
+                        </tr>
+                        <tr data-status="Pending">
+                            <td>TXN-12346</td>
+                            <td>Jane Smith</td>
+                            <td>USD/JPY</td>
+                            <td>¥150,000</td>
+                            <td>2024-08-19</td>
+                            <td class="text-warning">Pending</td>
+                        </tr>
+                        <tr data-status="Completed">
+                            <td>TXN-12347</td>
+                            <td>Michael Jones</td>
+                            <td>GBP/USD</td>
+                            <td>£500.00</td>
+                            <td>2024-08-19</td>
+                            <td class="text-success">Completed</td>
+                        </tr>
+                        <tr data-status="Completed">
+                            <td>TXN-12348</td>
+                            <td>Emily White</td>
+                            <td>AUD/USD</td>
+                            <td>A$800.00</td>
+                            <td>2024-08-18</td>
+                            <td class="text-success">Completed</td>
+                        </tr>
+                        <tr data-status="Failed">
+                            <td>TXN-12349</td>
+                            <td>David Brown</td>
+                            <td>USD/CAD</td>
+                            <td>C$2,100.00</td>
+                            <td>2024-08-18</td>
+                            <td class="text-danger">Failed</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer>
+        © 2024 DigiBank. All rights reserved.
+    </footer>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Logout Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #97144D; color: white;">
+                    <h5 class="modal-title" id="logoutModalLabel">Logout Successful</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Successfully logged out...!!
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" style="background-color: #97144D; color: white;" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Logout Script -->
+    <script>
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            var myModal = new bootstrap.Modal(document.getElementById('logoutModal'));
+            myModal.show();
+
+            // Redirect after 2 seconds
+            setTimeout(function() {
+                window.location.href ='login';
+            }, 2000);
+        });
+    </script>
+
+    <!-- Script for transaction filter functionality -->
+    <script>
+        const statusFilter = document.getElementById('statusFilter');
+        const tableBody = document.getElementById('transactionTableBody');
+        const rows = tableBody.getElementsByTagName('tr');
+
+        statusFilter.addEventListener('change', () => {
+            const selectedStatus = statusFilter.value;
+
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const status = row.getAttribute('data-status');
+                
+                if (selectedStatus === 'all' || status === selectedStatus) {
+                    row.style.display = ''; // Show row
+                } else {
+                    row.style.display = 'none'; // Hide row
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Card Applications</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Bootstrap CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .navbar {
+      background-color: #97144D;
+    }
+    .navbar-brand {
+      font-weight: bold;
+      color: white !important;
+    }
+    .nav-btn {
+      background-color: white;
+      color: #97144D;
+      border: 1px solid #97144D;
+      margin: 0 5px;
+    }
+    .nav-btn:hover, .nav-btn.active {
+      background-color: #97144D;
+      color: white;
+    }
+    .card {
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    footer {
+      background-color: #97144D;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      margin-top: 40px;
+    }
+    .table-responsive {
+      border-radius: 12px;
+    }
+    /* Breadcrumb styling */
+    .breadcrumb-item a {
+      color: #97144D;
+    }
+    .breadcrumb-item a:hover {
+      color: #7a103e;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#8B0A50; color:white;">
+  
+
+  <!-- Logo / Image -->
+  <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo" 
+       style="height: 40px; width:auto; background-color:#fff; border-radius:5px; padding:2px;" class="me-3">
+
+  <!-- Title -->
+  <h5 class="flex-grow-1 text-center m-0">Welcome To Cards Agent Dashboard - DigiBank</h5>
+
+  <!-- Logout Button -->
+  <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
+    Logout
+  </a>
+</div>
+      <!-- Breadcrumb -->
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="cards_dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="cardapplications">Cards Application</a></li>
+      </nav>
+  <!-- Page Content -->
+  <div class="container my-4">
+    <div class="card p-4">
+      <h4 class="mb-4">Card Applications Submitted</h4>
+
+
+
+      <!-- Filters -->
+      <div class="d-flex justify-content-center mb-4">
+        <!-- Card Type Filter -->
+        <div class="dropdown me-3">
+          <button class="btn nav-btn dropdown-toggle" type="button" id="cardTypeFilter" data-bs-toggle="dropdown" aria-expanded="false">
+            All Cards
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="cardTypeFilter">
+            <li><a class="dropdown-item" href="#" data-card-type="all">All Cards</a></li>
+            <li><a class="dropdown-item" href="#" data-card-type="Credit Card">Credit Card</a></li>
+            <li><a class="dropdown-item" href="#" data-card-type="Debit Card">Debit Card</a></li>
+            <li><a class="dropdown-item" href="#" data-card-type="International Card">International Card</a></li>
+          </ul>
+        </div>
+
+        <!-- Status Filter -->
+        <div class="dropdown">
+          <button class="btn nav-btn dropdown-toggle" type="button" id="statusFilter" data-bs-toggle="dropdown" aria-expanded="false">
+            All Statuses
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="statusFilter">
+            <li><a class="dropdown-item" href="#" data-status="all">All Statuses</a></li>
+            <li><a class="dropdown-item" href="#" data-status="Approved">Approved</a></li>
+            <li><a class="dropdown-item" href="#" data-status="Pending">Pending</a></li>
+            <li><a class="dropdown-item" href="#" data-status="Issued">Issued</a></li>
+            <li><a class="dropdown-item" href="#" data-status="Declined">Declined</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Applications Table -->
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="bg-light">
+            <tr>
+              <th scope="col">Customer ID</th>
+              <th scope="col">Customer Name</th>
+              <th scope="col">Card Type</th>
+              <th scope="col">Status</th>
+              <th scope="col">Issued Date</th>
+              <th scope="col">Delivery Date</th>
+            </tr>
+          </thead>
+          <tbody id="applicationsTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    © 2024 DigiBank. All rights reserved.
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Script for filtering and rendering -->
+  <script>
+    // Card Applications Data
+    const applicationsData = [
+      { customerId: 'DBA-101', customerName: 'John Doe', cardType: 'Credit Card', status: 'Approved', issuedDate: '2024-10-25', deliveryDate: '2024-11-01' },
+      { customerId: 'DBA-102', customerName: 'Jane Smith', cardType: 'Debit Card', status: 'Pending', issuedDate: 'N/A', deliveryDate: 'N/A' },
+      { customerId: 'DBA-103', customerName: 'Peter Jones', cardType: 'International Card', status: 'Issued', issuedDate: '2024-10-24', deliveryDate: '2024-10-30' },
+      { customerId: 'DBA-104', customerName: 'Mary Williams', cardType: 'Credit Card', status: 'Declined', issuedDate: '2024-10-23', deliveryDate: 'N/A' },
+      { customerId: 'DBA-105', customerName: 'Chris Evans', cardType: 'Debit Card', status: 'Approved', issuedDate: '2024-10-21', deliveryDate: '2024-10-28' },
+      { customerId: 'DBA-106', customerName: 'Alice Johnson', cardType: 'Credit Card', status: 'Pending', issuedDate: 'N/A', deliveryDate: 'N/A' },
+      { customerId: 'DBA-107', customerName: 'Bob Brown', cardType: 'International Card', status: 'Approved', issuedDate: '2024-10-22', deliveryDate: '2024-10-29' },
+      { customerId: 'DBA-108', customerName: 'Lucy Davis', cardType: 'Credit Card', status: 'Issued', issuedDate: '2024-10-20', deliveryDate: '2024-10-27' },
+      { customerId: 'DBA-109', customerName: 'Mike Miller', cardType: 'Debit Card', status: 'Declined', issuedDate: '2024-10-19', deliveryDate: 'N/A' }
+    ];
+
+    let currentCardType = 'all';
+    let currentStatus = 'all';
+
+    // Render table with filters
+    function renderTable(cardType, status) {
+      const tableBody = document.getElementById('applicationsTableBody');
+      const filteredApplications = applicationsData.filter(app => {
+        const typeMatch = cardType === 'all' || app.cardType === cardType;
+        const statusMatch = status === 'all' || app.status === status;
+        return typeMatch && statusMatch;
+      });
+
+      tableBody.innerHTML = ''; // Clear previous rows
+
+      if (filteredApplications.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="6" class="text-center">No applications found for this filter combination.</td></tr>';
+        return;
+      }
+
+      filteredApplications.forEach(app => {
+        let statusBadgeClass = '';
+        switch (app.status) {
+          case 'Approved': statusBadgeClass = 'bg-success'; break;
+          case 'Pending': statusBadgeClass = 'bg-warning text-dark'; break;
+          case 'Issued': statusBadgeClass = 'bg-primary'; break;
+          case 'Declined': statusBadgeClass = 'bg-danger'; break;
+        }
+
+        const row = `
+          <tr>
+            <td>${app.customerId}</td>
+            <td>${app.customerName}</td>
+            <td>${app.cardType}</td>
+            <td><span class="badge ${statusBadgeClass}">${app.status}</span></td>
+            <td>${app.issuedDate}</td>
+            <td>${app.deliveryDate}</td>
+          </tr>
+        `;
+        tableBody.innerHTML += row;
+      });
+    }
+
+    // Update dropdown button text
+    function updateDropdownButton(filterId, text) {
+      document.getElementById(filterId).textContent = text;
+    }
+
+    // Card Type Filter
+    document.querySelectorAll('#cardTypeFilter + .dropdown-menu .dropdown-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        currentCardType = e.target.dataset.cardType;
+        updateDropdownButton('cardTypeFilter', e.target.textContent);
+        renderTable(currentCardType, currentStatus);
+      });
+    });
+
+    // Status Filter
+    document.querySelectorAll('#statusFilter + .dropdown-menu .dropdown-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        currentStatus = e.target.dataset.status;
+        updateDropdownButton('statusFilter', e.target.textContent);
+        renderTable(currentCardType, currentStatus);
+      });
+    });
+
+    // Load initial table
+    window.onload = () => renderTable(currentCardType, currentStatus);
+  </script>
+
+</body>
+</html>

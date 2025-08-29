@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Agent Performance Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .navbar {
+      background-color: #97144D;
+    }
+    .navbar-brand {
+      font-weight: bold;
+      color: white !important;
+    }
+    .nav-btn {
+      background-color: white;
+      color: #97144D;
+      border: 1px solid #97144D;
+      margin: 0 5px;
+    }
+    .nav-btn:hover, .nav-btn.active {
+      background-color: #97144D;
+      color: white;
+    }
+    .metric-value {
+      font-size: 1.6rem;
+      font-weight: bold;
+    }
+    .card-footer {
+      border-top: none;
+    }
+    footer {
+      background-color: #97144D;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      margin-top: 40px;
+    }
+    .metric-card {
+      text-align: center;
+      padding: 20px;
+    }
+    .funnel-stage {
+      border-left: 5px solid #97144D;
+      padding: 10px;
+      margin-bottom: 15px;
+      background: #fff;
+      border-radius: 10px;
+    }
+    .breadcrumb-item a {
+      color: #97144D;
+    }
+    .breadcrumb-item a:hover {
+      color: #7a103e;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#8B0A50; color:white;">
+  
+
+  <!-- Logo / Image -->
+  <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo" 
+       style="height: 40px; width:auto; background-color:#fff; border-radius:5px; padding:2px;" class="me-3">
+
+  <!-- Title -->
+  <h5 class="flex-grow-1 text-center m-0">Welcome To Cards Agent Dashboard - DigiBank</h5>
+
+  <!-- Logout Button -->
+  <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
+    Logout
+  </a>
+</div>
+      <!-- Breadcrumb -->
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="cards_dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="performance">Agent Performance</a></li>
+      </nav>
+  <!-- Main Container -->
+  <div class="container my-5">
+    <div class="card p-4">
+      <h4 class="mb-4 text-center">Agent Performance</h4>
+
+
+
+      <!-- Filters -->
+      <div class="d-flex justify-content-center mb-4">
+        <div class="dropdown me-3">
+          <button class="btn nav-btn dropdown-toggle" type="button" id="cardTypeFilter" data-bs-toggle="dropdown" aria-expanded="false">
+            All Cards
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="cardTypeFilter">
+            <li><a class="dropdown-item" href="#" data-card-type="all">All Cards</a></li>
+            <li><a class="dropdown-item" href="#" data-card-type="Credit Card">Credit Card</a></li>
+            <li><a class="dropdown-item" href="#" data-card-type="Debit Card">Debit Card</a></li>
+            <li><a class="dropdown-item" href="#" data-card-type="International Card">International Card</a></li>
+          </ul>
+        </div>
+        <div class="dropdown">
+          <button class="btn nav-btn dropdown-toggle" type="button" id="statusFilter" data-bs-toggle="dropdown" aria-expanded="false">
+            All Statuses
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="statusFilter">
+            <li><a class="dropdown-item" href="#" data-status="all">All Statuses</a></li>
+            <li><a class="dropdown-item" href="#" data-status="Approved">Approved</a></li>
+            <li><a class="dropdown-item" href="#" data-status="Pending">Pending</a></li>
+            <li><a class="dropdown-item" href="#" data-status="Issued">Issued</a></li>
+            <li><a class="dropdown-item" href="#" data-status="Declined">Declined</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="row g-4 mb-4 text-center">
+        <div class="col-md-4">
+          <div class="card metric-card">
+            <h6>Sales Rate</h6>
+            <div id="salesRate" class="metric-value">
+              35.1% <i class="bi bi-arrow-up"></i>
+            </div>
+            <small>Compared to last week</small>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card metric-card">
+            <h6>Total Interactions</h6>
+            <div id="totalInteractions" class="metric-value">65</div>
+            <small>All customer contacts</small>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card metric-card">
+            <h6>Applications Submitted</h6>
+            <div id="applicationsSubmitted" class="metric-value">22</div>
+            <small>Successful card applications</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress & Trends -->
+      <div class="row g-4 mb-4">
+        <div class="col-md-6">
+          <div class="card p-4">
+            <h6>Sales Target Progress</h6>
+            <p>
+              <strong>Target:</strong> <span id="targetValue">120</span> | 
+              <strong>Sold:</strong> <span id="soldValue">75</span> | 
+              <strong>Remaining:</strong> <span id="remainingValue">45</span>
+            </p>
+            <div class="progress">
+              <div id="progressBar" class="progress-bar bg-success" role="progressbar" style="width: 62.5%;">62.5%</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card p-4">
+            <h6>Weekly Performance Trends</h6>
+            <canvas id="weeklyChart" height="140"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Funnel -->
+      <div class="card p-4">
+        <h6>Customer Journey Funnel</h6>
+        <div class="funnel-stage">
+          <strong>Stage 1: Contacted</strong>
+          <p><span id="contactedCount">65</span> Customers | Conversion: <span id="contactedConv">34</span>% → Interested</p>
+        </div>
+        <div class="funnel-stage">
+          <strong>Stage 2: Expressed Interest</strong>
+          <p><span id="interestedCount">22</span> Customers | Conversion: <span id="interestedConv">95</span>% → Application</p>
+        </div>
+        <div class="funnel-stage">
+          <strong>Stage 3: Application Submitted</strong>
+          <p><span id="submittedCount">21</span> Customers | Conversion: <span id="submittedConv">95</span>% → Approved</p>
+        </div>
+        <div class="funnel-stage">
+          <strong>Stage 4: Card Issued</strong>
+          <p><span id="issuedCount">20</span> Customers</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    © 2024 DigiBank. All rights reserved.
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Dashboard Script -->
+  <script>
+    // Sample data
+    const allPerformanceData = [
+      { cardType: 'Credit Card', status: 'Approved', interactions: 3, salesTrend: [10, 11, 12, 13], funnel: { contacted: 30, interested: 20, submitted: 18, issued: 15 } },
+      { cardType: 'Debit Card', status: 'Approved', interactions: 2, salesTrend: [15, 16, 17, 18], funnel: { contacted: 25, interested: 18, submitted: 16, issued: 15 } },
+      { cardType: 'International Card', status: 'Approved', interactions: 5, salesTrend: [5, 10, 15, 20], funnel: { contacted: 65, interested: 22, submitted: 21, issued: 20 } },
+      { cardType: 'Credit Card', status: 'Pending', interactions: 1, salesTrend: [0, 1, 2, 1], funnel: { contacted: 5, interested: 2, submitted: 1, issued: 0 } },
+      { cardType: 'Debit Card', status: 'Declined', interactions: 2, salesTrend: [2, 1, 0, 0], funnel: { contacted: 10, interested: 5, submitted: 3, issued: 0 } },
+      { cardType: 'Credit Card', status: 'Issued', interactions: 4, salesTrend: [8, 9, 10, 11], funnel: { contacted: 25, interested: 18, submitted: 17, issued: 15 } },
+    ];
+
+    let myChart;
+    let currentCardType = 'all';
+    let currentStatus = 'all';
+
+    // Update dashboard
+    function updateDashboard(cardType, status) {
+      const filteredData = allPerformanceData.filter(data => {
+        const typeMatch = cardType === 'all' || data.cardType === cardType;
+        const statusMatch = status === 'all' || data.status === status;
+        return typeMatch && statusMatch;
+      });
+
+      const totalInteractions = filteredData.reduce((sum, data) => sum + data.interactions, 0);
+      const applicationsSubmitted = filteredData.reduce((sum, data) => sum + (data.status === 'Approved' ? data.interactions : 0), 0);
+      const salesRate = applicationsSubmitted / (totalInteractions || 1);
+      const salesTarget = filteredData.reduce((sum, data) => sum + data.funnel.issued, 0) + 45;
+      const salesSold = filteredData.reduce((sum, data) => sum + data.funnel.issued, 0);
+      const salesRemaining = salesTarget - salesSold;
+      const progress = (salesSold / salesTarget) * 100;
+
+      const funnel = {
+        contacted: filteredData.reduce((sum, data) => sum + data.funnel.contacted, 0),
+        interested: filteredData.reduce((sum, data) => sum + data.funnel.interested, 0),
+        submitted: filteredData.reduce((sum, data) => sum + data.funnel.submitted, 0),
+        issued: filteredData.reduce((sum, data) => sum + data.funnel.issued, 0),
+      };
+
+      // Update DOM
+      document.getElementById('salesRate').innerHTML = `${(salesRate * 100).toFixed(1)}% <i class="bi bi-arrow-up text-success"></i>`;
+      document.getElementById('totalInteractions').textContent = totalInteractions;
+      document.getElementById('applicationsSubmitted').textContent = applicationsSubmitted;
+
+      document.getElementById('targetValue').textContent = salesTarget;
+      document.getElementById('soldValue').textContent = salesSold;
+      document.getElementById('remainingValue').textContent = salesRemaining;
+      document.getElementById('progressBar').style.width = `${progress}%`;
+      document.getElementById('progressBar').textContent = `${progress.toFixed(1)}%`;
+
+      document.getElementById('contactedCount').textContent = funnel.contacted;
+      document.getElementById('contactedConv').textContent = funnel.contacted > 0 ? ((funnel.interested / funnel.contacted) * 100).toFixed(0) : 0;
+      document.getElementById('interestedCount').textContent = funnel.interested;
+      document.getElementById('interestedConv').textContent = funnel.interested > 0 ? ((funnel.submitted / funnel.interested) * 100).toFixed(0) : 0;
+      document.getElementById('submittedCount').textContent = funnel.submitted;
+      document.getElementById('submittedConv').textContent = funnel.submitted > 0 ? ((funnel.issued / funnel.submitted) * 100).toFixed(0) : 0;
+      document.getElementById('issuedCount').textContent = funnel.issued;
+
+      // Chart
+      const salesTrends = filteredData.map(d => d.salesTrend);
+      const labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+      const aggregatedData = labels.map((_, i) => salesTrends.reduce((sum, trend) => sum + (trend[i] || 0), 0));
+
+      if (myChart) {
+        myChart.data.datasets[0].data = aggregatedData;
+        myChart.update();
+      } else {
+        const ctx = document.getElementById('weeklyChart').getContext('2d');
+        myChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Filtered Applications',
+                data: aggregatedData,
+                borderColor: '#97144D',
+                backgroundColor: 'rgba(151, 20, 77, 0.1)',
+                tension: 0.3
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { display: false }
+            }
+          }
+        });
+      }
+    }
+
+    // Filters
+    document.querySelectorAll('#cardTypeFilter + .dropdown-menu .dropdown-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        currentCardType = e.target.dataset.cardType;
+        document.getElementById('cardTypeFilter').textContent = e.target.textContent;
+        updateDashboard(currentCardType, currentStatus);
+      });
+    });
+
+    document.querySelectorAll('#statusFilter + .dropdown-menu .dropdown-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        currentStatus = e.target.dataset.status;
+        document.getElementById('statusFilter').textContent = e.target.textContent;
+        updateDashboard(currentCardType, currentStatus);
+      });
+    });
+
+    // Init
+    window.onload = () => updateDashboard(currentCardType, currentStatus);
+  </script>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Agent Profile - DigiBank</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            background-color: #97144D;
+        }
+        .navbar-brand, .navbar-text, .logout-btn {
+            color: white !important;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .logout-btn {
+            border: 1px solid white;
+            transition: 0.3s;
+        }
+        .logout-btn:hover {
+            background-color: white;
+            color: #97144D !important;
+        }
+        .profile-card {
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .profile-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        .profile-header {
+            background-color: #97144D;
+            color: white;
+            border-radius: 12px 12px 0 0;
+            padding: 2rem;
+            text-align: center;
+        }
+        .profile-icon {
+            font-size: 4rem;
+        }
+        .detail-icon {
+            color: #97144D;
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+        footer {
+            background-color: #97144D;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin-top: 40px;
+        }
+        /* Breadcrumb styling */
+        .breadcrumb {
+            margin-bottom: 0;
+        }
+        .breadcrumb .active {
+            color: #97144D;
+            font-weight: 500;
+        }
+        .breadcrumb a {
+            text-decoration: none;
+            color: #97144D;
+        }
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#8B0A50; color:white;">
+
+
+  <!-- Logo / Image -->
+  <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo" 
+       style="height: 40px; width:auto; background-color:#fff; border-radius:5px; padding:2px;" class="me-3">
+
+  <!-- Title -->
+  <h5 class="flex-grow-1 text-center m-0">Welcome To Cards Agent Dashboard - DigiBank</h5>
+
+  <!-- Logout Button -->
+  <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
+    Logout
+  </a>
+</div>
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="bg-light px-3 py-2">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="cards_dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="cardprofile">Agent Profile</a></li>
+      </ol>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container my-5">
+        <div class="card profile-card p-0">
+            <!-- Profile Header -->
+            <div class="profile-header d-flex flex-column align-items-center">
+                <i class="bi bi-person-circle profile-icon mb-2"></i>
+                <h4 class="mb-0">Siddhi More</h4>
+                <p class="mb-0">Senior Cards Agent</p>
+            </div>
+
+            <!-- Profile Details Body -->
+            <div class="card-body p-4">
+                <div class="row g-4">
+                    <!-- Agent ID Card -->
+                    <div class="col-md-6">
+                        <div class="card h-100 p-3">
+                            <h5 class="card-title text-muted">
+                                <i class="bi bi-person-badge detail-icon"></i>Agent ID
+                            </h5>
+                            <p class="card-text fw-bold fs-5">AG-7890</p>
+                        </div>
+                    </div>
+                    <!-- Email Card -->
+                    <div class="col-md-6">
+                        <div class="card h-100 p-3">
+                            <h5 class="card-title text-muted">
+                                <i class="bi bi-envelope detail-icon"></i>Email Address
+                            </h5>
+                            <p class="card-text fw-bold fs-5">siddhimore@digibank.com</p>
+                        </div>
+                    </div>
+                    <!-- Joined Date Card -->
+                    <div class="col-md-6">
+                        <div class="card h-100 p-3">
+                            <h5 class="card-title text-muted">
+                                <i class="bi bi-calendar-check detail-icon"></i>Joined DigiBank
+                            </h5>
+                            <p class="card-text fw-bold fs-5">January 15, 2023</p>
+                        </div>
+                    </div>
+                    <!-- Department Card -->
+                    <div class="col-md-6">
+                        <div class="card h-100 p-3">
+                            <h5 class="card-title text-muted">
+                                <i class="bi bi-building detail-icon"></i>Department
+                            </h5>
+                            <p class="card-text fw-bold fs-5">Cards and Lending</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer>
+        © 2024 DigiBank. All rights reserved.
+    </footer>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Logout Modal (same as previous implementations) -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #97144D; color: white;">
+                    <h5 class="modal-title" id="logoutModalLabel">Logout Successful</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Successfully logged out...!!
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" style="background-color: #97144D; color: white;" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Logout Script -->
+    <script>
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            var myModal = new bootstrap.Modal(document.getElementById('logoutModal'));
+            myModal.show();
+
+            // Redirect after 2 seconds
+            setTimeout(function() {
+                window.location.href = 'login.html';
+            }, 2000);
+        });
+    </script>
+
+</body>
+</html>

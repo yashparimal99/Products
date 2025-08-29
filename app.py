@@ -24,7 +24,6 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 
 
-
 mysql = MySQL(app)
 # mysql.init_app(app)
 
@@ -79,7 +78,7 @@ def viewaccounts():
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
     # Get user details
-    cur.execute("SELECT user_id, name, pan, email, mobile_no FROM bank_users WHERE email = %s", (email,))
+    cur.execute("SELECT user_id, name, pan, email, mobile FROM bank_users WHERE email = %s", (email,))
     user = cur.fetchone()
     grouped_accounts = defaultdict(list)
 
@@ -408,10 +407,10 @@ def profile():
     # session['cust_id'] = user['cust_id']
     # print("Logged in cust_id:", cust_id)   # debug
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute("SELECT user_id, name, pan, mobile_no, email,department,aadhar FROM bank_users WHERE user_id=%s", (user_id,))
+    cur.execute("SELECT user_id, name, pan, mobile, email,department,aadhaar FROM bank_users WHERE user_id=%s", (user_id,))
     user = cur.fetchone()
     cur.close()
-    print("Fetched user:", user)   # debug
+   
     return render_template("profile.html", user=user)
 
 
@@ -426,7 +425,7 @@ def open_account():
 
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("""
-        SELECT user_id, name, pan, email, mobile_no
+        SELECT user_id, name, pan, email, mobile
         FROM bank_users
         WHERE email = %s
     """, (email,))
@@ -469,6 +468,313 @@ def open_account():
 
     return render_template('applicationform1.html', user=user)
 
+from collections import defaultdict
+
+ACCOUNT_TABLES = {
+    'saving': 'saving_accounts',
+    'current': 'current_accounts',
+    'salary': 'salary_accounts',
+    'pmjdy': 'pmjdy_accounts',
+    'pension': 'pension_accounts',
+    'safecustody': 'safecustody_accounts',
+ 
+    # common aliases that map to safecustody
+    'safec': 'safecustody_accounts',
+    'safe': 'safecustody_accounts'
+}
+ACCOUNT_TYPES_CANON = set(ACCOUNT_TABLES.keys())
+ 
+def canon_type(t):
+    """Normalize incoming accountType values from forms."""
+    if not t:
+        return None
+    t = t.strip().lower()
+    if t in ('safe custody', 'safe_custody', 'safec', 'safe'):
+        t = 'safecustody'
+    return t
+
+# ------------------------- Account Query Helpers (UPDATED) -------------------------
+def find_account_by_number(account_number, for_update=False):
+    """
+    Look up an account by number across all account tables.
+    Returns dict: {table_name, account_type, account_number, balance, user_id}
+    """
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    for tbl in dict.fromkeys(ACCOUNT_TABLES.values()):
+        sql = f"SELECT '{tbl}' AS table_name, account_type, account_number, balance, user_id FROM {tbl} WHERE account_number=%s"
+        if for_update:
+            sql += " FOR UPDATE"
+        cur.execute(sql, (account_number,))
+        row = cur.fetchone()
+        if row:
+            cur.close()
+            return row
+    cur.close()
+    return None
+ 
+def update_account_balance(table_name, account_number, new_balance):
+    cur = mysql.connection.cursor()
+    cur.execute(f"UPDATE {table_name} SET balance=%s WHERE account_number=%s", (str(new_balance), account_number))
+    cur.close()
+ 
+def get_accounts_for_email(email):
+    """
+    Return list of user's accounts across all tables with:
+    {account_type, account_number, balance, table_name}
+    """
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    unions = []
+    params = []
+    for tbl in dict.fromkeys(ACCOUNT_TABLES.values()):
+        unions.append(f"""
+            SELECT a.account_type, a.account_number, COALESCE(a.balance, 0.00) AS balance, '{tbl}' AS table_name
+            FROM {tbl} a
+            JOIN bank_users u ON u.user_id = a.user_id
+            WHERE u.email = %s
+        """)
+        params.append(email)
+ 
+    sql = " UNION ALL ".join(unions) + " ORDER BY account_type, account_number"
+    cur.execute(sql, tuple(params))
+    rows = cur.fetchall()
+    cur.close()
+    return rows
+ 
+def get_account_numbers_for_email(email):
+    """Return list of account_numbers owned by email across all tables."""
+    accts = get_accounts_for_email(email)
+    return [a['account_number'] for a in accts]
+ 
+def generate_transaction_id():
+    prefix = "TXN" + datetime.now().strftime("%Y%m%d")
+    suffix = ''.join(random.choice(string.digits) for _ in range(6))
+    return prefix + suffix
+ 
+ 
+
+from decimal import Decimal, InvalidOperation
+@app.route('/accountbal')
+def accountbal():
+    email = session.get('user_email')
+    if not email:
+        flash('Please login first', 'danger')
+        return redirect(url_for('login'))
+ 
+    accts = get_accounts_for_email(email)
+    total = sum((Decimal(str(acc['balance'])) if acc['balance'] is not None else Decimal('0.00')) for acc in accts)
+ 
+    # pass user
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE email=%s", (email,))
+    user = cur.fetchone()
+    cur.close()
+ 
+    return render_template('balance.html', accounts=accts, total_balance=total, user=user) 
+
+@app.route('/Txnhistory')
+def Txnhistory():
+    email = session.get('user_email')
+    if not email:
+        flash('Please login first', 'danger')
+        return redirect(url_for('login'))
+ 
+    my_accts = get_account_numbers_for_email(email)
+ 
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    txns = []
+    if my_accts:
+        placeholders = ','.join(['%s'] * len(my_accts))
+        query = f"""
+            SELECT id, transaction_id, from_account, to_account, amount, note, status, created_at
+            FROM transactions
+            WHERE from_account IN ({placeholders}) OR to_account IN ({placeholders})
+            ORDER BY created_at DESC, id DESC
+            LIMIT 200
+        """
+        cur.execute(query, tuple(my_accts + my_accts))
+        txns = cur.fetchall()
+ 
+    # pass user for header
+    cur.execute("SELECT * FROM bank_users WHERE email=%s", (email,))
+    user = cur.fetchone()
+    cur.close()
+ 
+    return render_template('transactions.html', transactions=txns, my_accounts=set(my_accts), user=user)
+
+ 
+@app.route('/quicktransfer', methods=['GET', 'POST'])
+def quicktransfer():
+    email = session.get('user_email')
+    if not email:
+        flash('Please login first', 'danger')
+        return redirect(url_for('login'))
+ 
+    if request.method == 'GET':
+        my_accounts = get_accounts_for_email(email)
+        # pass user for header
+        cur2 = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cur2.execute("SELECT * FROM bank_users WHERE email=%s", (email,))
+        user = cur2.fetchone()
+        cur2.close()
+        return render_template('quicktransfer.html', my_accounts=my_accounts, user=user)
+ 
+    # POST: perform transfer
+    from_account = request.form.get('from_account')
+    to_account   = request.form.get('to_account')
+    amount_str   = request.form.get('amount')
+    note         = (request.form.get('note') or '').strip()[:255]
+ 
+    if not from_account or not to_account or not amount_str:
+        flash('Please provide source, destination, and amount.', 'danger')
+        return redirect(url_for('quicktransfer'))
+ 
+    if from_account == to_account:
+        flash('Source and destination accounts cannot be the same.', 'danger')
+        return redirect(url_for('quicktransfer'))
+ 
+    try:
+        amount = Decimal(amount_str)
+        if amount <= 0:
+            raise InvalidOperation()
+    except (InvalidOperation, TypeError):
+        flash('Amount must be a positive number.', 'danger')
+        return redirect(url_for('quicktransfer'))
+ 
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    txn_id = None
+    try:
+        mysql.connection.begin()
+ 
+        # who am I
+        cur.execute("SELECT user_id FROM bank_users WHERE email=%s", (email,))
+        me = cur.fetchone()
+        if not me:
+            raise ValueError("User not found.")
+        my_user_id = me['user_id']
+ 
+        # Lock rows in their specific tables
+        src = find_account_by_number(from_account, for_update=True)
+        dst = find_account_by_number(to_account, for_update=True)
+ 
+        if not src:
+            raise ValueError("Source account not found.")
+        if not dst:
+            raise ValueError("Destination account not found.")
+ 
+        # Ensure source belongs to logged-in user
+        if src['user_id'] != my_user_id:
+            raise ValueError("You can only transfer from your own account.")
+ 
+        # Balance check
+        if Decimal(str(src['balance'])) < amount:
+            raise ValueError("Insufficient balance.")
+ 
+        new_src_bal = Decimal(str(src['balance'])) - amount
+        new_dst_bal = Decimal(str(dst['balance'])) + amount
+ 
+        update_account_balance(src['table_name'], from_account, new_src_bal)
+        update_account_balance(dst['table_name'], to_account,   new_dst_bal)
+ 
+        txn_id = generate_transaction_id()
+        cur.execute("""
+            INSERT INTO transactions (transaction_id, from_account, to_account, amount, note, status)
+            VALUES (%s, %s, %s, %s, %s, 'success')
+        """, (txn_id, from_account, to_account, str(amount), note))
+ 
+        mysql.connection.commit()
+        flash(f'Transfer successful: ₹{amount} to {to_account} | Transaction ID: {txn_id}', 'success')
+        return redirect(url_for('Txnhistory'))
+ 
+    except Exception as e:
+        mysql.connection.rollback()
+        # log failure (best effort)
+        try:
+            if not txn_id:
+                txn_id = generate_transaction_id()
+            cur.execute("""
+                INSERT INTO transactions (transaction_id, from_account, to_account, amount, note, status)
+                VALUES (%s, %s, %s, %s, %s, 'failed')
+            """, (txn_id, from_account, to_account, str(amount_str or '0'), f'FAILED: {note}' if note else 'FAILED'))
+            mysql.connection.commit()
+        except Exception:
+            mysql.connection.rollback()
+        flash(f"Transfer failed: {str(e)}", 'danger')
+        return redirect(url_for('quicktransfer'))
+    finally:
+        cur.close()
+
+ 
+@app.route('/deposit', methods=['GET', 'POST'])
+def deposit():
+    email = session.get('user_email')
+    if not email:
+        flash("Please login first", "danger")
+        return redirect(url_for("login"))
+ 
+    # Fetch user accounts
+    my_accounts = get_accounts_for_email(email)
+ 
+    if request.method == "POST":
+        to_account = request.form.get("to_account")
+        re_to_account = request.form.get("re_to_account")
+        amount_str = request.form.get("amount")
+        remark = request.form.get("remark")
+ 
+        if to_account != re_to_account:
+            flash("Account numbers do not match!", "danger")
+            return redirect(url_for("deposit"))
+ 
+        try:
+            amount = Decimal(amount_str)
+            if amount <= 0:
+                raise InvalidOperation()
+        except (InvalidOperation, TypeError):
+            flash("Please enter a valid positive amount.", "danger")
+            return redirect(url_for("deposit"))
+ 
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        txn_id = None
+        try:
+            mysql.connection.begin()
+ 
+            # Lock destination account
+            dst = find_account_by_number(to_account, for_update=True)
+            if not dst:
+                raise ValueError("Destination account not found.")
+ 
+            new_balance = Decimal(str(dst["balance"])) + amount
+            update_account_balance(dst['table_name'], to_account, new_balance)
+ 
+            # Record transaction (CREDIT only)
+            txn_id = generate_transaction_id()
+            cur.execute("""
+                INSERT INTO transactions (transaction_id, from_account, to_account, amount, note, status)
+                VALUES (%s, NULL, %s, %s, %s, 'success')
+            """, (txn_id, to_account, str(amount), remark or "Deposit"))
+ 
+            mysql.connection.commit()
+            flash(f"Successfully deposited ₹{amount} to account {to_account}. Transaction ID: {txn_id}", "success")
+            return redirect(url_for("Txnhistory"))
+ 
+        except Exception as e:
+            mysql.connection.rollback()
+            try:
+                if not txn_id:
+                    txn_id = generate_transaction_id()
+                cur.execute("""
+                    INSERT INTO transactions (transaction_id, from_account, to_account, amount, note, status)
+                    VALUES (%s, NULL, %s, %s, %s, 'failed')
+                """, (txn_id, to_account or '', str(amount_str or '0'), f'FAILED: {remark}' if remark else 'FAILED'))
+                mysql.connection.commit()
+            except Exception:
+                mysql.connection.rollback()
+            flash(f"Deposit failed: {str(e)}", "danger")
+            return redirect(url_for("deposit"))
+        finally:
+            cur.close()
+ 
+    return render_template("deposit.html", accounts=my_accounts)
+ 
 
 @app.route('/open_deposits', methods=['GET', 'POST'])
 def open_deposits():
@@ -542,7 +848,8 @@ def dashboard():
     templates = {
         'User': 'userdashboard.html',
         'tl': 'TLdashboard.html',
-        'manager': 'managerdashboard.html'
+        'manager': 'managerdashboard.html',
+        'Card_Agent': 'cardagent_dashboard.html'
     }
 
     return render_template(templates.get(role, 'login.html'), user=user)
@@ -601,34 +908,6 @@ def branchperformance():
 
 # TL Dashboard Routes
 
-
-# Generate department-based Agent ID
-# def generate_user_id(department):
-#     prefixes = {
-#         "Cards": "CA",
-#         "Loans": "LN",
-#         "Investment": "IV",
-#         "Forex": "FX"
-#     }
-#     prefix = prefixes.get(department, "AG")
-#     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-#     cur.execute("SELECT MAX(id) AS max_id FROM agents WHERE department=%s", (department,))
-#     result = cur.fetchone()
-#     next_id = (result['max_id'] or 0) + 1
-#     return f"{prefix}{next_id:03d}"
-
-
-# Cards Page
-# @app.route('/tlcards')
-# def tlcards():
-#     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-#     cur.execute("""
-#         SELECT user_id, name, department, onboarding_date 
-#         FROM agents 
-#         WHERE status='active' AND department='Cards'
-#     """)
-#     agents = cur.fetchall()
-#     return render_template("tlcards.html", agents=agents)
 
 def generate_user_id(department):
     prefixes = {
@@ -780,38 +1059,64 @@ def download_excel():
     )
 
 
-# @app.route('/tldeleteuser', methods=['GET', 'POST'])
-# def tldeleteuser():
-#     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)   
-    
-#     if request.method == 'POST':
-#         ids = request.form.getlist('selected_ids')
-#         for id in ids:
-#             cur.execute(
-#                 "UPDATE agents SET status='deleted', deleted_date=%s WHERE user_id=%s",
-#                 (datetime.now(), id)
-#             )
-#         mysql.connection.commit()
-#         cur.close()
-#         return redirect(url_for('tlcards'))
+
 @app.route('/tldeleteuser', methods=['GET', 'POST'])
+
 def tldeleteuser():
-    if request.method == 'POST':
-        ids = request.form.getlist('selected_ids')
-        for id in ids:
-            cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-            cur.execute("UPDATE agents SET status='deleted', deleted_date=%s WHERE user_id=%s", (datetime.now(), id))
-            cur.execute("UPDATE bank_users SET status='deleted', deleted_date=%s WHERE user_id=%s", (datetime.now(), id))
-        mysql.connection.commit()
-        # Go back to home page after delete
-        return redirect(url_for('dashboard'))
+
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute("""
-        SELECT user_id, name, department, onboarding_date
-        FROM agents WHERE status='active'
-    """)
+ 
+    if request.method == 'POST':
+
+        ids = request.form.getlist('selected_ids')
+
+        for id in ids:
+
+            # update both tables
+
+            cur.execute("UPDATE agents SET status='deleted', deleted_date=%s WHERE user_id=%s", (datetime.now(), id))
+
+            cur.execute("UPDATE bank_users SET status='deleted', deleted_date=%s WHERE user_id=%s", (datetime.now(), id))
+
+        mysql.connection.commit()
+
+        cur.close()
+
+        flash("Selected users deleted successfully", "success")
+
+        return redirect(url_for('dashboard'))
+ 
+    # Filtering logic
+
+    department = request.args.get('department')
+
+    if department:
+
+        cur.execute("""
+
+            SELECT user_id, name, department, onboarding_date 
+
+            FROM agents WHERE status='active' AND department=%s
+
+        """, (department,))
+
+    else:
+
+        cur.execute("""
+
+            SELECT user_id, name, department, onboarding_date 
+
+            FROM agents WHERE status='active'
+
+        """)
+
     agents = cur.fetchall()
+
+    cur.close()
+ 
     return render_template("tldeleteuser.html", agents=agents)
+
+ 
 
    
 
@@ -925,21 +1230,13 @@ def userprepaidform():
 def paybill():
     return render_template('paybill.html')
 
-@app.route('/quicktransfer')
-def quicktransfer():
-    return render_template('quicktransfer.html')
+
 
 @app.route('/banktransfer')
 def banktransfer():
     return render_template('banktransfer.html')
 
-@app.route('/Txnhistory')
-def Txnhistory():
-    return render_template('transactions.html')
 
-@app.route('/accountbal')
-def accountbal():
-    return render_template('balance.html')
 
 
 
@@ -957,6 +1254,33 @@ def userdashloan():
 @app.route('/logout')
 def logout():
     return render_template('index.html')
+
+#Agent Dashboard(Card_Agent)
+
+@app.route('/agentprofile')
+def agentprofile():
+    user_id = session.get('user_id')
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT user_id, name, pan,dob, mobile, email,city,state,country,gender,department,status,role,password,aadhaar,deleted_date FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+
+    return render_template('agentprofile.html',user=user)
+
+@app.route('/updateprofile')
+def updateprofile():
+    return render_template('updateprofile.html')
+
+@app.route('/cardapplications')
+def cardapplications():
+    return render_template('cardapplications.html')
+@app.route('/applycardagent')
+def applycardagent():
+    return render_template('applycard.html')
+
+@app.route('/cardperformance')
+def cardperformance():
+    return render_template('cardperformance.html')
 
    
 if __name__ == '__main__':

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Forex Agent Profile - DigiBank</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            background-color: #97144D;
+        }
+        .navbar-brand, .navbar-text, .logout-btn {
+            color: white !important;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .logout-btn {
+            border: 1px solid white;
+            transition: 0.3s;
+        }
+        .logout-btn:hover {
+            background-color: white;
+            color: #97144D !important;
+        }
+        /* Breadcrumb styling */
+        .breadcrumb {
+            margin-bottom: 0;
+        }
+        .breadcrumb .active {
+            color: #97144D;
+            font-weight: 500;
+        }
+        .breadcrumb a {
+            text-decoration: none;
+            color: #97144D;
+        }
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        .performance-card {
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .card-header {
+            background-color: #f1f1f1;
+            font-weight: bold;
+        }
+        .metric-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        .metric-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #97144D;
+        }
+        .metric-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        footer {
+            background-color: #97144D;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+<!-- Top Bar -->
+<div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#8B0A50; color:white;">
+  
+
+  <!-- Logo / Image -->
+  <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo" 
+       style="height: 40px; width:auto; background-color:#fff; border-radius:5px; padding:2px;" class="me-3">
+
+  <!-- Title -->
+  <h5 class="flex-grow-1 text-center m-0">Welcome To Forex Agent Dashboard - DigiBank</h5>
+
+  <!-- Logout Button -->
+  <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
+    Logout
+  </a>
+</div>
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="bg-light px-3 py-2">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="forex_dashboard">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="profile">Agent_Profile</a>
+      </ol>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container my-5">
+        <div class="card performance-card p-4">
+            <h4 class="text-center mb-4" style="color: #97144D;">Siddhi More</h4>
+            
+            <!-- Agent Details Section -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 p-3">
+                        <h6 class="card-subtitle text-muted mb-2">Agent ID</h6>
+                        <p class="card-text fw-bold fs-5 mb-0">FX-1234</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 p-3">
+                        <h6 class="card-subtitle text-muted mb-2">Department</h6>
+                        <p class="card-text fw-bold fs-5 mb-0">Forex</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 p-3">
+                        <h6 class="card-subtitle text-muted mb-2">Hire Date</h6>
+                        <p class="card-text fw-bold fs-5 mb-0">January 15, 2023</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Metrics Section -->
+            <div class="row g-4 mb-4">
+                <div class="col-lg-4">
+                    <div class="metric-card bg-light">
+                        <p class="metric-value">1,250</p>
+                        <p class="metric-label">Total Tickets Resolved</p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="metric-card bg-light">
+                        <p class="metric-value">98%</p>
+                        <p class="metric-label">Customer Satisfaction</p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="metric-card bg-light">
+                        <p class="metric-value">55</p>
+                        <p class="metric-label">New Accounts Opened</p>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer>
+        © 2024 DigiBank. All rights reserved.
+    </footer>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Logout Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #97144D; color: white;">
+                    <h5 class="modal-title" id="logoutModalLabel">Logout Successful</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Successfully logged out...!!
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" style="background-color: #97144D; color: white;" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Logout Script -->
+    <script>
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            var myModal = new bootstrap.Modal(document.getElementById('logoutModal'));
+            myModal.show();
+
+            // Redirect after 2 seconds
+            setTimeout(function() {
+                window.location.href ='login';
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

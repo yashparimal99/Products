@@ -1,317 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
- 
 <head>
   <meta charset="UTF-8" />
-  <title>Dashboard - DigiBank</title>
+  <title>Transaction History - DigiBank</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
- 
-  <!-- Bootstrap CSS & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
- 
   <style>
-    body {
-      background-color: #f8f9fa;
-      font-family: 'Segoe UI', sans-serif;
-      padding: 20px 0 0 0;
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-
-    /* Sidebar Offcanvas */
-    #sidebarMenu.offcanvas-start {
-      width: 250px;
-    }
-
-    #sidebarMenu .offcanvas-body {
-      padding: 0.5rem 1rem;
-    }
-
-    #sidebarMenu .nav-link {
-      font-size: 0.9rem;
-      padding: 8px 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #333;
-      transition: color 0.3s;
-    }
-
-    #sidebarMenu .nav-link i {
-      font-size: 1.1rem;
-    }
-
-    #sidebarMenu .nav-link.active {
-      font-weight: 700;
-      color: #97144D !important;
-      background-color: #f0d7e0;
-      border-radius: 4px;
-    }
-
-    #sidebarMenu .nav-link:hover {
-      color: #7a0f3e;
-      background-color: #f9e5ef;
-      border-radius: 4px;
-    }
-
-    /* Top Bar */
-    .top-bar {
-      background-color: #97144D;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 20px;
-      user-select: none;
-      position: sticky;
-      top: 0;
-      z-index: 1030;
-    }
-
-    .top-bar h5 {
-      margin: 0;
-      font-weight: 700;
-      flex-grow: 1;
-      text-align: center;
-      color: white;
-    }
-
-    .logout-btn {
-      background: transparent;
-      border: 1.5px solid white;
-      color: white;
-      padding: 5px 15px;
-      border-radius: 4px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.2s, color 0.2s;
-      flex-shrink: 0;
-    }
-
-    .logout-btn:hover {
-      background-color: white;
-      color: #97144D;
-    }
-
-    /* Transaction Section */
-    .section-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin: 30px auto 20px auto;
-      padding: 0 20px;
-    }
-
-    .section-header h5 {
-      font-weight: 700;
-      color: #97144D;
-    }
-
-    table {
-      width: 95%;
-      margin: 0 auto 40px auto;
-      border-collapse: collapse;
-      background: white;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      border-radius: 6px;
-      overflow: hidden;
-    }
-
-    table th, table td {
-      padding: 12px 15px;
-      text-align: center;
-      border-bottom: 1px solid #ddd;
-    }
-
-    table thead {
-      background-color: #97144D;
-      color: white;
-    }
-
-    .status-success {
-      color: green;
-      font-weight: 600;
-    }
-    .status-failed {
-      color: red;
-      font-weight: 600;
-    }
-    .status-pending {
-      color: orange;
-      font-weight: 600;
-    }
-    .section-header {
-      margin: 20px auto;
-      padding: 0 20px;
-      gap: 20px; /* adds space between heading and filter box */
-    }
-
-    .section-header h5 {
-      font-weight: 700;
-      color: #97144D;
-      margin-right: 15px;
-    }
-
-    .section-header p {
-      margin-right: 10px;
-    }
-
-    /* Footer */
-    footer.bg-custom {
-      background-color: #97144D;
-    }
+    body{ background:#f8f9fa; font-family:'Segoe UI',sans-serif; min-height:100vh; display:flex; flex-direction:column; }
+    .top-bar{ background:#97144D; color:#fff; padding:10px 20px; position:sticky; top:0; z-index:1030;}
+    .logout-btn{ border:1.5px solid #fff; color:#fff; }
+    .logout-btn:hover{ background:#fff; color:#97144D;}
+    table{ width:95%; margin:0 auto 40px auto; border-collapse:collapse; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.1); border-radius:6px; overflow:hidden;}
+    table th, table td{ padding:12px 15px; text-align:center; border-bottom:1px solid #ddd;}
+    thead{ background:#97144D; color:#fff;}
+    .status-success{ color:green; font-weight:600; }
+    .status-failed{ color:red; font-weight:600; }
+    footer.bg-custom{ background:#97144D; }
   </style>
 </head>
- 
 <body>
  
-  <!-- Sidebar Offcanvas -->
- <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+<!-- Sidebar -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title" id="sidebarMenuLabel">DigiBank</h5>
     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">
     <ul class="nav flex-column">
-      <li class="nav-item mb-2">
-        <a class="nav-link text-dark" href="userdashboard.html"><i class="bi bi-speedometer2 me-2"></i> Home</a>
-      </li>
-      <li class="nav-item mb-2">
-        <a class="nav-link text-dark" href="account.html"><i class="bi bi-person-lines-fill me-2"></i> View Accounts</a>
-      </li>
-      <li class="nav-item mb-2">
-        <a class="nav-link text-dark active" href="transactions.html"><i class="bi bi-clock-history me-2"></i> Transaction History</a>
-      </li>
-      <li class="nav-item mb-2">
-        <a class="nav-link text-dark" href="checkbalance.html"><i class="bi bi-wallet2 me-2"></i> Check Balance</a>
-      </li>
-      <li class="nav-item mb-2">
-        <a class="nav-link text-dark" href="rewards.html"><i class="bi bi-gift-fill me-2"></i> Rewards</a>
-      </li>
-      <li class="nav-item mb-2">
-        <a class="nav-link text-dark" href="loans.html"><i class="bi bi-cash-coin me-2"></i> Loans</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link text-dark" href="paybill.html"><i class="bi bi-credit-card me-2"></i> Pay Bill</a>
-      </li>
-      <li class="nav-item mb-2">
-        <a class="nav-link text-dark" href="#">
-          <i class="bi bi-person-rolodex me-2"></i> Get Contact
-        </a>
-      </li>
-      <li class="nav-item mb-2">
-        <a class="nav-link text-dark" href="#">
-          <i class="bi bi-shield-lock-fill me-2"></i> Privacy & Security
-        </a>
-      </li>
+      <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('dashboard') }}"><i class="bi bi-speedometer2 me-2"></i> Home</a></li>
+      <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('viewaccounts') }}"><i class="bi bi-person-lines-fill me-2"></i> View Accounts</a></li>
+      <li class="nav-item mb-2"><a class="nav-link text-dark active" href="{{ url_for('Txnhistory') }}"><i class="bi bi-clock-history me-2"></i> Transaction History</a></li>
+      <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('accountbal') }}"><i class="bi bi-wallet2 me-2"></i> Check Balance</a></li>
+      <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('paybill') }}"><i class="bi bi-credit-card me-2"></i> Pay Bill</a></li>
     </ul>
   </div>
 </div>
-  <!-- Top Bar -->
-  <div class="top-bar d-flex align-items-center">
-    <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
-      aria-controls="sidebarMenu" aria-label="Toggle sidebar">
-      <i class="bi bi-list"></i>
-    </button>
-    <h5 class="m-0 flex-grow-1 text-center">DigiBank Transaction Dashboard</h5>
-    <div class="d-flex align-items-center">
-            <h5 class="m-0 me-2 fs-6">Welcome,  !</h5>
-            <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">
-              Logout
-            </a>
-          </div>
-  </div>
  
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" style="background-color:#f8f9fa; padding: 8px 15px; border-radius: 4px; margin-bottom: 15px;">
-      <ol class="breadcrumb mb-0">
-        <li class="breadcrumb-item"><a href="loandashboard.html" style="color:#97144D;">Home</a></li>
-        <li class="breadcrumb-item active" aria-current="page" style="color:#97144D; font-weight:bold;">Transactions</li>
-      </ol>
-    </nav>
-  <!-- Section Header -->
-<div class="section-header d-flex align-items-center justify-content-between gap-4">
-  <h5 class="mb-0">Transaction History</h5>
-  
+<!-- Top Bar -->
+<div class="top-bar d-flex align-items-center">
+  <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
+    aria-controls="sidebarMenu" aria-label="Toggle sidebar"><i class="bi bi-list"></i></button>
+  <h5 class="m-0 flex-grow-1 text-center">DigiBank Transaction Dashboard</h5>
+  <div class="d-flex align-items-center">
+    <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name if user else '' }}!</h5>
+    <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">Logout</a>
+  </div>
+</div>
+ 
+<nav aria-label="breadcrumb" style="background-color:#f8f9fa; padding:8px 15px; border-radius:4px; margin:10px 20px;">
+  <ol class="breadcrumb mb-0">
+    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#97144D;">Home</a></li>
+    <li class="breadcrumb-item active" aria-current="page" style="color:#97144D; font-weight:bold;">Transactions</li>
+  </ol>
+</nav>
+ 
+<div class="section-header d-flex align-items-center justify-content-between gap-4" style="padding:0 20px;">
+  <h5 class="mb-0" style="color:#97144D; font-weight:700;">Transaction History</h5>
   <div class="d-flex align-items-center gap-3">
     <p class="mb-0">Filter Transactions</p>
     <select id="filterStatus" class="form-select form-select-sm" aria-label="Filter Transactions">
       <option value="all" selected>All Transactions</option>
-      <option value="success">Successful Transactions</option>
-      <option value="failed">Failed Transactions</option>
-      <option value="processing">Processing Transactions</option>
+      <option value="success">Successful</option>
+      <option value="failed">Failed</option>
     </select>
-    <button aria-label="More options"><i class="bi bi-arrow-right-circle-fill"></i></button>
   </div>
 </div>
-
-
-  <!-- Transactions Table -->
-  <table>
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Transaction ID</th>
-        <th>Account</th>
-        <th>Type</th>
-        <th>Amount (₹)</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>2025-07-15</td>
-        <td>TXN123456789</td>
-        <td>Savings Account</td>
-        <td>Credit</td>
-        <td>₹15,000</td>
-        <td class="status-success">Success</td>
-      </tr>
-      <tr>
-        <td>2025-07-10</td>
-        <td>TXN123456788</td>
-        <td>Current Account</td>
-        <td>Debit</td>
-        <td>₹7,500</td>
-        <td class="status-pending">Pending</td>
-      </tr>
-      <tr>
-        <td>2025-07-05</td>
-        <td>TXN123456787</td>
-        <td>Savings Account</td>
-        <td>Debit</td>
-        <td>₹3,200</td>
-        <td class="status-failed">Failed</td>
-      </tr>
-      <tr>
-        <td>2025-07-02</td>
-        <td>TXN123456786</td>
-        <td>Current Account</td>
-        <td>Credit</td>
-        <td>₹20,000</td>
-        <td class="status-success">Success</td>
-      </tr>
-      <tr>
-        <td>2025-06-28</td>
-        <td>TXN123456785</td>
-        <td>Savings Account</td>
-        <td>Credit</td>
-        <td>₹10,500</td>
-        <td class="status-success">Success</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <!-- Footer -->
-  <footer class="bg-custom text-white text-center py-3 mt-auto">
-    © 2025 DigiBank. All rights reserved.
-  </footer>
  
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<table id="txnTable">
+  <thead>
+    <tr>
+      <th>Date/Time</th>
+      <th>Transaction ID</th>
+      <th>Type</th>
+      <th>From</th>
+      <th>To</th>
+      <th>Amount (₹)</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+<tbody>
+  {% for t in transactions %}
+    {% set is_debit = t.from_account in my_accounts %}
+    <tr data-status="{{ t.status }}">
+      <td>{{ t.created_at }}</td>
+      <td>{{ t.transaction_id }}</td>
+ 
+      <td>
+        {% if not t.from_account %}
+          Deposit (Credit)
+        {% elif is_debit %}
+          Debit
+        {% else %}
+          Credit
+        {% endif %}
+      </td>
+ 
+      <td>{{ t.from_account or '-' }}</td>
+      <td>{{ t.to_account or '-' }}</td>
+ 
+      <td>
+        {% if not t.from_account %}
+          +₹{{ '%.2f'|format(t.amount) }}
+        {% elif is_debit %}
+          -₹{{ '%.2f'|format(t.amount) }}
+        {% else %}
+          +₹{{ '%.2f'|format(t.amount) }}
+        {% endif %}
+      </td>
+ 
+      <td class="status-{{ t.status }}">{{ t.status|capitalize }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="7">No transactions yet.</td></tr>
+  {% endfor %}
+</tbody>
+ 
+ 
+</table>
+ 
+<footer class="bg-custom text-white text-center py-3 mt-auto" style="background:#97144D;">© 2025 DigiBank. All rights reserved.</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const filter = document.getElementById('filterStatus');
+  filter.addEventListener('change', () => {
+    const val = filter.value;
+    document.querySelectorAll('#txnTable tbody tr').forEach(tr => {
+      if (val === 'all') { tr.style.display = ''; return; }
+      tr.style.display = (tr.getAttribute('data-status') === val) ? '' : 'none';
+    });
+  });
+</script>
 </body>
 </html>
+ 
+ 

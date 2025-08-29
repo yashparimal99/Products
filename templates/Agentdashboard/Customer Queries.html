@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Customer Queries - DigiBank Agent</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Bootstrap CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #sidebarMenu.offcanvas-start {
+      width: 250px;
+    }
+
+    #sidebarMenu .nav-link {
+      font-size: 0.9rem;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #333;
+      transition: color 0.3s;
+    }
+
+    #sidebarMenu .nav-link.active {
+      font-weight: 700;
+      color: #97144D !important;
+      background-color: #f0d7e0;
+      border-radius: 4px;
+    }
+
+    #sidebarMenu .nav-link:hover {
+      color: #7a0f3e;
+      background-color: #f9e5ef;
+      border-radius: 4px;
+    }
+
+    .top-bar {
+      background-color: #97144D;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+    }
+
+    .top-bar h5 {
+      margin: 0;
+      font-weight: 700;
+      flex-grow: 1;
+      text-align: center;
+    }
+
+    .logout-btn {
+      background: transparent;
+      border: 1.5px solid white;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .logout-btn:hover {
+      background-color: white;
+      color: #97144D;
+    }
+
+    .search-chatbar {
+      max-width: 900px;
+      margin: 15px auto 30px auto;
+      padding: 0 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .search-chatbar input {
+      flex-grow: 1;
+      padding: 10px 14px;
+      border-radius: 5px;
+      border: 1.5px solid #ccc;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+
+    .search-chatbar input:focus {
+      border-color: #97144D;
+      box-shadow: 0 0 5px rgba(151, 20, 77, 0.5);
+    }
+
+    .query-card {
+      transition: 0.3s;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+      padding: 20px;
+    }
+
+    .query-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .query-card h5 {
+      font-weight: 600;
+      color: #97144D;
+    }
+
+    .btn-digibank {
+      background-color: #97144D;
+      color: #fff;
+      border: none;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      border-radius: 25px;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-digibank:hover {
+      background-color: #7a0f3e;
+    }
+
+    .nav-tabs .nav-link.active {
+      background-color: #97144D;
+      color: white !important;
+      border: none;
+    }
+
+    .nav-tabs .nav-link {
+      border-radius: 25px;
+      padding: 6px 18px;
+      font-weight: 500;
+      color: #97144D;
+    }
+
+    .nav-tabs .nav-link:hover {
+      background-color: #f0d7e0;
+      color: #7a0f3e;
+    }
+
+    footer.bg-custom {
+      background-color: #97144D;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">Welcome, Agent</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link active" href="#"><i class="bi bi-chat-dots"></i> Customer Queries</a></li>
+      </ul>
+    </div>
+  </div>
+
+<!-- Top Bar -->
+<div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#8B0A50; color:white;">
+  
+  <!-- Sidebar Toggle Button -->
+  <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
+    <i class="bi bi-list"></i>
+  </button>
+
+  <!-- Logo / Image -->
+  <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo" 
+       style="height: 40px; width:auto; background-color:#fff; border-radius:5px; padding:2px;" class="me-3">
+
+  <!-- Title -->
+  <h5 class="flex-grow-1 text-center m-0">Welcome To Loan Agent Dashboard - DigiBank</h5>
+
+  <!-- Logout Button -->
+  <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
+    Logout
+  </a>
+</div>
+  </div>
+  <!-- Breadcrumb -->
+<style>
+  .breadcrumb-item {
+    text-decoration: underline;
+  }
+</style>
+
+  <div class="container-fluid my-3 px-4">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item">
+          <a href="agentdashboard" style="color: #97144D; font-weight: bold;">Dashboard</a>
+        </li>
+        <li class="breadcrumb-item">
+          <a href="reports" style="color: #97144D; font-weight: bold;">Reports</a>
+        </li>
+      </ol>
+    </nav>
+  </div>
+  <!-- Search -->
+  <div class="search-chatbar">
+    <input type="text" placeholder="Search Queries..." id="searchBox" />
+    <button class="btn btn-digibank"><i class="bi bi-search"></i></button>
+  </div>
+
+  <!-- Content -->
+  <div class="container my-4 flex-grow-1">
+    <h3 class="mb-4 text-center">📩 Customer Queries</h3>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4" id="queryTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="open-tab" data-bs-toggle="tab" data-bs-target="#open" type="button"
+          role="tab">Open Queries</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="resolved-tab" data-bs-toggle="tab" data-bs-target="#resolved" type="button"
+          role="tab">Resolved Queries</button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="queryTabsContent">
+      <!-- Open Queries -->
+      <div class="tab-pane fade show active" id="open" role="tabpanel">
+        <div class="query-card mb-3">
+          <h5>Query #C1024</h5>
+          <p><strong>Customer:</strong> Danish Ahemad (danish@example.com)</p>
+          <p><strong>Subject:</strong> Loan EMI Issue</p>
+          <p><strong>Message:</strong> I want to change my EMI date, but the portal is not allowing me.</p>
+          <button class="btn btn-sm btn-success mark-resolved"><i class="bi bi-check2-circle"></i> Mark Resolved</button>
+          <button class="btn btn-sm btn-digibank reply-btn"><i class="bi bi-reply"></i> Reply</button>
+        </div>
+
+        <div class="query-card mb-3">
+          <h5>Query #C1025</h5>
+          <p><strong>Customer:</strong> Priya Singh (priya@example.com)</p>
+          <p><strong>Subject:</strong> Account Access Problem</p>
+          <p><strong>Message:</strong> Unable to login to my DigiBank account from the app.</p>
+          <button class="btn btn-sm btn-success mark-resolved"><i class="bi bi-check2-circle"></i> Mark Resolved</button>
+          <button class="btn btn-sm btn-digibank reply-btn"><i class="bi bi-reply"></i> Reply</button>
+        </div>
+      </div>
+
+      <!-- Resolved Queries -->
+      <div class="tab-pane fade" id="resolved" role="tabpanel">
+        <div class="query-card bg-light">
+          <h5>Query #C1019</h5>
+          <p><strong>Customer:</strong> Arjun Mehta (arjun@example.com)</p>
+          <p><strong>Subject:</strong> KYC Update</p>
+          <p class="text-success"><strong>Status:</strong> ✅ Resolved on 18 Aug 2025</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reply Modal -->
+  <div class="modal fade" id="replyModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Reply to Customer</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <textarea class="form-control" rows="4" placeholder="Type your reply here..."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-digibank" id="sendReply">Send Reply</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-custom text-white text-center py-3 mt-auto">
+    © 2025 DigiBank. All rights reserved.
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Custom JS -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const resolvedTab = document.getElementById("resolved");
+      const replyModal = new bootstrap.Modal(document.getElementById("replyModal"));
+
+      // Handle "Mark Resolved"
+      document.querySelectorAll(".mark-resolved").forEach(btn => {
+        btn.addEventListener("click", function () {
+          const card = this.closest(".query-card");
+          const today = new Date().toLocaleDateString("en-GB", {
+            day: "2-digit", month: "short", year: "numeric"
+          });
+          card.querySelectorAll("button").forEach(b => b.remove()); // remove buttons
+          card.classList.add("bg-light");
+          card.innerHTML += `<p class="text-success"><strong>Status:</strong> ✅ Resolved on ${today}</p>`;
+          resolvedTab.appendChild(card);
+        });
+      });
+
+      // Handle "Reply"
+      document.querySelectorAll(".reply-btn").forEach(btn => {
+        btn.addEventListener("click", function () {
+          replyModal.show();
+        });
+      });
+
+      document.getElementById("sendReply").addEventListener("click", function () {
+        alert("Reply sent successfully ✅");
+        replyModal.hide();
+      });
+    });
+  </script>
+</body>
+</html>
