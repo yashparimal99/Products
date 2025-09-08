@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-
+ 
 <head>
   <meta charset="UTF-8" />
   <title>Dashboard - DigiBank</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+ 
   <!-- Bootstrap CSS & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-
+ 
   <style>
     body {
       background-color: #f8f9fa;
@@ -21,16 +21,16 @@
       flex-direction: column;
       height: 100vh;
     }
-
+ 
     /* Sidebar Offcanvas */
     #sidebarMenu.offcanvas-start {
       width: 250px;
     }
-
+ 
     #sidebarMenu .offcanvas-body {
       padding: 0.5rem 1rem;
     }
-
+ 
     #sidebarMenu .nav-link {
       font-size: 0.9rem;
       padding: 8px 12px;
@@ -40,24 +40,24 @@
       color: #333;
       transition: color 0.3s;
     }
-
+ 
     #sidebarMenu .nav-link i {
       font-size: 1.1rem;
     }
-
+ 
     #sidebarMenu .nav-link.active {
       font-weight: 700;
       color: #97144D !important;
       background-color: #f0d7e0;
       border-radius: 4px;
     }
-
+ 
     #sidebarMenu .nav-link:hover {
       color: #7a0f3e;
       background-color: #f9e5ef;
       border-radius: 4px;
     }
-
+ 
     .top-bar button.btn-outline-light {
       border: 1.5px solid white;
       color: white;
@@ -68,13 +68,13 @@
       cursor: pointer;
       transition: background-color 0.2s, color 0.2s;
     }
-
+ 
     .top-bar button.btn-outline-light:hover {
       background-color: white;
       color: #97144D;
     }
-
-
+ 
+ 
     /* Top Bar */
     .top-bar {
       background-color: #97144D;
@@ -88,7 +88,7 @@
       top: 0;
       z-index: 1030;
     }
-
+ 
     .top-bar h5 {
       margin: 0;
       font-weight: 700;
@@ -96,7 +96,7 @@
       text-align: center;
       color: white;
     }
-
+ 
     .logout-btn {
       background: transparent;
       border: 1.5px solid white;
@@ -108,12 +108,12 @@
       transition: background-color 0.2s, color 0.2s;
       flex-shrink: 0;
     }
-
+ 
     .logout-btn:hover {
       background-color: white;
       color: #97144D;
     }
-
+ 
     /* Search Bar Row with Sidebar Toggle & Chatbot */
     .search-chatbar {
       max-width: 900px;
@@ -123,7 +123,7 @@
       align-items: center;
       gap: 15px;
     }
-
+ 
     /* Sidebar toggle button */
     .search-chatbar .btn-toggle-sidebar {
       display: flex;
@@ -140,12 +140,12 @@
       padding: 6px 8px;
       font-size: 1.3rem;
     }
-
+ 
     .search-chatbar .btn-toggle-sidebar:hover {
       border-color: #97144D;
       color: #97144D;
     }
-
+ 
     /* Search input centered and wide */
     .search-chatbar input[type="text"] {
       flex-grow: 1;
@@ -159,12 +159,12 @@
       margin: 0 auto;
       display: block;
     }
-
+ 
     .search-chatbar input[type="text"]:focus {
       border-color: #97144D;
       box-shadow: 0 0 5px rgba(151, 20, 77, 0.5);
     }
-
+ 
     /* Chatbot button right aligned */
     .search-chatbar .chatbot-btn {
       background-color: #97144D;
@@ -180,11 +180,11 @@
       font-size: 1.3rem;
       flex-shrink: 0;
     }
-
+ 
     .search-chatbar .chatbot-btn:hover {
       background-color: #7a0f3e;
     }
-
+ 
     /* Dashboard Cards */
     .dashboard-card {
       transition: 0.3s;
@@ -198,30 +198,30 @@
       border-radius: 8px;
       box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
     }
-
+ 
     .dashboard-card:hover {
       transform: translateY(-5px);
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
     }
-
+ 
     .dashboard-icon {
       font-size: 32px;
       color: #97144D;
       margin-bottom: 15px;
     }
-
+ 
     .dashboard-card h5 {
       font-weight: 600;
       margin-bottom: 10px;
     }
-
+ 
     .dashboard-card p {
       flex-grow: 1;
       font-size: 14px;
       color: #555;
       margin-bottom: 15px;
     }
-
+ 
     .btn-digibank {
       background-color: #97144D;
       color: #fff;
@@ -231,12 +231,12 @@
       border-radius: 25px;
       transition: background-color 0.3s ease;
     }
-
+ 
     .btn-digibank:hover {
       background-color: #7a0f3e;
       color: white;
     }
-
+ 
     /* Footer */
     footer.bg-custom {
       background-color: #97144D;
@@ -261,9 +261,9 @@
     }
   </style>
 </head>
-
+ 
 <body>
-
+ 
   <!-- Sidebar Offcanvas -->
   <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
     <div class="offcanvas-header">
@@ -317,11 +317,11 @@
             <i class="bi bi-shield-lock-fill me-2"></i> Privacy & Security
           </a>
         </li>
-
+ 
       </ul>
     </div>
   </div>
-
+ 
   <!-- ---------------------------- -->
   <div class="top-bar d-flex align-items-center">
     <!-- left toggle -->
@@ -329,7 +329,7 @@
       aria-controls="sidebarMenu" aria-label="Toggle sidebar">
       <i class="bi bi-list"></i>
     </button>
-
+ 
     <!-- title wrapper with flex-grow to take center space -->
     <!-- <h5 class="m-0 text-center flex-grow-1">DigiBank User Dashboard</h5> -->
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important; width: 100%;">
@@ -379,8 +379,8 @@
                 <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Home Loan</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Personal Loan</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Busniness Loan</a></li>
-
-
+ 
+ 
               </ul>
             </li>
             <!-- Deposits Dropdown -->
@@ -421,99 +421,197 @@
               Logout
             </a>
           </div>
-          
+         
         </div>
       </div>
     </nav>
     <!-- End of custom navbar -->
-
+ 
   </div>
-
-
-  
+ 
+ 
+ 
   </div>
-
-
-
-
-
-
-  
-
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
   <!-- Dashboard Content -->
   <!-- <div class="container my-4 flex-grow-1">
     <h3 class="mb-4 text-center">User Application Form</h3>
     <div class="row g-4 justify-content-center"> -->
-
+ 
         <div class="container my-5">
     <!-- <h3 class="text-danger mb-4">Account Opening Form</h3> -->
-    <h3 style="color: #97144D;" class="mb-4">Account Opening Form</h3>
-    <form action="#" method="post">
-      <div class="row mb-3">
-        <label for="fName" class="col-sm-2 col-form-label">First Name</label>
-        <div class="col-sm-4">
-          <input type="text" id="fName" name="first_name" class="form-control" style="border: 0.5px solid #97144D;" required>
-        </div>
-        <label for="mName" class="col-sm-2 col-form-label">Middle Name</label>
-        <div class="col-sm-4">
-          <input type="text" id="mName" name="middle_name" class="form-control" style="border: 0.5px solid #97144D;" required>
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <label for="lName" class="col-sm-2 col-form-label">Last Name</label>
-        <div class="col-sm-4">
-          <input type="text" id="lName" name="last_name" class="form-control" style="border: 0.5px solid #97144D;" required>
-        </div>
-        <label for="emailAddress" class="col-sm-2 col-form-label">Email Address</label>
-        <div class="col-sm-4">
-          <input type="email" id="emailAddress" name="email" class="form-control" style="border: 0.5px solid #97144D;" required>
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <label for="mobileNumber" class="col-sm-2 col-form-label">Mobile Number</label>
-        <div class="col-sm-4">
-          <input type="tel" id="mobileNumber" name="mobile" class="form-control" style="border: 0.5px solid #97144D;" required>
-        </div>
-        <label for="ANumber" class="col-sm-2 col-form-label">Aadhar Number</label>
-        <div class="col-sm-4">
-          <input type="text" id="ANumber" name="aadhar" class="form-control" style="border: 0.5px solid #97144D;" required>
-        </div>
-      </div>
-
-      <div class="row mb-4">
-        <label for="accountType" class="col-sm-2 col-form-label">Account Type</label>
-        <div class="col-sm-10">
-          <select id="accountType" name="accountType" class="form-select" required>
-            <option value="" selected disabled>Select account type</option>
-            <option value="digital fixed">Digital Fixed Deposit Account</option>
-            <option value="fixed">Fixed Deposit Account</option>
-            <option value="recurring">Recurring Deposit Account</option>
-            
-          </select>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-sm-12">
-          <button type="submit" class="btn-submit w-100">Submit Application</button>
-        </div>
-      </div>
-    </form>
+ <h3 style="color:#97144D;" class="mb-4">Open a Deposit</h3>
+ 
+<form action="{{ url_for('open_deposits') }}" method="POST" class="mb-5 pb-5">
+ 
+  <!-- KYC -->
+  <div class="row mb-3">
+    <label for="fName" class="col-sm-2 col-form-label">First Name</label>
+    <div class="col-sm-4">
+      <input type="text" id="fName" name="first_name" class="form-control" style="border:0.5px solid #97144D;" required>
+    </div>
+ 
+    <label for="mName" class="col-sm-2 col-form-label">Middle Name</label>
+    <div class="col-sm-4">
+      <!-- middle name is optional in the route -->
+      <input type="text" id="mName" name="middle_name" class="form-control" style="border:0.5px solid #97144D;">
+    </div>
   </div>
-
-    <!-- </div>
-  </div> -->
-
+ 
+  <div class="row mb-3">
+    <label for="lName" class="col-sm-2 col-form-label">Last Name</label>
+    <div class="col-sm-4">
+      <input type="text" id="lName" name="last_name" class="form-control" style="border:0.5px solid #97144D;" required>
+    </div>
+ 
+    <label for="emailAddress" class="col-sm-2 col-form-label">Email Address</label>
+    <div class="col-sm-4">
+      <input type="email" id="emailAddress" name="email" class="form-control" style="border:0.5px solid #97144D;" value="{{ user.email if user else '' }}" required>
+    </div>
+  </div>
+ 
+  <div class="row mb-3">
+    <label for="mobileNumber" class="col-sm-2 col-form-label">Mobile Number</label>
+    <div class="col-sm-4">
+      <input type="tel" id="mobileNumber" name="mobile" class="form-control" style="border:0.5px solid #97144D;" required>
+    </div>
+ 
+    <label for="ANumber" class="col-sm-2 col-form-label">Aadhar Number</label>
+    <div class="col-sm-4">
+      <input type="text" id="ANumber" name="aadhar" class="form-control" style="border:0.5px solid #97144D;" pattern="\d{12}" title="12 digit Aadhaar" required>
+    </div>
+  </div>
+ 
+  <!-- Type -->
+  <div class="row mb-4">
+    <label for="accountType" class="col-sm-2 col-form-label">Deposit Type</label>
+    <div class="col-sm-10">
+      <!-- values match canon_deposit_type() -->
+      <select id="accountType" name="accountType" class="form-select" required>
+        <option value="" selected disabled>Select deposit type</option>
+        <option value="digital fixed">Digital Fixed Deposit</option>
+        <option value="fixed">Fixed Deposit</option>
+        <option value="recurring">Recurring Deposit</option>
+      </select>
+    </div>
+  </div>
+ 
+  <!-- Common product fields -->
+  <div id="commonFields">
+  <div class="row mb-3">
+    <label for="interestRate" class="col-sm-2 col-form-label">Interest Rate (%)</label>
+    <div class="col-sm-4">
+      <!-- Fixed, uneditable 6% -->
+      <input
+        type="number"
+        id="interestRate"
+        name="interest_rate"
+        class="form-control"
+        value="6"
+        readonly
+        style="border:0.5px solid #97144D;"
+      >
+    </div>
+ 
+      <label for="compounding" class="col-sm-2 col-form-label">Compounding</label>
+      <div class="col-sm-4">
+        <select id="compounding" name="compounding" class="form-select" style="border:0.5px solid #97144D;">
+          <option value="MONTHLY">MONTHLY</option>
+          <option value="QUARTERLY" selected>QUARTERLY</option>
+          <option value="HALF_YEARLY">HALF_YEARLY</option>
+          <option value="YEARLY">YEARLY</option>
+        </select>
+      </div>
+    </div>
+ 
+    <div class="row mb-3">
+      <label for="tenure" class="col-sm-2 col-form-label">Tenure (months)</label>
+      <div class="col-sm-4">
+        <input type="number" id="tenure" name="tenure_months" class="form-control" min="1" step="1" style="border:0.5px solid #97144D;" required>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- FD/Digital FD only -->
+  <div id="fdFields" class="mb-3" style="display:none;">
+    <div class="row">
+      <label for="principal" class="col-sm-2 col-form-label">Principal Amount (₹)</label>
+      <div class="col-sm-4">
+        <input type="number" id="principal" name="principal_amount" class="form-control" step="0.01" min="0.01" style="border:0.5px solid #97144D;">
+      </div>
+    </div>
+  </div>
+ 
+  <!-- RD only -->
+  <div id="rdFields" class="mb-3" style="display:none;">
+    <div class="row">
+      <label for="installment" class="col-sm-2 col-form-label">Monthly Installment (₹)</label>
+      <div class="col-sm-4">
+        <input type="number" id="installment" name="monthly_installment" class="form-control" step="0.01" min="0.01" style="border:0.5px solid #97144D;">
+      </div>
+    </div>
+  </div>
+ 
+ 
+ 
+ 
+ 
+ 
+  <div class="row">
+  <div class="col-sm-12 text-center">
+    <button type="submit" class="btn btn-submit" style="max-width:220px;width:100%;">
+      Submit Application
+    </button>
+  </div>
+</div>
+ 
+ 
+<script>
+  (function () {
+    const typeSel = document.getElementById('accountType');
+    const fd = document.getElementById('fdFields');
+    const rd = document.getElementById('rdFields');
+    const principal = document.getElementById('principal');
+    const installment = document.getElementById('installment');
+ 
+    function update() {
+      const v = (typeSel.value || '').toLowerCase();
+      const isFD = v === 'fixed' || v === 'digital fixed';
+      const isRD = v === 'recurring';
+ 
+      fd.style.display = isFD ? 'block' : 'none';
+      rd.style.display = isRD ? 'block' : 'none';
+ 
+      // toggle required attrs to match your Flask route expectations
+      if (principal) principal.required = isFD;
+      if (installment) installment.required = isRD;
+    }
+ 
+    typeSel.addEventListener('change', update);
+    update();
+  })();
+</script>
+ 
+ 
+  <div class="mb-5"></div>
+<footer ...>
+ 
+ 
   <!-- Footer -->
   <footer class="bg-custom text-white text-center py-3 mt-auto" style="background-color: #97144D;">
     © 2025 DigiBank. All rights reserved.
   </footer>
-
+ 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+ 
   <!-- <script>
     function logout() {
       alert("Logout clicked! Implement logout logic here.");
@@ -521,5 +619,6 @@
     }
   </script> -->
 </body>
-
+ 
 </html>
+ 

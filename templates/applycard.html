@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <title>Card Application Form</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+ 
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  
+ 
   <style>
     body {
       background-color: #f8f9fa;
@@ -52,96 +52,249 @@
   </style>
 </head>
 <body>
-
+ 
   <!-- Navbar -->
-  <!-- <nav class="navbar navbar-expand-lg px-3">
+  <nav class="navbar navbar-expand-lg px-3">
     <a class="navbar-brand" href="#">DigiBank</a>
     <div class="mx-auto">
       <span class="navbar-text text-white h5 me-4">Apply for a New Card</span>
-      <div class="d-flex align-items-center">
-      <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }}</h5>
-      <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">Logout</a>
-  </div>
     </div>
-  </nav> -->
-  <!-- Top Bar -->
-<div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#8B0A50; color:white;">
-  
-
-  <!-- Logo / Image -->
-  <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo" 
-       style="height: 40px; width:auto; background-color:#fff; border-radius:5px; padding:2px;" class="me-3">
-
-  <!-- Title -->
-  <h5 class="flex-grow-1 text-center m-0">Welcome To Cards Agent Dashboard - DigiBank</h5>
-
-  <!-- Logout Button -->
-   <div class="d-flex align-items-center">
-  <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }}</h5>
-  <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
-    Logout
-  </a>
-</div>
-</div>
-
+  </nav>
+ 
   <!-- Breadcrumb -->
   <div class="container my-4">
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
-          <a href="{{ url_for('dashboard') }}">Dashboard</a>
+          <a href="cards_dashboard.html">Dashboard</a>
         </li>
         <li class="breadcrumb-item active" aria-current="page" style="color: #97144D; font-weight: bold;">
           Card Application Form
         </li>
       </ol>
     </nav>
-
-    <!-- Card Application Form -->
-    <div class="card p-4 mx-auto" style="max-width: 500px;">
-      <h4 class="mb-4">Card Application Details</h4>
-      <form>
-        <div class="mb-3">
-          <label for="customerName" class="form-label">Customer Name</label>
-          <input type="text" class="form-control" id="customerName" required>
+ 
+      <!-- flashes (optional) -->
+  {% with msgs = get_flashed_messages(with_categories=true) %}
+    {% if msgs %}
+      {% for cat,msg in msgs %}
+        <div class="alert alert-{{ 'success' if cat=='success' else 'danger' }} alert-dismissible fade show" role="alert">
+          {{ msg }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
-        <div class="mb-3">
-          <label for="cardType" class="form-label">Card Type</label>
-          <select class="form-select" id="cardType" required>
-            <option value="" selected disabled>Select Card Type</option>
-            <option value="Credit Card">Credit Card</option>
-            <option value="Debit Card">Debit Card</option>
-            <option value="International Card">International Card</option>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+ 
+<form action="{{ url_for('agent_apply_card') }}" method="post" id="agentCardForm">
+    <div class="row mb-3">
+      <label class="col-sm-3 col-form-label">Customer Email</label>
+      <div class="col-sm-9">
+        <input type="email" id="custEmail" name="applicant_email" class="form-control" placeholder="customer@email.com" required>
+        <small class="text-muted">We’ll fetch this customer’s accounts automatically.</small>
+      </div>
+    </div>
+ 
+    <div class="row mb-3">
+      <label class="col-sm-3 col-form-label">Customer Name</label>
+      <div class="col-sm-9">
+        <input type="text" name="customer_name" class="form-control" required>
+      </div>
+    </div>
+ 
+    <div class="row mb-3">
+      <label class="col-sm-3 col-form-label">Mobile Number</label>
+      <div class="col-sm-9">
+        <input type="tel" name="mobile" class="form-control" required>
+      </div>
+    </div>
+ 
+    <div class="row mb-3">
+      <label class="col-sm-3 col-form-label">Aadhaar Number</label>
+      <div class="col-sm-9">
+        <input type="text" name="aadharNumber" maxlength="12" class="form-control" required>
+      </div>
+    </div>
+ 
+    <div class="row mb-3">
+      <label class="col-sm-3 col-form-label">PAN (optional)</label>
+      <div class="col-sm-9">
+        <input type="text" name="panNumber" maxlength="10" class="form-control" placeholder="(format not enforced)">
+      </div>
+    </div>
+ 
+    <div class="row mb-3">
+      <label class="col-sm-3 col-form-label">Card Type</label>
+      <div class="col-sm-9">
+        <select id="cardType" name="card_type" class="form-select" required>
+          <option value="" selected disabled>Select Card Type</option>
+          <option value="credit">Credit Card</option>
+          <option value="debit">Debit Card</option>
+          <option value="prepaid">Prepaid Card</option>
+        </select>
+      </div>
+    </div>
+ 
+    <div class="row mb-3">
+      <label class="col-sm-3 col-form-label">Card Network</label>
+      <div class="col-sm-9">
+        <select name="card_subtype" class="form-select" required>
+          <option value="" selected disabled>Select network</option>
+          <option value="visa">VISA</option>
+          <option value="rupay">RUPAY</option>
+          <option value="mastercard">MASTERCARD</option>
+        </select>
+      </div>
+    </div>
+ 
+    <!-- Account (required for debit/prepaid, optional/hidden for credit) -->
+    <div class="row mb-3" id="acctRow" style="display:none;">
+      <label class="col-sm-3 col-form-label">Customer Account</label>
+      <div class="col-sm-9">
+        <select id="acctSelect" name="requested_for_account_number" class="form-select">
+          <option value="">Select account</option>
+        </select>
+        <small class="text-muted">Required for Debit/Prepaid. Optional for Credit.</small>
+      </div>
+    </div>
+ 
+    <!-- Credit-only -->
+    <div id="creditBlock" class="border rounded p-3 mb-3 d-none">
+      <div class="row mb-3">
+        <label class="col-sm-3 col-form-label">CIBIL Score</label>
+        <div class="col-sm-3">
+          <input type="number" id="cibil" name="cibil_score" class="form-control" min="300" max="900">
+        </div>
+ 
+        <label class="col-sm-3 col-form-label">Issue Limit (₹)</label>
+        <div class="col-sm-3">
+          <input type="text" id="issueLimitDisplay" class="form-control" value="0" readonly>
+        </div>
+      </div>
+ 
+      <div class="row mb-3">
+        <label class="col-sm-3 col-form-label">Monthly Income (₹)</label>
+        <div class="col-sm-3">
+          <input type="number" name="monthly_income" class="form-control" min="0" step="1">
+        </div>
+ 
+        <label class="col-sm-3 col-form-label">Employment Type</label>
+        <div class="col-sm-3">
+          <select name="employment_type" class="form-select">
+            <option value="">Select…</option>
+            <option value="salaried">Salaried</option>
+            <option value="self_employed">Self Employed</option>
+            <option value="student">Student</option>
+            <option value="retired">Retired</option>
+            <option value="other">Other</option>
           </select>
         </div>
-        <div class="mb-3">
-          <label for="dob" class="form-label">Date of Birth</label>
-          <input type="date" class="form-control" id="dob" required>
-        </div>
-        <!-- New Aadhar Field -->
-        <div class="mb-3">
-          <label for="aadharNumber" class="form-label">Aadhar Number</label>
-          <input type="text" class="form-control" id="aadharNumber" maxlength="12" pattern="\d{12}" placeholder="Enter 12-digit Aadhar number" required>
-        </div>
-        <!-- New PAN Field -->
-        <div class="mb-3">
-          <label for="panNumber" class="form-label">PAN Card Number</label>
-          <input type="text" class="form-control" id="panNumber" maxlength="10" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" placeholder="Enter PAN number (e.g., ABCDE1234F)" required>
-        </div>
-        <div class="d-grid gap-2">
-          <button type="submit" class="btn nav-btn">Submit Application</button>
-        </div>
-      </form>
+      </div>
+ 
+      <div class="alert alert-info mb-0" id="cibilMsg" style="display:none;"></div>
     </div>
-  </div>
-
+ 
+   <div class="row">
+      <div class="col-sm-12 text-center">
+        <button type="submit" class="btn btn-digibank">Submit Application</button>
+      </div>
+  </form>
+</div>
+ 
+<script>
+  const emailInput  = document.getElementById('custEmail');
+  const acctRow     = document.getElementById('acctRow');
+  const acctSelect  = document.getElementById('acctSelect');
+  const cardTypeSel = document.getElementById('cardType');
+  const creditBlock = document.getElementById('creditBlock');
+  const cibilInput  = document.getElementById('cibil');
+  const limitOut    = document.getElementById('issueLimitDisplay');
+  const cibilMsg    = document.getElementById('cibilMsg');
+ 
+  function computeIssueLimit(cibil) {
+    if (!Number.isInteger(cibil)) return 0;
+    if (cibil < 550) return 0;
+    if (cibil < 650) return 20000;
+    if (cibil < 700) return 50000;
+    if (cibil < 750) return 100000;
+    return 200000;
+  }
+  function formatINR(n) { return new Intl.NumberFormat('en-IN').format(n); }
+ 
+  // Load customer accounts by email
+  let acctTimer = null;
+  emailInput.addEventListener('input', () => {
+    clearTimeout(acctTimer);
+    acctTimer = setTimeout(async () => {
+      const email = emailInput.value.trim();
+      acctSelect.innerHTML = '<option value="">Select account</option>';
+      if (!email) return;
+      try {
+        const res = await fetch(`/api/user-accounts?email=${encodeURIComponent(email)}`);
+        const data = await res.json();
+        if (data.ok && Array.isArray(data.accounts)) {
+          data.accounts.forEach(a => {
+            const opt = document.createElement('option');
+            opt.value = a.account_number;
+            opt.textContent = `${a.account_number} — ${a.account_type.toUpperCase()}`;
+            acctSelect.appendChild(opt);
+          });
+        }
+      } catch (e) { /* ignore */ }
+    }, 400);
+  });
+ 
+  function onTypeChange() {
+    const t = (cardTypeSel.value || '').toLowerCase();
+    const isCredit = t === 'credit';
+ 
+    creditBlock.classList.toggle('d-none', !isCredit);
+ 
+    // Account row visible unless credit
+    acctRow.style.display = isCredit ? 'none' : '';
+    if (isCredit) {
+      acctSelect.removeAttribute('required');
+    } else {
+      acctSelect.setAttribute('required', 'required');
+    }
+  }
+ 
+  function onCibilInput() {
+    const v = parseInt(cibilInput.value, 10);
+    const limit = computeIssueLimit(Number.isInteger(v) ? v : NaN);
+    limitOut.value = formatINR(limit);
+ 
+    if (!Number.isInteger(v)) {
+      cibilMsg.style.display = 'none';
+    } else {
+      let txt = '';
+      if (v < 550) txt = 'CIBIL very low — card may be declined.';
+      else if (v < 650) txt = 'Low score — tentative limit ₹20,000.';
+      else if (v < 700) txt = 'Fair score — tentative limit ₹50,000.';
+      else if (v < 750) txt = 'Good score — tentative limit ₹1,00,000.';
+      else txt = 'Excellent score — tentative limit ₹2,00,000.';
+      cibilMsg.textContent = txt;
+      cibilMsg.style.display = 'block';
+    }
+  }
+ 
+  cardTypeSel.addEventListener('change', onTypeChange);
+  cibilInput.addEventListener('input', onCibilInput);
+ 
+  onTypeChange();
+  onCibilInput();
+</script>
+ 
+ 
   <!-- Footer -->
   <footer>
     © 2024 DigiBank. All rights reserved.
   </footer>
-
+ 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+ 
 </body>
 </html>
+ 
+ 

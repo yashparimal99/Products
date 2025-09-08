@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>Pay Bill - DigiBank</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+ 
   <!-- Bootstrap CSS & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
@@ -14,7 +14,7 @@
       font-family: 'Segoe UI', sans-serif;
       padding: 20px;
     }
-
+ 
     .card-custom {
       border: 1px solid #97144D;
       border-radius: 12px;
@@ -46,7 +46,7 @@
       font-size: 1.5rem;
       color: #97144D;
     }
-
+ 
     .banner-box {
       display: flex;
       align-items: center;
@@ -71,7 +71,7 @@
       color: #97144D;
       cursor: pointer;
     }
-
+ 
     .label-box {
       background-color: #fff;
       border: 1px solid #ccc;
@@ -95,7 +95,7 @@
 </head>
 <body>
   <div class="container">
-
+ 
     <!-- First Row: Transfers -->
     <div class="row g-3 mb-4">
       <div class="col-md-4">
@@ -107,13 +107,13 @@
           <i class="bi bi-arrow-right-circle-fill arrow"></i>
         </div>
       </div>
-      
+     
       <div class="col-md-4">
         <div class="card-custom">
           <h6>Bank Transfer</h6>
           <p>To own/other account</p>
           <a href="{{ url_for('banktransfer') }}" class="btn btn-primary btn-sm btn-custom">Transfer Now</a>
-          
+         
           <i class="bi bi-arrow-right-circle-fill arrow"></i>
         </div>
       </div>
@@ -126,7 +126,7 @@
         </div>
       </div>
     </div>
-
+ 
     <!-- Second Row: Bill Payments -->
     <div class="row g-3 mb-4">
       <div class="col-md-4">
@@ -149,14 +149,14 @@
       </div>
       <div class="col-md-4">
         <div class="card-custom">
-          <h6>NPS Contribution</h6>
-          <p></p>
-          <i class="bi bi-graph-up-arrow icon"></i>
+          <h6>Deposit</h6>
+          <p>Deposit your money easily</p>
+          <a href="{{ url_for('deposit') }}" class="btn btn-primary btn-sm btn-custom">Deposit Now</a>
           <i class="bi bi-arrow-right-circle-fill arrow"></i>
         </div>
       </div>
     </div>
-
+ 
     <!-- Donation Banner -->
     <div class="banner-box">
       <i class="bi bi-heart-fill"></i>
@@ -165,7 +165,7 @@
         <p>Donate and create impact that lasts a lifetime</p>
       </div>
     </div>
-
+ 
     <!-- Manage Transaction Limit Banner -->
     <div class="banner-box">
       <div>
@@ -174,14 +174,16 @@
       </div>
       <i class="bi bi-arrow-right-circle-fill arrow-btn"></i>
     </div>
-
+ 
     <!-- Label Box -->
     <div class="label-box">
       For a hassle-free transactions experience, please make sure your total limit per day for third-party transfer transactions is sufficiently set for all your transactions planned through the day. You can reach TPT limit anytime from above Manage Transaction Limit.
     </div>
-
+ 
   </div>
-
+ 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+ 
+ 

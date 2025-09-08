@@ -1,529 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
-  <title>Dashboard - DigiBank</title>
+  <title>Quick Transfer - DigiBank</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Bootstrap CSS & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-
   <style>
-    body {
-      background-color: #f8f9fa;
-      font-family: 'Segoe UI', sans-serif;
-      padding: 20px 0 0 0;
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-
-    /* Sidebar Offcanvas */
-    #sidebarMenu.offcanvas-start {
-      width: 250px;
-    }
-
-    #sidebarMenu .offcanvas-body {
-      padding: 0.5rem 1rem;
-    }
-
-    #sidebarMenu .nav-link {
-      font-size: 0.9rem;
-      padding: 8px 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #333;
-      transition: color 0.3s;
-    }
-
-    #sidebarMenu .nav-link i {
-      font-size: 1.1rem;
-    }
-
-    #sidebarMenu .nav-link.active {
-      font-weight: 700;
-      color: #97144D !important;
-      background-color: #f0d7e0;
-      border-radius: 4px;
-    }
-
-    #sidebarMenu .nav-link:hover {
-      color: #7a0f3e;
-      background-color: #f9e5ef;
-      border-radius: 4px;
-    }
-
-    .top-bar button.btn-outline-light {
-      border: 1.5px solid white;
-      color: white;
-      background: transparent;
-      padding: 4px 10px;
-      font-size: 1.3rem;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.2s, color 0.2s;
-    }
-
-    .top-bar button.btn-outline-light:hover {
-      background-color: white;
-      color: #97144D;
-    }
-
-
-    /* Top Bar */
-    .top-bar {
-      background-color: #97144D;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 20px;
-      user-select: none;
-      position: sticky;
-      top: 0;
-      z-index: 1030;
-    }
-
-    .top-bar h5 {
-      margin: 0;
-      font-weight: 700;
-      flex-grow: 1;
-      text-align: center;
-      color: white;
-    }
-
-    .logout-btn {
-      background: transparent;
-      border: 1.5px solid white;
-      color: white;
-      padding: 5px 15px;
-      border-radius: 4px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.2s, color 0.2s;
-      flex-shrink: 0;
-    }
-
-    .logout-btn:hover {
-      background-color: white;
-      color: #97144D;
-    }
-
-    /* Search Bar Row with Sidebar Toggle & Chatbot */
-    .search-chatbar {
-      max-width: 900px;
-      margin: 15px auto 40px auto;
-      padding: 0 15px;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    /* Sidebar toggle button */
-    .search-chatbar .btn-toggle-sidebar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 5px;
-      border: 1.5px solid #ccc;
-      color: #444;
-      background: white;
-      transition: border-color 0.3s, color 0.3s;
-      cursor: pointer;
-      flex-shrink: 0;
-      min-width: 42px;
-      padding: 6px 8px;
-      font-size: 1.3rem;
-    }
-
-    .search-chatbar .btn-toggle-sidebar:hover {
-      border-color: #97144D;
-      color: #97144D;
-    }
-
-    /* Search input centered and wide */
-    .search-chatbar input[type="text"] {
-      flex-grow: 1;
-      padding: 10px 14px;
-      border-radius: 5px;
-      border: 1.5px solid #ccc;
-      font-size: 1rem;
-      outline-offset: 0;
-      transition: border-color 0.3s;
-      width: 9000px;
-      margin: 0 auto;
-      display: block;
-    }
-
-    .search-chatbar input[type="text"]:focus {
-      border-color: #97144D;
-      box-shadow: 0 0 5px rgba(151, 20, 77, 0.5);
-    }
-
-    /* Chatbot button right aligned */
-    .search-chatbar .chatbot-btn {
-      background-color: #97144D;
-      border: none;
-      color: white;
-      padding: 10px 14px;
-      border-radius: 5px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background-color 0.3s ease;
-      font-size: 1.3rem;
-      flex-shrink: 0;
-    }
-
-    .search-chatbar .chatbot-btn:hover {
-      background-color: #7a0f3e;
-    }
-
-    /* Dashboard Cards */
-    .dashboard-card {
-      transition: 0.3s;
-      height: 280px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 20px 20px 30px 20px;
-      text-align: center;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
-    }
-
-    .dashboard-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
-    }
-
-    .dashboard-icon {
-      font-size: 32px;
-      color: #97144D;
-      margin-bottom: 15px;
-    }
-
-    .dashboard-card h5 {
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
-
-    .dashboard-card p {
-      flex-grow: 1;
-      font-size: 14px;
-      color: #555;
-      margin-bottom: 15px;
-    }
-
-    .btn-digibank {
-      background-color: #97144D;
-      color: #fff;
-      border: none;
-      padding: 8px 18px;
-      font-size: 0.9rem;
-      border-radius: 25px;
-      transition: background-color 0.3s ease;
-    }
-
-    .btn-digibank:hover {
-      background-color: #7a0f3e;
-      color: white;
-    }
-
-    /* Footer */
-    footer.bg-custom {
-      background-color: #97144D;
-    }
-  </style>
-  <style>
-  body {
-      background-color: #f8f9fa;
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-    }
-    .btn-submit {
-      background-color: #97144D;
-      color: #fff;
-      font-weight: 600;
-      border: none;
-      padding: 10px 0;
-      border-radius: 4px;
-    }
-    .btn-submit:hover {
-      background-color: #7a0f3e;
-    }
+    body { background-color:#f8f9fa; font-family:'Segoe UI',sans-serif; }
+    .top-bar { background:#97144D; color:#fff; padding:10px 20px; position:sticky; top:0; z-index:1030; }
+    .logout-btn { border:1.5px solid #fff; color:#fff; }
+    .logout-btn:hover{ background:#fff; color:#97144D;}
+    .btn-submit { background-color:#97144D; color:#fff; font-weight:600; border:none; padding:10px 0; border-radius:4px; }
+    .btn-submit:hover { background:#7a0f3e; }
+    .form-control, .form-select { border:0.5px solid #97144D; }
   </style>
 </head>
-
 <body>
-
-  <!-- Sidebar Offcanvas -->
-  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
-    <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="sidebarMenuLabel">User</h5>
-      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body">
-      <ul class="nav flex-column">
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark active" href="userdashboard.html">
-            <i class="bi bi-speedometer2 me-2"></i> Home
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="{{ url_for('viewaccounts') }}">
-            <i class="bi bi-person-lines-fill me-2"></i> View Accounts
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="loans.html">
-            <i class="bi bi-cash-coin me-2"></i> Loans
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="transactions.html">
-            <i class="bi bi-clock-history me-2"></i> Transaction History
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="balance.html">
-            <i class="bi bi-wallet2 me-2"></i> Check Balance
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="rewards.html">
-            <i class="bi bi-gift-fill me-2"></i> Rewards
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="paybill.html">
-            <i class="bi bi-credit-card me-2"></i> Pay Bill
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="#">
-            <i class="bi bi-person-rolodex me-2"></i> Get Contact
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="#">
-            <i class="bi bi-shield-lock-fill me-2"></i> Privacy & Security
-          </a>
-        </li>
-
-      </ul>
-    </div>
+ 
+<!-- Sidebar -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="sidebarMenuLabel">User</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
-
-  <!-- ---------------------------- -->
-  <div class="top-bar d-flex align-items-center">
-    <!-- left toggle -->
-    <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
-      aria-controls="sidebarMenu" aria-label="Toggle sidebar">
-      <i class="bi bi-list"></i>
-    </button>
-
-    <!-- title wrapper with flex-grow to take center space -->
-    <!-- <h5 class="m-0 text-center flex-grow-1">DigiBank User Dashboard</h5> -->
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important; width: 100%;">
-      <div class="container-fluid">
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <!-- <li class="nav-item"><a class="nav-link active" href="{{ url_for('home') }}">Home</a></li> -->
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">My Activities</a>
-            </li>
-            <!-- Open Account Dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Open Account</a>
-              <ul class="dropdown-menu" aria-labelledby="accountDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('savingform') }}">Savings
-                    Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Salary Account</a>
-                </li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Current
-                    Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Safe Custody
-                    Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Pension
-                    Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">PMJDY Account</a>
-                </li>
-              </ul>
-            </li>
-            <!-- Deposits Dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Deposits</a>
-              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Digital Fixed
-                    Deposits</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Fixed
-                    Deposits</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Recurring
-                    Deposits</a></li>
-              </ul>
-            </li>
-            <!-- Deposits Dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Loans</a>
-              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Home Loan</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Personal Loan</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Busniness Loan</a></li>
-
-
-              </ul>
-            </li>
-            <!-- Deposits Dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Cards</a>
-              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Credit Cards</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Debit Cards</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Prepaid Cards</a></li>
-              </ul>
-            </li>
-            <!-- Deposits Dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Forex</a>
-              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Travel Forex Cards</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Send Money Abroad</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Send Money India</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Foregin Currency Exchange</a></li>
-              </ul>
-            </li>
-            <!-- Deposits Dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Investments</a>
-              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Public Provident Fund</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Floating Rate Saving Bonds</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">National Pension System</a></li>
-              </ul>
-            </li>
-          </ul>
-          <div class="d-flex align-items-center">
-            <h5 class="m-0 me-2 fs-6">Welcome,  !</h5>
-            <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">
-              Logout
-            </a>
+  <div class="offcanvas-body">
+    <ul class="nav flex-column">
+      <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('dashboard') }}"><i class="bi bi-speedometer2 me-2"></i> Home</a></li>
+      <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('viewaccounts') }}"><i class="bi bi-person-lines-fill me-2"></i> View Accounts</a></li>
+      <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('Txnhistory') }}"><i class="bi bi-clock-history me-2"></i> Transaction History</a></li>
+      <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('accountbal') }}"><i class="bi bi-wallet2 me-2"></i> Check Balance</a></li>
+      <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('paybill') }}"><i class="bi bi-credit-card me-2"></i> Pay Bill</a></li>
+    </ul>
+  </div>
+</div>
+ 
+<!-- Top Bar -->
+<div class="top-bar d-flex align-items-center">
+  <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
+    aria-controls="sidebarMenu" aria-label="Toggle sidebar"><i class="bi bi-list"></i></button>
+  <h5 class="m-0 flex-grow-1 text-center">Quick Fund Transfer</h5>
+  <div class="d-flex align-items-center">
+    <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name if user else '' }}!</h5>
+    <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">Logout</a>
+  </div>
+</div>
+ 
+<div class="container my-4">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#97144D;">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page" style="color:#97144D; font-weight:bold;">Quick Transfer</li>
+    </ol>
+  </nav>
+ 
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form method="post" action="{{ url_for('quicktransfer') }}" id="transferForm" novalidate>
+        <div class="row mb-3">
+          <label class="col-sm-2 col-form-label">From Account</label>
+          <div class="col-sm-10">
+            <select name="from_account" class="form-select" required>
+              <option value="" disabled selected>Select your account</option>
+              {% for a in my_accounts %}
+                <option value="{{ a.account_number }}">
+                  {{ a.account_type|capitalize }} - {{ a.account_number }}
+                </option>
+              {% endfor %}
+            </select>
           </div>
-          
         </div>
-      </div>
-    </nav>
-    <!-- End of custom navbar -->
-
-  </div>
-
-
-  
-  </div>
-
-
-
-
-
-
-  
-
-  <!-- Dashboard Content -->
-  <!-- <div class="container my-4 flex-grow-1">
-    <h3 class="mb-4 text-center">User Application Form</h3>
-    <div class="row g-4 justify-content-center"> -->
-
-        <div class="container my-5">
-    <!-- <h3 class="text-danger mb-4">Account Opening Form</h3> -->
-    <h3 class="mb-4" style="color: #97144D;">Quick Fund Transfer</h3>
-
-<form action="#" method="post">
-  <div class="row mb-3">
-    <label for="cardType" class="col-sm-2 col-form-label">From Account</label>
-    <div class="col-sm-4">
-      <select id="cardType" name="card_type" class="form-select" style="border: 0.5px solid #97144D;" required>
-        <option value="" selected disabled>Select card type</option>
-        <option value="saving">saving</option>
-        <option value="current">Current</option>
-        
-      </select>
-    </div>
-    <label for="mName" class="col-sm-2 col-form-label">From Account Number</label>
-    <div class="col-sm-4">
-      <select id="cardType" name="card_type" class="form-select" style="border: 0.5px solid #97144D;" required>
-        <option value="" selected disabled>Select card type</option>
-        <option value="saving">01</option>
-        <option value="current">02</option>
-        
-      </select>
+ 
+        <div class="row mb-3">
+          <label class="col-sm-2 col-form-label">To Account Number</label>
+          <div class="col-sm-4">
+            <input type="text" name="to_account" class="form-control" required />
+          </div>
+          <label class="col-sm-2 col-form-label">Re-enter Account No</label>
+          <div class="col-sm-4">
+            <input type="text" id="to_account_confirm" class="form-control" required />
+          </div>
+        </div>
+ 
+        <div class="row mb-3">
+          <label class="col-sm-2 col-form-label">Amount (₹)</label>
+          <div class="col-sm-4">
+            <input type="number" name="amount" step="0.01" min="0.01" class="form-control" required />
+          </div>
+          <label class="col-sm-2 col-form-label">Remark</label>
+          <div class="col-sm-4">
+            <input type="text" name="note" maxlength="255" class="form-control" placeholder="(optional)" />
+          </div>
+        </div>
+ 
+        <div class="text-center">
+          <button type="submit" class="btn-submit btn px-4">Transfer Amount</button>
+        </div>
+      </form>
     </div>
   </div>
-
-  <div class="row mb-3">
-    <label for="lName" class="col-sm-2 col-form-label">To Account Number</label>
-    <div class="col-sm-4">
-      <input type="text" id="lName" name="last_name" class="form-control" style="border: 0.5px solid #97144D;" required>
-    </div>
-    <label for="emailAddress" class="col-sm-2 col-form-label">Re-Enter Account No</label>
-    <div class="col-sm-4">
-      <input type="email" id="emailAddress" name="email" class="form-control" style="border: 0.5px solid #97144D;" required>
-    </div>
-  </div>
-
-  <div class="row mb-3">
-    <label for="mobileNumber" class="col-sm-2 col-form-label">Amount</label>
-    <div class="col-sm-4">
-      <input type="tel" id="mobileNumber" name="mobile" class="form-control" style="border: 0.5px solid #97144D;" required>
-    </div>
-    <label for="ANumber" class="col-sm-2 col-form-label">Remark</label>
-    <div class="col-sm-4">
-      <input type="text" id="ANumber" name="Addhar" class="form-control" style="border: 0.5px solid #97144D;" maxlength="12" required>
-    </div>
-  </div>
-
-  
-  </div>
-
-  <div class="row">
-    <div class="col-sm-12 text-center">
-      <button type="submit" class="btn btn-primary" style="background-color: #97144D; border: none;">
-        Transfer Amount
-      </button>
-    </div>
-  </div>
-</form>
-
-  </div>
-
-    <!-- </div>
-  </div> -->
-
-  <!-- Footer -->
-  <footer class="bg-custom text-white text-center py-3 mt-auto" style="background-color: #97144D;">
-    © 2025 DigiBank. All rights reserved.
-  </footer>
-
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-  <!-- <script>
-    function logout() {
-      alert("Logout clicked! Implement logout logic here.");
-      // e.g. window.location.href = "login.html";
+</div>
+ 
+<footer class="text-white text-center py-3 mt-auto" style="background-color:#97144D;">© 2025 DigiBank. All rights reserved.</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.getElementById('transferForm').addEventListener('submit', function(e){
+    const toAcc = document.querySelector('input[name="to_account"]').value.trim();
+    const toAccConf = document.getElementById('to_account_confirm').value.trim();
+    if (toAcc !== toAccConf) {
+      e.preventDefault();
+      alert('The destination account numbers do not match.');
     }
-  </script> -->
+  });
+</script>
 </body>
-
 </html>
+ 
+ 

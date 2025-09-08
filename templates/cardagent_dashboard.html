@@ -92,7 +92,7 @@
 
   <!-- Logout Button -->
   <div class="d-flex align-items-center">
-  <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }}</h5>
+  <h5 class="m-0 me-2 fs-6">Welcome, </h5>
   <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
     Logout
   </a>
@@ -112,7 +112,7 @@
   <!-- Dashboard Content -->
   <div class="container my-5">
     <div class="card p-4">
-      <h4 class="mb-4 text-center">Welcome, <span id="agentName">{{ user.name }}</span>..!!</h4>
+      <h4 class="mb-4 text-center">Welcome, <span id="agentName"></span>..!!</h4>
 
       <div class="row g-4 text-center">
         <!-- Profile Card (New First Card) -->

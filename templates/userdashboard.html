@@ -265,23 +265,23 @@
           </a>
         </li>
         <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="loans.html">
+          <a class="nav-link text-dark" href="{{ url_for('userdashloan') }}">
             <i class="bi bi-cash-coin me-2"></i> Loans
           </a>
         </li>
         <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="transactions.html">
+          <a class="nav-link text-dark" href="{{ url_for('Txnhistory') }}">
             <i class="bi bi-clock-history me-2"></i> Transaction History
           </a>
         </li>
         <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="balance.html">
+          <a class="nav-link text-dark" href="{{ url_for('accountbal') }}">
             <i class="bi bi-wallet2 me-2"></i> Check Balance
           </a>
         </li>
         <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="rewards.html">
-            <i class="bi bi-gift-fill me-2"></i> Rewards
+          <a class="nav-link text-dark" href="{{ url_for('profile') }}">
+            <i class="bi bi-gift-fill me-2"></i> Profile
           </a>
         </li>
         <li class="nav-item mb-2">
@@ -358,9 +358,9 @@
               <a class="nav-link dropdown-toggle" href="#" id="loanDropdown" role="button" data-bs-toggle="dropdown"
                 aria-expanded="false">Loans</a>
               <ul class="dropdown-menu" aria-labelledby="loanDropdown">
-                <li><a class="dropdown-item" href="#">Home Loan</a></li>
-                <li><a class="dropdown-item" href="#">Personal Loan</a></li>
-                <li><a class="dropdown-item" href="#">Busniness Loan</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('userdashloan') }}">Home Loan</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('userdashloan') }}">Personal Loan</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('userdashloan') }}">Busniness Loan</a></li>
 
 
               </ul>
@@ -371,8 +371,8 @@
                 aria-expanded="false" type="button">Cards</button>
               <ul class="dropdown-menu" aria-labelledby="cardDropdown">
                 <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Credit Cards</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('userdebitform') }}">Debit Cards</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('userprepaidform') }}">Prepaid Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Debit Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Prepaid Cards</a></li>
               </ul>
             </li>
             <!-- Deposits Dropdown -->
@@ -490,9 +490,9 @@
       <!-- Rewards -->
       <div class="col-md-4 col-sm-6">
         <div class="card dashboard-card p-4 text-center">
-          <i class="bi bi-gift dashboard-icon mb-2"></i>
+          <i class="bi bi-person dashboard-icon mb-2"></i>
           <h5>Profile</h5>
-          <p>View your reward points and redeem exciting offers.</p>
+          <p>View your profile details and update profile.</p>
           <a href="{{ url_for('profile') }}" class="btn btn-digibank">View Profile</a>
         </div>
       </div>

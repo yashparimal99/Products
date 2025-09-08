@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My Cards - DigiBank</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+ 
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+ 
+  <style>
+    body { background-color:#f8f9fa; font-family:'Segoe UI', sans-serif; min-height:100vh; display:flex; flex-direction:column; }
+    #sidebarMenu.offcanvas-start{ width:250px; }
+    #sidebarMenu .nav-link{ font-size:.9rem; padding:8px 12px; display:flex; align-items:center; gap:8px; color:#333; transition:color .3s; }
+    #sidebarMenu .nav-link.active{ font-weight:700; color:#97144D !important; background:#f0d7e0; border-radius:4px; }
+    #sidebarMenu .nav-link:hover{ color:#7a0f3e; background:#f9e5ef; border-radius:4px; }
+ 
+    .top-bar{ background:#97144D; color:#fff; display:flex; align-items:center; gap:12px; padding:10px 20px; position:sticky; top:0; z-index:1030; }
+    .logout-btn{ background:transparent; border:1.5px solid #fff; color:#fff; padding:5px 15px; border-radius:4px; font-weight:600; }
+    .logout-btn:hover{ background:#fff; color:#97144D; }
+    .btn-outline-light{ border:1.5px solid #fff; color:#fff; }
+ 
+    .nav-tabs .nav-link{ color:#97144D; font-weight:600; }
+    .nav-tabs .nav-link.active{ background:#97144D; color:#fff; border-color:#97144D #97144D #fff; }
+ 
+    .card-item{ background:#fff; border-radius:8px; padding:20px; margin-top:20px; box-shadow:0 0 8px rgba(0,0,0,.1); }
+    .card-left{ border-right:1px solid #ddd; padding-right:20px; }
+    .label{ font-weight:600; color:#444; }
+    .value{ font-size:1.05rem; color:#97144D; font-weight:700; }
+    .badges .badge{ font-size:.8rem; }
+    @media (max-width:576px){ .card-left{ border-right:none; padding-right:0; margin-bottom:15px; } }
+    footer.bg-custom{ background:#97144D; }
+  </style>
+</head>
+<body>
+ 
+<!-- Sidebar -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="sidebarMenuLabel">DigiBank</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+  </div>
+  <div class="offcanvas-body">
+    <ul class="nav flex-column">
+      <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('dashboard') }}"><i class="bi bi-speedometer2 me-2"></i> Home</a></li>
+      <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('viewaccounts') }}"><i class="bi bi-person-lines-fill me-2"></i> View Accounts</a></li>
+      <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('Txnhistory') }}"><i class="bi bi-clock-history me-2"></i> Transaction History</a></li>
+      <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('accountbal') }}"><i class="bi bi-wallet2 me-2"></i> Check Balance</a></li>
+      <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('quicktransfer') }}"><i class="bi bi-send me-2"></i> Quick Transfer</a></li>
+      <li class="nav-item mb-2"><a class="nav-link text-dark active" href="{{ url_for('view_cards') }}"><i class="bi bi-credit-card me-2"></i> My Cards</a></li>
+    </ul>
+  </div>
+</div>
+ 
+<!-- Top Bar -->
+<div class="top-bar">
+  <button class="btn btn-outline-light btn-sm" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"><i class="bi bi-list"></i></button>
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background:#97144D; width:100%;">
+    <div class="container-fluid">
+      <div class="collapse navbar-collapse">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">My Activities</a></li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Open Account</a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Savings Account</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Salary Account</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Current Account</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Safe Custody Account</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Pension Account</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('open_account') }}">PMJDY Account</a></li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Deposits</a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Digital Fixed Deposits</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Fixed Deposits</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Recurring Deposits</a></li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Cards</a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{{ url_for('open_cards', preset='credit') }}">Credit Cards</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('open_cards', preset='debit') }}">Debit Cards</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('open_cards', preset='prepaid') }}">Prepaid Cards</a></li>
+            </ul>
+          </li>
+        </ul>
+        <div class="d-flex align-items-center">
+          <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name if user else '' }}!</h5>
+          <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</div>
+ 
+<div class="container mt-4">
+  <ul class="nav nav-tabs" id="accountTabs" role="tablist">
+    <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('viewaccounts') }}">My Accounts</a></li>
+    <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('viewdeposits') }}">My Deposits</a></li>
+    <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#cards-tab" type="button">My Cards</button></li>
+  </ul>
+ 
+  <div class="tab-content mt-3">
+    <div class="tab-pane fade show active" id="cards-tab">
+      {% if cards %}
+        {% for c in cards %}
+          <div class="card-item d-flex flex-wrap justify-content-between align-items-center">
+            <div class="card-left col-md-7 col-12">
+             
+              <div class="mb-1">
+                <span class="label">Card:</span>
+                <span class="value">{{ c.card_type_label }}{% if c.card_subtype %} ({{ c.card_subtype }}){% endif %}</span>
+                <span class="ms-2 badges">
+                  <span class="badge
+                    {% if c.status_label == 'Issued' %}bg-primary
+                    {% elif c.status_label == 'Approved' %}bg-success
+                    {% elif c.status_label == 'Pending' %}bg-warning text-dark
+                    {% elif c.status_label == 'Declined' %}bg-danger
+                    {% else %}bg-secondary{% endif %}">
+                    {{ c.status_label }}
+                  </span>
+                </span>
+              </div>
+             
+              <div class="mb-1"><span class="label">Card Number:</span> <span class="value">{{ c.card_number_fmt }}</span></div>
+            </div>
+ 
+            <div class="col-md-5 col-12 text-md-end mt-3 mt-md-0">
+              <div class="mb-1"><span class="label">CVV:</span> <span class="value">{{ c.cvv }}</span></div>
+              <div class="mb-1">
+                <span class="label">Limit Utilized:</span>
+                <span class="value">₹ {{ "%0.2f"|format(c.limit_utilized or 0) }}</span>
+              </div>
+             
+              {% if c.status == 'issued' and c.card_number %}
+                <div class="text-muted small">Issued on: {{ (c.updated_at or c.created_at).strftime('%Y-%m-%d %H:%M') if (c.updated_at or c.created_at) else '' }}</div>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="alert alert-info mt-3">No cards found for your profile.</div>
+      {% endif %}
+    </div>
+  </div>
+ 
+  <footer class="text-white text-center py-3 mt-5 bg-custom">© 2025 DigiBank. All rights reserved.</footer>
+</div>
+ 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+ 

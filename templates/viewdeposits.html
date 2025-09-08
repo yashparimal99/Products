@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-
+ 
 <head>
   <meta charset="UTF-8" />
   <title>My Accounts - DigiBank</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+ 
   <!-- Bootstrap CSS & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-
+ 
   <style>
     body {
       background-color: #f8f9fa;
       font-family: 'Segoe UI', sans-serif;
     }
-
+ 
     .topbar {
       background-color: white;
       padding: 15px 20px;
@@ -24,16 +24,16 @@
       align-items: center;
       justify-content: space-between;
     }
-
+ 
     /* Compact Sidebar Offcanvas */
     #sidebarMenu.offcanvas-start {
       width: 250px;
     }
-
+ 
     #sidebarMenu .offcanvas-body {
       padding: 0.5rem 1rem;
     }
-
+ 
     #sidebarMenu .nav-link {
       font-size: 0.9rem;
       padding: 8px 12px;
@@ -43,35 +43,35 @@
       color: #333;
       transition: color 0.3s;
     }
-
+ 
     #sidebarMenu .nav-link i {
       font-size: 1.1rem;
     }
-
+ 
     #sidebarMenu .nav-link.active {
       font-weight: 700;
       color: #97144D !important;
       background-color: #f0d7e0;
       border-radius: 4px;
     }
-
+ 
     #sidebarMenu .nav-link:hover {
       color: #7a0f3e;
       background-color: #f9e5ef;
       border-radius: 4px;
     }
-
+ 
     .nav-tabs .nav-link {
       color: #97144D;
       font-weight: 600;
     }
-
+ 
     .nav-tabs .nav-link.active {
       background-color: #97144D;
       color: white;
       border-color: #97144D #97144D #fff;
     }
-
+ 
     .account-info-section {
       background: white;
       border-radius: 8px;
@@ -79,23 +79,23 @@
       margin-top: 30px;
       box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
     }
-
+ 
     .account-info-left {
       border-right: 1px solid #ddd;
       padding-right: 20px;
     }
-
+ 
     .account-label {
       font-weight: 600;
       color: #444;
     }
-
+ 
     .account-value {
       font-size: 1.1rem;
       color: #97144D;
       font-weight: 700;
     }
-
+ 
     @media (max-width: 576px) {
       .account-info-left {
         border-right: none;
@@ -115,16 +115,16 @@
       flex-direction: column;
       height: 100vh;
     }
-
+ 
     /* Sidebar Offcanvas */
     #sidebarMenu.offcanvas-start {
       width: 250px;
     }
-
+ 
     #sidebarMenu .offcanvas-body {
       padding: 0.5rem 1rem;
     }
-
+ 
     #sidebarMenu .nav-link {
       font-size: 0.9rem;
       padding: 8px 12px;
@@ -134,24 +134,24 @@
       color: #333;
       transition: color 0.3s;
     }
-
+ 
     #sidebarMenu .nav-link i {
       font-size: 1.1rem;
     }
-
+ 
     #sidebarMenu .nav-link.active {
       font-weight: 700;
       color: #97144D !important;
       background-color: #f0d7e0;
       border-radius: 4px;
     }
-
+ 
     #sidebarMenu .nav-link:hover {
       color: #7a0f3e;
       background-color: #f9e5ef;
       border-radius: 4px;
     }
-
+ 
     .top-bar button.btn-outline-light {
       border: 1.5px solid white;
       color: white;
@@ -162,13 +162,13 @@
       cursor: pointer;
       transition: background-color 0.2s, color 0.2s;
     }
-
+ 
     .top-bar button.btn-outline-light:hover {
       background-color: white;
       color: #97144D;
     }
-
-
+ 
+ 
     /* Top Bar */
     .top-bar {
       background-color: #97144D;
@@ -182,7 +182,7 @@
       top: 0;
       z-index: 1030;
     }
-
+ 
     .top-bar h5 {
       margin: 0;
       font-weight: 700;
@@ -190,7 +190,7 @@
       text-align: center;
       color: white;
     }
-
+ 
     .logout-btn {
       background: transparent;
       border: 1.5px solid white;
@@ -202,12 +202,12 @@
       transition: background-color 0.2s, color 0.2s;
       flex-shrink: 0;
     }
-
+ 
     .logout-btn:hover {
       background-color: white;
       color: #97144D;
     }
-
+ 
     /* Search Bar Row with Sidebar Toggle & Chatbot */
     .search-chatbar {
       max-width: 900px;
@@ -217,7 +217,7 @@
       align-items: center;
       gap: 15px;
     }
-
+ 
     /* Sidebar toggle button */
     .search-chatbar .btn-toggle-sidebar {
       display: flex;
@@ -234,12 +234,12 @@
       padding: 6px 8px;
       font-size: 1.3rem;
     }
-
+ 
     .search-chatbar .btn-toggle-sidebar:hover {
       border-color: #97144D;
       color: #97144D;
     }
-
+ 
     /* Search input centered and wide */
     .search-chatbar input[type="text"] {
       flex-grow: 1;
@@ -253,12 +253,12 @@
       margin: 0 auto;
       display: block;
     }
-
+ 
     .search-chatbar input[type="text"]:focus {
       border-color: #97144D;
       box-shadow: 0 0 5px rgba(151, 20, 77, 0.5);
     }
-
+ 
     /* Chatbot button right aligned */
     .search-chatbar .chatbot-btn {
       background-color: #97144D;
@@ -274,11 +274,11 @@
       font-size: 1.3rem;
       flex-shrink: 0;
     }
-
+ 
     .search-chatbar .chatbot-btn:hover {
       background-color: #7a0f3e;
     }
-
+ 
     /* Dashboard Cards */
     .dashboard-card {
       transition: 0.3s;
@@ -292,30 +292,30 @@
       border-radius: 8px;
       box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
     }
-
+ 
     .dashboard-card:hover {
       transform: translateY(-5px);
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
     }
-
+ 
     .dashboard-icon {
       font-size: 32px;
       color: #97144D;
       margin-bottom: 15px;
     }
-
+ 
     .dashboard-card h5 {
       font-weight: 600;
       margin-bottom: 10px;
     }
-
+ 
     .dashboard-card p {
       flex-grow: 1;
       font-size: 14px;
       color: #555;
       margin-bottom: 15px;
     }
-
+ 
     .btn-digibank {
       background-color: #97144D;
       color: #fff;
@@ -325,23 +325,23 @@
       border-radius: 25px;
       transition: background-color 0.3s ease;
     }
-
+ 
     .btn-digibank:hover {
       background-color: #7a0f3e;
       color: white;
     }
-
+ 
     /* Footer */
     footer.bg-custom {
       background-color: #97144D;
     }
   </style>
 </head>
-
-<body>
-
  
-
+<body>
+ 
+ 
+ 
   <!-- Sidebar Offcanvas -->
   <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
     <div class="offcanvas-header">
@@ -395,11 +395,11 @@
             <i class="bi bi-shield-lock-fill me-2"></i> Privacy & Security
           </a>
         </li>
-
+ 
       </ul>
     </div>
   </div>
-
+ 
   <!-- ---------------------------- -->
   <div class="top-bar d-flex align-items-center">
     <!-- left toggle -->
@@ -407,10 +407,10 @@
       aria-controls="sidebarMenu" aria-label="Toggle sidebar">
       <i class="bi bi-list"></i>
     </button>
-
+ 
     <!-- title wrapper with flex-grow to take center space -->
     <h5 class="m-0 text-center flex-grow-1">DigiBank User Dashboard</h5>
-
+ 
     <!-- right items grouped, placed after flex-grow -->
     <div class="d-flex align-items-center">
       <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name }} !</h5>
@@ -420,7 +420,7 @@
     </div>
   </div>
   <div class="container mt-4">
-
+ 
     <!-- Account Tabs -->
     <ul class="nav nav-tabs" id="accountTabs" role="tablist">
       <li class="nav-item" role="presentation">
@@ -440,60 +440,59 @@
           role="tab" aria-controls="investments" aria-selected="false">My Investments</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link" id="cards-tab" data-bs-toggle="tab" data-bs-target="#cards" type="button" role="tab"
-          aria-controls="cards" aria-selected="false">My Cards</button>
+        <a class="nav-link" href="{{ url_for('view_cards') }}">My Cards</a>
       </li>
     </ul>
-
-    <!-- Tab Content -->
-    <div class="tab-content mt-4" id="accountTabsContent">
-      <div class="tab-pane fade show active" id="balance" role="tabpanel" aria-labelledby="balance-tab">
-        <p>Your Deposit balance details will be displayed here.</p>
+ 
+ <!-- Account Info Section (minimal) -->
+{% if deposits %}
+  <h6 class="mt-3 mb-2 text-muted">My Deposits</h6>
+ 
+  {% for d in deposits %}
+    <div class="border rounded p-3 mb-2 d-flex flex-wrap justify-content-between align-items-center">
+      <div class="me-3">
+        <div class="fw-semibold">{{ d.account_number }}</div>
+        <div class="small text-muted">
+          {{ d.account_type }} • Rate: {{ d.interest_rate }}% • Tenure: {{ d.tenure_months }} mo
+        </div>
+        <div>
+          <span class="badge
+            {% if d.status_text == 'Pending' %} bg-warning text-dark
+            {% elif d.status_text == 'Approved' %} bg-success
+            {% else %} bg-secondary {% endif %}">
+            {{ d.status_text }}
+          </span>
+        </div>
       </div>
-      <div class="tab-pane fade" id="deposit" role="tabpanel" aria-labelledby="deposit-tab">
-        <p>Information about your deposits will be shown here.</p>
+ 
+      <div class="ms-auto text-end me-4">
+        <div class="small text-muted">Current Balance</div>
+        <div class="fw-bold">₹ {{ '{:,.2f}'.format(d.current_balance or 0) }}</div>
       </div>
-      <div class="tab-pane fade" id="borrowings" role="tabpanel" aria-labelledby="borrowings-tab">
-        <p>Details of your borrowings and loans appear here.</p>
-      </div>
-      <div class="tab-pane fade" id="investments" role="tabpanel" aria-labelledby="investments-tab">
-        <p>Your investment portfolio overview is available here.</p>
-      </div>
-      <div class="tab-pane fade" id="cards" role="tabpanel" aria-labelledby="cards-tab">
-        <p>Manage your credit/debit cards in this section.</p>
+ 
+      <div class="text-end">
+        <div class="small text-muted">
+          Maturity {% if d.maturity_date %} ({{ d.maturity_date }}){% endif %}
+        </div>
+        <div class="fw-bold">₹ {{ '{:,.2f}'.format(d.maturity_amount or 0) }}</div>
       </div>
     </div>
-
-    <!-- Account Info Section -->
-    {% if grouped_deposits %}
-    {% for account_type, deposits in grouped_deposits.items() %}
-    {% for deposit in deposits %}
-    <div class="account-info-section d-flex flex-wrap justify-content-between align-items-center">
-      <div class="account-info-left col-md-6 col-12">
-        <div><span class="account-label">Account Number:</span> <span
-            class="account-value">{{deposit.account_number}}</span></div>
-        <div><span class="account-label">Account Type:</span> <span class="account-value">{{deposit.account_type |
-            upper}}</span></div>
-      </div>
-      <div class="account-balance col-md-5 col-12 text-md-end mt-3 mt-md-0">
-        <div><span class="account-label">Account Balance:</span> <span class="account-value">₹ 00</span></div>
-      </div>
-    </div>
-    {% endfor %}
-    {% endfor %}
-    {% else %}
-    <p>No accounts found for your profile.</p>
-    {% endif %}
-
+  {% endfor %}
+{% else %}
+  <p>No deposits found for your profile.</p>
+{% endif %}
+ 
+ 
     <!-- Footer -->
     <footer class="text-white text-center py-3 mt-5" style="background-color: #97144D;">
       © 2025 DigiBank. All rights reserved.
     </footer>
-
+ 
   </div>
-
+ 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
+ 
 </html>
+ 
