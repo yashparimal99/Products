@@ -1,15 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
-  <title>Dashboard - DigiBank</title>
+  <title>Investments - DigiBank</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Bootstrap CSS & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+    }
+
+    /* Sidebar */
+    #sidebarMenu.offcanvas-start {
+      width: 250px;
+    }
+    #sidebarMenu .nav-link {
+      font-size: 0.9rem;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #333;
+      transition: color 0.3s;
+    }
+    #sidebarMenu .nav-link.active {
+      font-weight: 700;
+      color: #97144D !important;
+      background-color: #f0d7e0;
+      border-radius: 4px;
+    }
+    #sidebarMenu .nav-link:hover {
+      color: #7a0f3e;
+      background-color: #f9e5ef;
+      border-radius: 4px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 30px 0 20px 0;
+    }
+    .section-header h5 {
+      color: #97144D;
+      font-weight: 700;
+      margin: 0;
+    }
+    .section-header p {
+      margin: 0 10px 0 0;
+      color: #555;
+      font-size: 0.9rem;
+    }
+    .section-header button {
+      background: none;
+      border: none;
+      color: #97144D;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .investment-card {
+      height: 230px;
+      background-color: #f8f9fa;
+      border-radius: 12px;
+      border: 1px solid #7a0f3e;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 10px;
+      transition: transform 0.2s ease;
+    }
+    .investment-icon {
+      width: 60px;
+      height: 60px;
+      border: 2px solid #97144D;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+    }
+    .investment-icon i {
+      font-size: 28px;
+      color: #97144D;
+    }
+    .investment-title {
+      font-weight: 600;
+      font-size: 15px;
+      color: #333;
+    }
+    .btn-apply {
+      background-color: #97144D;
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      font-size: 14px;
+      border-radius: 8px;
+      align-self: center;
+    }
+    .btn-apply:hover {
+      background-color: #7e103f;
+    }
+  </style>
   <style>
     body {
       background-color: #f8f9fa;
@@ -243,13 +344,12 @@
     }
   </style>
 </head>
-
 <body>
 
-  <!-- Sidebar Offcanvas -->
+<!-- Sidebar Offcanvas -->
   <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
     <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="sidebarMenuLabel">Welcome, {{ user.name }} ! ({{user.role}})</h5>
+      <h5 class="offcanvas-title" id="sidebarMenuLabel">Welcome,{{ user.name }} ! ({{user.role}}) </h5>
       <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
@@ -398,7 +498,7 @@
             </li>
           </ul>
           <div class="d-flex align-items-center">
-            <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name }} ! ({{user.role}})</h5>
+            <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name }} ! ({{user.role}}) </h5>
             <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">
               Logout
             </a>
@@ -415,101 +515,82 @@
 
   </div>
 
+  <nav aria-label="breadcrumb" style="background-color:#f8f9fa; padding:8px 15px; border-radius:4px; margin:10px 20px;">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#97144D;">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page" style="color:#97144D; font-weight:bold;"> Investments
+      </li>
+    </ol>
+  </nav>
 
 
+<div class="container">
 
-
-
-  <!-- Search Bar and Chatbot with Sidebar Toggle -->
-  <div class="search-chatbar">
-    <input type="text" placeholder="Search..." aria-label="Search" />
-    <button class="chatbot-btn" aria-label="Chatbot">
-      <i class="bi bi-chat-dots-fill"></i>
+  <!-- Carousel -->
+  <!-- <div id="investmentCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner rounded">
+      <div class="carousel-item active">
+        <img src="{{ url_for('static', filename='User Dashboard/investment/invest1.jpg') }}" class="d-block w-100" alt="Investment Banner 1" style="height: 300px; object-fit: cover;">
+      </div>
+      <div class="carousel-item">
+        <img src="{{ url_for('static', filename='User Dashboard/investment/invest2.jpg') }}" class="d-block w-100" alt="Investment Banner 2" style="height: 300px; object-fit: cover;">
+      </div>
+      <div class="carousel-item">
+        <img src="{{ url_for('static', filename='User Dashboard/investment/invest3.jpg') }}" class="d-block w-100" alt="Investment Banner 3" style="height: 300px; object-fit: cover;">
+      </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#investmentCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
     </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#investmentCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div> -->
+
+  <!-- Section -->
+  <div class="section-header">
+    <h5>My Investments</h5>
+    <!-- <div class="d-flex align-items-center">
+      <p class="mb-0">Explore and manage your investment options</p>
+      <button aria-label="More options"><i class="bi bi-arrow-right-circle-fill"></i></button>
+    </div> -->
   </div>
 
-  <!-- Dashboard Content -->
-  <div class="container my-4 flex-grow-1">
-    <h3 class="mb-4 text-center">User Dashboard</h3>
-    <div class="row g-4 justify-content-center">
-
-      <!-- Accounts -->
-      <div class="col-md-4 col-sm-6">
-        <div class="card dashboard-card p-4 text-center">
-          <i class="bi bi-wallet2 dashboard-icon mb-2"></i>
-          <h5>Accounts</h5>
-          <p>View and manage your savings or current accounts.</p>
-          <a href="{{ url_for('viewaccounts') }}" class="btn btn-digibank">View Accounts</a>
-        </div>
+  <!-- Investment Cards -->
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="investment-card">
+        <div class="investment-icon"><i class="bi bi-bank2"></i></div>
+        <div class="investment-title">Public Provident Fund (PPF)</div>
+        <a class="btn-apply" href="{{ url_for('userpfform') }}">Invest Now</a>
       </div>
-
-      <!-- Loans -->
-      <div class="col-md-4 col-sm-6">
-        <div class="card dashboard-card p-4 text-center">
-          <i class="bi bi-cash-stack dashboard-icon mb-2"></i>
-          <h5>Loans</h5>
-          <p>Check your loan details, EMIs, and apply for new loans.</p>
-          <a href="{{ url_for('userdashloan') }}" class="btn btn-digibank">Loan Details</a>
-        </div>
+    </div>
+    <div class="col-md-4">
+      <div class="investment-card">
+        <div class="investment-icon"><i class="bi bi-cash-stack"></i></div>
+        <div class="investment-title">Floating Rate Saving Bonds</div>
+        <a class="btn-apply" href="{{ url_for('userpfform') }}">Invest Now</a>
       </div>
-
-      <!-- Transaction History -->
-      <div class="col-md-4 col-sm-6">
-        <div class="card dashboard-card p-4 text-center">
-          <i class="bi bi-clock-history dashboard-icon mb-2"></i>
-          <h5>Transaction History</h5>
-          <p>Review all past transactions and download statements.</p>
-          <a href="{{ url_for('Txnhistory') }}" class="btn btn-digibank">View History</a>
-        </div>
+    </div>
+    <div class="col-md-4">
+      <div class="investment-card">
+        <div class="investment-icon"><i class="bi bi-person-badge-fill"></i></div>
+        <div class="investment-title">National Pension System (NPS)</div>
+        <a class="btn-apply" href="{{ url_for('userpfform') }}">Invest Now</a>
       </div>
-
-      <!-- Check Balance -->
-      <div class="col-md-4 col-sm-6">
-        <div class="card dashboard-card p-4 text-center">
-          <i class="bi bi-currency-rupee dashboard-icon mb-2"></i>
-          <h5>Check Balance</h5>
-          <p>Get real-time account balance updates.</p>
-          <a href="{{ url_for('accountbal') }}" class="btn btn-digibank">Check Now</a>
-        </div>
-      </div>
-
-      <!-- Rewards -->
-      <div class="col-md-4 col-sm-6">
-        <div class="card dashboard-card p-4 text-center">
-          <i class="bi bi-person dashboard-icon mb-2"></i>
-          <h5>Profile</h5>
-          <p>View your profile details and update profile.</p>
-          <a href="{{ url_for('profile') }}" class="btn btn-digibank">View Profile</a>
-        </div>
-      </div>
-
-      <!-- Pay Bills -->
-      <div class="col-md-4 col-sm-6">
-        <div class="card dashboard-card p-4 text-center">
-          <i class="bi bi-receipt dashboard-icon mb-2"></i>
-          <h5>Pay Bills</h5>
-          <p>Pay utility bills, credit card bills, and more.</p>
-          <a href="{{ url_for('paybill') }}" class="btn btn-digibank">Pay Now</a>
-        </div>
-      </div>
-
     </div>
   </div>
+</div>
 
-  <!-- Footer -->
-  <footer class="bg-custom text-white text-center py-3 mt-auto" style="background-color: #97144D;">
-    © 2025 DigiBank. All rights reserved.
-  </footer>
+<!-- Footer -->
+<footer class="text-white text-center py-3 mt-5" style="background-color: #97144D;">
+  © 2025 DigiBank. All rights reserved.
+</footer>
 
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-  <script>
-    function logout() {
-      alert("Logout clicked! Implement logout logic here.");
-      // e.g. window.location.href = "login.html";
-    }
-  </script>
 </body>
-
 </html>

@@ -184,6 +184,20 @@
     .search-chatbar .chatbot-btn:hover {
       background-color: #7a0f3e;
     }
+    .breadcrumb {
+      margin-bottom: 0;
+    }
+    .breadcrumb .active {
+      color: #97144D;
+      font-weight: 500;
+    }
+    .breadcrumb a {
+      text-decoration: none;
+      color: #97144D;
+    }
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
  
     /* Dashboard Cards */
     .dashboard-card {
@@ -440,11 +454,12 @@
 
 
   <!-- Breadcrumb -->
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#961F53;">Dashboard</a></li>
-      <li class="breadcrumb-item active"><a href="{{ url_for('profile') }}"
-          style="color:#961F53; font-weight: bold;">User Profile</a></li>
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" style="background-color:#f8f9fa; padding:8px 15px; border-radius:4px; margin:10px 20px;">
+    <ol class="breadcrumb mt-0">
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#97144D;">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page" style="color:#97144D; font-weight:bold;"> Update Profile
+      </li>
     </ol>
   </nav>
 

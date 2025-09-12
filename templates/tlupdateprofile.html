@@ -264,167 +264,31 @@
  
 <body>
  
-  <!-- Sidebar Offcanvas -->
-  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
-    <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="sidebarMenuLabel">User</h5>
-      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D;">
+  <div class="container-fluid">
+    <!-- Left: Bank Logo -->
+    <a class="navbar-brand d-flex align-items-center" href="#">
+      <img src="{{ url_for('static', filename='images/Digilogo.jpg') }}" alt="Bank Logo"
+        style="height: 40px; margin-right: 10px;">
+    </a>
+
+    <!-- Center: Title -->
+    <div class="mx-auto text-white fw-bold fs-5">
+      Teamlead Dashboard
     </div>
-    <div class="offcanvas-body">
-      <ul class="nav flex-column">
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark active" href="userdashboard.html">
-            <i class="bi bi-speedometer2 me-2"></i> Home
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="{{ url_for('viewaccounts') }}">
-            <i class="bi bi-person-lines-fill me-2"></i> View Accounts
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="loans.html">
-            <i class="bi bi-cash-coin me-2"></i> Loans
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="transactions.html">
-            <i class="bi bi-clock-history me-2"></i> Transaction History
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="balance.html">
-            <i class="bi bi-wallet2 me-2"></i> Check Balance
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="rewards.html">
-            <i class="bi bi-gift-fill me-2"></i> Rewards
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="paybill.html">
-            <i class="bi bi-credit-card me-2"></i> Pay Bill
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="#">
-            <i class="bi bi-person-rolodex me-2"></i> Get Contact
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="#">
-            <i class="bi bi-shield-lock-fill me-2"></i> Privacy & Security
-          </a>
-        </li>
- 
-      </ul>
+
+    <!-- Right: Welcome + Logout -->
+    <div class="d-flex align-items-center">
+      <span class="text-white me-3 fw-semibold">
+        Welcome, {{ user.email }} !
+      </span>
+      <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">
+        Logout
+      </a>
     </div>
   </div>
- 
-  <!-- ---------------------------- -->
-  <div class="top-bar d-flex align-items-center">
-    <!-- left toggle -->
-    <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
-      aria-controls="sidebarMenu" aria-label="Toggle sidebar">
-      <i class="bi bi-list"></i>
-    </button>
- 
-    <!-- title wrapper with flex-grow to take center space -->
-    <!-- <h5 class="m-0 text-center flex-grow-1">DigiBank User Dashboard</h5> -->
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important; width: 100%;">
-      <div class="container-fluid">
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <!-- <li class="nav-item"><a class="nav-link active" href="{{ url_for('home') }}">Home</a></li> -->
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">My Activities</a>
-            </li>
-            <!-- Open Account Dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Open Account</a>
-              <ul class="dropdown-menu" aria-labelledby="accountDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('savingform') }}">Savings
-                    Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Salary Account</a>
-                </li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Current
-                    Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Safe Custody
-                    Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Pension
-                    Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">PMJDY Account</a>
-                </li>
-              </ul>
-            </li>
-            <!-- Deposits Dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Deposits</a>
-              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Digital Fixed
-                    Deposits</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Fixed
-                    Deposits</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Recurring
-                    Deposits</a></li>
-              </ul>
-            </li>
-            <!-- Deposits Dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Loans</a>
-              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Home Loan</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Personal Loan</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Busniness Loan</a></li>
- 
- 
-              </ul>
-            </li>
-            <!-- Deposits Dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Cards</a>
-              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Credit Cards</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Debit Cards</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Prepaid Cards</a></li>
-              </ul>
-            </li>
-            <!-- Deposits Dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Forex</a>
-              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Travel Forex Cards</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Send Money Abroad</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Send Money India</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Foregin Currency Exchange</a></li>
-              </ul>
-            </li>
-            <!-- Deposits Dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Investments</a>
-              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Public Provident Fund</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Floating Rate Saving Bonds</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">National Pension System</a></li>
-              </ul>
-            </li>
-          </ul>
-          <div class="d-flex align-items-center">
-            <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name }} !</h5>
-            <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">
-              Logout
-            </a>
-          </div>
-         
-        </div>
-      </div>
-    </nav>
+</nav>
     <!-- End of custom navbar -->
  
   </div>
@@ -440,19 +304,20 @@
 
 
   <!-- Breadcrumb -->
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#961F53;">Dashboard</a></li>
-      <li class="breadcrumb-item active"><a href="{{ url_for('profile') }}"
-          style="color:#961F53; font-weight: bold;">User Profile</a></li>
-    </ol>
-  </nav>
+  <nav aria-label="breadcrumb"
+        style="background-color:#f8f9fa; padding:8px 15px; border-radius:4px; margin:10px 20px;">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#97144D;">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page" style="color:#97144D; font-weight:bold;"> Update Profile
+            </li>
+        </ol>
+    </nav>
 
   <!-- Content -->
   <div class="container my-5">
     <h3 class="mb-4" style="color: #97144D;">User Details</h3>
 
-    <form action="{{ url_for('update_profile') }}" method="post" id="userForm" novalidate>
+    <form action="{{ url_for('tlupdate_profile') }}" method="post" id="userForm" novalidate>
 
       <!-- keep a copy of original mobile for change-detection -->
       <input type="hidden" id="origMobile" value="{{ user.mobile or '' }}">

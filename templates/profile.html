@@ -433,7 +433,12 @@
  
   </div>
  
- 
+ <nav aria-label="breadcrumb" style="background-color:#f8f9fa; padding:8px 15px; border-radius:4px; margin:10px 20px;">
+  <ol class="breadcrumb mb-0">
+    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#97144D;">Home</a></li>
+    <li class="breadcrumb-item active" aria-current="page" style="color:#97144D; font-weight:bold;"> Profile</li>
+  </ol>
+</nav>
  
  
  
@@ -447,65 +452,126 @@
   <form action="#" method="post">
  
     <div class="row mb-3">
-      <div class="col-md-6">
+      <div class="col-md-4">
         <label for="firstName" class="form-label">Name</label>
         <input type="text" id="firstName" name="name" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.name }}"  readonly>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-4">
         <label for="middleName" class="form-label">Customer ID</label>
         <input type="text" id="middleName" name="cid" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.user_id }}" readonly>
       </div>
-    </div>
- 
-    <div class="row mb-3">
-      <div class="col-md-6">
-        <label for="lastName" class="form-label">PAN</label>
+      <div class="col-md-4">
+         <label for="lastName" class="form-label">PAN</label>
         <input type="text" id="lastName" name="pan" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.pan }}" readonly>
       </div>
-      <div class="col-md-6">
-        <label for="mobileNumber" class="form-label">Mobile Number</label>
-        <input type="tel" id="mobileNumber" name="mobile_no" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.mobile_no }}" readonly>
-      </div>
     </div>
  
     <div class="row mb-3">
-      <div class="col-md-6">
+      
+      <div class="col-md-4">
+        <label for="mobileNumber" class="form-label">Mobile Number</label>
+        <input type="tel" id="mobileNumber" name="mobile_no" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.mobile }}" readonly>
+      </div>
+      <div class="col-md-4">
         <label for="emailAddress" class="form-label">Email Address</label>
         <input type="email" id="emailAddress" name="email" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.email }}" readonly>
       </div>
-      <div class="col-md-6">
-        <label for="panNumber" class="form-label">Role</label>
-        <input type="text" id="panNumber" name="role" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.role }}" readonly>
-      </div>
-    </div>
- 
-    <div class="row mb-3">
-      <div class="col-md-6">
+      <div class="col-md-4">
         <label for="aadharNumber" class="form-label">Aadhar Number</label>
-        <input type="text" id="aadharNumber" name="aadhar_number" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.addhar }}" readonly>
-      </div>
-      <div class="col-md-6">
-        <label for="userId" class="form-label">User ID</label>
-        <input type="text" id="userId" name="user_id" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.user_id }}" readonly>
+        <input type="text" id="aadharNumber" name="aadhar_number" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.aadhaar }}" readonly>
       </div>
     </div>
  
     <div class="row mb-3">
-      <div class="col-md-6">
-        <label for="role" class="form-label">Role</label>
-        <input type="text" id="role" name="role" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.department }}" readonly>
+      <div class="col-md-4">
+        <label for="role" class="form-label">Date of Birth</label>
+        <input type="text" id="role" name="role" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.dob }}" readonly>
       </div>
-      <div class="col-md-6">
-        <!-- Empty column to maintain 2-column layout -->
+      <div class="col-md-4">
+        <label for="role" class="form-label">Gender</label>
+        <input type="text" id="gender" name="gender" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.gender }}" readonly>
       </div>
+      <div class="col-md-4">
+        <label for="role" class="form-label">User Created at</label>
+        <input type="text" id="gender" name="gender" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.onboarding_date }}" readonly>
+      </div>
+      
     </div>
+
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label for="role" class="form-label">City</label>
+        <input type="text" id="role" name="role" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.city }}" readonly>
+      </div>
+      <div class="col-md-4">
+        <label for="role" class="form-label">State</label>
+        <input type="text" id="gender" name="gender" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.state }}" readonly>
+      </div>
+      <div class="col-md-4">
+        <label for="role" class="form-label">Country</label>
+        <input type="text" id="gender" name="gender" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.country }}" readonly>
+      </div>
+      
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label for="role" class="form-label">Status</label>
+        <input type="text" id="role" name="role" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.status }}" readonly>
+      </div>
+      <div class="col-md-4">
+        <label for="role" class="form-label">Role</label>
+        <input type="text" id="gender" name="gender" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.role }}" readonly>
+      </div>
+      <div class="col-md-4 position-relative">
+          <label class="form-label">Password</label>
+          <div class="input-group">
+            <input type="password" id="passwordField" class="form-control" style="border:0.5px solid #97144D;"
+              value="{{ user.password }}" readonly>
+            <button type="button" class="btn btn-outline-secondary" style="border:0.5px solid #97144D;"  onclick="togglePassword()" tabindex="-1">
+              <i id="toggleIcon" class="bi bi-eye"></i>
+            </button>
+          </div>
+        </div>
+      
+    </div>
+    <script>
+  function togglePassword() {
+    const passwordField = document.getElementById("passwordField");
+    const toggleIcon = document.getElementById("toggleIcon");
+
+    if (passwordField.type === "password") {
+      passwordField.type = "text";
+      toggleIcon.classList.remove("bi-eye");
+      toggleIcon.classList.add("bi-eye-slash");
+    } else {
+      passwordField.type = "password";
+      toggleIcon.classList.remove("bi-eye-slash");
+      toggleIcon.classList.add("bi-eye");
+    }
+  }
+</script>
  
     <div class="row mb-3">
       <div class="col-12">
         <label for="address" class="form-label">Address</label>
-        <textarea id="address" name="address" class="form-control" rows="3" style="border: 0.5px solid #97144D;" readonly>Siddhi More, 123 Street Name, City, State, India</textarea>
-      </div>
+        <textarea id="address" name="address" class="form-control" rows="3" style="border: 0.5px solid #97144D;" readonly>{{ user.address }}</textarea>
+
+        </div>
     </div>
+
+    <div class="mt-5 d-flex justify-content-center">
+      <a href="{{ url_for('update_profile') }}" class="btn px-4 py-2" style="background-color:#97144D; border:none; color:white; font-weight:600;">
+        Edit Details
+      </a>
+    </div>
+
+    <!-- <div class="d-flex justify-content-center mt-3">
+          <button id="saveBtn" type="submit" class="btn px-4 py-2"
+            style="background-color:#97144D; border:none; color:white; font-weight:600;">
+            Save Changes
+          </button>
+        </div> -->
  
   </form>
 </div>

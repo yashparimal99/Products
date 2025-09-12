@@ -460,79 +460,83 @@
    
   </div>
   <!-- Breadcrumb -->
-  <nav aria-label="breadcrumb" class="breadcrumb-nav">
-    <ol class="breadcrumb container mb-0">
-      <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
-      <li class="breadcrumb-item"><a href="{{ url_for('paybill') }}">Paybill</a></li>
  
-      <li class="breadcrumb-item"><a href="{{ url_for('deposit') }}">Deposit</a></li>
- 
-      <!-- <li class="breadcrumb-item active" aria-current="page">Login</li> -->
-    </ol>
-  </nav>
 </nav>
  
- 
-        <div class="container my-5">
-    <!-- <h3 class="text-danger mb-4">Account Opening Form</h3> -->
-    <h3 class="mb-4" style="color: #97144D;">Deposit Money</h3>
- 
-<form action="{{ url_for('deposit') }}" method="POST">
-  <div class="row mb-3">
-    <label for="fromAcc" class="col-sm-2 col-form-label">From Account</label>
-    <div class="col-sm-4">
-      <select id="fromAcc" name="from_account" class="form-select" required>
-        <option value="" disabled selected>Select From Account</option>
-        {% for acc in accounts %}
-          <option value="{{ acc.account_number }}">
-            {{ acc.account_type }} - {{ acc.account_number }}
-          </option>
-        {% endfor %}
-      </select>
-    </div>
- 
-    <label for="toAcc" class="col-sm-2 col-form-label">To Account</label>
-    <div class="col-sm-4">
-      <input type="text" id="toAcc" name="to_account" class="form-control" required>
+<nav aria-label="breadcrumb" style="background-color:#f8f9fa; padding:8px 15px; border-radius:4px; margin:10px 20px;">
+  <ol class="breadcrumb mb-0">
+    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#97144D;">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('paybill') }}" style="color:#97144D;">Paybill</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page" style="color:#97144D; font-weight:bold;">Transactions</li>
+  </ol>
+</nav>
+ <div class="container my-4">
+  <div class="balance-box">
+    <h5 class="mb-4" style="color:#97144D; font-weight:700; font-size: 24px;">Deposit Money</h5>
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <form action="{{ url_for('deposit') }}" method="POST" id="depositForm" novalidate>
+          
+          <div class="row mb-3">
+            <label for="fromAcc" class="col-sm-2 col-form-label">From Account</label>
+            <div class="col-sm-4">
+              <select id="fromAcc" name="from_account" class="form-select" required>
+                <option value="" disabled selected>Select From Account</option>
+                {% for acc in accounts %}
+                  <option value="{{ acc.account_number }}">
+                    {{ acc.account_type|capitalize }} - {{ acc.account_number }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <label for="toAcc" class="col-sm-2 col-form-label">To Account</label>
+            <div class="col-sm-4">
+              <input type="text" id="toAcc" name="to_account" class="form-control" required>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <label for="reToAcc" class="col-sm-2 col-form-label">Re-Enter Account No</label>
+            <div class="col-sm-4">
+              <input type="text" id="reToAcc" name="re_to_account" class="form-control" required>
+            </div>
+
+            <label for="amount" class="col-sm-2 col-form-label">Amount (₹)</label>
+            <div class="col-sm-4">
+              <input type="number" id="amount" name="amount" step="0.01" min="0.01" class="form-control" required>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <label for="remark" class="col-sm-2 col-form-label">Remark</label>
+            <div class="col-sm-10">
+              <input type="text" id="remark" name="remark" maxlength="255" class="form-control" placeholder="(optional)">
+            </div>
+          </div>
+
+          <div class="text-center">
+            <button type="submit" class="btn-submit btn px-4" style="background-color:#97144D; color:#fff; border:none;">
+              Deposit Amount
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
- 
-  <div class="row mb-3">
-    <label for="reToAcc" class="col-sm-2 col-form-label">Re-Enter Account No</label>
-    <div class="col-sm-4">
-      <input type="text" id="reToAcc" name="re_to_account" class="form-control" required>
-    </div>
- 
-    <label for="amount" class="col-sm-2 col-form-label">Amount</label>
-    <div class="col-sm-4">
-      <input type="number" id="amount" name="amount" class="form-control" step="0.01" required>
-    </div>
-  </div>
- 
-  <div class="row mb-3">
-    <label for="remark" class="col-sm-2 col-form-label">Remark</label>
-    <div class="col-sm-10">
-      <input type="text" id="remark" name="remark" class="form-control">
-    </div>
-  </div>
- 
-  <div class="row">
-    <div class="col-sm-12 text-center">
-      <button type="submit" class="btn btn-primary" style="background-color:#97144D;">Deposit Amount</button>
-    </div>
-  </div>
-</form>
-        </div>
- 
-    <!-- </div>
-  </div> -->
+
+  <!-- Flash messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    {% for category, message in messages %}
-      <div class="alert alert-{{ category }}">{{ message }}</div>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} mt-3">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+</div>
+
  
  
   <!-- Footer -->

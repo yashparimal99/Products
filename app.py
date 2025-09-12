@@ -506,16 +506,23 @@ def generate_card_number(card_subtype):
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        name = request.form['fname']
+        name = request.form['name']
         pan = request.form['pan']
         email = request.form['email']
-        mobile_no = request.form['mn']
+        dob = request.form['dob']
+        aadhaar = request.form['aadhaar']
+        gender = request.form['gender']
+        mobile = request.form['mobile']
         password = request.form['password']
+        city = request.form['city']
+        state = request.form['state']
+        country = request.form['country']
+        onboarding_date = datetime.now()
 
         cur = mysql.connection.cursor()
 
         # Check if email or mobile already exists
-        cur.execute("SELECT * FROM bank_users WHERE email = %s OR mobile_no = %s", (email, mobile_no))
+        cur.execute("SELECT * FROM bank_users WHERE email = %s OR mobile = %s", (email, mobile))
         if cur.fetchone():
             flash('Email or mobile number already registered', 'danger')
         else:
@@ -528,8 +535,8 @@ def signup():
 
             # Insert user with the generated cust_id
             cur.execute(
-                "INSERT INTO bank_users (user_id, name,pan, email, mobile_no, password) VALUES (%s, %s,%s, %s, %s, %s)",
-                (user_id, name,pan, email, mobile_no, password)
+                "INSERT INTO bank_users (user_id, name,pan,dob, email, mobile, password,aadhaar,gender,city,state,country,onboarding_date) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s)",
+                (user_id, name,pan,dob, email, mobile, password,aadhaar,gender,city,state,country,onboarding_date)
             )
             mysql.connection.commit()
             cur.close()
@@ -551,11 +558,124 @@ def profile():
     # session['cust_id'] = user['cust_id']
     # print("Logged in cust_id:", cust_id)   # debug
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute("SELECT user_id, name, pan, mobile, email,department,aadhaar FROM bank_users WHERE user_id=%s", (user_id,))
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
     user = cur.fetchone()
     cur.close()
    
     return render_template("profile.html", user=user)
+
+@app.route('/update_profile', methods=['GET', 'POST'])
+def update_profile():
+    email = session.get('user_email')
+    if not email:
+        flash('Please login first', 'danger')
+        return redirect(url_for('login'))
+ 
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+ 
+    # GET → load edit form
+    if request.method == 'GET':
+        cur.execute("""
+            SELECT user_id, name, email, mobile,
+                   COALESCE(address,'') AS address,
+                   COALESCE(city,'')    AS city,
+                   COALESCE(state,'')   AS state,
+                   COALESCE(country,'') AS country
+            FROM bank_users
+            WHERE email=%s
+        """, (email,))
+        user = cur.fetchone()
+        cur.close()
+        return render_template('updateprofile.html', user=user)
+ 
+    # POST → save changes
+    cur.execute("""
+        SELECT mobile, address, city, state, country, password
+        FROM bank_users
+        WHERE email=%s
+    """, (email,))
+    current = cur.fetchone()
+ 
+    mobile   = (request.form.get('mobile')   or '').strip()
+    address  = (request.form.get('address')  or '').strip()
+    city     = (request.form.get('city')     or '').strip()
+    state    = (request.form.get('state')    or '').strip()
+    country  = (request.form.get('country')  or '').strip()
+ 
+    curr_pw  = (request.form.get('current_password') or '').strip()
+    new_pw   = (request.form.get('new_password')     or '').strip()
+    conf_pw  = (request.form.get('confirm_password') or '').strip()
+ 
+    updates = {}
+ 
+    # Only update changed & non-empty values
+    if mobile and mobile != (current['mobile'] or ''):
+        if not (len(mobile) == 10 and mobile.isdigit()):
+            flash('Mobile must be exactly 10 digits.', 'danger')
+            cur.close()
+            return redirect(url_for('update_profile'))
+        updates['mobile'] = mobile
+    if address and address != (current['address'] or ''):
+        updates['address'] = address
+    if city and city != (current['city'] or ''):
+        updates['city'] = city
+    if state and state != (current['state'] or ''):
+        updates['state'] = state
+    if country and country != (current['country'] or ''):
+        updates['country'] = country
+ 
+    # Optional password change
+    if curr_pw or new_pw or conf_pw:
+        if not current or current['password'] != curr_pw:
+            flash('Current password is incorrect.', 'danger')
+            cur.close()
+            return redirect(url_for('update_profile'))
+        if not new_pw or new_pw != conf_pw or len(new_pw) < 8:
+            flash('New password mismatch or too short (min 8).', 'danger')
+            cur.close()
+            return redirect(url_for('update_profile'))
+        updates['password'] = new_pw
+ 
+    # Helper: human list join
+    def human_join(items):
+        if not items:
+            return ''
+        if len(items) == 1:
+            return items[0]
+        return ', '.join(items[:-1]) + ' and ' + items[-1]
+ 
+    labels = {
+        'mobile': 'mobile number',
+        'address': 'address',
+        'city': 'city',
+        'state': 'state',
+        'country': 'country',
+        'password': 'password'
+    }
+ 
+    try:
+        if updates:
+            set_clause = ", ".join([f"{k}=%s" for k in updates.keys()])
+            params = list(updates.values()) + [email]
+            cur.execute(f"UPDATE bank_users SET {set_clause} WHERE email=%s", params)
+            mysql.connection.commit()
+ 
+            changed = [labels[k] for k in updates.keys()]
+            msg = f"Updated {human_join(changed)}."
+            # Make password updates feel more “done”
+            if 'password' in updates and len(updates) == 1:
+                msg = "Password changed successfully."
+            flash(msg, 'success')
+        else:
+            flash('No changes to update.', 'info')
+ 
+    except Exception as e:
+        mysql.connection.rollback()
+        flash(f"Couldn't save your changes. Error: {e}", 'danger')
+    finally:
+        cur.close()
+ 
+    return redirect(url_for('profile'))
 
 
 
@@ -1230,7 +1350,8 @@ def dashboard():
         'tl': 'TLdashboard.html',
         'manager': 'managerdashboard.html',
         'Card_Agent': 'cardagent_dashboard.html',
-        'Loan_Agent': 'loanagent_dashboard.html'
+        'Loan_Agent': 'loanagent_dashboard.html',
+        'Invest_Agent': 'investagent_dashboard.html'
     }
 
     return render_template(templates.get(role, 'login.html'), user=user)
@@ -1544,12 +1665,14 @@ def branchperformance():
 # TL Dashboard Routes
 
 
-def generate_user_id(department):
+def generate_tluser_id(department):
     prefixes = {
         "Cards": "CA",
         "Loans": "LN",
         "Investment": "IV",
-        "Forex": "FX"
+        "Forex": "FX",
+        
+
     }
     prefix = prefixes.get(department, "AG")
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -1561,6 +1684,13 @@ def generate_user_id(department):
     # Cards Page
 @app.route('/tlcards')
 def tlcards():
+    user_id = session.get('user_id')
+    # session['cust_id'] = user['cust_id']
+    # print("Logged in cust_id:", cust_id)   # debug
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("""
         SELECT user_id, name, department, onboarding_date
@@ -1568,15 +1698,24 @@ def tlcards():
         WHERE status='active' AND department='Cards'
     """)
     agents = cur.fetchall()
-    return render_template("tlcards.html", agents=agents)
+    return render_template("tlcards.html", agents=agents,user=user)
 
  # Add User Page
 @app.route('/tladduser', methods=['GET', 'POST'])
 def tladduser():
+    user_id = session.get('user_id')
+    # session['cust_id'] = user['cust_id']
+    # print("Logged in cust_id:", cust_id)   # debug
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+
+
     if request.method == 'POST':
         data = request.form
         plain_pw = data['password']
-        user_id = generate_user_id(data['department'])
+        user_id = generate_tluser_id(data['department'])
  
         # Auto-generate email
         email = f"{user_id}@digibank.com"
@@ -1643,7 +1782,7 @@ def tladduser():
         else:
             return redirect(url_for('dashboard'))
  
-    return render_template("tladduser.html")
+    return render_template("tladduser.html",user=user)
 
 
 @app.route('/download_excel')
@@ -1657,7 +1796,7 @@ def download_excel():
     sheet.title = "Agent Details"
 
     sheet.append([
-        "ID", "Agent Id", "First Name", "Last Name", "Dob", "Gender", "Pan Card",
+        "ID", "Agent Id", "Name", "Dob", "Gender", "Pan Card",
         "Aadhaar Card", "Date of Joining", "Country", "State", "City", "Department", 
         "Status", "Onboarding Date", "Deleted Date"
     ])
@@ -1698,6 +1837,13 @@ def download_excel():
 @app.route('/tldeleteuser', methods=['GET', 'POST'])
 
 def tldeleteuser():
+    user_id = session.get('user_id')
+    # session['cust_id'] = user['cust_id']
+    # print("Logged in cust_id:", cust_id)   # debug
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
 
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
  
@@ -1749,7 +1895,131 @@ def tldeleteuser():
 
     cur.close()
  
-    return render_template("tldeleteuser.html", agents=agents)
+    return render_template("tldeleteuser.html", agents=agents,user=user)
+
+
+@app.route('/tlprofile')
+def tlprofile():
+    user_id = session.get('user_id')
+    
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    return render_template("tlprofile.html",user=user)
+
+@app.route('/tlupdate_profile', methods=['GET', 'POST'])
+def tlupdate_profile():
+    email = session.get('user_email')
+    if not email:
+        flash('Please login first', 'danger')
+        return redirect(url_for('login'))
+ 
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+ 
+    # GET → load edit form
+    if request.method == 'GET':
+        cur.execute("""
+            SELECT user_id, name, email, mobile,
+                   COALESCE(address,'') AS address,
+                   COALESCE(city,'')    AS city,
+                   COALESCE(state,'')   AS state,
+                   COALESCE(country,'') AS country
+            FROM bank_users
+            WHERE email=%s
+        """, (email,))
+        user = cur.fetchone()
+        cur.close()
+        return render_template('tlupdateprofile.html', user=user)
+ 
+    # POST → save changes
+    cur.execute("""
+        SELECT mobile, address, city, state, country, password
+        FROM bank_users
+        WHERE email=%s
+    """, (email,))
+    current = cur.fetchone()
+ 
+    mobile   = (request.form.get('mobile')   or '').strip()
+    address  = (request.form.get('address')  or '').strip()
+    city     = (request.form.get('city')     or '').strip()
+    state    = (request.form.get('state')    or '').strip()
+    country  = (request.form.get('country')  or '').strip()
+ 
+    curr_pw  = (request.form.get('current_password') or '').strip()
+    new_pw   = (request.form.get('new_password')     or '').strip()
+    conf_pw  = (request.form.get('confirm_password') or '').strip()
+ 
+    updates = {}
+ 
+    # Only update changed & non-empty values
+    if mobile and mobile != (current['mobile'] or ''):
+        if not (len(mobile) == 10 and mobile.isdigit()):
+            flash('Mobile must be exactly 10 digits.', 'danger')
+            cur.close()
+            return redirect(url_for('tlupdate_profile'))
+        updates['mobile'] = mobile
+    if address and address != (current['address'] or ''):
+        updates['address'] = address
+    if city and city != (current['city'] or ''):
+        updates['city'] = city
+    if state and state != (current['state'] or ''):
+        updates['state'] = state
+    if country and country != (current['country'] or ''):
+        updates['country'] = country
+ 
+    # Optional password change
+    if curr_pw or new_pw or conf_pw:
+        if not current or current['password'] != curr_pw:
+            flash('Current password is incorrect.', 'danger')
+            cur.close()
+            return redirect(url_for('tlupdate_profile'))
+        if not new_pw or new_pw != conf_pw or len(new_pw) < 8:
+            flash('New password mismatch or too short (min 8).', 'danger')
+            cur.close()
+            return redirect(url_for('tlupdate_profile'))
+        updates['password'] = new_pw
+ 
+    # Helper: human list join
+    def human_join(items):
+        if not items:
+            return ''
+        if len(items) == 1:
+            return items[0]
+        return ', '.join(items[:-1]) + ' and ' + items[-1]
+ 
+    labels = {
+        'mobile': 'mobile number',
+        'address': 'address',
+        'city': 'city',
+        'state': 'state',
+        'country': 'country',
+        'password': 'password'
+    }
+ 
+    try:
+        if updates:
+            set_clause = ", ".join([f"{k}=%s" for k in updates.keys()])
+            params = list(updates.values()) + [email]
+            cur.execute(f"UPDATE bank_users SET {set_clause} WHERE email=%s", params)
+            mysql.connection.commit()
+ 
+            changed = [labels[k] for k in updates.keys()]
+            msg = f"Updated {human_join(changed)}."
+            # Make password updates feel more “done”
+            if 'password' in updates and len(updates) == 1:
+                msg = "Password changed successfully."
+            flash(msg, 'success')
+        else:
+            flash('No changes to update.', 'info')
+ 
+    except Exception as e:
+        mysql.connection.rollback()
+        flash(f"Couldn't save your changes. Error: {e}", 'danger')
+    finally:
+        cur.close()
+ 
+    return redirect(url_for('tlprofile'))
 
  
 
@@ -1759,6 +2029,13 @@ def tldeleteuser():
 # Loan Page
 @app.route('/tlloan')
 def tlloan():
+    user_id = session.get('user_id')
+    # session['cust_id'] = user['cust_id']
+    # print("Logged in cust_id:", cust_id)   # debug
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("""
         SELECT user_id,name, department, onboarding_date 
@@ -1766,7 +2043,7 @@ def tlloan():
         WHERE status='active' AND department='Loans'
     """)
     agents = cur.fetchall()
-    return render_template("tlloan.html", agents=agents)
+    return render_template("tlloan.html", agents=agents,user=user)
 
 # Invest Page
 @app.route('/tlinvest')
@@ -1883,8 +2160,131 @@ def _luhn_check_digit(number_without_check: str) -> str:
  
  
  
+@app.route('/agentprofile')
+def agentprofile():
+    user_id = session.get('user_id')
+    
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    return render_template("agentprofile.html",user=user)
+
+@app.route('/agentupdate_profile', methods=['GET', 'POST'])
+def agentupdate_profile():
+    email = session.get('user_email')
+    if not email:
+        flash('Please login first', 'danger')
+        return redirect(url_for('login'))
+ 
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+ 
+    # GET → load edit form
+    if request.method == 'GET':
+        cur.execute("""
+            SELECT user_id, name, email, mobile,
+                   COALESCE(address,'') AS address,
+                   COALESCE(city,'')    AS city,
+                   COALESCE(state,'')   AS state,
+                   COALESCE(country,'') AS country
+            FROM bank_users
+            WHERE email=%s
+        """, (email,))
+        user = cur.fetchone()
+        cur.close()
+        return render_template('agentupdateprofile.html', user=user)
+ 
+    # POST → save changes
+    cur.execute("""
+        SELECT mobile, address, city, state, country, password
+        FROM bank_users
+        WHERE email=%s
+    """, (email,))
+    current = cur.fetchone()
+ 
+    mobile   = (request.form.get('mobile')   or '').strip()
+    address  = (request.form.get('address')  or '').strip()
+    city     = (request.form.get('city')     or '').strip()
+    state    = (request.form.get('state')    or '').strip()
+    country  = (request.form.get('country')  or '').strip()
+ 
+    curr_pw  = (request.form.get('current_password') or '').strip()
+    new_pw   = (request.form.get('new_password')     or '').strip()
+    conf_pw  = (request.form.get('confirm_password') or '').strip()
+ 
+    updates = {}
+ 
+    # Only update changed & non-empty values
+    if mobile and mobile != (current['mobile'] or ''):
+        if not (len(mobile) == 10 and mobile.isdigit()):
+            flash('Mobile must be exactly 10 digits.', 'danger')
+            cur.close()
+            return redirect(url_for('tlupdate_profile'))
+        updates['mobile'] = mobile
+    if address and address != (current['address'] or ''):
+        updates['address'] = address
+    if city and city != (current['city'] or ''):
+        updates['city'] = city
+    if state and state != (current['state'] or ''):
+        updates['state'] = state
+    if country and country != (current['country'] or ''):
+        updates['country'] = country
+ 
+    # Optional password change
+    if curr_pw or new_pw or conf_pw:
+        if not current or current['password'] != curr_pw:
+            flash('Current password is incorrect.', 'danger')
+            cur.close()
+            return redirect(url_for('agentupdate_profile'))
+        if not new_pw or new_pw != conf_pw or len(new_pw) < 8:
+            flash('New password mismatch or too short (min 8).', 'danger')
+            cur.close()
+            return redirect(url_for('agentupdate_profile'))
+        updates['password'] = new_pw
+ 
+    # Helper: human list join
+    def human_join(items):
+        if not items:
+            return ''
+        if len(items) == 1:
+            return items[0]
+        return ', '.join(items[:-1]) + ' and ' + items[-1]
+ 
+    labels = {
+        'mobile': 'mobile number',
+        'address': 'address',
+        'city': 'city',
+        'state': 'state',
+        'country': 'country',
+        'password': 'password'
+    }
+ 
+    try:
+        if updates:
+            set_clause = ", ".join([f"{k}=%s" for k in updates.keys()])
+            params = list(updates.values()) + [email]
+            cur.execute(f"UPDATE bank_users SET {set_clause} WHERE email=%s", params)
+            mysql.connection.commit()
+ 
+            changed = [labels[k] for k in updates.keys()]
+            msg = f"Updated {human_join(changed)}."
+            # Make password updates feel more “done”
+            if 'password' in updates and len(updates) == 1:
+                msg = "Password changed successfully."
+            flash(msg, 'success')
+        else:
+            flash('No changes to update.', 'info')
+ 
+    except Exception as e:
+        mysql.connection.rollback()
+        flash(f"Couldn't save your changes. Error: {e}", 'danger')
+    finally:
+        cur.close()
+ 
+    return redirect(url_for('agentprofile'))
  
  
+
 
 
 @app.route('/open_cards', methods=['GET', 'POST'])
@@ -2315,7 +2715,14 @@ def banktransfer():
 
 @app.route('/userdashloan')
 def userdashloan():
-    return render_template('userloand.html')
+    user_id = session.get('user_id')
+    # session['cust_id'] = user['cust_id']
+    # print("Logged in cust_id:", cust_id)   # debug
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    return render_template('userloand.html',user=user)
 
 @app.route('/homeloan')
 def homeloan():
@@ -2330,7 +2737,29 @@ def userbusinessloan():
     return render_template('userbusinessloan.html')
 
    
+#Dashboard - user->Investment
 
+@app.route('/userdashinvest')
+def userdashinvest():
+    user_id = session.get('user_id')
+    # session['cust_id'] = user['cust_id']
+    # print("Logged in cust_id:", cust_id)   # debug
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    return render_template('userdashinvest.html',user=user)
+
+@app.route('/userpfform')
+def userpfform():
+    user_id = session.get('user_id')
+    # session['cust_id'] = user['cust_id']
+    # print("Logged in cust_id:", cust_id)   # debug
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    return render_template('userpfform.html',user=user)
 
 
 
@@ -2340,19 +2769,7 @@ def logout():
 
 #Agent Dashboard(Card_Agent)
 
-@app.route('/agentprofile')
-def agentprofile():
-    user_id = session.get('user_id')
-    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute("SELECT user_id, name, pan,dob, mobile, email,city,state,country,gender,department,status,role,password,aadhaar,deleted_date FROM bank_users WHERE user_id=%s", (user_id,))
-    user = cur.fetchone()
-    cur.close()
 
-    return render_template('agentprofile.html',user=user)
-
-@app.route('/updateprofile')
-def updateprofile():
-    return render_template('updateprofile.html')
 
 @app.route('/cardapplications', methods=['GET'])
 def cardapplications():
@@ -2438,15 +2855,15 @@ def cardperformance():
 
 #Loan Agent Dashboard
 
-@app.route('/loanagentprofile')
-def loanagentprofile():
-    user_id = session.get('user_id')
-    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute("SELECT user_id, name, pan,dob, mobile, email,city,state,country,gender,department,status,role,password,aadhaar,deleted_date FROM bank_users WHERE user_id=%s", (user_id,))
-    user = cur.fetchone()
-    cur.close()
+# @app.route('/loanagentprofile')
+# def loanagentprofile():
+#     user_id = session.get('user_id')
+#     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#     cur.execute("SELECT user_id, name, pan,dob, mobile, email,city,state,country,gender,department,status,role,password,aadhaar,deleted_date FROM bank_users WHERE user_id=%s", (user_id,))
+#     user = cur.fetchone()
+#     cur.close()
 
-    return render_template('agentprofile.html',user=user)
+#     return render_template('agentprofile.html',user=user)
 
 @app.route('/agentapplyloan')
 def agentapplyloan():

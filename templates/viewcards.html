@@ -54,16 +54,23 @@
  
 <!-- Top Bar -->
 <div class="top-bar">
-  <button class="btn btn-outline-light btn-sm" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"><i class="bi bi-list"></i></button>
-  <nav class="navbar navbar-expand-lg navbar-dark" style="background:#97144D; width:100%;">
+  <button class="btn btn-outline-light btn-sm" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
+    aria-controls="sidebarMenu" aria-label="Toggle sidebar">
+    <i class="bi bi-list"></i>
+  </button>
+ 
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#97144D; width:100%;">
     <div class="container-fluid">
-      <div class="collapse navbar-collapse">
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}">Home</a></li>
+ 
+          
           <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">My Activities</a></li>
+ 
+          <!-- Open Account -->
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Open Account</a>
-            <ul class="dropdown-menu">
+            <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Open Account</a>
+            <ul class="dropdown-menu" aria-labelledby="accountDropdown">
               <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Savings Account</a></li>
               <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Salary Account</a></li>
               <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Current Account</a></li>
@@ -72,23 +79,59 @@
               <li><a class="dropdown-item" href="{{ url_for('open_account') }}">PMJDY Account</a></li>
             </ul>
           </li>
+ 
+          <!-- Deposits -->
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Deposits</a>
-            <ul class="dropdown-menu">
+            <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Deposits</a>
+            <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
               <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Digital Fixed Deposits</a></li>
               <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Fixed Deposits</a></li>
               <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Recurring Deposits</a></li>
             </ul>
           </li>
+ 
+          <!-- Loans -->
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Cards</a>
-            <ul class="dropdown-menu">
+            <a class="nav-link dropdown-toggle" href="#" id="loansDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Loans</a>
+            <ul class="dropdown-menu" aria-labelledby="loansDropdown">
+              <li><a class="dropdown-item" href="{{ url_for('home_loan') }}">Home Loan</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('personal_loan') }}">Personal Loan</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('Business_loan') }}">Business Loan</a></li>
+            </ul>
+          </li>
+ 
+          <!-- Cards -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="cardsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Cards</a>
+            <ul class="dropdown-menu" aria-labelledby="cardsDropdown">
               <li><a class="dropdown-item" href="{{ url_for('open_cards', preset='credit') }}">Credit Cards</a></li>
               <li><a class="dropdown-item" href="{{ url_for('open_cards', preset='debit') }}">Debit Cards</a></li>
               <li><a class="dropdown-item" href="{{ url_for('open_cards', preset='prepaid') }}">Prepaid Cards</a></li>
             </ul>
           </li>
+ 
+          <!-- Forex -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="forexDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Forex</a>
+            <ul class="dropdown-menu" aria-labelledby="forexDropdown">
+              <li><a class="dropdown-item" href="{{ url_for('travel_forex') }}">Travel Forex Cards</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('send_money_abroad') }}">Send Money Abroad</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('send_money_india') }}">Send Money India</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('currency_exchange') }}">Foreign Currency Exchange</a></li>
+            </ul>
+          </li>
+ 
+          <!-- Investments -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="investDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Investments</a>
+            <ul class="dropdown-menu" aria-labelledby="investDropdown">
+              <li><a class="dropdown-item" href="{{ url_for('pfinvest') }}">Public Provident Fund</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('pfinvest') }}">Floating Rate Saving Bonds</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('pfinvest') }}">National Pension System</a></li>
+            </ul>
+          </li>
         </ul>
+ 
         <div class="d-flex align-items-center">
           <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name if user else '' }}!</h5>
           <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">Logout</a>
@@ -97,11 +140,20 @@
     </div>
   </nav>
 </div>
+
+<nav aria-label="breadcrumb" class="bg-light px-3 py-2 mt-3">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color: #97144D;">Dashboard</a></li>
+      <li class="breadcrumb-item active" aria-current="page" style="color: #97144D; font-weight: bold;">View Cards</li>
+    </ol>
+  </nav>
  
 <div class="container mt-4">
   <ul class="nav nav-tabs" id="accountTabs" role="tablist">
     <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('viewaccounts') }}">My Accounts</a></li>
     <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('viewdeposits') }}">My Deposits</a></li>
+    <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('viewdeposits') }}">My Borrowings</a></li>
+    <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('viewdeposits') }}">My Investments</a></li>
     <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#cards-tab" type="button">My Cards</button></li>
   </ul>
  

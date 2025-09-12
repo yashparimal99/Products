@@ -117,7 +117,7 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
  
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}">Home</a></li>
+          
           <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">My Activities</a></li>
  
           <!-- Open Account -->
@@ -193,6 +193,13 @@
     </div>
   </nav>
 </div>
+
+<nav aria-label="breadcrumb" class="bg-light px-3 py-2 mt-3">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color: #97144D;">Dashboard</a></li>
+      <li class="breadcrumb-item active" aria-current="page" style="color: #97144D; font-weight: bold;">View Accounts</li>
+    </ol>
+  </nav>
  
 <div class="container mt-4">
  

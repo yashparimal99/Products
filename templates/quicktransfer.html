@@ -14,45 +14,230 @@
     .btn-submit { background-color:#97144D; color:#fff; font-weight:600; border:none; padding:10px 0; border-radius:4px; }
     .btn-submit:hover { background:#7a0f3e; }
     .form-control, .form-select { border:0.5px solid #97144D; }
+    /* Sidebar Offcanvas */
+    #sidebarMenu.offcanvas-start {
+      width: 250px;
+    }
+ 
+    #sidebarMenu .offcanvas-body {
+      padding: 0.5rem 1rem;
+    }
+ 
+    #sidebarMenu .nav-link {
+      font-size: 0.9rem;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #333;
+      transition: color 0.3s;
+    }
+ 
+    #sidebarMenu .nav-link i {
+      font-size: 1.1rem;
+    }
+ 
+    #sidebarMenu .nav-link.active {
+      font-weight: 700;
+      color: #97144D !important;
+      background-color: #f0d7e0;
+      border-radius: 4px;
+    }
+ 
+    #sidebarMenu .nav-link:hover {
+      color: #7a0f3e;
+      background-color: #f9e5ef;
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body>
  
 <!-- Sidebar -->
-<div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="sidebarMenuLabel">User</h5>
-    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body">
-    <ul class="nav flex-column">
-      <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('dashboard') }}"><i class="bi bi-speedometer2 me-2"></i> Home</a></li>
-      <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('viewaccounts') }}"><i class="bi bi-person-lines-fill me-2"></i> View Accounts</a></li>
-      <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('Txnhistory') }}"><i class="bi bi-clock-history me-2"></i> Transaction History</a></li>
-      <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('accountbal') }}"><i class="bi bi-wallet2 me-2"></i> Check Balance</a></li>
-      <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('paybill') }}"><i class="bi bi-credit-card me-2"></i> Pay Bill</a></li>
-    </ul>
-  </div>
-</div>
+
  
-<!-- Top Bar -->
-<div class="top-bar d-flex align-items-center">
-  <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
-    aria-controls="sidebarMenu" aria-label="Toggle sidebar"><i class="bi bi-list"></i></button>
-  <h5 class="m-0 flex-grow-1 text-center">Quick Fund Transfer</h5>
-  <div class="d-flex align-items-center">
-    <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name if user else '' }}!</h5>
-    <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">Logout</a>
-  </div>
-</div>
+  <!-- Sidebar Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="sidebarMenuLabel">User</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark active" href="userdashboard.html">
+            <i class="bi bi-speedometer2 me-2"></i> Home
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('viewaccounts') }}">
+            <i class="bi bi-person-lines-fill me-2"></i> View Accounts
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="loans.html">
+            <i class="bi bi-cash-coin me-2"></i> Loans
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="transactions.html">
+            <i class="bi bi-clock-history me-2"></i> Transaction History
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="balance.html">
+            <i class="bi bi-wallet2 me-2"></i> Check Balance
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="rewards.html">
+            <i class="bi bi-gift-fill me-2"></i> Rewards
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="paybill.html">
+            <i class="bi bi-credit-card me-2"></i> Pay Bill
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="#">
+            <i class="bi bi-person-rolodex me-2"></i> Get Contact
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="#">
+            <i class="bi bi-shield-lock-fill me-2"></i> Privacy & Security
+          </a>
+        </li>
  
-<div class="container my-4">
-  <nav aria-label="breadcrumb" class="mb-3">
+      </ul>
+    </div>
+  </div>
+ 
+  <!-- ---------------------------- -->
+  <div class="top-bar d-flex align-items-center">
+    <!-- left toggle -->
+    <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
+      aria-controls="sidebarMenu" aria-label="Toggle sidebar">
+      <i class="bi bi-list"></i>
+    </button>
+ 
+    <!-- title wrapper with flex-grow to take center space -->
+    <!-- <h5 class="m-0 text-center flex-grow-1">DigiBank User Dashboard</h5> -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important; width: 100%;">
+      <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <!-- <li class="nav-item"><a class="nav-link active" href="{{ url_for('home') }}">Home</a></li> -->
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">My Activities</a>
+            </li>
+            <!-- Open Account Dropdown -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Open Account</a>
+              <ul class="dropdown-menu" aria-labelledby="accountDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('savingform') }}">Savings
+                    Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Salary Account</a>
+                </li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Current
+                    Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Safe Custody
+                    Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Pension
+                    Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">PMJDY Account</a>
+                </li>
+              </ul>
+            </li>
+            <!-- Deposits Dropdown -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Deposits</a>
+              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Digital Fixed
+                    Deposits</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Fixed
+                    Deposits</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Recurring
+                    Deposits</a></li>
+              </ul>
+            </li>
+            <!-- Deposits Dropdown -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Loans</a>
+              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Home Loan</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Personal Loan</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Busniness Loan</a></li>
+ 
+ 
+              </ul>
+            </li>
+            <!-- Deposits Dropdown -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Cards</a>
+              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Credit Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Debit Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Prepaid Cards</a></li>
+              </ul>
+            </li>
+            <!-- Deposits Dropdown -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Forex</a>
+              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Travel Forex Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Send Money Abroad</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Send Money India</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Foregin Currency Exchange</a></li>
+              </ul>
+            </li>
+            <!-- Deposits Dropdown -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Investments</a>
+              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Public Provident Fund</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Floating Rate Saving Bonds</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">National Pension System</a></li>
+              </ul>
+            </li>
+          </ul>
+          <div class="d-flex align-items-center">
+            <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name }} !</h5>
+            <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">
+              Logout
+            </a>
+          </div>
+         
+        </div>
+      </div>
+    </nav>
+    <!-- End of custom navbar -->
+ 
+  </div>
+ 
+ 
+ 
+  </div>
+
+ <nav aria-label="breadcrumb" class="mb-3 mt-3">
     <ol class="breadcrumb mb-0">
       <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#97144D;">Home</a></li>
       <li class="breadcrumb-item active" aria-current="page" style="color:#97144D; font-weight:bold;">Quick Transfer</li>
     </ol>
-  </nav>
+  </nav> 
+
+  
+ 
+<div class="container my-4">
+<div class="balance-box">
+  <h5 class="mb-4" style="color:#97144D; font-weight:700; font-size: 24px;">Quick Transfer</h5>
+   
  
   <div class="card shadow-sm">
     <div class="card-body">

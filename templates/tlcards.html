@@ -15,17 +15,41 @@
 </head>
 <body>
  
+<!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D;">
   <div class="container-fluid">
+    <!-- Left: Bank Logo -->
     <a class="navbar-brand d-flex align-items-center" href="#">
-      <img src="bank-logo.png" alt="Bank Logo" style="height: 40px; margin-right: 10px;">
+      <img src="{{ url_for('static', filename='images/Digilogo.jpg') }}" alt="Bank Logo"
+        style="height: 40px; margin-right: 10px;">
     </a>
-    <div class="mx-auto text-white fw-bold fs-5">Hello, User</div>
-    <div class="d-flex">
-      <a href="{{ url_for('logout') }}" class="btn btn-light btn-sm">Logout</a>
+
+    <!-- Center: Title -->
+    <div class="mx-auto text-white fw-bold fs-5">
+      Teamlead Dashboard
+    </div>
+
+    <!-- Right: Welcome + Logout -->
+    <div class="d-flex align-items-center">
+      <span class="text-white me-3 fw-semibold">
+        Welcome, {{ user.email }} !
+      </span>
+      <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">
+        Logout
+      </a>
     </div>
   </div>
 </nav>
+
+
+    <nav aria-label="breadcrumb"
+        style="background-color:#f8f9fa; padding:8px 15px; border-radius:4px; margin:10px 20px;">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#97144D;">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page" style="color:#97144D; font-weight:bold;"> Cards Team
+            </li>
+        </ol>
+    </nav>
  
 <div class="container my-4">
   <div class="d-flex justify-content-between align-items-center">
