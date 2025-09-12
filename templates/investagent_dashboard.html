@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Investment Agent Dashboard - DigiBank</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Bootstrap CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .navbar {
+      background-color: #97144D;
+    }
+
+    .navbar-brand {
+      font-weight: bold;
+      color: white !important;
+    }
+
+    .logout-btn {
+      background-color: #97144D;
+      border: 1px solid white;
+      color: white;
+      transition: 0.3s;
+    }
+
+    .logout-btn:hover {
+      background-color: white;
+      color: #97144D;
+      border: 1px solid #97144D;
+    }
+
+    .dashboard-card {
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .nav-btn {
+      background-color: #97144D;
+      color: white;
+      border: 1px solid white;
+      transition: 0.3s;
+    }
+
+    .nav-btn:hover {
+      background-color: white;
+      color: #97144D;
+    }
+
+    footer {
+      background-color: #97144D;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      margin-top: 40px;
+    }
+
+    .icon-color {
+      color: #97144D !important;
+    }
+
+    .breadcrumb {
+      margin-bottom: 0;
+    }
+
+    .breadcrumb .active {
+      color: #97144D;
+      font-weight: 500;
+    }
+
+    .breadcrumb a {
+      text-decoration: none;
+      color: #97144D;
+    }
+
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Top Bar -->
+  <div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#8B0A50; color:white;">
+
+
+    <!-- Logo / Image -->
+    <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo"
+      style="height: 40px; width:auto; background-color:#fff; border-radius:5px; padding:2px;" class="me-3">
+
+    <!-- Title -->
+    <h5 class="flex-grow-1 text-center m-0">Welcome To Investments Agent Dashboard - DigiBank</h5>
+
+    <!-- Logout Button -->
+    <div class="d-flex align-items-center">
+      <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }} </h5>
+      <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
+        Logout
+      </a>
+    </div>
+  </div>
+
+
+
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="bg-light px-3 py-2">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item"><a href="{{ url_for('login') }}">Login</a></li>
+      <li class="breadcrumb-item active" aria-current="page"><a href="{{ url_for('dashboard') }}">Investment Dashboard</a>
+      </li>
+    </ol>
+  </nav>
+
+  <!-- Dashboard Content -->
+  <div class="container my-5">
+    <div class="card p-4">
+      <h4 class="mb-4 text-center">Welcome,{{ user.name }} <span id="agentName"></span>..!!</h4>
+
+      <div class="row g-4 text-center">
+        <!-- Profile Card (New First Card) -->
+        <div class="col-sm-6 col-md-6 col-lg-6">
+          <div class="card dashboard-card h-100 p-3">
+            <div class="card-body">
+              <i class="bi bi-person-circle display-4 icon-color mb-3"></i>
+              <h5 class="card-title">Profile</h5>
+              <p class="card-text text-muted">View and update your personal information and account settings.</p>
+            </div>
+            <div class="card-footer bg-transparent border-0 d-grid">
+              <a href="{{ url_for('agentprofile') }}" class="btn nav-btn">View Profile</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Applications -->
+        <div class="col-sm-6 col-md-6 col-lg-6">
+          <div class="card dashboard-card h-100 p-3">
+            <div class="card-body">
+              <i class="bi bi-file-earmark-text display-4 icon-color mb-3"></i>
+              <h5 class="card-title">Applications</h5>
+              <p class="card-text text-muted">View all submitted card applications and their current status.</p>
+            </div>
+            <div class="card-footer bg-transparent border-0 d-grid">
+              <a href="{{ url_for('cardapplications') }}" class="btn nav-btn">View Applications</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Apply Card -->
+        <div class="col-sm-6 col-md-6 col-lg-6">
+          <div class="card dashboard-card h-100 p-3">
+            <div class="card-body">
+              <i class="bi bi-file-earmark-plus display-4 icon-color mb-3"></i>
+              <h5 class="card-title">Apply Card</h5>
+              <p class="card-text text-muted">Submit a new credit, debit, or international card application for a
+                customer.</p>
+            </div>
+            <div class="card-footer bg-transparent border-0 d-grid">
+              <a href="{{ url_for('applycardagent') }}" class="btn nav-btn">Apply for Card</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Performance -->
+        <div class="col-sm-6 col-md-6 col-lg-6">
+          <div class="card dashboard-card h-100 p-3">
+            <div class="card-body">
+              <i class="bi bi-graph-up display-4 icon-color mb-3"></i>
+              <h5 class="card-title">Performance</h5>
+              <p class="card-text text-muted">Track your submission performance, approvals, and key metrics.</p>
+            </div>
+            <div class="card-footer bg-transparent border-0 d-grid">
+              <a href="{{ url_for('cardperformance') }}" class="btn nav-btn">View Performance</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    © 2024 DigiBank. All rights reserved.
+  </footer>
+
+  <!-- Logout Modal -->
+  <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color: #97144D; color: white;">
+          <h5 class="modal-title" id="logoutModalLabel">Logout Successful</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Successfully logged out...!!
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn" style="background-color: #97144D; color: white;"
+            data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Logout Script -->
+  <script>
+    document.getElementById('logoutBtn').addEventListener('click', function () {
+      var myModal = new bootstrap.Modal(document.getElementById('logoutModal'));
+      myModal.show();
+
+      // Redirect after 2 seconds
+      setTimeout(function () {
+        window.location.href = 'login';
+      }, 2000);
+    });
+  </script>
+
+</body>
+
+</html>

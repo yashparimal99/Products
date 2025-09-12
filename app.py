@@ -1351,7 +1351,7 @@ def dashboard():
         'manager': 'managerdashboard.html',
         'Card_Agent': 'cardagent_dashboard.html',
         'Loan_Agent': 'loanagent_dashboard.html',
-        'Invest_Agent': 'investagent_dashboard.html'
+        'Investment_Agent': 'investagent_dashboard.html'
     }
 
     return render_template(templates.get(role, 'login.html'), user=user)
