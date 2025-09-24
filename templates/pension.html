@@ -1,146 +1,377 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
+ 
 <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pension Account - Digi Bank</title>
+ 
+  <!-- Fonts & Icons -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    rel="stylesheet">
+ 
+  <!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+ 
+  <style>
 
-    <title>Axis Bank Products</title>
-</head>
+    :root {
 
-<body>
-    <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-dark"> -->
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important;">
-        <div class="container-fluid">
-            <img src="axislogo1.png" alt="Axis Bank" height="60" class="my-2">
+      --primary-color: #0B4D83;
 
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <!-- <div class="container-fluid justify-content-center"></div> -->
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      --secondary-color: #1976D2;
 
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="index.html">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="ExploreP.html">Explore Products</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Grab Deals</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Make Payments</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Bank Smart</a>
-                    </li>
+      --accent-color: #FF6B35;
 
-                </ul>
-                <form class="d-flex">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
+      --success-color: #00C853;
 
-                </form>
-            </div>
-        </div>
-    </nav>
-    <div class="card mt-4 border-0"></div>
-    <div class="card mt-4 border-0"></div>
-<style>
+      --warning-color: #FF8F00;
+
+      --dark-color: #263238;
+
+      --light-color: #F8F9FA;
+
+      --gradient-primary: linear-gradient(135deg, #0B4D83 0%, #1976D2 100%);
+
+      --gradient-secondary: linear-gradient(135deg, #FF6B35 0%, #FF8F00 100%);
+
+      --shadow-light: 0 4px 20px rgba(11, 77, 131, 0.1);
+
+      --shadow-medium: 0 8px 30px rgba(11, 77, 131, 0.15);
+
+      --shadow-heavy: 0 15px 40px rgba(11, 77, 131, 0.2);
+
+    }
+ 
+    * {
+
+      margin: 0;
+
+      padding: 0;
+
+      box-sizing: border-box;
+
+    }
+ 
+    body {
+
+      font-family: 'Poppins', sans-serif;
+
+      line-height: 1.6;
+
+      color: var(--dark-color);
+
+      background: linear-gradient(135deg, rgba(11, 77, 131, 0.02), rgba(25, 118, 210, 0.02));
+
+    }
+ 
+    /* Navbar */
+
+    .navbar {
+
+      background: var(--gradient-primary) !important;
+
+      backdrop-filter: blur(10px);
+
+      box-shadow: var(--shadow-medium);
+
+      padding: 1rem 0;
+
+    }
+ 
+    .navbar-nav .nav-link {
+
+      transition: all 0.3s ease;
+
+      position: relative;
+
+    }
+ 
+    .navbar-nav .nav-link::after {
+
+      content: '';
+
+      position: absolute;
+
+      width: 0;
+
+      height: 2px;
+
+      bottom: -5px;
+
+      left: 50%;
+
+      background-color: white;
+
+      transition: all 0.3s ease;
+
+    }
+ 
+    .navbar-nav .nav-link:hover::after {
+
+      width: 100%;
+
+      left: 0;
+
+    }
+ 
+    /* Breadcrumb */
+
+    .breadcrumb {
+
+      background: linear-gradient(135deg, rgba(11, 77, 131, 0.05), rgba(25, 118, 210, 0.05));
+
+      border-radius: 15px;
+
+      padding: 1rem 1.5rem;
+
+      margin: 1.5rem;
+
+      box-shadow: var(--shadow-light);
+
+    }
+ 
     .breadcrumb .breadcrumb-item a {
-      color: #97144D;
+
+      color: var(--primary-color);
+
       text-decoration: none;
-    }
 
+      font-weight: 500;
+
+      transition: all 0.3s ease;
+
+    }
+ 
     .breadcrumb .breadcrumb-item a:hover {
+
       text-decoration: underline;
-    }
 
+      color: var(--secondary-color);
+
+    }
+ 
     .breadcrumb .breadcrumb-item {
-      color: #97144D;
+
+      color: var(--primary-color);
+
+      font-weight: 500;
+
     }
-  </style>  
-<nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-    <li class="breadcrumb-item"><a href="accounts.html">Accounts</a></li>
-    <li class="breadcrumb-item"><a href="pension.html">Pension Account</a></li>
-   
-   
-  </ol>
+ 
+    /* Section Title */
+
+    .section-title {
+
+      color: var(--primary-color);
+
+      text-align: center;
+
+      margin: 3rem 0 2rem 0;
+
+      font-size: 2.5rem;
+
+      font-weight: 700;
+
+      position: relative;
+
+    }
+ 
+    .section-title::after {
+
+      content: '';
+
+      position: absolute;
+
+      bottom: -10px;
+
+      left: 50%;
+
+      transform: translateX(-50%);
+
+      width: 120px;
+
+      height: 4px;
+
+      background: var(--gradient-primary);
+
+      border-radius: 2px;
+
+    }
+ 
+    /* Card */
+
+    .custom-card {
+
+      border-radius: 20px;
+
+      box-shadow: var(--shadow-light);
+
+      transition: all 0.4s ease;
+
+      background: linear-gradient(145deg, #ffffff, #f8f9fa);
+
+      padding: 2rem;
+
+      margin-bottom: 2rem;
+
+      animation: fadeInUp 0.6s ease-out;
+
+    }
+ 
+    .custom-card:hover {
+
+      transform: translateY(-10px) scale(1.02);
+
+      box-shadow: var(--shadow-heavy);
+
+      background: linear-gradient(145deg, #ffffff, #f0f4ff);
+
+    }
+ 
+    .custom-card h3 {
+
+      color: var(--primary-color);
+
+      font-weight: 700;
+
+      margin-bottom: 1rem;
+
+    }
+ 
+    .custom-card p {
+
+      color: #555;
+
+      line-height: 1.7;
+
+    }
+ 
+    /* Buttons */
+
+    .btn-apply {
+
+      border: 1px solid var(--secondary-color);
+
+      color: var(--secondary-color);
+
+      padding: 12px 30px;
+
+      border-radius: 8px;
+
+      font-size: 1rem;
+
+      transition: all 0.3s ease;
+
+      margin-top: 20px;
+
+    }
+ 
+    .btn-apply:hover {
+
+      background: var(--secondary-color);
+
+      color: white;
+
+    }
+ 
+    /* Animations */
+
+    @keyframes fadeInUp {
+
+      from {
+
+        opacity: 0;
+
+        transform: translateY(30px);
+
+      }
+ 
+      to {
+
+        opacity: 1;
+
+        transform: translateY(0);
+
+      }
+
+    }
+</style>
+</head>
+ 
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+<div class="container-fluid">
+<img src="axislogo1.png" alt="Digi Bank" height="60" class="my-2">
+<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarSupportedContent">
+<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+<li class="nav-item"><a class="nav-link active" href="index.html">Home</a></li>
+<li class="nav-item"><a class="nav-link" href="ExploreP.html">Explore Products</a></li>
+<li class="nav-item"><a class="nav-link" href="#">Grab Deals</a></li>
+<li class="nav-item"><a class="nav-link" href="#">Make Payments</a></li>
+<li class="nav-item"><a class="nav-link" href="#">Bank Smart</a></li>
+</ul>
+<form class="d-flex">
+<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+<button class="btn btn-light" type="submit">Search</button>
+</form>
+</div>
+</div>
 </nav>
+ 
+  <!-- Breadcrumb -->
+<nav aria-label="breadcrumb">
+<ol class="breadcrumb">
+<li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('Accounts') }}">Accounts</a></li>
+<li class="breadcrumb-item active" aria-current="page">Pension Account</li>
+</ol>
+</nav>
+ 
+  <!-- Page Title -->
+<h1 class="section-title">Pension Disbursement Account</h1>
+ 
+  <!-- Content -->
+<div class="container mb-5">
+<div class="custom-card">
+<img src="pens.png" class="img-fluid rounded mb-3" alt="Pension Account">
+<h3><span style="font-style: italic;">Digi Bank</span> Pension Disbursement Account</h3>
+<p>
 
-    <img src="pens.png" class="img-fluid mt-4" alt="...">
+        Manage your pension payments with ease and enjoy convenient banking services with Digi Bank's Pension
 
-    <div class="card mt-4 border-0">
-        <div class="card-body" style="margin-left: 0.5in;">
-            <h3>
-                <span style="color: #97144D; font-style: italic;">Axis Bank</span> Pension Disbursement Account
-            </h3><br>
-            <p>
-                <span style="color: #97144D; font-style: italic;"><b></b></span>
-                Manage your pension payments with ease and enjoy convenient banking services with Axis Bank's Pension
-                Disbursement Account. The Pension Disbursement Account simplifies banking for individuals earning
-                pension. Its benefits include latest banking solutions at low costs. All you have to do is open the
-                account using the required documents before getting your first pension and provide a Life Certificate
-                issued by the authority of the organisation you had served earlier. Here are a few benefits of the
-                Pension Disbursement Account.
-            </p><br>
-            <p>
-                Pensioners can now download 'DIRGHAYU' Mobile App from Google Play store (Android), Apple Store (IOS) or
-                CPAO's website <span style="color: #97144D; font-style: italic;">"https://cpao.nic.in"</span> This app
-                will provide details of last 24 pension disbursements as
-                well as facility for raising grievances (if any).
-            </p>
+        Disbursement Account. The Pension Disbursement Account simplifies banking for individuals earning pension. Its
 
-            
-            <style>
-                .btn-apply {
-                    background-color: #97144D;
-                    color: white;
-                    padding: 12px 30px;
-                    border: none;
-                    border-radius: 8px;
-                    font-size: 1rem;
-                    transition: 0.3s ease;
-                    margin-top: 20px;
-                }
+        benefits include latest banking solutions at low costs. All you have to do is open the account using the required
 
-                .btn-submit {
-                    background-color: #97144D;
-                    color: white;
-                }
+        documents before getting your first pension and provide a Life Certificate issued by the authority of the
 
-                .btn-submit:hover {
-                    background-color: #7a103c;
-                }
-            </style>
-            <a href="{{ url_for('login') }}" class="btn btn-apply">Apply Now</a>
-        </div>
-    </div>
+        organisation you had served earlier.
+</p>
+<p>
 
+        Pensioners can now download 'DIRGHAYU' Mobile App from Google Play Store (Android), Apple Store (iOS) or CPAO's
 
+        website <span style="color: var(--secondary-color); font-style: italic;">https://cpao.nic.in</span>. This app
 
-
-
-
-
-    <!-- Optional JavaScript; choose one of the two! -->
-
-    <!-- Option 1: Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossorigin="anonymous"></script>
-
-    <!-- Option 2: Separate Popper and Bootstrap JS -->
-    <!--
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
-    -->
+        provides details of last 24 pension disbursements as well as a facility for raising grievances (if any).
+</p>
+<div class="mt-4">
+<a href="{{ url_for('login') }}" class="btn btn-apply">Apply Now</a>
+</div>
+</div>
+</div>
+ 
+  <!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
+ 
 </html>
+
+ 

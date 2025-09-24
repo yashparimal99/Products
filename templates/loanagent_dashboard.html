@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <title>Loan Agent Dashboard - DigiBank</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+ 
   <!-- Bootstrap CSS & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
+ 
   <style>
     body {
       background-color: #f8f9fa;
@@ -78,18 +78,18 @@
   </style>
 </head>
 <body>
-
+ 
 <!-- Top Bar -->
 <div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#8B0A50; color:white;">
-  
-
+ 
+ 
   <!-- Logo / Image -->
-  <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo" 
+  <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo"
        style="height: 40px; width:auto; background-color:#fff; border-radius:5px; padding:2px;" class="me-3">
-
+ 
   <!-- Title -->
   <h5 class="flex-grow-1 text-center m-0">Welcome To Loan Agent Dashboard - DigiBank</h5>
-
+ 
   <!-- Logout Button -->
   <div class="d-flex align-items-center">
   <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }}</h5>
@@ -98,15 +98,15 @@
   </a>
 </div>
 </div>
-
+ 
 <!-- <div class="d-flex align-items-center">
             <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name }} !  ({{user.role}})</h5>
             <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">
               Logout
             </a>
           </div> -->
-
-
+ 
+ 
   <!-- Breadcrumb -->
   <nav aria-label="breadcrumb" class="bg-light px-3 py-2">
     <ol class="breadcrumb mb-0">
@@ -114,12 +114,12 @@
       <li class="breadcrumb-item active" aria-current="page"><a href="{{ url_for('dashboard') }}">Loans_Dashboard</a></li>
     </ol>
   </nav>
-
+ 
   <!-- Dashboard Content -->
   <div class="container my-5">
     <div class="card p-4">
       <h4 class="mb-4 text-center">Welcome, <span id="agentName">{{ user.name }}</span>..!!</h4>
-
+ 
       <div class="row g-4 text-center">
         <!-- Profile Card (New First Card) -->
         <div class="col-sm-6 col-md-6 col-lg-6">
@@ -134,7 +134,7 @@
             </div>
           </div>
         </div>
-
+ 
         <!-- Applications -->
         <div class="col-sm-6 col-md-6 col-lg-6">
           <div class="card dashboard-card h-100 p-3">
@@ -148,7 +148,7 @@
             </div>
           </div>
         </div>
-
+ 
         <!-- Apply Card -->
         <div class="col-sm-6 col-md-6 col-lg-6">
           <div class="card dashboard-card h-100 p-3">
@@ -162,7 +162,7 @@
             </div>
           </div>
         </div>
-
+ 
         <!-- Performance -->
         <div class="col-sm-6 col-md-6 col-lg-6">
           <div class="card dashboard-card h-100 p-3">
@@ -177,15 +177,15 @@
           </div>
         </div>
       </div>
-
+ 
     </div>
   </div>
-
+ 
   <!-- Footer -->
   <footer>
     © 2024 DigiBank. All rights reserved.
   </footer>
-
+ 
   <!-- Logout Modal -->
   <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -203,22 +203,24 @@
       </div>
     </div>
   </div>
-
+ 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+ 
   <!-- Logout Script -->
   <script>
     document.getElementById('logoutBtn').addEventListener('click', function() {
       var myModal = new bootstrap.Modal(document.getElementById('logoutModal'));
       myModal.show();
-
+ 
       // Redirect after 2 seconds
       setTimeout(function() {
         window.location.href ='login';
       }, 2000);
     });
   </script>
-
+ 
 </body>
 </html>
+ 
+ 

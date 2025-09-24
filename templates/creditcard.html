@@ -1,396 +1,288 @@
 <!doctype html>
 <html lang="en">
-
+ 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DiGi Bank Products</title>
-
+  <title>Digi Bank Credit Card</title>
+ 
+  <!-- Fonts & Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-
-<body>
-    <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-dark"> -->
-   <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important;">
-  <div class="container-fluid">
-    <img src="{{ url_for('static', filename='images/Digilogo.jpg') }}"
-         alt="DiGi Bank" height="60" class="my-2">
  
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-            aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
- 
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <!-- your existing nav items -->
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page"
-             href="{{ url_for('home') }}">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link"
-             href="{{ url_for('exploreproduct') }}">Explore Products</a>
-        </li>
-        <li class="nav-item"><a class="nav-link" href="#">Grab Deals</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Make Payments</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Bank Smart</a></li>
-      </ul>
- 
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="btn btn-outline-light me-2 navbar-btn"
-             href="{{ url_for('login') }}">Login</a>
-        </li>
-        <li class="nav-item">
-          <a class="btn btn-light navbar-btn"
-             href="{{ url_for('signup') }}">Sign Up</a>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
-
   <style>
-    .breadcrumb .breadcrumb-item a {
-      color: #97144D;
-      text-decoration: none;
+    :root {
+      --primary-color: #0B4D83;
+      --secondary-color: #1976D2;
+      --accent-color: #FF6B35;
+      --success-color: #00C853;
+      --warning-color: #FF8F00;
+      --dark-color: #263238;
+      --light-color: #F8F9FA;
+      --gradient-primary: linear-gradient(135deg, #0B4D83 0%, #1976D2 100%);
+      --gradient-secondary: linear-gradient(135deg, #FF6B35 0%, #FF8F00 100%);
+      --shadow-light: 0 4px 20px rgba(11, 77, 131, 0.1);
+      --shadow-medium: 0 8px 30px rgba(11, 77, 131, 0.15);
+      --shadow-heavy: 0 15px 40px rgba(11, 77, 131, 0.2);
     }
-
-    .breadcrumb .breadcrumb-item a:hover {
-      text-decoration: underline;
+ 
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-
-    .breadcrumb .breadcrumb-item {
-      color: #97144D;
+ 
+    body {
+      font-family: 'Poppins', sans-serif;
+      line-height: 1.6;
+      color: var(--dark-color);
+      background: linear-gradient(135deg, rgba(11, 77, 131, 0.02), rgba(25, 118, 210, 0.02));
     }
-
-    .custom-btn {
-      background-color: #97144D;
-      color: white;
-      border: none;
+ 
+    .navbar {
+      background: var(--gradient-primary) !important;
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow-medium);
+      padding: 1rem 0;
+    }
+ 
+    .navbar-brand img {
+      filter: brightness(0) invert(1);
+    }
+ 
+    .navbar-nav .nav-link {
+      transition: all 0.3s ease;
+      position: relative;
+    }
+ 
+    .navbar-nav .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -5px;
+      left: 50%;
+      background-color: white;
       transition: all 0.3s ease;
     }
-
-    .custom-btn:hover {
-      background-color: #7b1040;
-      color: white;
-      transform: translateY(-2px);
+ 
+    .navbar-nav .nav-link:hover::after {
+      width: 100%;
+      left: 0;
     }
-
-    .card {
-      transition: transform 0.3s ease;
-      height: 100%;
+ 
+    .breadcrumb {
+      background: linear-gradient(135deg, rgba(11, 77, 131, 0.05), rgba(25, 118, 210, 0.05));
+      border-radius: 15px;
+      padding: 1rem 1.5rem;
+      margin: 1.5rem;
+      box-shadow: var(--shadow-light);
     }
-
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 25px rgba(151, 20, 77, 0.15);
+ 
+    .breadcrumb .breadcrumb-item a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
     }
-
-    .card-img-top {
-      height: 200px;
-      object-fit: cover;
+ 
+    .breadcrumb .breadcrumb-item a:hover {
+      text-decoration: underline;
+      color: var(--secondary-color);
     }
-
-    .product-title {
-      color: #97144D;
-      font-weight: bold;
+ 
+    .breadcrumb .breadcrumb-item {
+      color: var(--primary-color);
+      font-weight: 500;
+    }
+ 
+    .section-title {
+      color: var(--primary-color);
       text-align: center;
-      margin: 40px 0;
+      margin: 3rem 0 2rem 0;
+      font-size: 2.5rem;
+      font-weight: 700;
+      position: relative;
+    }
+ 
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 4px;
+      background: var(--gradient-primary);
+      border-radius: 2px;
+    }
+ 
+    .custom-card {
+      border-radius: 20px;
+      box-shadow: var(--shadow-light);
+      transition: all 0.4s ease;
+      overflow: hidden;
+      background: linear-gradient(145deg, #ffffff, #f8f9fa);
+      position: relative;
+    }
+ 
+    .custom-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: var(--shadow-heavy);
+      background: linear-gradient(145deg, #ffffff, #f0f4ff);
+    }
+ 
+    .custom-card img {
+      height: 220px;
+      width: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+ 
+    .custom-card:hover img {
+      transform: scale(1.05);
+    }
+ 
+    .card-title {
+      color: var(--primary-color);
+      font-weight: 700;
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+    }
+ 
+    .card-text {
+      color: #666;
+      line-height: 1.6;
+      font-size: 1rem;
+    }
+ 
+    .btn-custom {
+      border: 1px solid var(--secondary-color);
+      color: var(--secondary-color);
+      transition: all 0.3s ease;
+    }
+ 
+    .btn-custom:hover {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+ 
+    .final-apply {
+      text-align: center;
+      margin-top: 40px;
+    }
+ 
+    @media (max-width: 768px) {
+      .custom-card img {
+        height: 180px;
+      }
+ 
+      .section-title {
+        font-size: 2rem;
+        margin: 2rem 0 1rem 0;
+      }
+    }
+ 
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+ 
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+ 
+    .custom-card {
+      animation: fadeInUp 0.6s ease-out;
     }
   </style>
-
-  <nav aria-label="breadcrumb" class="mt-3 ms-3">
+</head>
+ 
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+      <img src="{{ url_for('static', filename='images/Digilogo.jpg') }}" alt="Digi Bank" height="60" class="my-2">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link active" href="{{ url_for('home') }}">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Grab Deals</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Make Payments</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Bank Smart</a></li>
+        </ul>
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="btn btn-outline-light me-2" href="{{ url_for('login') }}">Login</a></li>
+          <li class="nav-item"><a class="btn btn-light" href="{{ url_for('signup') }}">Sign Up</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+ 
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
       <li class="breadcrumb-item"><a href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
       <li class="breadcrumb-item"><a href="{{ url_for('cards') }}">Cards</a></li>
-      <li class="breadcrumb-item"><a href="{{ url_for('creditcard') }}">Credit card</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Credit Card</li>
     </ol>
   </nav>
-
-    <!-- Hero Image -->
-<div class="container mt-4">
-    <img src="{{ url_for('static', filename='Cards/creditc.jpg') }}" class="img-fluid rounded shadow" alt="Digi Bank Credit Cards">
-
-</div>
-
-
-    <!-- Main Content -->
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-lg-8 mx-auto text-center">
-                <h3>
-                    <span style="color: #97144D; font-style: italic;">Digi Bank</span> Apply for Credit Card Online
-                </h3>
-                <p class="mt-4">
-                    <span style="color: #97144D; font-style: italic;"><b>Digi GO</b></span> Credit Card is your go-to-tool
-                    for making purchases or paying for services on credit. It is a payment card that provides a credit
-                    facility up to a certain limit, which you can repay within a permitted timeframe without incurring extra
-                    costs. Credit Cards can be a great choice for managing your finances smartly, as they
-                    offer valuable benefits for mindful spending and timely repayment.
-                </p>
-            </div>
-        </div>
+ 
+  <!-- Hero -->
+  <div class="container mt-4">
+    <div class="custom-card p-3 text-center">
+      <img src="{{ url_for('static', filename='Cards/creditc.jpg') }}" class="rounded" alt="Digi Bank Credit Card">
+      <h2 class="mt-4 section-title">Apply for Credit Card Online</h2>
+      <p>Digi Bank Credit Card gives you the convenience of shopping and payments with rewards, cashback, and enhanced
+        security.</p>
     </div>
-
-    <!-- Benefits Section -->
-    <div class="container benefits-section mt-5">
-        <h2 class="text-center mb-5">Why Choose Digi Bank Credit Cards?</h2>
-        
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 feature-card shadow-sm">
-                    <div class="card-body text-center">
-                        <i class="bi bi-credit-card-2-front benefit-icon"></i>
-                        <h5>Wide Acceptance</h5>
-                        <p>Accepted at millions of merchants worldwide, online and offline</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 feature-card shadow-sm">
-                    <div class="card-body text-center">
-                        <i class="bi bi-cash-coin benefit-icon"></i>
-                        <h5>Rewards & Cashback</h5>
-                        <p>Earn reward points on every spend that can be redeemed for exciting gifts</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 feature-card shadow-sm">
-                    <div class="card-body text-center">
-                        <i class="bi bi-shield-check benefit-icon"></i>
-                        <h5>Secure Transactions</h5>
-                        <p>Advanced security features including EMV chip and 24/7 fraud monitoring</p>
-                    </div>
-                </div>
-            </div>
+  </div>
+ 
+  <!-- Benefits -->
+  <div class="container mt-5">
+    <h2 class="section-title">Why Choose Digi Bank Credit Cards?</h2>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="custom-card p-4 text-center">
+          <i class="fas fa-credit-card fa-2x text-primary mb-3"></i>
+          <h5 class="card-title">Wide Acceptance</h5>
+          <p class="card-text">Accepted at millions of merchants worldwide, online and offline.</p>
         </div>
+      </div>
+      <div class="col-md-4">
+        <div class="custom-card p-4 text-center">
+          <i class="fas fa-coins fa-2x text-primary mb-3"></i>
+          <h5 class="card-title">Rewards & Cashback</h5>
+          <p class="card-text">Earn reward points on every spend and redeem for exciting gifts.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="custom-card p-4 text-center">
+          <i class="fas fa-shield-alt fa-2x text-primary mb-3"></i>
+          <h5 class="card-title">Secure Transactions</h5>
+          <p class="card-text">EMV chip and 24/7 fraud monitoring keep your transactions safe.</p>
+        </div>
+      </div>
     </div>
-
-    
-    <div class="container mt-5">
-    <h2 class="text-center mb-4">Credit Card Eligibility & Documentation</h2>
-    
-    <div class="row">
-        <!-- Eligibility Criteria Card -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow">
-                <div class="card-header text-white" style="background-color: #97144D;">
-                    <h4 class="mb-0">Credit Card Eligibility Criteria</h4>
-                </div>
-                <div class="card-body">
-                    <p>If you have applied for an Digi Bank Credit Card, your eligibility will depend largely on the following factors:</p>
-                    
-                    <div class="d-flex align-items-start mb-3">
-                        <div class="me-3" style="color: #97144D; font-size: 1.5rem;">
-                            <i class="bi bi-person-vcard"></i>
-                        </div>
-                        <div>
-                            <h5 class="mb-1">Age</h5>
-                            <p class="mb-0">Primary cardholder should be between 18 and 70 years</p>
-                        </div>
-                    </div>
-                    
-                    <div class="d-flex align-items-start mb-3">
-                        <div class="me-3" style="color: #97144D; font-size: 1.5rem;">
-                            <i class="bi bi-cash-stack"></i>
-                        </div>
-                        <div>
-                            <h5 class="mb-1">Income</h5>
-                            <p class="mb-0">Varies by card variant (typically ₹25,000+ monthly income)</p>
-                        </div>
-                    </div>
-                    
-                    <div class="d-flex align-items-start mb-3">
-                        <div class="me-3" style="color: #97144D; font-size: 1.5rem;">
-                            <i class="bi bi-geo-alt"></i>
-                        </div>
-                        <div>
-                            <h5 class="mb-1">Residential status</h5>
-                            <p class="mb-0">Should be a resident or NRI</p>
-                        </div>
-                    </div>
-                    
-                    <div class="d-flex align-items-start">
-                        <div class="me-3" style="color: #97144D; font-size: 1.5rem;">
-                            <i class="bi bi-graph-up"></i>
-                        </div>
-                        <div>
-                            <h5 class="mb-1">Credit score</h5>
-                            <p class="mb-0">Generally 750+ for premium cards</p>
-                        </div>
-                    </div>
-                    
-                    <p class="mt-3"><em>Note: These are indicative criteria. Final approval is subject to the bank's discretion.</em></p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Required Documents Card -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow">
-                <div class="card-header text-white" style="background-color: #97144D;">
-                    <h4 class="mb-0">Required Documents</h4>
-                </div>
-                <div class="card-body">
-                    <p>While applying for a credit card, you will need to share these documents:</p>
-                    
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead class="table-light">
-                                <tr>
-                                    <th colspan="2">Identity & Address Proof</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><i class="bi bi-card-text me-2"></i> PAN card (mandatory)</td>
-                                    <td class="text-center"><i class="bi bi-check-lg text-success"></i></td>
-                                </tr>
-                                <tr>
-                                    <td><i class="bi bi-person-badge me-2"></i> Aadhaar card</td>
-                                    <td class="text-center"><i class="bi bi-check-lg text-success"></i></td>
-                                </tr>
-                                <tr>
-                                    <td><i class="bi bi-passport me-2"></i> Passport</td>
-                                    <td class="text-center"><i class="bi bi-check-lg text-success"></i></td>
-                                </tr>
-                                <tr>
-                                    <td><i class="bi bi-car-front me-2"></i> Driver's license</td>
-                                    <td class="text-center"><i class="bi bi-check-lg text-success"></i></td>
-                                </tr>
-                                <tr>
-                                    <td><i class="bi bi-person-vcard me-2"></i> Voter ID</td>
-                                    <td class="text-center"><i class="bi bi-check-lg text-success"></i></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <h5 class="mt-4"><i class="bi bi-file-earmark-text me-2"></i> Income Proof</h5>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item"><i class="bi bi-file-earmark-spreadsheet me-2"></i> Salary slips (last 3 months)</li>
-                        <li class="list-group-item"><i class="bi bi-bank me-2"></i> Bank statements (last 6 months)</li>
-                        <li class="list-group-item"><i class="bi bi-file-earmark-bar-graph me-2"></i> Income Tax Returns (if self-employed)</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-    <!-- Application Steps -->
-    <div class="container mt-5">
-        <h2 class="text-center mb-3">How To Apply For A Credit Card Online?</h2>
-        <p class="text-center mb-5">Follow the below mentioned steps to apply for an Digi Bank credit card online:</p>
-
-        <div class="row text-center justify-content-center">
-            <div class="col-6 col-md-3 mb-4">
-                <div class="step-circle">
-                    <i class="bi bi-credit-card"></i>
-                </div>
-                <h6 class="mt-3">STEP 1</h6>
-                <p>Select the card of your choice.</p>
-            </div>
-            <div class="col-6 col-md-3 mb-4">
-                <div class="step-circle">
-                    <i class="bi bi-hand-index-thumb"></i>
-                </div>
-                <h6 class="mt-3">STEP 2</h6>
-                <p>Click on 'Apply Now'.</p>
-            </div>
-            <div class="col-6 col-md-3 mb-4">
-                <div class="step-circle">
-                    <i class="bi bi-file-text"></i>
-                </div>
-                <h6 class="mt-3">STEP 3</h6>
-                <p>You will be redirected to the online application form.</p>
-            </div>
-            <div class="col-6 col-md-3 mb-4">
-                <div class="step-circle">
-                    <i class="bi bi-file-earmark-check"></i>
-                </div>
-                <h6 class="mt-3">STEP 4</h6>
-                <p>Fill in the required information and click on 'Submit'.</p>
-            </div>
-        </div>
-    </div>
-    
-    <!-- CTA Section -->
-<div class="container mt-5 text-center">
-        <div class="card border-0 shadow">
-            <div class="card-body py-5">
-                <h3 class="mb-4">Ready to Get Your Digi Bank Debit Card?</h3>
-                <p class="mb-4">Experience the convenience of secure and instant access to your funds</p>
-               <a href="{{ url_for('login') }}"class="btn custom-btn me-2">
-                <i class="bi bi-credit-card me-2"></i>Apply Now
-            </a>
-            <a href="{{url_for('login')}}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left me-2"></i>Compare Cards
-            </a>
-            </div>
-        </div>
-    </div>
-     <!-- FAQ Section -->
-    <div class="container mt-5 mb-5">
-        <h2 class="text-center mb-4">Frequently Asked Questions</h2>
-        
-        <div class="accordion" id="faqAccordion">
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="faqHeading1">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1">
-                        What is the interest rate on Digi Bank Credit Cards?
-                    </button>
-                </h2>
-                <div id="faqCollapse1" class="accordion-collapse collapse show" aria-labelledby="faqHeading1">
-                    <div class="accordion-body">
-                        The interest rate on Digi Bank Credit Cards typically ranges from 3.4% per month (about 40.8% per annum) but may vary based on the card variant and customer profile. You can avoid interest charges by paying your total dues before the payment due date.
-                    </div>
-                </div>
-            </div>
-            
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="faqHeading2">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2">
-                        How long does it take to get the credit card after approval?
-                    </button>
-                </h2>
-                <div id="faqCollapse2" class="accordion-collapse collapse" aria-labelledby="faqHeading2">
-                    <div class="accordion-body">
-                        Once your application is approved, your Digi Bank Credit Card will typically be dispatched within 3-5 working days. Delivery time depends on your location but usually takes 7-10 working days from approval.
-                    </div>
-                </div>
-            </div>
-            
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="faqHeading3">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3">
-                        Can I get a credit card without income proof?
-                    </button>
-                </h2>
-                <div id="faqCollapse3" class="accordion-collapse collapse" aria-labelledby="faqHeading3">
-                    <div class="accordion-body">
-                       Digi Bank requires income proof for most credit card applications to assess your repayment capacity. However, students or young professionals may be eligible for entry-level cards with lower limits based on their banking relationship.
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    
-
-    <!-- Optional JavaScript; choose one of the two! -->
-
-    <!-- Option 1: Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossorigin="anonymous"></script>
+  </div>
+ 
+  <!-- Apply -->
+  <div class="final-apply">
+    <a href="{{ url_for('login') }}" class="btn btn-custom mt-4">Apply Now</a>
+  </div>
+ 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
+ 
 </html>
+ 
+ 

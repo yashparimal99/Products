@@ -1,44 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>View Investments - DigiBank Manager</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+
     <!-- Bootstrap CSS & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-<!-- SheetJS for Excel export -->
-    <script src="https://cdn.sheetjs.com/xlsx-0.18.5/package/dist/xlsx.full.min.js"></script>
 
     <style>
-        /* General Styles */
+        /* ✅ Unified CSS (matching manage-loans) */
         body {
             background-color: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        /* Sidebar Styles */
         #sidebarMenu.offcanvas-start {
             width: 250px;
-        }
-
-        #sidebarMenu .offcanvas-body {
-            padding: 0.5rem 1rem;
         }
 
         #sidebarMenu .nav-link {
             font-size: 0.9rem;
             padding: 8px 12px;
             display: flex;
-            align-items: center;
             gap: 8px;
             color: #333;
-            transition: color 0.3s;
-        }
-
-        #sidebarMenu .nav-link i {
-            font-size: 1.1rem;
         }
 
         #sidebarMenu .nav-link.active {
@@ -54,7 +42,7 @@
             border-radius: 4px;
         }
 
-        /* Top Bar Styles */
+        /* Top Bar */
         .top-bar {
             background-color: #97144D;
             color: white;
@@ -62,10 +50,6 @@
             align-items: center;
             justify-content: space-between;
             padding: 10px 20px;
-            user-select: none;
-            position: sticky;
-            top: 0;
-            z-index: 1030;
         }
 
         .top-bar h5 {
@@ -73,23 +57,6 @@
             font-weight: 700;
             flex-grow: 1;
             text-align: center;
-            color: white;
-        }
-
-        .top-bar button.btn-outline-light {
-            border: 1.5px solid white;
-            color: white;
-            background: transparent;
-            padding: 4px 10px;
-            font-size: 1.3rem;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.2s, color 0.2s;
-        }
-
-        .top-bar button.btn-outline-light:hover {
-            background-color: white;
-            color: #97144D;
         }
 
         .logout-btn {
@@ -99,9 +66,6 @@
             padding: 5px 15px;
             border-radius: 4px;
             font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s, color 0.2s;
-            flex-shrink: 0;
         }
 
         .logout-btn:hover {
@@ -109,13 +73,13 @@
             color: #97144D;
         }
 
-        /* Main Content Area */
+        /* Main Content */
         .main-content {
             margin-left: 250px;
             padding: 20px;
         }
 
-        /* Card Styles */
+        /* Cards */
         .card {
             border: none;
             border-radius: 10px;
@@ -128,65 +92,18 @@
             border-radius: 10px 10px 0 0 !important;
         }
 
-        /* Button Styles */
+        /* Buttons */
         .btn-primary {
             background-color: #97144D;
             border-color: #97144D;
         }
 
-        /* Table Styles */
+        /* Tables */
         .table th {
             background-color: #f1f1f1;
         }
 
-        /* Search Bar Styles */
-        .search-chatbar {
-            max-width: 900px;
-            margin: 15px auto 40px auto;
-            padding: 0 15px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .search-chatbar input[type="text"] {
-            flex-grow: 1;
-            padding: 10px 14px;
-            border-radius: 5px;
-            border: 1.5px solid #ccc;
-            font-size: 1rem;
-            outline-offset: 0;
-            transition: border-color 0.3s;
-            width: 9000px; 
-            margin: 0 auto;
-            display: block;
-        }
-
-        .search-chatbar input[type="text"]:focus {
-            border-color: #97144D;
-            box-shadow: 0 0 5px rgba(151, 20, 77, 0.5);
-        }
-
-        .search-chatbar .chatbot-btn {
-            background-color: #97144D;
-            border: none;
-            color: white;
-            padding: 10px 14px;
-            border-radius: 5px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.3s ease;
-            font-size: 1.3rem;
-            flex-shrink: 0;
-        }
-
-        .search-chatbar .chatbot-btn:hover {
-            background-color: #7a0f3e;
-        }
-
-        /* Status Badges */
+        /* Badges */
         .badge-pending {
             background-color: #ffc107;
             color: #212529;
@@ -201,747 +118,206 @@
             background-color: #dc3545;
             color: white;
         }
-
-        /* Summary Cards */
-        .summary-card {
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .summary-card .value {
-            font-size: 1.8rem;
-            font-weight: 700;
-        }
-
-        .summary-card .label {
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-        .export-alert {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 9999;
-            min-width: 300px;
-        }
     </style>
 </head>
+
 <body>
 
-    <!-- Sidebar Offcanvas -->
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+    <!-- Sidebar -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu">
         <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="sidebarMenuLabel">Manager</h5>
-            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            <h5 class="offcanvas-title">Manager</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body">
             <ul class="nav flex-column">
-                <li class="nav-item mb-2">
-                    <a class="nav-link text-dark" href="{{ url_for('managerapprovals') }}">
-                        <i class="bi bi-speedometer2 me-2"></i> Dashboard
-                    </a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a class="nav-link text-dark" href="{{ url_for('manage_accounts') }}">
-                        <i class="bi bi-people-fill me-2"></i> Manage Accounts
-                    </a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a class="nav-link text-dark" href="{{ url_for('manview_deposits') }}">
-                        <i class="bi bi-cash-stack me-2"></i> View Deposits
-                    </a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a class="nav-link text-dark" href="{{ url_for('manage_loans') }}">
-                        <i class="bi bi-file-earmark-check me-2"></i> Manage Loans
-                    </a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a class="nav-link text-dark active" href="{{ url_for('view_investments') }}">
-                        <i class="bi bi-graph-up me-2"></i> View Investments
-                    </a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a class="nav-link text-dark" href="{{ url_for('view_cards') }}">
-                        <i class="bi bi-credit-card me-2"></i> Cards
-                    </a>
-                </li>
-               
+                <li class="nav-item mb-2"><a class="nav-link" href="{{ url_for('dashboard') }}"><i
+                            class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
+                <li class="nav-item mb-2"><a class="nav-link" href="{{ url_for('manage_accounts') }}"><i
+                            class="bi bi-people-fill me-2"></i> Manage Accounts</a></li>
+                <li class="nav-item mb-2"><a class="nav-link" href="{{ url_for('manview_deposits') }}"><i
+                            class="bi bi-cash-stack me-2"></i> View Deposits</a></li>
+                <li class="nav-item mb-2"><a class="nav-link" href="{{ url_for('manage_loans') }}"><i
+                            class="bi bi-file-earmark-check me-2"></i> Manage Loans</a></li>
+                <li class="nav-item mb-2"><a class="nav-link active" href="#"><i class="bi bi-graph-up me-2"></i> View
+                        Investments</a></li>
+                <li class="nav-item mb-2"><a class="nav-link" href="{{ url_for('view_cards') }}"><i
+                            class="bi bi-credit-card me-2"></i> Cards</a></li>
             </ul>
+            <div class="tab-content mt-3" id="accountTabsContent">
+      <div class="tab-pane fade show active" id="balance" role="tabpanel" aria-labelledby="balance-tab">
+        <p class="text-muted">Your Investments account details are shown below.</p>
+      </div>
+      <div class="tab-pane fade" id="borrowings" role="tabpanel" aria-labelledby="borrowings-tab">
+        <p class="text-muted">Borrowings/loans info coming soon.</p>
+      </div>
+      <div class="tab-pane fade" id="investments" role="tabpanel" aria-labelledby="investments-tab">
+        <p class="text-muted">Investments overview coming soon.</p>
+      </div>
+      <div class="tab-pane fade" id="cards" role="tabpanel" aria-labelledby="cards-tab">
+        <p class="text-muted">Manage your cards here soon.</p>
+      </div>
+    </div>
         </div>
     </div>
 
+    
+
     <!-- Top Bar -->
-    <div class="top-bar d-flex align-items-center">
-  <button class="btn btn-outline-light btn-sm me-3"
-          data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
-          aria-controls="sidebarMenu" aria-label="Toggle sidebar">
-    <i class="bi bi-list"></i>
-  </button>
-
-  <h5 class="me-auto mb-0">DigiBank Manager Dashboard</h5>
-
-  <div class="d-flex align-items-center">
-    <p class="navbar-text text-white mb-0">
-      Welcome, <strong></strong>
-    </p>
-  </div>
-
-  <!-- Ensuring contrast with .text-white -->
-  <a href="{{ url_for('logout') }}" class="logout-btn ms-3">
-    Logout
-  </a>
-</div>
-
-    <!-- Search Bar and Chatbot with Sidebar Toggle -->
-    <div class="search-chatbar">
-        <input type="text" placeholder="Search investments, customers..." aria-label="Search">
-        <button class="chatbot-btn" aria-label="Chatbot">
-            <i class="bi bi-chat-dots-fill"></i>
-        </button>
+    <div class="top-bar">
+        <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"><i
+                class="bi bi-list"></i></button>
+        <h5>DigiBank Investment Management</h5>
+        <a href="{{ url_for('logout') }}" class="logout-btn ms-3">
+            Logout
+        </a>
     </div>
 
     <!-- Main Content -->
     <div class="main-content">
-        <h2 class="mb-4"><i class="bi bi-graph-up"></i> View Investments</h2>
-        
-        <!-- Investment Summary Cards -->
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="summary-card bg-white">
-                    <div class="value text-primary">₹1,24,57,890</div>
-                    <div class="label">Total Assets Under Management</div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="summary-card bg-white">
-                    <div class="value text-success">142</div>
-                    <div class="label">Active Investment Accounts</div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="summary-card bg-white">
-                    <div class="value text-info">8.7%</div>
-                    <div class="label">Average Annual Return</div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Investment Requests Card -->
+        <!-- Investment Requests -->
         <div class="card mb-4">
             <div class="card-header">
                 <h5 class="mb-0">Investment Requests</h5>
             </div>
             <div class="card-body">
-                <p>Approve or reject investment transactions submitted by customers.</p>
-                
-                <!-- Filter Controls -->
-                <div class="row mb-4">
-                    <div class="col-md-4">
-                        <label for="investmentTypeFilter" class="form-label">Investment Type</label>
-                        <select class="form-select" id="investmentTypeFilter" onchange="filterInvestments()">
-                            <option value="all">All Types</option>
-                            <option value="Mutual Fund Purchase">Mutual Fund</option>
-                            <option value="Early Redemption">Redemption</option>
-                            <option value="Investment Switch">Switch</option>
-                            <option value="New Investment">New Investment</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="investmentStatusFilter" class="form-label">Status</label>
-                        <select class="form-select" id="investmentStatusFilter" onchange="filterInvestments()">
-                            <option value="all">All Statuses</option>
-                            <option value="Pending">Pending</option>
-                            <option value="Approved">Approved</option>
-                            <option value="Rejected">Rejected</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4 d-flex align-items-end justify-content-end">
-        <div class="dropdown">
-            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-download"></i> Export Data
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="exportDropdown">
-                <li><a class="dropdown-item" href="#" onclick="exportInvestments('current')">Current View</a></li>
-                <li><a class="dropdown-item" href="#" onclick="exportInvestments('all')">All Investments</a></li>
-                <li><a class="dropdown-item" href="#" onclick="exportInvestments('active')">Active Portfolios</a></li>
-                <li><a class="dropdown-item" href="#" onclick="exportInvestments('pending')">Pending Requests</a></li>
-            </ul>
-        </div>
-    </div>
-
-                </div>
-                
-                <!-- Investments Table -->
+                <p>Approve or reject investment applications submitted by customers.</p>
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover align-middle">
                         <thead>
                             <tr>
-                                <th>Investment ID</th>
+                                <th>Request ID</th>
+                                <th>Application No</th>
                                 <th>Customer</th>
                                 <th>Investment Type</th>
-                                <th>Amount</th>
+                                <th>Deposit (₹)</th>
                                 <th>Date</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="investmentTableBody"></tbody>
+                        <tbody>
+                            {% for inv in investments %}
+                            {% if inv.status == 'pending_manager' %}
+                            <tr>
+                                <td>{{ inv.request_id }}</td>
+                                <td>{{ inv.application_number }}</td>
+                                <td>{{ inv.customer }}</td>
+                                <td>{{ inv.investment_type }}</td>
+                                <td>{{ inv.initial_deposit }}</td>
+                                <td>{{ inv.application_date }}</td>
+                                <td><span class="badge badge-pending">Pending</span></td>
+                                <td>
+                                    <form
+                                        action="{{ url_for('update_investment_status', inv_id=inv.id, action='approve') }}"
+                                        method="post" style="display:inline;">
+                                        <button class="btn btn-sm btn-success"><i class="bi bi-check-circle"></i>
+                                            Approve</button>
+                                    </form>
+                                    <form
+                                        action="{{ url_for('update_investment_status', inv_id=inv.id, action='reject') }}"
+                                        method="post" style="display:inline;">
+                                        <button class="btn btn-sm btn-danger"><i class="bi bi-x-circle"></i>
+                                            Reject</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
                     </table>
                 </div>
-                
-                <!-- Pagination -->
-                <nav aria-label="Investment pagination">
-                    <ul class="pagination justify-content-center mt-4">
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#" tabindex="-1">Previous</a>
-                        </li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">Next</a>
-                        </li>
-                    </ul>
-                </nav>
             </div>
         </div>
 
-        <!-- Active Investments Card -->
+        <!-- Active Investments -->
         <div class="card">
             <div class="card-header">
                 <h5 class="mb-0">Active Investments</h5>
             </div>
             <div class="card-body">
-                <p>View and manage currently active investment portfolios.</p>
+                <p>View currently active investments.</p>
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th>Portfolio ID</th>
+                                <th>Request ID</th>
                                 <th>Customer</th>
                                 <th>Investment Type</th>
-                                <th>Current Value</th>
-                                <th>YTD Return</th>
-                                <th>Risk Level</th>
+                                <th>Deposit (₹)</th>
+                                <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="activeInvestmentsTableBody"></tbody>
+                        <tbody>
+                            {% for inv in investments %}
+                            {% if inv.status == 'approved' %}
+                            <tr>
+                                <td>{{ inv.request_id }}</td>
+                                <td>{{ inv.customer }}</td>
+                                <td>{{ inv.investment_type }}</td>
+                                <td>{{ inv.initial_deposit }}</td>
+                                <td><span class="badge badge-approved">Approved</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary view-details" data-bs-toggle="modal"
+                                        data-bs-target="#investmentDetailsModal" data-id="{{ inv.request_id }}"
+                                        data-customer="{{ inv.customer }}" data-type="{{ inv.investment_type }}"
+                                        data-deposit="{{ inv.initial_deposit }}" data-date="{{ inv.application_date }}">
+                                        <i class="bi bi-eye"></i> View
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
+
     </div>
 
     <!-- Investment Details Modal -->
-    <div class="modal fade" id="investmentDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="investmentDetailsModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="investmentModalTitle">Investment Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title">Investment Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body" id="investmentModalBody">
-                    <!-- Content will be loaded here -->
+                <div class="modal-body">
+                    <p><strong>Request ID:</strong> <span id="modalReqId"></span></p>
+                    <p><strong>Customer:</strong> <span id="modalCustomer"></span></p>
+                    <p><strong>Investment Type:</strong> <span id="modalType"></span></p>
+                    <p><strong>Deposit (₹):</strong> <span id="modalDeposit"></span></p>
+                    <p><strong>Application Date:</strong> <span id="modalDate"></span></p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="printInvestmentBtn">
-                        <i class="bi bi-printer"></i> Print Details
-                    </button>
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button class="btn btn-primary" onclick="window.print()"><i class="bi bi-printer"></i>
+                        Print</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap JS Bundle with Popper -->
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Data initialization
-        const investmentRequests = [
-            { 
-                id: 'INV3001', 
-                customer: 'John Smith', 
-                type: 'Mutual Fund Purchase', 
-                amount: '₹2,00,000', 
-                date: '2025-08-05', 
-                status: 'Pending',
-                details: {
-                    fundName: 'ABC Equity Fund - Growth',
-                    folioNumber: 'FOL1002345',
-                    paymentMode: 'Lump Sum',
-                    documents: ['KYC', 'PAN', 'Cancelled Cheque']
-                }
-            },
-            { 
-                id: 'INV3002', 
-                customer: 'Priya Verma', 
-                type: 'Early Redemption', 
-                amount: '₹1,50,000', 
-                date: '2025-08-07', 
-                status: 'Approved',
-                details: {
-                    fundName: 'XYZ Debt Fund - Regular',
-                    folioNumber: 'FOL1006789',
-                    redemptionDate: '2025-08-14',
-                    redemptionUnits: '245.678'
-                }
-            },
-            { 
-                id: 'INV3003', 
-                customer: 'Amit Sharma', 
-                type: 'Investment Switch', 
-                amount: '₹75,000', 
-                date: '2025-08-09', 
-                status: 'Pending',
-                details: {
-                    fromFund: 'PQR Balanced Fund - Growth',
-                    toFund: 'LMN Equity Fund - Dividend',
-                    switchUnits: '120.456',
-                    switchType: 'Capital Gains'
-                }
-            }
-        ];
-
-        const activeInvestments = [
-            { 
-                id: 'PORT2023-001', 
-                customer: 'Rajesh Kumar', 
-                type: 'Equity Mutual Fund', 
-                currentValue: '₹3,45,678', 
-                ytdReturn: '+12.5%',
-                riskLevel: 'High',
-                details: {
-                    fundName: 'Bluechip Equity Fund - Growth',
-                    investmentDate: '2023-05-15',
-                    investedAmount: '₹2,50,000',
-                    currentUnits: '1,245.67'
-                }
-            },
-            { 
-                id: 'PORT2024-005', 
-                customer: 'Neha Patel', 
-                type: 'Debt Mutual Fund', 
-                currentValue: '₹1,87,500', 
-                ytdReturn: '+7.8%',
-                riskLevel: 'Low',
-                details: {
-                    fundName: 'Corporate Bond Fund - Regular',
-                    investmentDate: '2024-02-20',
-                    investedAmount: '₹1,75,000',
-                    currentUnits: '1,876.54'
-                }
-            }
-        ];
-
-        // DOM Elements
-        const investmentTableBody = document.getElementById('investmentTableBody');
-        const activeInvestmentsTableBody = document.getElementById('activeInvestmentsTableBody');
-        const investmentDetailsModal = new bootstrap.Modal(document.getElementById('investmentDetailsModal'));
-
-        // Initialize the page
-        document.addEventListener('DOMContentLoaded', function() {
-            renderInvestmentRequests();
-            renderActiveInvestments();
-        });
-
-        // Render Investment Requests Table
-        function renderInvestmentRequests(filteredData = investmentRequests) {
-            investmentTableBody.innerHTML = '';
-            
-            if (filteredData.length === 0) {
-                investmentTableBody.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="text-center py-4">No investment requests found matching your criteria</td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            filteredData.forEach((investment, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${investment.id}</td>
-                    <td>${investment.customer}</td>
-                    <td>${investment.type}</td>
-                    <td>${investment.amount}</td>
-                    <td>${investment.date}</td>
-                    <td><span class="badge ${getStatusBadgeClass(investment.status)}">${investment.status}</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-primary me-1" onclick="viewInvestmentDetails(${index})">
-                            <i class="bi bi-eye"></i> View
-                        </button>
-                        ${investment.status === 'Pending' ? `
-                        <button class="btn btn-sm btn-success me-1" onclick="approveInvestment(${index})">
-                            <i class="bi bi-check-circle"></i> Approve
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="rejectInvestment(${index})">
-                            <i class="bi bi-x-circle"></i> Reject
-                        </button>
-                        ` : ''}
-                    </td>
-                `;
-                investmentTableBody.appendChild(row);
+        document.addEventListener("DOMContentLoaded", function () {
+            const modal = document.getElementById("investmentDetailsModal");
+            modal.addEventListener("show.bs.modal", function (event) {
+                const button = event.relatedTarget;
+                document.getElementById("modalReqId").textContent = button.getAttribute("data-id");
+                document.getElementById("modalCustomer").textContent = button.getAttribute("data-customer");
+                document.getElementById("modalType").textContent = button.getAttribute("data-type");
+                document.getElementById("modalDeposit").textContent = button.getAttribute("data-deposit");
+                document.getElementById("modalDate").textContent = button.getAttribute("data-date");
             });
-        }
-
-        // Render Active Investments Table
-        function renderActiveInvestments() {
-            activeInvestmentsTableBody.innerHTML = '';
-            
-            activeInvestments.forEach((investment, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${investment.id}</td>
-                    <td>${investment.customer}</td>
-                    <td>${investment.type}</td>
-                    <td>${investment.currentValue}</td>
-                    <td class="${investment.ytdReturn.startsWith('+') ? 'text-success' : 'text-danger'}">${investment.ytdReturn}</td>
-                    <td><span class="badge ${getRiskBadgeClass(investment.riskLevel)}">${investment.riskLevel}</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-primary" onclick="viewActiveInvestmentDetails(${index})">
-                            <i class="bi bi-eye"></i> Details
-                        </button>
-                    </td>
-                `;
-                activeInvestmentsTableBody.appendChild(row);
-            });
-        }
-
-        // Get appropriate badge class for status
-        function getStatusBadgeClass(status) {
-            switch(status) {
-                case 'Approved': return 'badge-approved';
-                case 'Rejected': return 'badge-rejected';
-                case 'Pending': return 'badge-pending';
-                default: return 'bg-secondary';
-            }
-        }
-
-        // Get appropriate badge class for risk level
-        function getRiskBadgeClass(riskLevel) {
-            switch(riskLevel) {
-                case 'High': return 'bg-danger';
-                case 'Medium': return 'bg-warning text-dark';
-                case 'Low': return 'bg-success';
-                default: return 'bg-secondary';
-            }
-        }
-
-        // Filter investments based on type and status
-        function filterInvestments() {
-            const typeFilter = document.getElementById('investmentTypeFilter').value;
-            const statusFilter = document.getElementById('investmentStatusFilter').value;
-            
-            let filtered = investmentRequests;
-            
-            // Filter by investment type
-            if (typeFilter !== 'all') {
-                filtered = filtered.filter(investment => investment.type.includes(typeFilter));
-            }
-            
-            // Filter by status
-            if (statusFilter !== 'all') {
-                filtered = filtered.filter(investment => investment.status === statusFilter);
-            }
-            
-            renderInvestmentRequests(filtered);
-        }
-
-        // View investment request details
-        function viewInvestmentDetails(index) {
-            const investment = investmentRequests[index];
-            document.getElementById('investmentModalTitle').textContent = `Investment Request - ${investment.id}`;
-            
-            let detailsHtml = `
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>Investment ID:</strong> ${investment.id}</p>
-                        <p><strong>Customer:</strong> ${investment.customer}</p>
-                        <p><strong>Type:</strong> ${investment.type}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <p><strong>Amount:</strong> ${investment.amount}</p>
-                        <p><strong>Date:</strong> ${investment.date}</p>
-                        <p><strong>Status:</strong> <span class="badge ${getStatusBadgeClass(investment.status)}">${investment.status}</span></p>
-                    </div>
-                </div>
-                <hr>
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <h6>Investment Details</h6>
-            `;
-
-            // Add specific details based on investment type
-            if (investment.type.includes('Mutual Fund')) {
-                detailsHtml += `
-                    <p><strong>Fund Name:</strong> ${investment.details.fundName}</p>
-                    <p><strong>Folio Number:</strong> ${investment.details.folioNumber}</p>
-                    <p><strong>Payment Mode:</strong> ${investment.details.paymentMode}</p>
-                `;
-            } else if (investment.type.includes('Redemption')) {
-                detailsHtml += `
-                    <p><strong>Fund Name:</strong> ${investment.details.fundName}</p>
-                    <p><strong>Redemption Date:</strong> ${investment.details.redemptionDate}</p>
-                    <p><strong>Units Redeemed:</strong> ${investment.details.redemptionUnits}</p>
-                `;
-            } else if (investment.type.includes('Switch')) {
-                detailsHtml += `
-                    <p><strong>From Fund:</strong> ${investment.details.fromFund}</p>
-                    <p><strong>To Fund:</strong> ${investment.details.toFund}</p>
-                    <p><strong>Switch Type:</strong> ${investment.details.switchType}</p>
-                    <p><strong>Units Switched:</strong> ${investment.details.switchUnits}</p>
-                `;
-            }
-
-            detailsHtml += `
-                    </div>
-                    <div class="col-md-6">
-                        <h6>Documents</h6>
-                        <ul>
-            `;
-
-            if (investment.details.documents) {
-                investment.details.documents.forEach(doc => {
-                    detailsHtml += `<li>${doc}</li>`;
-                });
-            } else {
-                detailsHtml += `<li>No additional documents required</li>`;
-            }
-
-            detailsHtml += `
-                        </ul>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('investmentModalBody').innerHTML = detailsHtml;
-            investmentDetailsModal.show();
-        }
-
-        // View active investment details
-        function viewActiveInvestmentDetails(index) {
-            const investment = activeInvestments[index];
-            document.getElementById('investmentModalTitle').textContent = `Investment Portfolio - ${investment.id}`;
-            
-            let detailsHtml = `
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>Portfolio ID:</strong> ${investment.id}</p>
-                        <p><strong>Customer:</strong> ${investment.customer}</p>
-                        <p><strong>Investment Type:</strong> ${investment.type}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <p><strong>Current Value:</strong> ${investment.currentValue}</p>
-                        <p><strong>YTD Return:</strong> <span class="${investment.ytdReturn.startsWith('+') ? 'text-success' : 'text-danger'}">${investment.ytdReturn}</span></p>
-                        <p><strong>Risk Level:</strong> <span class="badge ${getRiskBadgeClass(investment.riskLevel)}">${investment.riskLevel}</span></p>
-                    </div>
-                </div>
-                <hr>
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <h6>Portfolio Details</h6>
-                        <p><strong>Fund Name:</strong> ${investment.details.fundName}</p>
-                        <p><strong>Investment Date:</strong> ${investment.details.investmentDate}</p>
-                        <p><strong>Invested Amount:</strong> ${investment.details.investedAmount}</p>
-                        <p><strong>Current Units:</strong> ${investment.details.currentUnits}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <h6>Performance</h6>
-                        <canvas id="performanceChart" height="200"></canvas>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('investmentModalBody').innerHTML = detailsHtml;
-            investmentDetailsModal.show();
-
-            // In a real application, you would render a chart here
-            // renderPerformanceChart();
-        }
-
-        // Approve an investment
-        function approveInvestment(index) {
-            if (confirm(`Are you sure you want to approve investment ${investmentRequests[index].id}?`)) {
-                investmentRequests[index].status = 'Approved';
-                renderInvestmentRequests();
-                alert(`Investment ${investmentRequests[index].id} has been approved.`);
-            }
-        }
-
-        // Reject an investment
-        function rejectInvestment(index) {
-            const reason = prompt(`Please enter reason for rejecting investment ${investmentRequests[index].id}:`);
-            if (reason !== null) {
-                investmentRequests[index].status = 'Rejected';
-                investmentRequests[index].rejectionReason = reason;
-                renderInvestmentRequests();
-                alert(`Investment ${investmentRequests[index].id} has been rejected.`);
-            }
-        }
-
-        function exportInvestments(type = 'current') {
-            try {
-                let dataToExport = [];
-                let fileName = 'DigiBank_Investments_Export';
-                let sheetName = "Investment Data";
-                
-                if (type === 'current') {
-                    // Get filtered data
-                    const typeFilter = document.getElementById('investmentTypeFilter').value;
-                    const statusFilter = document.getElementById('investmentStatusFilter').value;
-                    
-                    dataToExport = investmentRequests.filter(investment => {
-                        const typeMatch = typeFilter === 'all' || investment.type.includes(typeFilter);
-                        const statusMatch = statusFilter === 'all' || investment.status === statusFilter;
-                        return typeMatch && statusMatch;
-                    });
-                    fileName = 'DigiBank_Filtered_Investments_' + formatDate(new Date());
-                } 
-                else if (type === 'all') {
-                    dataToExport = investmentRequests;
-                    fileName = 'DigiBank_All_Investments_' + formatDate(new Date());
-                }
-                else if (type === 'active') {
-                    dataToExport = activeInvestments;
-                    sheetName = "Active Portfolios";
-                    fileName = 'DigiBank_Active_Portfolios_' + formatDate(new Date());
-                }
-                else if (type === 'pending') {
-                    dataToExport = investmentRequests.filter(inv => inv.status === 'Pending');
-                    fileName = 'DigiBank_Pending_Investments_' + formatDate(new Date());
-                }
-
-                if (dataToExport.length === 0) {
-                    showExportAlert('No data to export!', 'warning');
-                    return;
-                }
-
-                // Prepare the worksheet
-                let wsData = [];
-                
-                if (type === 'active') {
-                    // Active portfolios export format
-                    wsData = [
-                        // Headers
-                        ['Portfolio ID', 'Customer', 'Investment Type', 'Current Value', 'YTD Return', 'Risk Level', 'Fund Name', 'Investment Date'],
-                        // Data rows
-                        ...dataToExport.map(investment => [
-                            investment.id,
-                            investment.customer,
-                            investment.type,
-                            investment.currentValue,
-                            investment.ytdReturn,
-                            investment.riskLevel,
-                            investment.details.fundName,
-                            investment.details.investmentDate
-                        ])
-                    ];
-                } else {
-                    // Investment requests export format
-                    wsData = [
-                        // Headers
-                        ['Investment ID', 'Customer', 'Investment Type', 'Amount', 'Date', 'Status', 'Fund Name', 'Folio/Units'],
-                        // Data rows
-                        ...dataToExport.map(investment => [
-                            investment.id,
-                            investment.customer,
-                            investment.type,
-                            investment.amount,
-                            investment.date,
-                            investment.status,
-                            investment.details.fundName || investment.details.fromFund || 'N/A',
-                            investment.details.folioNumber || investment.details.redemptionUnits || investment.details.switchUnits || 'N/A'
-                        ])
-                    ];
-                }
-
-                const ws = XLSX.utils.aoa_to_sheet(wsData);
-                
-                // Create workbook
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, sheetName);
-                
-                // Try the standard method first
-                try {
-                    XLSX.writeFile(wb, `${fileName}.xlsx`);
-                    showExportAlert('Export started successfully!', 'success');
-                } catch (e) {
-                    // Fallback method if standard export fails
-                    fallbackExport(wb, fileName);
-                }
-
-            } catch (error) {
-                console.error('Export error:', error);
-                showExportAlert('Failed to export data. Please try again.', 'danger');
-            }
-        }
-
-        // Fallback export method
-        function fallbackExport(wb, fileName) {
-            try {
-                // Generate base64 string
-                const base64 = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
-                
-                // Create download link
-                const link = document.createElement('a');
-                link.href = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${base64}`;
-                link.download = `${fileName}.xlsx`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                showExportAlert('Export started using fallback method!', 'info');
-            } catch (fallbackError) {
-                console.error('Fallback export error:', fallbackError);
-                showExportAlert('Both export methods failed. Please check console for details.', 'danger');
-            }
-        }
-
-        // Helper function to format date
-        function formatDate(date) {
-            return date.toISOString().split('T')[0].replace(/-/g, '');
-        }
-
-        // Helper function to show export alerts
-        function showExportAlert(message, type) {
-            // Remove any existing alerts first
-            const existingAlert = document.querySelector('.export-alert');
-            if (existingAlert) existingAlert.remove();
-            
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type} alert-dismissible fade show export-alert`;
-            alertDiv.role = 'alert';
-            alertDiv.innerHTML = `
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            `;
-            document.body.appendChild(alertDiv);
-            
-            // Auto-remove after 5 seconds
-            setTimeout(() => {
-                alertDiv.remove();
-            }, 5000);
-        }
-
-        // Logout function
-        function logout() {
-            if (confirm('Are you sure you want to logout?')) {
-                // In a real application, this would redirect to logout endpoint
-                alert('Logged out successfully!');
-                window.location.href = 'login.html';
-            }
-        }
-
-        // Print investment details handler
-        document.getElementById('printInvestmentBtn').addEventListener('click', function() {
-            alert('Printing investment details...');
-            investmentDetailsModal.hide();
         });
     </script>
 </body>
+
 </html>

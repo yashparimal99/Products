@@ -373,6 +373,7 @@
                 <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Credit Cards</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Debit Cards</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Prepaid Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Forex Cards</a></li>
               </ul>
             </li>
             <!-- Deposits Dropdown -->
@@ -380,10 +381,10 @@
               <a class="nav-link dropdown-toggle" href="#" id="forexDropdown" role="button" data-bs-toggle="dropdown"
                 aria-expanded="false">Forex</a>
               <ul class="dropdown-menu" aria-labelledby="forexDropdown">
-                <li><a class="dropdown-item" href="#">Travel Forex Cards</a></li>
-                <li><a class="dropdown-item" href="#">Send Money Abroad</a></li>
-                <li><a class="dropdown-item" href="#">Send Money India</a></li>
-                <li><a class="dropdown-item" href="#">Foregin Currency Exchange</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('userdashforex') }}">Travel Forex Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('userdashforex') }}">Send Money Abroad</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('userdashforex') }}">Send Money India</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('userdashforex') }}">Foregin Currency Exchange</a></li>
               </ul>
             </li>
             <!-- Deposits Dropdown -->

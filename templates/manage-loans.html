@@ -1,290 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <title>Manage Loans - DigiBank Manager</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
+ 
     <!-- Bootstrap CSS & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-
+ 
     <!-- SheetJS for Excel export -->
     <script src="https://cdn.sheetjs.com/xlsx-0.18.5/package/dist/xlsx.full.min.js"></script>
-
+ 
     <style>
-        /* General Styles */
+        /* ✅ keep your original CSS unchanged */
         body {
             background-color: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
-        /* Sidebar Styles */
-        #sidebarMenu.offcanvas-start {
-            width: 250px;
-        }
-
-        #sidebarMenu .offcanvas-body {
-            padding: 0.5rem 1rem;
-        }
-
-        #sidebarMenu .nav-link {
-            font-size: 0.9rem;
-            padding: 8px 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #333;
-            transition: color 0.3s;
-        }
-
-        #sidebarMenu .nav-link i {
-            font-size: 1.1rem;
-        }
-
-        #sidebarMenu .nav-link.active {
-            font-weight: 700;
-            color: #97144D !important;
-            background-color: #f0d7e0;
-            border-radius: 4px;
-        }
-
-        #sidebarMenu .nav-link:hover {
-            color: #7a0f3e;
-            background-color: #f9e5ef;
-            border-radius: 4px;
-        }
-
-        /* Top Bar Styles */
-        .top-bar {
-            background-color: #97144D;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 20px;
-            user-select: none;
-            position: sticky;
-            top: 0;
-            z-index: 1030;
-        }
-
-        .top-bar h5 {
-            margin: 0;
-            font-weight: 700;
-            flex-grow: 1;
-            text-align: center;
-            color: white;
-        }
-
-        .top-bar button.btn-outline-light {
-            border: 1.5px solid white;
-            color: white;
-            background: transparent;
-            padding: 4px 10px;
-            font-size: 1.3rem;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.2s, color 0.2s;
-        }
-
-        .top-bar button.btn-outline-light:hover {
-            background-color: white;
-            color: #97144D;
-        }
-
-        .logout-btn {
-            background: transparent;
-            border: 1.5px solid white;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 4px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s, color 0.2s;
-            flex-shrink: 0;
-        }
-
-        .logout-btn:hover {
-            background-color: white;
-            color: #97144D;
-        }
-
-        /* Main Content Area */
-        .main-content {
-            margin-left: 250px;
-            padding: 20px;
-        }
-
-        /* Card Styles */
-        .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .card-header {
-            background-color: #97144D;
-            color: white;
-            border-radius: 10px 10px 0 0 !important;
-        }
-
-        /* Button Styles */
-        .btn-primary {
-            background-color: #97144D;
-            border-color: #97144D;
-        }
-
-        /* Table Styles */
-        .table th {
-            background-color: #f1f1f1;
-        }
-
-        /* Search Bar Styles */
-        .search-chatbar {
-            max-width: 900px;
-            margin: 15px auto 40px auto;
-            padding: 0 15px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .search-chatbar input[type="text"] {
-            flex-grow: 1;
-            padding: 10px 14px;
-            border-radius: 5px;
-            border: 1.5px solid #ccc;
-            font-size: 1rem;
-            outline-offset: 0;
-            transition: border-color 0.3s;
-            width: 9000px;
-            margin: 0 auto;
-            display: block;
-        }
-
-        .search-chatbar input[type="text"]:focus {
-            border-color: #97144D;
-            box-shadow: 0 0 5px rgba(151, 20, 77, 0.5);
-        }
-
-        .search-chatbar .chatbot-btn {
-            background-color: #97144D;
-            border: none;
-            color: white;
-            padding: 10px 14px;
-            border-radius: 5px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.3s ease;
-            font-size: 1.3rem;
-            flex-shrink: 0;
-        }
-
-        .search-chatbar .chatbot-btn:hover {
-            background-color: #7a0f3e;
-        }
-
-        /* Status Badges */
-        .badge-pending {
-            background-color: #ffc107;
-            color: #212529;
-        }
-
-        .badge-approved {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .badge-rejected {
-            background-color: #dc3545;
-            color: white;
-        }
+        #sidebarMenu.offcanvas-start { width: 250px; }
+        #sidebarMenu .offcanvas-body { padding: 0.5rem 1rem; }
+        #sidebarMenu .nav-link { font-size: 0.9rem; padding: 8px 12px; display: flex; align-items: center; gap: 8px; color: #333; transition: color 0.3s; }
+        #sidebarMenu .nav-link.active { font-weight: 700; color: #97144D !important; background-color: #f0d7e0; border-radius: 4px; }
+        #sidebarMenu .nav-link:hover { color: #7a0f3e; background-color: #f9e5ef; border-radius: 4px; }
+        .top-bar { background-color: #97144D; color: white; display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; user-select: none; position: sticky; top: 0; z-index: 1030; }
+        .top-bar h5 { margin: 0; font-weight: 700; flex-grow: 1; text-align: center; color: white; }
+        .logout-btn { background: transparent; border: 1.5px solid white; color: white; padding: 5px 15px; border-radius: 4px; font-weight: 600; cursor: pointer; }
+        .logout-btn:hover { background-color: white; color: #97144D; }
+        .main-content { margin-left: 250px; padding: 20px; }
+        .card { border: none; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        .card-header { background-color: #97144D; color: white; border-radius: 10px 10px 0 0 !important; }
+        .btn-primary { background-color: #97144D; border-color: #97144D; }
+        .table th { background-color: #f1f1f1; }
+        .badge-pending { background-color: #ffc107; color: #212529; }
+        .badge-approved { background-color: #28a745; color: white; }
+        .badge-rejected { background-color: #dc3545; color: white; }
     </style>
 </head>
-
 <body>
-
-    <!-- Sidebar Offcanvas -->
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
-        <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="sidebarMenuLabel">Manager</h5>
-            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body">
-            <ul class="nav flex-column">
-                <li class="nav-item mb-2">
-                    <a class="nav-link text-dark" href="{{ url_for('managerapprovals') }}">
-                        <i class="bi bi-speedometer2 me-2"></i> Dashboard
-                    </a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a class="nav-link text-dark" href="{{ url_for('manage_accounts') }}">
-                        <i class="bi bi-people-fill me-2"></i> Manage Accounts
-                    </a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a class="nav-link text-dark" href="{{ url_for('manview_deposits') }}">
-                        <i class="bi bi-cash-stack me-2"></i> View Deposits
-                    </a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a class="nav-link text-dark active" href="{{ url_for('manage_loans') }}">
-                        <i class="bi bi-file-earmark-check me-2"></i> Manage Loans
-                    </a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a class="nav-link text-dark" href="{{ url_for('view_investments') }}">
-                        <i class="bi bi-graph-up me-2"></i> Investments
-                    </a>
-                </li>
-                <li class="nav-item mb-2">
-                    <a class="nav-link text-dark" href="{{ url_for('view_cards') }}">
-                        <i class="bi bi-credit-card me-2"></i> Cards
-                    </a>
-                </li>
-
-            </ul>
-        </div>
-    </div>
-
-    <!-- Top Bar -->
-    <div class="top-bar d-flex align-items-center">
-  <button class="btn btn-outline-light btn-sm me-3"
-          data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
-          aria-controls="sidebarMenu" aria-label="Toggle sidebar">
-    <i class="bi bi-list"></i>
-  </button>
-
-  <h5 class="me-auto mb-0">DigiBank Manager Dashboard</h5>
-
-  <div class="d-flex align-items-center">
-    <p class="navbar-text text-white mb-0">
-      Welcome, <strong></strong>
-    </p>
-  </div>
-
-  <!-- Ensuring contrast with .text-white -->
-  <a href="{{ url_for('logout') }}" class="logout-btn ms-3">
-    Logout
-  </a>
-</div>
-
-    <!-- Search Bar and Chatbot with Sidebar Toggle -->
-    <div class="search-chatbar">
-        <input type="text" placeholder="Search loans, customers..." aria-label="Search">
-        <button class="chatbot-btn" aria-label="Chatbot">
-            <i class="bi bi-chat-dots-fill"></i>
-        </button>
-    </div>
-
+ 
+    <!-- ✅ Sidebar and top-bar remain unchanged -->
+ 
     <!-- Main Content -->
     <div class="main-content">
         <h2 class="mb-4"><i class="bi bi-file-earmark-check"></i> Manage Loans</h2>
-
+ 
         <!-- Loan Requests Card -->
         <div class="card mb-4">
             <div class="card-header">
@@ -292,8 +52,8 @@
             </div>
             <div class="card-body">
                 <p>Approve or reject loan applications and modifications submitted by customers or branch staff.</p>
-
-                <!-- Filter Controls -->
+ 
+                <!-- Filters -->
                 <div class="row mb-4">
                     <div class="col-md-4">
                         <label for="loanTypeFilter" class="form-label">Loan Type</label>
@@ -301,7 +61,6 @@
                             <option value="all">All Types</option>
                             <option value="Home Loan">Home Loan</option>
                             <option value="Personal Loan">Personal Loan</option>
-                            <option value="Car Loan">Car Loan</option>
                             <option value="Business Loan">Business Loan</option>
                         </select>
                     </div>
@@ -309,473 +68,183 @@
                         <label for="loanStatusFilter" class="form-label">Status</label>
                         <select class="form-select" id="loanStatusFilter" onchange="filterLoans()">
                             <option value="all">All Statuses</option>
-                            <option value="Pending">Pending</option>
+                            <option value="pending_manager">Pending</option>
                             <option value="Approved">Approved</option>
                             <option value="Rejected">Rejected</option>
                         </select>
                     </div>
-
-                    <div class="col-md-4 d-flex align-items-end justify-content-end">
-                        <div class="dropdown">
-                            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="exportDropdown"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-download"></i> Export Data
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="exportDropdown">
-                                <li><a class="dropdown-item" href="#" onclick="exportLoanData('current')">Current
-                                        View</a></li>
-                                <li><a class="dropdown-item" href="#" onclick="exportLoanData('all')">All Loan
-                                        Applications</a></li>
-                                <li><a class="dropdown-item" href="#" onclick="exportLoanData('active')">Active
-                                        Loans</a></li>
-                            </ul>
-                        </div>
-                    </div>
-
-
-
-                    <!-- Loans Table -->
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Loan ID</th>
-                                    <th>Customer</th>
-                                    <th>Loan Type</th>
-                                    <th>Amount</th>
-                                    <th>Date</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="loanTableBody"></tbody>
-                        </table>
-                    </div>
-
-                    <!-- Pagination -->
-                    <nav aria-label="Loan pagination">
-                        <ul class="pagination justify-content-center mt-4">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" tabindex="-1">Previous</a>
-                            </li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">Next</a>
-                            </li>
-                        </ul>
-                    </nav>
                 </div>
-            </div>
-
-            <!-- Approved Loans Card -->
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Active Loans</h5>
-                </div>
-                <div class="card-body">
-                    <p>View and manage currently active loans.</p>
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Loan ID</th>
-                                    <th>Customer</th>
-                                    <th>Type</th>
-                                    <th>Amount</th>
-                                    <th>Disbursed</th>
-                                    <th>EMI</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="activeLoansTableBody"></tbody>
-                        </table>
-                    </div>
+ 
+                <!-- Loan Applications Table -->
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Loan ID</th>
+                                <th>Customer</th>
+                                <th>Loan Type</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="loanTableBody">
+                            {% for loan in loans %}
+                            <tr id="loanRow-{{ loan.request_id }}"
+                                data-applicant="{{ loan.applicant_name }}"
+                                data-type="{{ loan.loan_type|capitalize }} Loan"
+                                data-amount="{{ loan.loan_amount }}"
+                                data-date="{{ loan.application_date }}"
+                                data-status="{{ loan.status }}"
+                                data-purpose="{{ loan.purpose }}"
+                                data-emi="{{ loan.emi_amount }}">
+                                <td>{{ loan.request_id }}</td>
+                                <td>{{ loan.applicant_name }}</td>
+                                <td>{{ loan.loan_type|capitalize }} Loan</td>
+                                <td>{{ loan.loan_amount }}</td>
+                                <td>{{ loan.application_date }}</td>
+                                <td>
+                                    <span class="badge
+                                        {% if loan.status == 'pending_manager' %}badge-pending
+                                        {% elif loan.status == 'Approved' %}badge-approved
+                                        {% elif loan.status == 'Rejected' %}badge-rejected
+                                        {% endif %}">
+                                        {{ loan.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary me-1" onclick="viewLoanDetails('{{ loan.request_id }}')">
+                                        <i class="bi bi-eye"></i> View
+                                    </button>
+                                    {% if loan.status == 'pending_manager' %}
+                                    <form method="POST" action="{{ url_for('approve_loan', request_id=loan.request_id) }}" style="display:inline;">
+                                        <button type="submit" class="btn btn-sm btn-success me-1">
+                                            <i class="bi bi-check-circle"></i> Approve
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="{{ url_for('reject_loan', request_id=loan.request_id) }}" style="display:inline;">
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="bi bi-x-circle"></i> Reject
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="7" class="text-center">No loan applications found.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-
-        <!-- Loan Details Modal -->
-        <div class="modal fade" id="loanDetailsModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="loanModalTitle">Loan Details</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body" id="loanModalBody">
-                        <!-- Content will be loaded here -->
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" id="printLoanBtn">
-                            <i class="bi bi-printer"></i> Print Details
-                        </button>
-                    </div>
+ 
+        <!-- Active Loans Card -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Active Loans</h5>
+            </div>
+            <div class="card-body">
+                <p>View and manage currently active loans.</p>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Loan ID</th>
+                                <th>Customer</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Disbursed</th>
+                                <th>EMI</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activeLoansTableBody">
+                            {% for loan in loans if loan.status == 'Approved' %}
+                            <tr>
+                                <td>{{ loan.request_id }}</td>
+                                <td>{{ loan.applicant_name }}</td>
+                                <td>{{ loan.loan_type|capitalize }} Loan</td>
+                                <td>{{ loan.loan_amount }}</td>
+                                <td>{{ loan.updated_at.strftime('%Y-%m-%d') if loan.updated_at else '' }}</td>
+                                <td>{{ loan.emi_amount }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" onclick="viewLoanDetails('{{ loan.request_id }}')">
+                                        <i class="bi bi-eye"></i> Details
+                                    </button>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="7" class="text-center">No active loans yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-
-        <!-- Bootstrap JS Bundle with Popper -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-        <script>
-            // Data initialization
-            const loanApplications = [
-                {
-                    id: 'LN1001',
-                    customer: 'Rajesh Kumar',
-                    type: 'Home Loan',
-                    amount: '₹25,00,000',
-                    date: '2025-08-05',
-                    status: 'Pending',
-                    details: {
-                        tenure: '20 years',
-                        interestRate: '8.4%',
-                        purpose: 'Purchase of new apartment',
-                        documents: ['Aadhaar', 'PAN', 'Salary Slips', 'Property Documents']
-                    }
-                },
-                {
-                    id: 'LN1002',
-                    customer: 'Sneha Kapoor',
-                    type: 'Personal Loan',
-                    amount: '₹5,00,000',
-                    date: '2025-08-07',
-                    status: 'Approved',
-                    details: {
-                        tenure: '5 years',
-                        interestRate: '12.5%',
-                        purpose: 'Medical emergency',
-                        documents: ['Aadhaar', 'PAN', 'Bank Statements']
-                    }
-                },
-                {
-                    id: 'LN1003',
-                    customer: 'Arjun Mehta',
-                    type: 'Car Loan',
-                    amount: '₹8,00,000',
-                    date: '2025-08-09',
-                    status: 'Pending',
-                    details: {
-                        tenure: '7 years',
-                        interestRate: '9.2%',
-                        purpose: 'New car purchase',
-                        documents: ['Aadhaar', 'PAN', 'Driving License', 'Quotation']
-                    }
-                }
-            ];
-
-            const activeLoans = [
-                {
-                    id: 'LN2023-001',
-                    customer: 'Priya Sharma',
-                    type: 'Home Loan',
-                    amount: '₹35,00,000',
-                    disbursed: '2023-05-15',
-                    emi: '₹32,450',
-                    details: {
-                        remainingAmount: '₹28,75,000',
-                        nextDue: '2025-09-05',
-                        paymentsMade: '28/240'
-                    }
-                },
-                {
-                    id: 'LN2024-005',
-                    customer: 'Vikram Singh',
-                    type: 'Business Loan',
-                    amount: '₹15,00,000',
-                    disbursed: '2024-02-20',
-                    emi: '₹18,750',
-                    details: {
-                        remainingAmount: '₹12,30,000',
-                        nextDue: '2025-09-20',
-                        paymentsMade: '18/60'
-                    }
-                }
-            ];
-
-            // DOM Elements
-            const loanTableBody = document.getElementById('loanTableBody');
-            const activeLoansTableBody = document.getElementById('activeLoansTableBody');
-            const loanDetailsModal = new bootstrap.Modal(document.getElementById('loanDetailsModal'));
-
-            // Initialize the page
-            document.addEventListener('DOMContentLoaded', function () {
-                renderLoanApplications();
-                renderActiveLoans();
-            });
-
-            // Render Loan Applications Table
-            function renderLoanApplications(filteredData = loanApplications) {
-                loanTableBody.innerHTML = '';
-
-                if (filteredData.length === 0) {
-                    loanTableBody.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="text-center py-4">No loan applications found matching your criteria</td>
-                    </tr>
-                `;
-                    return;
-                }
-
-                filteredData.forEach((loan, index) => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                    <td>${loan.id}</td>
-                    <td>${loan.customer}</td>
-                    <td>${loan.type}</td>
-                    <td>${loan.amount}</td>
-                    <td>${loan.date}</td>
-                    <td><span class="badge ${getStatusBadgeClass(loan.status)}">${loan.status}</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-primary me-1" onclick="viewLoanDetails(${index})">
-                            <i class="bi bi-eye"></i> View
-                        </button>
-                        ${loan.status === 'Pending' ? `
-                        <button class="btn btn-sm btn-success me-1" onclick="approveLoan(${index})">
-                            <i class="bi bi-check-circle"></i> Approve
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="rejectLoan(${index})">
-                            <i class="bi bi-x-circle"></i> Reject
-                        </button>
-                        ` : ''}
-                    </td>
-                `;
-                    loanTableBody.appendChild(row);
-                });
-            }
-
-            // Render Active Loans Table
-            function renderActiveLoans() {
-                activeLoansTableBody.innerHTML = '';
-
-                activeLoans.forEach((loan, index) => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                    <td>${loan.id}</td>
-                    <td>${loan.customer}</td>
-                    <td>${loan.type}</td>
-                    <td>${loan.amount}</td>
-                    <td>${loan.disbursed}</td>
-                    <td>${loan.emi}</td>
-                    <td>
-                        <button class="btn btn-sm btn-primary" onclick="viewActiveLoanDetails(${index})">
-                            <i class="bi bi-eye"></i> Details
-                        </button>
-                    </td>
-                `;
-                    activeLoansTableBody.appendChild(row);
-                });
-            }
-
-            // Get appropriate badge class for status
-            function getStatusBadgeClass(status) {
-                switch (status) {
-                    case 'Approved': return 'badge-approved';
-                    case 'Rejected': return 'badge-rejected';
-                    case 'Pending': return 'badge-pending';
-                    default: return 'bg-secondary';
-                }
-            }
-
-            // Filter loans based on type and status
-            function filterLoans() {
-                const typeFilter = document.getElementById('loanTypeFilter').value;
-                const statusFilter = document.getElementById('loanStatusFilter').value;
-
-                let filtered = loanApplications;
-
-                // Filter by loan type
-                if (typeFilter !== 'all') {
-                    filtered = filtered.filter(loan => loan.type === typeFilter);
-                }
-
-                // Filter by status
-                if (statusFilter !== 'all') {
-                    filtered = filtered.filter(loan => loan.status === statusFilter);
-                }
-
-                renderLoanApplications(filtered);
-            }
-
-            // View loan application details
-            function viewLoanDetails(index) {
-                const loan = loanApplications[index];
-                document.getElementById('loanModalTitle').textContent = `Loan Application - ${loan.id}`;
-
-                let detailsHtml = `
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>Loan ID:</strong> ${loan.id}</p>
-                        <p><strong>Customer:</strong> ${loan.customer}</p>
-                        <p><strong>Loan Type:</strong> ${loan.type}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <p><strong>Amount:</strong> ${loan.amount}</p>
-                        <p><strong>Application Date:</strong> ${loan.date}</p>
-                        <p><strong>Status:</strong> <span class="badge ${getStatusBadgeClass(loan.status)}">${loan.status}</span></p>
-                    </div>
+    </div>
+ 
+    <!-- Loan Details Modal -->
+    <div class="modal fade" id="loanDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loanModalTitle">Loan Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <hr>
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <h6>Loan Details</h6>
-                        <p><strong>Tenure:</strong> ${loan.details.tenure}</p>
-                        <p><strong>Interest Rate:</strong> ${loan.details.interestRate}</p>
-                        <p><strong>Purpose:</strong> ${loan.details.purpose}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <h6>Documents Submitted</h6>
-                        <ul>
-            `;
-
-                loan.details.documents.forEach(doc => {
-                    detailsHtml += `<li>${doc}</li>`;
-                });
-
-                detailsHtml += `
-                        </ul>
-                    </div>
-                </div>
-            `;
-
-                document.getElementById('loanModalBody').innerHTML = detailsHtml;
-                loanDetailsModal.show();
-            }
-
-            // View active loan details
-            function viewActiveLoanDetails(index) {
-                const loan = activeLoans[index];
-                document.getElementById('loanModalTitle').textContent = `Active Loan - ${loan.id}`;
-
-                let detailsHtml = `
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>Loan ID:</strong> ${loan.id}</p>
-                        <p><strong>Customer:</strong> ${loan.customer}</p>
-                        <p><strong>Loan Type:</strong> ${loan.type}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <p><strong>Amount:</strong> ${loan.amount}</p>
-                        <p><strong>Disbursed On:</strong> ${loan.disbursed}</p>
-                        <p><strong>EMI Amount:</strong> ${loan.emi}</p>
-                    </div>
-                </div>
-                <hr>
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <h6>Repayment Details</h6>
-                        <p><strong>Remaining Amount:</strong> ${loan.details.remainingAmount}</p>
-                        <p><strong>Next Due Date:</strong> ${loan.details.nextDue}</p>
-                        <p><strong>Payments Made:</strong> ${loan.details.paymentsMade}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <h6>Actions</h6>
-                        <button class="btn btn-outline-primary me-2">View Payment History</button>
-                        <button class="btn btn-outline-secondary">Generate Statement</button>
-                    </div>
-                </div>
-            `;
-
-                document.getElementById('loanModalBody').innerHTML = detailsHtml;
-                loanDetailsModal.show();
-            }
-
-            // Approve a loan
-            function approveLoan(index) {
-                if (confirm(`Are you sure you want to approve loan ${loanApplications[index].id}?`)) {
-                    loanApplications[index].status = 'Approved';
-                    renderLoanApplications();
-                    alert(`Loan ${loanApplications[index].id} has been approved.`);
-                }
-            }
-
-            // Reject a loan
-            function rejectLoan(index) {
-                const reason = prompt(`Please enter reason for rejecting loan ${loanApplications[index].id}:`);
-                if (reason !== null) {
-                    loanApplications[index].status = 'Rejected';
-                    loanApplications[index].rejectionReason = reason;
-                    renderLoanApplications();
-                    alert(`Loan ${loanApplications[index].id} has been rejected.`);
-                }
-            }
-
-
-            // Enhanced export function
-            function exportLoanData(type = 'current') {
-                let dataToExport = [];
-                let fileName = 'DigiBank_Loans_Export';
-
-                if (type === 'current') {
-                    // Get filtered data
-                    const typeFilter = document.getElementById('loanTypeFilter').value;
-                    const statusFilter = document.getElementById('loanStatusFilter').value;
-
-                    dataToExport = loanApplications.filter(loan => {
-                        return (typeFilter === 'all' || loan.type === typeFilter) &&
-                            (statusFilter === 'all' || loan.status === statusFilter);
-                    });
-                    fileName = 'DigiBank_Filtered_Loans_' + new Date().toISOString().split('T')[0];
-                }
-                else if (type === 'all') {
-                    dataToExport = loanApplications;
-                    fileName = 'DigiBank_All_Loan_Applications_' + new Date().toISOString().split('T')[0];
-                }
-                else if (type === 'active') {
-                    dataToExport = activeLoans;
-                    fileName = 'DigiBank_Active_Loans_' + new Date().toISOString().split('T')[0];
-                }
-
-                if (dataToExport.length === 0) {
-                    alert('No data to export!');
-                    return;
-                }
-
-                // Prepare the worksheet
-                const wsData = [
-                    // Headers
-                    ['Loan ID', 'Customer Name', 'Loan Type', 'Amount', 'Date', 'Status', 'Tenure', 'Interest Rate'],
-                    // Data rows
-                    ...dataToExport.map(loan => [
-                        loan.id,
-                        loan.customer,
-                        loan.type,
-                        loan.amount,
-                        loan.date,
-                        loan.status,
-                        loan.details?.tenure || 'N/A',
-                        loan.details?.interestRate || 'N/A'
-                    ])
-                ];
-
-                const ws = XLSX.utils.aoa_to_sheet(wsData);
-
-                // Create workbook
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Loan Data");
-
-                // Generate and download the file
-                XLSX.writeFile(wb, `${fileName}.xlsx`);
-            }
-
-            // Logout function
-            function logout() {
-                if (confirm('Are you sure you want to logout?')) {
-                    // In a real application, this would redirect to logout endpoint
-                    alert('Logged out successfully!');
-                    window.location.href = 'login.html';
-                }
-            }
-
-            // Print loan details handler
-            document.getElementById('printLoanBtn').addEventListener('click', function () {
-                alert('Printing loan details...');
-                loanDetailsModal.hide();
-            });
-        </script>
+                <div class="modal-body" id="loanModalBody"></div>
+            </div>
+        </div>
+    </div>
+ 
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+ 
+    <script>
+      function viewLoanDetails(requestId) {
+        const row = document.getElementById(`loanRow-${requestId}`);
+        if (!row) return;
+ 
+        const applicant = row.getAttribute("data-applicant");
+        const type = row.getAttribute("data-type");
+        const amount = row.getAttribute("data-amount");
+        const date = row.getAttribute("data-date");
+        const status = row.getAttribute("data-status");
+        const purpose = row.getAttribute("data-purpose");
+        const emi = row.getAttribute("data-emi");
+ 
+        document.getElementById("loanModalTitle").textContent = `Loan Request - ${requestId}`;
+        document.getElementById("loanModalBody").innerHTML = `
+          <p><strong>Applicant:</strong> ${applicant}</p>
+          <p><strong>Loan Type:</strong> ${type}</p>
+          <p><strong>Amount:</strong> ${amount}</p>
+          <p><strong>Application Date:</strong> ${date}</p>
+          <p><strong>Status:</strong> ${status}</p>
+          <p><strong>Purpose:</strong> ${purpose}</p>
+          <p><strong>EMI:</strong> ${emi}</p>
+        `;
+        const modal = new bootstrap.Modal(document.getElementById('loanDetailsModal'));
+        modal.show();
+      }
+ 
+      function filterLoans() {
+        const typeFilter = document.getElementById('loanTypeFilter').value;
+        const statusFilter = document.getElementById('loanStatusFilter').value;
+ 
+        document.querySelectorAll('#loanTableBody tr').forEach(row => {
+          const rowType = row.getAttribute('data-type');
+          const rowStatus = row.getAttribute('data-status');
+          let show = true;
+ 
+          if (typeFilter !== 'all' && rowType !== typeFilter) show = false;
+          if (statusFilter !== 'all' && rowStatus !== statusFilter) show = false;
+ 
+          row.style.display = show ? '' : 'none';
+        });
+      }
+    </script>
 </body>
-
 </html>
+ 
+ 

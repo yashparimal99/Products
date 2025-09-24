@@ -80,7 +80,7 @@
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="loansDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Loans</a>
             <ul class="dropdown-menu" aria-labelledby="loansDropdown">
-              <li><a class="dropdown-item" href="{{ url_for('home_loan') }}">Home Loan</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('homeloan') }}">Home Loan</a></li>
               <li><a class="dropdown-item" href="{{ url_for('personal_loan') }}">Personal Loan</a></li>
               <li><a class="dropdown-item" href="{{ url_for('Business_loan') }}">Business Loan</a></li>
             </ul>
@@ -92,18 +92,11 @@
               <li><a class="dropdown-item" href="{{ url_for('open_cards', preset='credit') }}">Credit Cards</a></li>
               <li><a class="dropdown-item" href="{{ url_for('open_cards', preset='debit') }}">Debit Cards</a></li>
               <li><a class="dropdown-item" href="{{ url_for('open_cards', preset='prepaid') }}">Prepaid Cards</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('open_cards', preset='prepaid') }}">Forex Cards</a></li>
             </ul>
           </li>
  
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="forexDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Forex</a>
-            <ul class="dropdown-menu" aria-labelledby="forexDropdown">
-              <li><a class="dropdown-item" href="{{ url_for('travel_forex') }}">Travel Forex Cards</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('send_money_abroad') }}">Send Money Abroad</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('send_money_india') }}">Send Money India</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('currency_exchange') }}">Foreign Currency Exchange</a></li>
-            </ul>
-          </li>
+         
  
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="investDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Investments</a>
@@ -172,6 +165,7 @@
           <option value="credit"  {{ 'selected' if preset == 'credit' else '' }}>Credit Card</option>
           <option value="debit"   {{ 'selected' if preset == 'debit' else '' }}>Debit Card</option>
           <option value="prepaid" {{ 'selected' if preset == 'prepaid' else '' }}>Prepaid Card</option>
+          <option value="forex"   {{ 'selected' if preset == 'forex'   else '' }}>Forex Card</option>
         </select>
       </div>
  

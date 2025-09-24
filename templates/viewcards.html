@@ -94,7 +94,7 @@
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="loansDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Loans</a>
             <ul class="dropdown-menu" aria-labelledby="loansDropdown">
-              <li><a class="dropdown-item" href="{{ url_for('home_loan') }}">Home Loan</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('homeloan') }}">Home Loan</a></li>
               <li><a class="dropdown-item" href="{{ url_for('personal_loan') }}">Personal Loan</a></li>
               <li><a class="dropdown-item" href="{{ url_for('Business_loan') }}">Business Loan</a></li>
             </ul>
@@ -149,13 +149,38 @@
   </nav>
  
 <div class="container mt-4">
-  <ul class="nav nav-tabs" id="accountTabs" role="tablist">
-    <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('viewaccounts') }}">My Accounts</a></li>
-    <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('viewdeposits') }}">My Deposits</a></li>
-    <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('viewdeposits') }}">My Borrowings</a></li>
-    <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('viewdeposits') }}">My Investments</a></li>
-    <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#cards-tab" type="button">My Cards</button></li>
-  </ul>
+  <!-- Account Tabs (first two are navigation) -->
+    <ul class="nav nav-tabs" id="accountTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <a class="nav-link " href="{{ url_for('viewaccounts') }}">My Accounts</a>
+      </li>
+      <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('viewdeposits') }}">My Deposits</a>
+      </li>
+      <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('view_loans') }}">My Loans</a>
+      </li>
+      <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('view_investments') }}">My Investments</a>
+      </li>
+      <li class="nav-item" role="presentation">
+        <a class="nav-link active" href="{{ url_for('view_cards') }}">My Cards</a>
+      </li>
+    </ul>
+    <div class="tab-content mt-3" id="accountTabsContent">
+      <div class="tab-pane fade show active" id="balance" role="tabpanel" aria-labelledby="balance-tab">
+        <p class="text-muted">Your Card details are shown below.</p>
+      </div>
+      <div class="tab-pane fade" id="borrowings" role="tabpanel" aria-labelledby="borrowings-tab">
+        <p class="text-muted">Borrowings/loans info coming soon.</p>
+      </div>
+      <div class="tab-pane fade" id="investments" role="tabpanel" aria-labelledby="investments-tab">
+        <p class="text-muted">Investments overview coming soon.</p>
+      </div>
+      <div class="tab-pane fade" id="cards" role="tabpanel" aria-labelledby="cards-tab">
+        <p class="text-muted">Manage your cards here soon.</p>
+      </div>
+    </div>
  
   <div class="tab-content mt-3">
     <div class="tab-pane fade show active" id="cards-tab">
@@ -165,8 +190,8 @@
             <div class="card-left col-md-7 col-12">
              
               <div class="mb-1">
-                <span class="label">Card:</span>
-                <span class="value">{{ c.card_type_label }}{% if c.card_subtype %} ({{ c.card_subtype }}){% endif %}</span>
+                <span style="font-size: 20px;" class="label">Card:</span>
+                <span style="font-size: 20px;" class="value">{{ c.card_type_label }}{% if c.card_subtype %} ({{ c.card_subtype }}){% endif %}</span>
                 <span class="ms-2 badges">
                   <span class="badge
                     {% if c.status_label == 'Issued' %}bg-primary
@@ -179,14 +204,14 @@
                 </span>
               </div>
              
-              <div class="mb-1"><span class="label">Card Number:</span> <span class="value">{{ c.card_number_fmt }}</span></div>
+              <div class="mb-1"><span style="font-size: 20px;" class="label">Card Number:</span> <span class="value">{{ c.card_number_fmt }}</span></div>
             </div>
  
             <div class="col-md-5 col-12 text-md-end mt-3 mt-md-0">
-              <div class="mb-1"><span class="label">CVV:</span> <span class="value">{{ c.cvv }}</span></div>
+              <div class="mb-1"><span style="font-size: 18px;" class="label">CVV:</span> <span class="value">{{ c.cvv }}</span></div>
               <div class="mb-1">
-                <span class="label">Limit Utilized:</span>
-                <span class="value">₹ {{ "%0.2f"|format(c.limit_utilized or 0) }}</span>
+                <span style="font-size: 18px;" class="label">Limit Utilized:</span>
+                <span style="font-size: 18px;" class="value">₹ {{ "%0.2f"|format(c.limit_utilized or 0) }}</span>
               </div>
              
               {% if c.status == 'issued' and c.card_number %}

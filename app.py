@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash,session,jsonify
+from flask import Flask,abort, render_template, request, redirect, url_for, flash,session,jsonify
 import MySQLdb
 import MySQLdb.cursors
 from flask_mysqldb import MySQL
@@ -12,6 +12,7 @@ from decimal import Decimal, InvalidOperation
 import openpyxl
 from io import BytesIO
 from model import *
+import os, uuid, re, MySQLdb
 
 app = Flask(__name__)
 app.secret_key = 'a3f5ea2691a8e93c05f4e90e1b8ff123'
@@ -275,6 +276,10 @@ def digitalfixed():
 def fixeddeposits():
     return render_template('fixeddeposits.html')
 
+@app.route('/Recurringdeposits')
+def Recurringdeposits():
+    return render_template('Recurringdeposits.html')
+
 #Cards
 
 @app.route('/cards')
@@ -306,17 +311,20 @@ def prepaid():
 def loans():
     return render_template('loans.html')
 
-@app.route('/home_loan')
-def home_loan():
-    return render_template('home_loan_form.html')
+# @app.route('/home_loan')
+# def home_loan():
+#     return render_template('home_loan_form.html')
  
-@app.route('/personal_loan')
-def personal_loan():
-    return render_template('Loan_personal.html')
+# @app.route('/personal_loan')
+# def personal_loan():
+#     return render_template('Loan_personal.html')
  
-@app.route('/Business_loan')
-def Business_loan():
-    return render_template('Business_Loan.html')
+# @app.route('/Business_loan')
+# def Business_loan():
+#     return render_template('Business_Loan.html')
+
+# ========== USER: VIEW LOANS ==========
+ 
 
 #forex
 
@@ -682,6 +690,7 @@ def update_profile():
 from datetime import datetime
 
 def generate_request_id():
+
     """
     Generate a unique request ID:
     Always starts with 'REQ' + 3 random digits
@@ -1334,17 +1343,17 @@ def open_deposits():
 def dashboard():
     role = session.get('user_role')
     email = session.get('user_email')
-
+ 
     if not role or not email:
         flash('Please login first', 'danger')
         return redirect(url_for('login'))
-
+ 
     # Fetch the full user details
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("SELECT * FROM bank_users WHERE email = %s", (email,))
     user = cur.fetchone()
     cur.close()
-
+ 
     templates = {
         'User': 'userdashboard.html',
         'tl': 'TLdashboard.html',
@@ -1353,9 +1362,55 @@ def dashboard():
         'Loan_Agent': 'loanagent_dashboard.html',
         'Investment_Agent': 'investagent_dashboard.html'
     }
-
+ 
+    if role == "manager":
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+ 
+        # Total customers
+        cur.execute("SELECT COUNT(*) AS total_customers FROM bank_users WHERE role = 'User'")
+        total_customers = cur.fetchone()['total_customers']
+ 
+        # Pending requests
+        cur.execute("SELECT COUNT(*) AS c FROM accounts_requests WHERE status_flag IS NULL")
+        acc_count = cur.fetchone()['c']
+ 
+        cur.execute("SELECT COUNT(*) AS c FROM request_deposits WHERE status_flag IS NULL")
+        dep_count = cur.fetchone()['c']
+ 
+        cur.execute("SELECT COUNT(*) AS c FROM loan_requests WHERE status = 'pending_manager'")
+        loan_count = cur.fetchone()['c']
+ 
+        cur.execute("SELECT COUNT(*) AS c FROM card_requests WHERE status_flag IS NULL")
+        card_count = cur.fetchone()['c']
+ 
+        cur.execute("SELECT COUNT(*) AS c FROM investment_applications WHERE status = 'pending_manager'")
+        invest_count = cur.fetchone()['c']
+ 
+        total_pending = acc_count + dep_count + loan_count + card_count + invest_count
+ 
+        # 💰 Total Principal Amount (from request_deposits only)
+        cur.execute("SELECT COALESCE(SUM(principal_amount),0) AS total_principal FROM request_deposits")
+        total_deposits = cur.fetchone()['total_principal']
+ 
+        # 💰 Total Funded Amount (Approved Loans)
+        cur.execute("SELECT COALESCE(SUM(loan_amount),0) AS total_funded FROM loan_requests WHERE status = 'approved'")
+        total_funded = cur.fetchone()['total_funded']
+ 
+        cur.close()
+ 
+        return render_template(
+            'managerdashboard.html',
+            user=user,
+            total_customers=total_customers,
+            total_pending=total_pending,
+            total_deposits=total_deposits,
+            total_funded=total_funded
+        )
+ 
+        return render_template('managerdashboard.html', user=user, total_customers=total_customers)
+   
     return render_template(templates.get(role, 'login.html'), user=user)
-
+ 
 
 #Manager Dasboard Routes
 
@@ -1510,11 +1565,12 @@ def update_deposit_request(request_id, action):
 
 @app.route('/manage_loans')
 def manage_loans():
-    return render_template('manage-loans.html')
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM loan_requests")
+    loans = cur.fetchall()
+    return render_template('manage-loans.html', loans=loans)
 
-@app.route('/view_investments')
-def view_investments():
-    return render_template('view-investments.html')
+
 
 @app.route('/viewcards')
 def viewcards():
@@ -1528,7 +1584,7 @@ def viewcards():
     # ✅ Only fetch pending requests
     cur.execute("""
         SELECT r.request_id, r.customer_name, r.customer_email, r.card_type, r.card_subtype,
-               r.submitted_by_role, r.application_ref, r.created_at, r.status_flag,
+               r.card_type, r.application_ref, r.created_at, r.status_flag,
                a.id AS app_id
         FROM card_requests r
         LEFT JOIN card_applications a
@@ -2142,7 +2198,7 @@ def compute_issue_limit_from_cibil(cibil: int | None) -> Decimal:
         return Decimal('100000')
     return Decimal('200000')
 
-ALLOWED_CARD_TYPES     = {'credit', 'debit', 'prepaid'}
+ALLOWED_CARD_TYPES     = {'credit', 'debit', 'prepaid','forex'}
 ALLOWED_CARD_NETWORKS  = {'visa', 'mastercard', 'rupay'}
 ALLOWED_EMPLOYMENT     = {'salaried','self_employed','student','retired','other'}
 def _luhn_check_digit(number_without_check: str) -> str:
@@ -2286,15 +2342,15 @@ def agentupdate_profile():
  
 
 
-
 @app.route('/open_cards', methods=['GET', 'POST'])
 def open_cards():
     """
     USER flow:
     - Credit: account optional
-    - Debit/Prepaid: account required (and must belong to user)
+    - Debit/Prepaid/Forex: account required (must belong to user)
     - Derive issue_limit from CIBIL for credit; 0 otherwise
     - Generate card_number + cvv
+    - Insert into both card_applications & card_requests
     - After INSERT, set application_ref like APPYYYYMMDD-000123
     """
     email = session.get('user_email')
@@ -2311,7 +2367,7 @@ def open_cards():
         return redirect(url_for('login'))
  
     if request.method == 'GET':
-        preset = (request.args.get('preset') or '').lower()
+        preset = (request.args.get('preset') or '').lower()  # can be forex
         my_accounts = get_accounts_for_email(email)
         cur.close()
         return render_template('usercardform.html',
@@ -2335,15 +2391,18 @@ def open_cards():
     employment_type     = (request.form.get('employment_type') or '').strip().lower() or None
  
     if not (first_name and last_name and applicant_email and applicant_mobile and applicant_aadhaar):
-        flash('Please fill all required fields.', 'danger'); return redirect(url_for('open_cards'))
+        flash('Please fill all required fields.', 'danger')
+        return redirect(url_for('open_cards'))
  
     if card_type not in ALLOWED_CARD_TYPES:
-        flash('Invalid card type selected.', 'danger'); return redirect(url_for('open_cards'))
+        flash('Invalid card type selected.', 'danger')
+        return redirect(url_for('open_cards'))
     if card_subtype not in ALLOWED_CARD_NETWORKS:
-        flash('Invalid card network selected.', 'danger'); return redirect(url_for('open_cards'))
+        flash('Invalid card network selected.', 'danger')
+        return redirect(url_for('open_cards'))
  
-    # Account requirement
-    if card_type in ('debit', 'prepaid'):
+    # Account requirement (include forex)
+    if card_type in ('debit', 'prepaid', 'forex'):
         if not req_acct:
             flash('Please select the account for which you are applying the card.', 'danger')
             return redirect(url_for('open_cards'))
@@ -2392,7 +2451,7 @@ def open_cards():
                 monthly_income = None
         issue_limit = compute_issue_limit_from_cibil(cibil_score)
     else:
-        employment_type = None
+        employment_type = None  # not stored for non-credit
  
     full_name = ' '.join([p for p in [first_name, middle_name, last_name] if p]).strip()
     applicant_pan = user.get('pan')
@@ -2403,6 +2462,7 @@ def open_cards():
  
     try:
         mysql.connection.begin()
+        # Insert into card_applications
         cur.execute("""
             INSERT INTO card_applications
             (customer_user_id, customer_name, customer_email, customer_mobile, customer_aadhaar, customer_pan,
@@ -2426,14 +2486,16 @@ def open_cards():
         new_id = cur.lastrowid
         app_ref = f"APP{datetime.now():%Y%m%d}-{new_id:06d}"
         cur.execute("UPDATE card_applications SET application_ref=%s WHERE id=%s", (app_ref, new_id))
+ 
+        # Insert into card_requests
         request_id = generate_card_request_id()
         cur.execute("""
             INSERT INTO card_requests
             (request_id, customer_name, customer_email, customer_mobile, customer_aadhaar, customer_pan,
-            card_type, card_subtype, requested_for_account_number,
-            employment_type, monthly_income, cibil_score,
-            submitted_by_role, submitted_by_user_id, submitted_by_agent_id,
-            card_number, cvv, issue_limit, limit_utilized, application_ref)
+             card_type, card_subtype, requested_for_account_number,
+             employment_type, monthly_income, cibil_score,
+             submitted_by_role, submitted_by_user_id, submitted_by_agent_id,
+             card_number, cvv, issue_limit, limit_utilized, application_ref)
             VALUES
             (%s,%s,%s,%s,%s,%s,
             %s,%s,%s,
@@ -2444,12 +2506,11 @@ def open_cards():
             request_id, full_name, applicant_email, applicant_mobile, applicant_aadhaar, applicant_pan,
             card_type, card_subtype, req_acct,
             employment_type, monthly_income, cibil_score,
-            'User', None, user['user_id'],
+            'User', user['user_id'], None,
             gen_card_number, gen_cvv, str(issue_limit), '0', app_ref
         ))
-        mysql.connection.commit()
-   
  
+        mysql.connection.commit()
         flash(f'Application submitted. Ref: {app_ref} | Card: {gen_card_number} | CVV: {gen_cvv} | Issue Limit: ₹{issue_limit}', 'success')
     except Exception as e:
         mysql.connection.rollback()
@@ -2459,13 +2520,22 @@ def open_cards():
  
     return redirect(url_for('dashboard'))
  
+ 
 @app.route('/cards/agent/apply', methods=['GET', 'POST'])
 def agent_apply_card():
+    user_id = session.get('user_id')
+    
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+
     """
     CARD AGENT flow:
-    - Credit: account optional; Debit/Prepaid: account required
+    - Credit: account optional; Debit/Prepaid/Forex: account required
     - Derive issue_limit from CIBIL for credit; 0 otherwise
     - Generate card_number + cvv
+    - Insert into both card_applications & card_requests
     - After INSERT, set application_ref
     """
     email = session.get('user_email')
@@ -2490,7 +2560,7 @@ def agent_apply_card():
     applicant_name    = (request.form.get('customer_name') or '').strip()
     applicant_mobile  = clean_digit_str(request.form.get('mobile'))
     applicant_aadhaar = clean_digit_str(request.form.get('aadharNumber'))
-    applicant_pan     = (request.form.get('panNumber') or '').strip()  # format free per your request
+    applicant_pan     = (request.form.get('panNumber') or '').strip()
  
     card_type         = (request.form.get('card_type') or '').strip().lower()
     card_subtype      = (request.form.get('card_subtype') or '').strip().lower()
@@ -2517,8 +2587,8 @@ def agent_apply_card():
         flash('Customer email not found in the system.', 'danger')
         return redirect(url_for('agent_apply_card'))
  
-    # Account requirement
-    if card_type in ('debit', 'prepaid'):
+    # Account requirement (include forex)
+    if card_type in ('debit', 'prepaid', 'forex'):
         if not req_acct:
             cur.close()
             flash('Please select the customer account for this application.', 'danger')
@@ -2582,6 +2652,7 @@ def agent_apply_card():
  
     try:
         mysql.connection.begin()
+        # Insert into card_applications
         cur.execute("""
             INSERT INTO card_applications
             (customer_user_id, customer_name, customer_email, customer_mobile, customer_aadhaar, customer_pan,
@@ -2605,6 +2676,8 @@ def agent_apply_card():
         new_id = cur.lastrowid
         app_ref = f"APP{datetime.now():%Y%m%d}-{new_id:06d}"
         cur.execute("UPDATE card_applications SET application_ref=%s WHERE id=%s", (app_ref, new_id))
+ 
+        # Insert into card_requests
         request_id = generate_card_request_id()
         cur.execute("""
             INSERT INTO card_requests
@@ -2626,9 +2699,8 @@ def agent_apply_card():
             'Card_Agent', None, me['user_id'],
             gen_card_number, gen_cvv, str(issue_limit), '0', app_ref
         ))
+ 
         mysql.connection.commit()
- 
- 
         flash(f'Card application submitted. Ref: {app_ref} | Card: {gen_card_number} | CVV: {gen_cvv} | Issue Limit: ₹{issue_limit}', 'success')
     except Exception as e:
         mysql.connection.rollback()
@@ -2636,9 +2708,10 @@ def agent_apply_card():
     finally:
         cur.close()
  
-   
-    return render_template('cardagent_dashboard.html')
-  
+    return render_template('cardagent_dashboard.html',user=user)
+ 
+ 
+ 
  
 
 @app.route('/api/user-accounts', methods=['GET'])
@@ -2713,28 +2786,1188 @@ def banktransfer():
 
 #Dashboard - user->loan
 
+# @app.route('/userdashloan')
+# def userdashloan():
+#     user_id = session.get('user_id')
+#     # session['cust_id'] = user['cust_id']
+#     # print("Logged in cust_id:", cust_id)   # debug
+#     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#     cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+#     user = cur.fetchone()
+#     cur.close()
+#     return render_template('userloand.html',user=user)
+
 @app.route('/userdashloan')
 def userdashloan():
-    user_id = session.get('user_id')
-    # session['cust_id'] = user['cust_id']
-    # print("Logged in cust_id:", cust_id)   # debug
-    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
-    user = cur.fetchone()
-    cur.close()
-    return render_template('userloand.html',user=user)
-
-@app.route('/homeloan')
-def homeloan():
-    return render_template('userhomeapply.html')
-
+    return render_template('userloand.html')
+ 
 @app.route('/userpersonalloan')
 def userpersonalloan():
     return render_template('userpersonalloan.html')
-
+ 
 @app.route('/userbusinessloan')
 def userbusinessloan():
     return render_template('userbusinessloan.html')
+
+#Loan Agent Dashboard
+ 
+ 
+import os, uuid, re, MySQLdb
+from datetime import datetime
+from decimal import Decimal
+from werkzeug.utils import secure_filename
+from flask import request, render_template, redirect, url_for, session, flash, jsonify
+ 
+# ---- uploads ----
+app.config.setdefault('UPLOAD_FOLDER', os.path.join(os.getcwd(), 'uploads'))
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+ 
+ 
+# ---------- helpers ----------
+def _status_label(s):
+    return {
+        'pending_manager': 'Pending',
+        'approved': 'Approved',
+        'rejected': 'Rejected',
+        'issued': 'Issued'
+    }.get((s or '').lower(), s or '—')
+ 
+ 
+def save_upload(file_storage, subdir='signatures'):
+    """Save uploaded file and return relative path under UPLOAD_FOLDER."""
+    if not file_storage or not getattr(file_storage, 'filename', ''):
+        return None
+    folder = os.path.join(app.config['UPLOAD_FOLDER'], subdir)
+    os.makedirs(folder, exist_ok=True)
+    fname = secure_filename(file_storage.filename) or 'upload'
+    root, ext = os.path.splitext(fname)
+    new_name = f"{root}_{uuid.uuid4().hex[:8]}{ext or '.png'}"
+    full_path = os.path.join(folder, new_name)
+    file_storage.save(full_path)
+    rel = os.path.relpath(full_path, app.config['UPLOAD_FOLDER'])
+    return rel.replace('\\', '/')
+ 
+ 
+def compute_emi(principal, annual_rate_percent, tenure_years):
+    """
+    EMI = P * r * (1+r)^n / ((1+r)^n - 1) ; r = annual/12/100 ; n = years*12
+    """
+    try:
+        P = float(principal)
+        r = float(annual_rate_percent) / 12.0 / 100.0
+        n = int(tenure_years) * 12
+        if P <= 0 or n <= 0:
+            return 0.0
+        if r == 0:
+            return round(P / n, 2)
+        emi = P * r * ((1 + r) ** n) / (((1 + r) ** n) - 1)
+        return round(emi, 2)
+    except Exception:
+        return 0.0
+ 
+ 
+def find_interest_rate(category, interest_type, amount, tenure_years):
+    """
+    Look up interest rate from loan_interest_rate_matrix; return float or None.
+    """
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    try:
+        cur.execute("""
+            SELECT rate_percent
+            FROM loan_interest_rate_matrix
+            WHERE loan_category = %s
+              AND interest_type = %s
+              AND is_active = 1
+              AND (effective_from <= CURDATE())
+              AND (effective_to IS NULL OR effective_to >= CURDATE())
+              AND %s BETWEEN min_amount AND max_amount
+              AND %s BETWEEN min_tenure_years AND max_tenure_years
+            ORDER BY (max_amount - min_amount) ASC,
+                     (max_tenure_years - min_tenure_years) ASC, id ASC
+            LIMIT 1
+        """, (category, interest_type, amount, tenure_years))
+        row = cur.fetchone()
+        return float(row['rate_percent']) if row else None
+    finally:
+        cur.close()
+ 
+ 
+def _current_user():
+    """
+    Try session email first, then user_id. Returns bank_users row or None.
+    """
+    email = session.get('user_email')
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    try:
+        if email:
+            cur.execute("SELECT * FROM bank_users WHERE email=%s", (email,))
+            u = cur.fetchone()
+            if u:
+                return u
+        uid = session.get('user_id')
+        if uid:
+            cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (uid,))
+            return cur.fetchone()
+        return None
+    finally:
+        cur.close()
+ 
+ 
+def _normalize_role(role_str: str) -> str:
+    # "Loan Agent" / "Loan_Agent" / "loan-agent" => "loan_agent"
+    return re.sub(r'[^a-z0-9]+', '_', (role_str or '').strip().lower()).strip('_')
+ 
+ 
+def _user_role(u):
+    raw = (u.get('role') or u.get('user_role') or u.get('staff_role') or '')
+    return _normalize_role(raw)
+ 
+ 
+def table_has_column(table_name, column_name):
+    cur = mysql.connection.cursor()
+    try:
+        cur.execute("""
+            SELECT COUNT(*) FROM information_schema.COLUMNS
+            WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME=%s AND COLUMN_NAME=%s
+        """, (table_name, column_name))
+        return (cur.fetchone()[0] or 0) > 0
+    finally:
+        cur.close()
+ 
+ 
+def _safe_float(x):
+    try:
+        return float(x)
+    except Exception:
+        return 0.0
+ 
+ 
+def _compute_interest_rate(kind, interest_type, amount, tenure_years):
+    rate = find_interest_rate(
+        (kind or '').lower(),
+        (interest_type or '').title(),
+        _safe_float(amount),
+        int(tenure_years or 0)
+    )
+    if rate is not None:
+        return rate
+    # defaults
+    defaults = {
+        ('home', 'Floating'): 8.50,
+        ('home', 'Fixed'):    9.00,
+        ('personal', 'Fixed'):13.50,
+        ('business', 'Fixed'):12.50
+    }
+    return defaults.get(((kind or '').lower(), (interest_type or '').title()), 12.0)
+ 
+ 
+def _compute_emi(amount, rate, tenure_years):
+    return compute_emi(_safe_float(amount), _safe_float(rate), int(tenure_years or 0))
+ 
+ 
+def generate_loan_request_id():
+    """
+    Generate unique LR + 3 digit request id for loans
+    """
+    cur = mysql.connection.cursor()
+    while True:
+        rid = "LR" + f"{random.randint(0, 999):03d}"
+        cur.execute("SELECT 1 FROM loan_requests WHERE request_id=%s", (rid,))
+        if not cur.fetchone():
+            break
+    cur.close()
+    return rid
+ 
+def generate_invest_request_id():
+    """
+    Generate unique IR + 3 digit request id for investments
+    """
+    cur = mysql.connection.cursor()
+    while True:
+        rid = "IR" + f"{random.randint(0, 999):03d}"
+        cur.execute("SELECT 1 FROM investment_applications WHERE request_id=%s", (rid,))
+        if not cur.fetchone():
+            break
+    cur.close()
+    return rid
+ 
+ 
+# ---------- live-rate mini API ----------
+@app.route('/api/loan-rate')
+def api_loan_rate():
+    category      = (request.args.get('category') or '').strip().lower()      # 'home'|'personal'|'business'
+    interest_type = (request.args.get('interest_type') or '').strip().title() # 'Floating'|'Fixed'
+    amount        = float(request.args.get('amount') or 0)
+    tenure_years  = int(request.args.get('tenure_years') or 0)
+ 
+    DEFAULTS = {
+        ('home', 'Floating'): 8.50,
+        ('home', 'Fixed'):    9.00,
+        ('personal', 'Fixed'):13.50,
+        ('business', 'Fixed'):12.50
+    }
+    rate = find_interest_rate(category, interest_type, amount, tenure_years)
+    if rate is None:
+        rate = DEFAULTS.get((category, interest_type), 12.00)
+    emi = compute_emi(amount, rate, tenure_years)
+    return jsonify({"ok": True, "rate_percent": rate, "emi": emi})
+ 
+ 
+# ========== USER: HOME LOAN ==========
+@app.route('/homeloan', methods=['GET', 'POST'])
+def homeloan():
+    user = _current_user()
+    if not user:
+        flash('Please login first.', 'danger')
+        return redirect(url_for('login'))
+ 
+    if request.method == 'GET':
+        return render_template('userhomeapply.html', user=user)
+ 
+    f, files = request.form, request.files
+    try:
+        # Applicant
+        applicant_name = (f.get('applicantName') or '').strip()
+        dob            = f.get('dob') or None
+        age            = f.get('age') or None
+        gender         = (f.get('gender') or '').strip()
+        address        = (f.get('address') or '').strip()
+        pin            = (f.get('pin') or '').strip()
+        telephone      = (f.get('telephone') or '').strip()
+        mobile         = (f.get('mobile') or '').strip()
+        nationality    = (f.get('nationality') or '').strip()
+        marital_status = (f.get('maritalStatus') or '').strip()
+        pan            = (f.get('pan') or '').strip()
+ 
+        # Employment
+        employment_type = (f.get('employmentType') or '').strip()
+        company_name    = (f.get('companyName') or '').strip()
+        designation     = (f.get('designation') or '').strip()
+        gross_income    = Decimal(f.get('grossIncome') or '0')
+        experience      = int(f.get('experience') or 0)
+        current_exp     = f.get('currentExp')
+        current_exp     = int(current_exp) if current_exp else None
+ 
+        # Property
+        property_address = (f.get('propertyAddress') or '').strip()
+        property_type    = (f.get('propertyType') or '').strip()
+        property_age     = f.get('propertyAge')
+        property_age     = int(property_age) if property_age else None
+        built_up_area    = int(f.get('builtUpArea') or 0)
+        property_value   = Decimal(f.get('propertyValue') or '0')
+ 
+        # Loan
+        loan_amount      = Decimal(f.get('loanAmount') or '0')
+        loan_tenure      = int(f.get('loanTenure') or 0)
+        builder_name     = (f.get('builderName') or '').strip()
+        purpose          = (f.get('purpose') or '').strip()
+        interest_type    = (f.get('interestType') or '').strip().title()
+ 
+        # Financials
+        existing_loan    = Decimal(f.get('existingLoan') or '0')
+        other_loan       = Decimal(f.get('otherLoan') or '0')
+        credit_card      = Decimal(f.get('creditCard') or '0')
+        savings          = Decimal(f.get('savings') or '0')
+        other_assets     = Decimal(f.get('otherAssets') or '0')
+ 
+        # Bank
+        bank_name        = (f.get('bankName') or '').strip()
+        account_number   = (f.get('accountNumber') or '').strip()
+        account_type     = (f.get('accountType') or '').strip()
+        account_years    = int(f.get('accountYears') or 0)
+ 
+        # Co-app
+        co_name          = (f.get('coApplicantName') or '').strip()
+        co_relation      = (f.get('coApplicantRelation') or '').strip()
+        co_income        = f.get('coApplicantIncome')
+        co_income        = Decimal(co_income) if co_income else None
+ 
+        # Docs / flags
+        has_id_proof     = 1 if f.get('idProof') else 0
+        has_addr_proof   = 1 if f.get('addressProof') else 0
+        has_income_proof = 1 if f.get('incomeProof') else 0
+        has_property_docs= 1 if f.get('propertyDocs') else 0
+        declaration      = 1 if f.get('declaration') else 0
+ 
+        # Uploads
+        applicant_sig    = save_upload(files.get('applicantSignature'), 'signatures')
+        coapp_sig        = save_upload(files.get('coApplicantSignature'), 'signatures')
+ 
+        # Submission
+        application_date = f.get('date') or datetime.today().strftime('%Y-%m-%d')
+        place            = (f.get('place') or '').strip()
+ 
+        # rate & emi
+        rate = find_interest_rate('home', interest_type, float(loan_amount), int(loan_tenure))
+        if rate is None:
+            rate = 8.50 if interest_type == 'Floating' else 9.00
+        emi = compute_emi(loan_amount, rate, loan_tenure)
+ 
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+       
+        request_id = generate_loan_request_id()
+ 
+        cur.execute("""
+            INSERT INTO home_loan_applications
+            (request_id, user_id, applicant_name, dob, age, gender, address, pin, telephone, mobile, nationality,
+             marital_status, pan, employment_type, company_name, designation, gross_annual_income,
+             total_experience_years, current_company_experience_years, property_address, property_type,
+             property_age_years, built_up_area_sqft, property_value, loan_amount, loan_tenure_years,
+             builder_name, purpose, interest_type, interest_rate, emi_amount,
+             existing_home_loan, other_loans, credit_card_limits, savings_investments, other_assets,
+             bank_name, bank_account_number, bank_account_type, bank_years_with_bank,
+             coapplicant_name, coapplicant_relationship, coapplicant_annual_income,
+             has_id_proof, has_address_proof, has_income_proof, has_property_docs, declaration_agreed,
+             applicant_signature_path, coapplicant_signature_path, application_date, place, status
+            )
+            VALUES
+            (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
+             %s,%s,%s,%s,%s,%s,
+             %s,%s,%s,%s,
+             %s,%s,%s,%s,%s,
+             %s,%s,%s,%s,%s,
+             %s,%s,%s,%s,%s,
+             %s,%s,%s,%s,
+             %s,%s,%s,
+             %s,%s,%s,%s,%s,
+             %s,%s,%s,%s,'pending_manager')
+        """, (
+            request_id, user['user_id'], applicant_name, dob, age, gender, address, pin, telephone, mobile, nationality,
+            marital_status, pan, employment_type, company_name, designation, str(gross_income),
+            experience, current_exp, property_address, property_type,
+            property_age, built_up_area, str(property_value), str(loan_amount), loan_tenure,
+            builder_name, purpose, interest_type, str(rate), str(emi),
+            str(existing_loan), str(other_loan), str(credit_card), str(savings), str(other_assets),
+            bank_name, account_number, account_type, account_years,
+            co_name, co_relation, (str(co_income) if co_income is not None else None),
+            has_id_proof, has_addr_proof, has_income_proof, has_property_docs, declaration,
+            applicant_sig, coapp_sig, application_date, place
+        ))
+ 
+        cur.execute("""
+            INSERT INTO loan_requests
+            (request_id, loan_type,
+            applicant_name, dob, age, gender, address, pin, telephone, mobile, nationality,
+            marital_status, pan, employment_type, company_name, designation, gross_annual_income,
+            total_experience_years, current_company_experience_years, property_address, property_type,
+            property_age_years, built_up_area_sqft, property_value, loan_amount, loan_tenure_years,
+            builder_name, purpose, interest_type, interest_rate, emi_amount,
+            existing_home_loan, other_loans, credit_card_limits, savings_investments, other_assets,
+            bank_name, bank_account_number, bank_account_type, bank_years_with_bank,
+            coapplicant_name, coapplicant_relationship, coapplicant_annual_income,
+            has_id_proof, has_address_proof, has_income_proof, has_property_docs, declaration_agreed,
+            applicant_signature_path, coapplicant_signature_path, application_date, place, status)
+            VALUES
+            (%s,'home',
+            %s,%s,%s,%s,%s,%s,%s,%s,%s,
+            %s,%s,%s,%s,%s,%s,
+            %s,%s,%s,%s,
+            %s,%s,%s,%s,%s,
+            %s,%s,%s,%s,%s,
+            %s,%s,%s,%s,%s,
+            %s,%s,%s,%s,
+            %s,%s,%s,
+            %s,%s,%s,%s,%s,
+            %s,%s,%s,%s,'pending_manager')
+        """, (
+            request_id,
+            applicant_name, dob, age, gender, address, pin, telephone, mobile, nationality,
+            marital_status, pan, employment_type, company_name, designation, str(gross_income),
+            experience, current_exp, property_address, property_type,
+            property_age, built_up_area, str(property_value), str(loan_amount), loan_tenure,
+            builder_name, purpose, interest_type, str(rate), str(emi),
+            str(existing_loan), str(other_loan), str(credit_card), str(savings), str(other_assets),
+            bank_name, account_number, account_type, account_years,
+            co_name, co_relation, (str(co_income) if co_income is not None else None),
+            has_id_proof, has_addr_proof, has_income_proof, has_property_docs, declaration,
+            applicant_sig, coapp_sig, application_date, place
+        ))
+ 
+        mysql.connection.commit()
+        flash(f'Home loan application submitted. Rate {rate:.2f}% • EMI ₹{emi:.2f}', 'success')
+    except Exception as e:
+        mysql.connection.rollback()
+        flash(f'Could not submit loan application: {e}', 'danger')
+    return redirect(url_for('userdashloan'))
+ 
+ 
+# ========== USER: PERSONAL LOAN ==========
+@app.route('/personal_loan', methods=['GET', 'POST'])
+def personal_loan():
+    user = _current_user()
+    if not user:
+        flash('Please login first.', 'danger')
+        return redirect(url_for('login'))
+ 
+    if request.method == 'GET':
+        return render_template('Loan_personal.html', user=user)
+ 
+    f, files = request.form, request.files
+    try:
+        # Common
+        applicant_name = (f.get('applicantName') or '').strip()
+        dob            = f.get('dob') or None
+        age            = f.get('age') or None
+        gender         = (f.get('gender') or '').strip()
+        address        = (f.get('address') or '').strip()
+        pin            = (f.get('pin') or '').strip()
+        telephone      = (f.get('telephone') or '').strip()
+        mobile         = (f.get('mobile') or '').strip()
+        nationality    = (f.get('nationality') or '').strip()
+        marital_status = (f.get('maritalStatus') or '').strip()
+        pan            = (f.get('pan') or '').strip()
+ 
+        employment_type = (f.get('employmentType') or '').strip()
+        company_name    = (f.get('companyName') or '').strip()
+        designation     = (f.get('designation') or '').strip()
+        gross_income    = Decimal(f.get('grossIncome') or '0')
+        experience      = int(f.get('experience') or 0)
+        current_exp     = f.get('currentExp')
+        current_exp     = int(current_exp) if current_exp else None
+ 
+        # personal: no property
+        property_address = ''
+        property_type    = ''
+        property_age     = None
+        built_up_area    = 0
+        property_value   = Decimal('0')
+ 
+        loan_amount      = Decimal(f.get('loanAmount') or '0')
+        loan_tenure      = int(f.get('loanTenure') or 0)
+        builder_name     = ''
+        purpose          = (f.get('purpose') or 'personal').strip()
+        interest_type    = (f.get('interestType') or '').strip().title()
+ 
+        existing_loan    = Decimal(f.get('existingLoan') or '0')
+        other_loan       = Decimal(f.get('otherLoan') or '0')
+        credit_card      = Decimal(f.get('creditCard') or '0')
+        savings          = Decimal(f.get('savings') or '0')
+        other_assets     = Decimal(f.get('otherAssets') or '0')
+ 
+        bank_name        = (f.get('bankName') or '').strip()
+        account_number   = (f.get('accountNumber') or '').strip()
+        account_type     = (f.get('accountType') or '').strip()
+        account_years    = int(f.get('accountYears') or 0)
+ 
+        co_name          = (f.get('coApplicantName') or '').strip()
+        co_relation      = (f.get('coApplicantRelation') or '').strip()
+        co_income        = f.get('coApplicantIncome')
+        co_income        = Decimal(co_income) if co_income else None
+ 
+        has_id_proof     = 1 if f.get('idProof') else 0
+        has_addr_proof   = 1 if f.get('addressProof') else 0
+        has_income_proof = 1 if f.get('incomeProof') else 0
+        has_property_docs= 1 if f.get('propertyDocs') else 0
+        declaration      = 1 if f.get('declaration') else 0
+ 
+        applicant_sig    = save_upload(files.get('applicantSignature'), 'signatures')
+        coapp_sig        = save_upload(files.get('coApplicantSignature'), 'signatures')
+ 
+        application_date = f.get('date') or datetime.today().strftime('%Y-%m-%d')
+        place            = (f.get('place') or '').strip()
+ 
+        rate = find_interest_rate('personal', interest_type, float(loan_amount), int(loan_tenure))
+        if rate is None:
+            rate = 13.50
+        emi  = compute_emi(loan_amount, rate, loan_tenure)
+ 
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+       
+        request_id = generate_loan_request_id()
+ 
+        cur.execute("""
+            INSERT INTO personal_loan_applications
+            (request_id, user_id, applicant_name, dob, age, gender, address, pin, telephone, mobile, nationality,
+             marital_status, pan, employment_type, company_name, designation, gross_annual_income,
+             total_experience_years, current_company_experience_years, property_address, property_type,
+             property_age_years, built_up_area_sqft, property_value, loan_amount, loan_tenure_years,
+             builder_name, purpose, interest_type, interest_rate, emi_amount,
+             existing_home_loan, other_loans, credit_card_limits, savings_investments, other_assets,
+             bank_name, bank_account_number, bank_account_type, bank_years_with_bank,
+             coapplicant_name, coapplicant_relationship, coapplicant_annual_income,
+             has_id_proof, has_address_proof, has_income_proof, has_property_docs, declaration_agreed,
+             applicant_signature_path, coapplicant_signature_path, application_date, place, status
+            )
+            VALUES
+            (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
+             %s,%s,%s,%s,%s,%s,
+             %s,%s,%s,%s,
+             %s,%s,%s,%s,%s,
+             %s,%s,%s,%s,%s,
+             %s,%s,%s,%s,%s,
+             %s,%s,%s,%s,
+             %s,%s,%s,
+             %s,%s,%s,%s,%s,
+             %s,%s,%s,%s,'pending_manager')
+        """, (
+            request_id, user['user_id'], applicant_name, dob, age, gender, address, pin, telephone, mobile, nationality,
+            marital_status, pan, employment_type, company_name, designation, str(gross_income),
+            experience, current_exp, property_address, property_type,
+            property_age, built_up_area, str(property_value), str(loan_amount), loan_tenure,
+            builder_name, purpose, interest_type, str(rate), str(emi),
+            str(existing_loan), str(other_loan), str(credit_card), str(savings), str(other_assets),
+            bank_name, account_number, account_type, account_years,
+            co_name, co_relation, (str(co_income) if co_income is not None else None),
+            has_id_proof, has_addr_proof, has_income_proof, has_property_docs, declaration,
+            applicant_sig, coapp_sig, application_date, place
+        ))
+ 
+        cur.execute("""
+            INSERT INTO loan_requests
+            (request_id, loan_type,
+            applicant_name, dob, age, gender, address, pin, telephone, mobile, nationality,
+            marital_status, pan, employment_type, company_name, designation, gross_annual_income,
+            total_experience_years, current_company_experience_years, property_address, property_type,
+            property_age_years, built_up_area_sqft, property_value, loan_amount, loan_tenure_years,
+            builder_name, purpose, interest_type, interest_rate, emi_amount,
+            existing_home_loan, other_loans, credit_card_limits, savings_investments, other_assets,
+            bank_name, bank_account_number, bank_account_type, bank_years_with_bank,
+            coapplicant_name, coapplicant_relationship, coapplicant_annual_income,
+            has_id_proof, has_address_proof, has_income_proof, has_property_docs, declaration_agreed,
+            applicant_signature_path, coapplicant_signature_path, application_date, place, status)
+            VALUES
+            (%s,'personal',
+            %s,%s,%s,%s,%s,%s,%s,%s,%s,
+            %s,%s,%s,%s,%s,%s,
+            %s,%s,%s,%s,
+            %s,%s,%s,%s,%s,
+            %s,%s,%s,%s,%s,
+            %s,%s,%s,%s,%s,
+            %s,%s,%s,%s,
+            %s,%s,%s,
+            %s,%s,%s,%s,%s,
+            %s,%s,%s,%s,'pending_manager')
+        """, (
+            request_id,
+            applicant_name, dob, age, gender, address, pin, telephone, mobile, nationality,
+            marital_status, pan, employment_type, company_name, designation, str(gross_income),
+            experience, current_exp, property_address, property_type,
+            property_age, built_up_area, str(property_value), str(loan_amount), loan_tenure,
+            builder_name, purpose, interest_type, str(rate), str(emi),
+            str(existing_loan), str(other_loan), str(credit_card), str(savings), str(other_assets),
+            bank_name, account_number, account_type, account_years,
+            co_name, co_relation, (str(co_income) if co_income is not None else None),
+            has_id_proof, has_addr_proof, has_income_proof, has_property_docs, declaration,
+            applicant_sig, coapp_sig, application_date, place
+        ))
+ 
+        mysql.connection.commit()
+        flash(f'Personal loan application submitted. Rate {rate:.2f}% • EMI ₹{emi:.2f}', 'success')
+    except Exception as e:
+        mysql.connection.rollback()
+        flash(f'Could not submit personal loan application: {e}', 'danger')
+    return redirect(url_for('userdashloan'))
+ 
+ 
+# ========== USER: BUSINESS LOAN ==========
+@app.route('/Business_loan', methods=['GET', 'POST'])
+def Business_loan():
+    user = _current_user()
+    if not user:
+        flash('Please login first.', 'danger')
+        return redirect(url_for('login'))
+ 
+    if request.method == 'GET':
+        return render_template('Business_Loan.html', user=user)
+ 
+    f, files = request.form, request.files
+    try:
+        applicant_name = (f.get('applicantName') or '').strip()
+        dob            = f.get('dob') or None
+        age            = f.get('age') or None
+        gender         = (f.get('gender') or '').strip()
+        address        = (f.get('address') or '').strip()
+        pin            = (f.get('pin') or '').strip()
+        telephone      = (f.get('telephone') or '').strip()
+        mobile         = (f.get('mobile') or '').strip()
+        nationality    = (f.get('nationality') or '').strip()
+        marital_status = (f.get('maritalStatus') or '').strip()
+        pan            = (f.get('pan') or '').strip()
+ 
+        employment_type = (f.get('employmentType') or '').strip()
+        company_name    = (f.get('companyName') or '').strip()
+        designation     = (f.get('designation') or '').strip()
+        gross_income    = Decimal(f.get('grossIncome') or '0')
+        experience      = int(f.get('experience') or 0)
+        current_exp     = f.get('currentExp')
+        current_exp     = int(current_exp) if current_exp else None
+ 
+        # business: no property
+        property_address = ''
+        property_type    = ''
+        property_age     = None
+        built_up_area    = 0
+        property_value   = Decimal('0')
+ 
+        loan_amount      = Decimal(f.get('loanAmount') or '0')
+        loan_tenure      = int(f.get('loanTenure') or 0)
+        builder_name     = ''
+        purpose          = (f.get('purpose') or 'business').strip()
+        interest_type    = (f.get('interestType') or '').strip().title()
+ 
+        existing_loan    = Decimal(f.get('existingLoan') or '0')
+        other_loan       = Decimal(f.get('otherLoan') or '0')
+        credit_card      = Decimal(f.get('creditCard') or '0')
+        savings          = Decimal(f.get('savings') or '0')
+        other_assets     = Decimal(f.get('otherAssets') or '0')
+ 
+        bank_name        = (f.get('bankName') or '').strip()
+        account_number   = (f.get('accountNumber') or '').strip()
+        account_type     = (f.get('accountType') or '').strip()
+        account_years    = int(f.get('accountYears') or 0)
+ 
+        co_name          = (f.get('coApplicantName') or '').strip()
+        co_relation      = (f.get('coApplicantRelation') or '').strip()
+        co_income        = f.get('coApplicantIncome')
+        co_income        = Decimal(co_income) if co_income else None
+ 
+        has_id_proof     = 1 if f.get('idProof') else 0
+        has_addr_proof   = 1 if f.get('addressProof') else 0
+        has_income_proof = 1 if f.get('incomeProof') else 0
+        has_property_docs= 1 if f.get('propertyDocs') else 0
+        declaration      = 1 if f.get('declaration') else 0
+ 
+        applicant_sig    = save_upload(files.get('applicantSignature'), 'signatures')
+        coapp_sig        = save_upload(files.get('coApplicantSignature'), 'signatures')
+ 
+        application_date = f.get('date') or datetime.today().strftime('%Y-%m-%d')
+        place            = (f.get('place') or '').strip()
+ 
+        rate = find_interest_rate('business', interest_type, float(loan_amount), int(loan_tenure))
+        if rate is None:
+            rate = 12.50
+        emi  = compute_emi(loan_amount, rate, loan_tenure)
+ 
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+ 
+        request_id = generate_loan_request_id()
+ 
+        cur.execute("""
+            INSERT INTO business_loan_applications
+            (request_id, user_id, applicant_name, dob, age, gender, address, pin, telephone, mobile, nationality,
+             marital_status, pan, employment_type, company_name, designation, gross_annual_income,
+             total_experience_years, current_company_experience_years, property_address, property_type,
+             property_age_years, built_up_area_sqft, property_value, loan_amount, loan_tenure_years,
+             builder_name, purpose, interest_type, interest_rate, emi_amount,
+             existing_home_loan, other_loans, credit_card_limits, savings_investments, other_assets,
+             bank_name, bank_account_number, bank_account_type, bank_years_with_bank,
+             coapplicant_name, coapplicant_relationship, coapplicant_annual_income,
+             has_id_proof, has_address_proof, has_income_proof, has_property_docs, declaration_agreed,
+             applicant_signature_path, coapplicant_signature_path, application_date, place, status
+            )
+            VALUES
+            (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
+             %s,%s,%s,%s,%s,%s,
+             %s,%s,%s,%s,
+             %s,%s,%s,%s,%s,
+             %s,%s,%s,%s,%s,
+             %s,%s,%s,%s,%s,
+             %s,%s,%s,%s,
+             %s,%s,%s,
+             %s,%s,%s,%s,%s,
+             %s,%s,%s,%s,'pending_manager')
+        """, (
+            request_id, user['user_id'], applicant_name, dob, age, gender, address, pin, telephone, mobile, nationality,
+            marital_status, pan, employment_type, company_name, designation, str(gross_income),
+            experience, current_exp, property_address, property_type,
+            property_age, built_up_area, str(property_value), str(loan_amount), loan_tenure,
+            builder_name, purpose, interest_type, str(rate), str(emi),
+            str(existing_loan), str(other_loan), str(credit_card), str(savings), str(other_assets),
+            bank_name, account_number, account_type, account_years,
+            co_name, co_relation, (str(co_income) if co_income is not None else None),
+            has_id_proof, has_addr_proof, has_income_proof, has_property_docs, declaration,
+            applicant_sig, coapp_sig, application_date, place
+        ))
+ 
+ 
+        cur.execute("""
+            INSERT INTO loan_requests
+            (request_id, loan_type,
+            applicant_name, dob, age, gender, address, pin, telephone, mobile, nationality,
+            marital_status, pan, employment_type, company_name, designation, gross_annual_income,
+            total_experience_years, current_company_experience_years, property_address, property_type,
+            property_age_years, built_up_area_sqft, property_value, loan_amount, loan_tenure_years,
+            builder_name, purpose, interest_type, interest_rate, emi_amount,
+            existing_home_loan, other_loans, credit_card_limits, savings_investments, other_assets,
+            bank_name, bank_account_number, bank_account_type, bank_years_with_bank,
+            coapplicant_name, coapplicant_relationship, coapplicant_annual_income,
+            has_id_proof, has_address_proof, has_income_proof, has_property_docs, declaration_agreed,
+            applicant_signature_path, coapplicant_signature_path, application_date, place, status)
+            VALUES
+            (%s,'business',
+            %s,%s,%s,%s,%s,%s,%s,%s,%s,
+            %s,%s,%s,%s,%s,%s,
+            %s,%s,%s,%s,
+            %s,%s,%s,%s,%s,
+            %s,%s,%s,%s,%s,
+            %s,%s,%s,%s,%s,
+            %s,%s,%s,%s,
+            %s,%s,%s,
+            %s,%s,%s,%s,%s,
+            %s,%s,%s,%s,'pending_manager')
+        """, (
+            request_id,
+            applicant_name, dob, age, gender, address, pin, telephone, mobile, nationality,
+            marital_status, pan, employment_type, company_name, designation, str(gross_income),
+            experience, current_exp, property_address, property_type,
+            property_age, built_up_area, str(property_value), str(loan_amount), loan_tenure,
+            builder_name, purpose, interest_type, str(rate), str(emi),
+            str(existing_loan), str(other_loan), str(credit_card), str(savings), str(other_assets),
+            bank_name, account_number, account_type, account_years,
+            co_name, co_relation, (str(co_income) if co_income is not None else None),
+            has_id_proof, has_addr_proof, has_income_proof, has_property_docs, declaration,
+            applicant_sig, coapp_sig, application_date, place
+        ))
+        mysql.connection.commit()
+        flash(f'Business loan application submitted. Rate {rate:.2f}% • EMI ₹{emi:.2f}', 'success')
+    except Exception as e:
+        mysql.connection.rollback()
+        flash(f'Could not submit business loan application: {e}', 'danger')
+    return redirect(url_for('userdashloan'))
+ 
+ 
+# ========== USER: VIEW LOANS ==========
+@app.route('/view_loans')
+def view_loans():
+    email = session.get('user_email')
+    if not email:
+        flash('Please login first', 'danger')
+        return redirect(url_for('login'))
+ 
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT user_id, name FROM bank_users WHERE email=%s", (email,))
+    user = cur.fetchone()
+    if not user:
+        cur.close()
+        flash('User not found.', 'danger')
+        return redirect(url_for('login'))
+ 
+    loans = []
+ 
+    def _fetch_and_append(kind, table):
+        cur.execute(f"""
+            SELECT id, user_id, applicant_name, purpose,
+                   interest_type, interest_rate, emi_amount,
+                   loan_amount, loan_tenure_years,
+                   application_date, status, updated_at
+            FROM {table}
+            WHERE user_id=%s
+            ORDER BY application_date DESC, id DESC
+        """, (user['user_id'],))
+        rows = cur.fetchall() or []
+        for r in rows:
+            amount = r.get('loan_amount')
+            tenure = r.get('loan_tenure_years')
+            rate   = r.get('interest_rate')
+            emi    = r.get('emi_amount')
+ 
+            if rate is None:
+                rate = _compute_interest_rate(kind, r.get('interest_type'), amount, tenure)
+            if emi is None:
+                emi = compute_emi(amount, rate, tenure)
+ 
+            loans.append({
+                'loan_kind': kind,
+                'loan_type_label': 'Home Loan' if kind=='home' else ('Personal Loan' if kind=='personal' else 'Business Loan'),
+                'purpose': r.get('purpose'),
+                'interest_type': r.get('interest_type'),
+                'interest_rate': rate,
+                'emi_amount': emi,
+                'loan_tenure_years': tenure,
+                'loan_amount': amount,
+                'application_date': r.get('application_date'),
+                'status': r.get('status'),
+                'status_label': _status_label(r.get('status')),
+                'updated_at': r.get('updated_at'),
+            })
+ 
+    _fetch_and_append('home',     'home_loan_applications')
+    _fetch_and_append('personal', 'personal_loan_applications')
+    _fetch_and_append('business', 'business_loan_applications')
+ 
+    cur.close()
+    return render_template('view_loans.html', user=user, loans=loans)
+ 
+ 
+# ========== AGENT: PROFILE & APPLY PAGES ==========
+
+@app.route('/loanagentprofile')
+def loanagentprofile():
+    user_id = session.get('user_id')
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT user_id, name, pan,dob, mobile, email,city,state,country,gender,department,status,role,password,aadhaar,deleted_date FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    return render_template('agentprofile.html', user=user)
+
+
+@app.route('/agentapplyloan')
+def agentapplyloan():
+    # just render the agent form; the POST is handled by /loan-agent/apply
+    agent = _current_user()
+    return render_template('loan_apply.html', user=agent)
+
+
+# ========== AGENT: SUBMIT APPLICATION ==========
+@app.route('/loan-agent/apply', methods=['GET', 'POST'])
+def loan_agent_apply():
+    agent = _current_user()
+    if not agent or _user_role(agent) not in {'loan_agent', 'loanagent', 'agent_loan'}:
+        flash('Only Loan Agents can access this page.', 'danger')
+        return redirect(url_for('login'))
+ 
+    if request.method == 'GET':
+        return render_template('loan_apply.html', user=agent)
+ 
+    f, files = request.form, request.files
+    try:
+        # Target customer
+        customer_email = (f.get('customer_email') or '').strip().lower()
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cur.execute("SELECT user_id, name FROM bank_users WHERE email=%s", (customer_email,))
+        cust = cur.fetchone()
+        if not cust:
+            cur.close()
+            flash('Customer email not found.', 'danger')
+            return redirect(url_for('loan_agent_apply'))
+ 
+        loan_kind = (f.get('loan_kind') or '').strip().lower()  # home|personal|business
+        if loan_kind not in ('home', 'personal', 'business'):
+            cur.close()
+            flash('Please select a valid loan type.', 'danger')
+            return redirect(url_for('loan_agent_apply'))
+ 
+        # ---------- FORM FIELDS ----------
+        applicant_name = (f.get('applicantName') or '').strip()
+        dob            = f.get('dob') or None
+        age            = f.get('age') or None
+        gender         = (f.get('gender') or '').strip()
+        address        = (f.get('address') or '').strip()
+        pin            = (f.get('pin') or '').strip()
+        telephone      = (f.get('telephone') or '').strip()
+        mobile         = (f.get('mobile') or '').strip()
+        nationality    = (f.get('nationality') or '').strip()
+        marital_status = (f.get('maritalStatus') or '').strip()
+        pan            = (f.get('pan') or '').strip()
+ 
+        employment_type = (f.get('employmentType') or '').strip()
+        company_name    = (f.get('companyName') or '').strip()
+        designation     = (f.get('designation') or '').strip()
+        gross_income    = Decimal(f.get('grossIncome') or '0')
+        experience      = int(f.get('experience') or 0)
+        current_exp     = f.get('currentExp')
+        current_exp     = int(current_exp) if current_exp else None
+ 
+        # Property only for home
+        property_address = (f.get('propertyAddress') or '').strip() if loan_kind == 'home' else ''
+        property_type    = (f.get('propertyType') or '').strip()    if loan_kind == 'home' else ''
+        property_age     = int(f.get('propertyAge') or 0) if (loan_kind == 'home' and f.get('propertyAge')) else None
+        built_up_area    = int(f.get('builtUpArea') or 0) if loan_kind == 'home' else 0
+        property_value   = Decimal(f.get('propertyValue') or '0') if loan_kind == 'home' else Decimal('0')
+        builder_name     = (f.get('builderName') or '').strip() if loan_kind == 'home' else ''
+ 
+        loan_amount      = Decimal(f.get('loanAmount') or '0')
+        loan_tenure      = int(f.get('loanTenure') or 0)
+        purpose          = (f.get('purpose') or (loan_kind if loan_kind!='home' else 'dream-home')).strip()
+        interest_type    = (f.get('interestType') or '').strip().title()
+ 
+        existing_loan    = Decimal(f.get('existingLoan') or '0')
+        other_loan       = Decimal(f.get('otherLoan') or '0')
+        credit_card      = Decimal(f.get('creditCard') or '0')
+        savings          = Decimal(f.get('savings') or '0')
+        other_assets     = Decimal(f.get('otherAssets') or '0')
+ 
+        bank_name        = (f.get('bankName') or '').strip()
+        account_number   = (f.get('accountNumber') or '').strip()
+        account_type     = (f.get('accountType') or '').strip()
+        account_years    = int(f.get('accountYears') or 0)
+ 
+        co_name          = (f.get('coApplicantName') or '').strip()
+        co_relation      = (f.get('coApplicantRelation') or '').strip()
+        co_income        = f.get('coApplicantIncome')
+        co_income        = Decimal(co_income) if co_income else None
+ 
+        has_id_proof     = 1 if f.get('idProof') else 0
+        has_addr_proof   = 1 if f.get('addressProof') else 0
+        has_income_proof = 1 if f.get('incomeProof') else 0
+        has_property_docs= 1 if f.get('propertyDocs') else 0
+        declaration      = 1 if f.get('declaration') else 0
+ 
+        applicant_sig    = save_upload(files.get('applicantSignature'), 'signatures')
+        coapp_sig        = save_upload(files.get('coApplicantSignature'), 'signatures')
+ 
+        application_date = f.get('date') or datetime.today().strftime('%Y-%m-%d')
+        place            = (f.get('place') or '').strip()
+ 
+        # Rate/EMI
+        rate = _compute_interest_rate(loan_kind, interest_type, loan_amount, loan_tenure)
+        emi  = _compute_emi(loan_amount, rate, loan_tenure)
+ 
+        # ---------- TABLE MAPPING ----------
+        table = {
+            'home': 'home_loan_applications',
+            'personal': 'personal_loan_applications',
+            'business': 'business_loan_applications'
+        }[loan_kind]
+ 
+        # ---------- GENERATE UNIQUE REQUEST ID ----------
+        request_id = generate_loan_request_id()  # LRxxxxx
+ 
+        # ---------- INSERT INTO LOAN-SPECIFIC TABLE ----------
+        cols = ["request_id","user_id","applicant_name","dob","age","gender","address","pin","telephone","mobile","nationality",
+                "marital_status","pan","employment_type","company_name","designation","gross_annual_income",
+                "total_experience_years","current_company_experience_years","property_address","property_type",
+                "property_age_years","built_up_area_sqft","property_value","loan_amount","loan_tenure_years",
+                "builder_name","purpose","interest_type"]
+ 
+        vals = [request_id, cust['user_id'], applicant_name, dob, age, gender, address, pin, telephone, mobile, nationality,
+                marital_status, pan, employment_type, company_name, designation, str(gross_income),
+                experience, current_exp, property_address, property_type,
+                property_age, built_up_area, str(property_value), str(loan_amount), loan_tenure,
+                builder_name, purpose, interest_type]
+ 
+        # optional interest/emi columns
+        if table_has_column(table, 'interest_rate'):
+            cols.append('interest_rate'); vals.append(str(rate))
+        if table_has_column(table, 'emi_amount'):
+            cols.append('emi_amount'); vals.append(str(emi))
+ 
+        # remaining fields
+        cols += ["existing_home_loan","other_loans","credit_card_limits","savings_investments","other_assets",
+                 "bank_name","bank_account_number","bank_account_type","bank_years_with_bank",
+                 "coapplicant_name","coapplicant_relationship","coapplicant_annual_income",
+                 "has_id_proof","has_address_proof","has_income_proof","has_property_docs","declaration_agreed",
+                 "applicant_signature_path","coapplicant_signature_path","application_date","place","status"]
+ 
+        vals += [str(existing_loan),str(other_loan),str(credit_card),str(savings),str(other_assets),
+                 bank_name,account_number,account_type,account_years,
+                 co_name,co_relation,(str(co_income) if co_income is not None else None),
+                 has_id_proof,has_addr_proof,has_income_proof,has_property_docs, declaration,
+                 applicant_sig,coapp_sig,application_date,place,'pending_manager']
+ 
+        # mark submitter role if column exists
+        if table_has_column(table, 'submitted_by_role'):
+            cols.append('submitted_by_role'); vals.append('Loan_Agent')
+ 
+        placeholders = ",".join(["%s"] * len(vals))
+        sql = f"INSERT INTO {table} ({','.join(cols)}) VALUES ({placeholders})"
+        cur.execute(sql, tuple(vals))
+ 
+        # ---------- ALSO INSERT INTO loan_requests ----------
+        req_cols = ["request_id","loan_type"] + cols[2:]
+        req_vals = [request_id, loan_kind] + vals[2:]
+ 
+        req_placeholders = ",".join(["%s"] * len(req_vals))
+        req_sql = f"INSERT INTO loan_requests ({','.join(req_cols)}) VALUES ({req_placeholders})"
+        cur.execute(req_sql, tuple(req_vals))
+ 
+        mysql.connection.commit()
+        cur.close()
+ 
+        flash(f'{loan_kind.title()} loan application submitted for {cust["name"]}. '
+              f'Rate {rate:.2f}% • EMI ₹{emi:.2f}', 'success')
+ 
+    except Exception as e:
+        mysql.connection.rollback()
+        try: cur.close()
+        except:
+            pass
+        flash(f'Could not submit application: {e}', 'danger')
+ 
+    return redirect(url_for('loan_agent_apply'))
+ 
+
+
+# ---------- AGENT: LOAD LOANS ----------
+def _load_loans_for_agent(only_agent=True):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    loans = []
+
+    def pull(kind, table):
+        has_role = table_has_column(table, 'submitted_by_role')
+        has_rate = table_has_column(table, 'interest_rate')
+        has_emi  = table_has_column(table, 'emi_amount')
+
+        sel = [
+            "t.id", "t.user_id", "u.name AS customer_name",
+            "t.loan_amount", "t.loan_tenure_years", "t.interest_type",
+            "t.application_date", "t.status", "t.updated_at"
+        ]
+        if has_rate: sel.append("t.interest_rate")
+        if has_emi:  sel.append("t.emi_amount")
+
+        sql = f"""
+            SELECT {", ".join(sel)}
+            FROM {table} t
+            LEFT JOIN bank_users u ON u.user_id = t.user_id
+        """
+        where = []
+        params = []
+        if only_agent and has_role:
+            where.append("t.submitted_by_role=%s")
+            params.append('Loan_Agent')
+        if where:
+            sql += " WHERE " + " AND ".join(where)
+        sql += " ORDER BY t.application_date DESC, t.id DESC"
+
+        cur.execute(sql, tuple(params))
+        for r in cur.fetchall() or []:
+            rate = r.get('interest_rate')
+            emi  = r.get('emi_amount')
+            if rate is None:
+                rate = _compute_interest_rate(kind, r.get('interest_type'), r.get('loan_amount'), r.get('loan_tenure_years'))
+            if emi is None:
+                emi  = _compute_emi(r.get('loan_amount'), rate, r.get('loan_tenure_years'))
+
+            loans.append({
+                'loan_kind': kind,
+                'loan_type_label': 'Home Loan' if kind=='home' else ('Personal Loan' if kind=='personal' else 'Business Loan'),
+                'customer_user_id': r.get('user_id'),
+                'customer_name': r.get('customer_name') or '—',
+                'loan_amount': r.get('loan_amount') or 0,
+                'loan_tenure_years': r.get('loan_tenure_years') or 0,
+                'interest_type': r.get('interest_type'),
+                'interest_rate': rate,
+                'emi_amount': emi,
+                'application_date': r.get('application_date'),
+                'status': r.get('status'),
+                'status_label': _status_label(r.get('status')),
+                'updated_at': r.get('updated_at'),
+            })
+
+    pull('home',     'home_loan_applications')
+    pull('personal', 'personal_loan_applications')
+    pull('business', 'business_loan_applications')
+    cur.close()
+
+    # If filtered by agent and got none (e.g., column missing), fall back to all
+    if only_agent and len(loans) == 0:
+        return _load_loans_for_agent(only_agent=False)
+    return loans
+
+
+# ========== AGENT: VIEW LOANS ==========
+@app.route('/agent/loans')
+def agent_view_loans():
+    agent = _current_user()
+    if not agent or _user_role(agent) not in {'loan_agent', 'loanagent', 'agent_loan'}:
+        flash('Only Loan Agents can view this page.', 'danger')
+        return redirect(url_for('login'))
+    loans = _load_loans_for_agent(only_agent=True)
+    return render_template('agent_view_loans_simple.html', loans=loans)
+
+
+# Keep this route if your UI links here; it now loads data as well.
+@app.route('/agentloanapproval')
+def agentloanapproval():
+    agent = _current_user()
+    if not agent or _user_role(agent) not in {'loan_agent', 'loanagent', 'agent_loan'}:
+        flash('Only Loan Agents can view this page.', 'danger')
+        return redirect(url_for('login'))
+    loans = _load_loans_for_agent(only_agent=True)
+    return render_template('agent_view_loans_simple.html', loans=loans)
+
+
+@app.route('/loanperformance')
+def loanperformance():
+    user_id = session.get('user_id')
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT email FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    return render_template('loanperformance.html',user=user)
+
+
+
+@app.route('/approve_loan/<request_id>', methods=['POST'])
+def approve_loan(request_id):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+ 
+    # Get loan type
+    cur.execute("SELECT loan_type FROM loan_requests WHERE request_id=%s", (request_id,))
+    loan_req = cur.fetchone()
+    if not loan_req:
+        flash("Loan request not found", "danger")
+        return redirect(url_for('manage_loans'))
+   
+    loan_type = loan_req['loan_type'].lower()
+ 
+    # Update loan_requests
+    cur.execute("""
+        UPDATE loan_requests
+        SET status='Approved', updated_at=NOW()
+        WHERE request_id=%s
+    """, (request_id,))
+ 
+    # Map loan type to table
+    table_map = {
+        'home': 'home_loan_applications',
+        'personal': 'personal_loan_applications',
+        'business': 'business_loan_applications'
+    }
+ 
+    # Update respective loan table
+    if loan_type in table_map:
+        cur.execute(f"""
+            UPDATE {table_map[loan_type]}
+            SET status='Approved'
+            WHERE request_id=%s
+        """, (request_id,))
+        if cur.rowcount == 0:
+            flash(f"⚠ No matching record in {table_map[loan_type]} for request_id {request_id}", "warning")
+ 
+    mysql.connection.commit()
+    cur.close()
+ 
+    flash("Loan Approved successfully", "success")
+    return redirect(url_for('manage_loans'))
+ 
+ 
+@app.route('/reject_loan/<request_id>', methods=['POST'])
+def reject_loan(request_id):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+ 
+    # Get loan type
+    cur.execute("SELECT loan_type FROM loan_requests WHERE request_id=%s", (request_id,))
+    loan_req = cur.fetchone()
+    if not loan_req:
+        flash("Loan request not found", "danger")
+        return redirect(url_for('manage_loans'))
+   
+    loan_type = loan_req['loan_type'].lower()
+ 
+    # Update loan_requests
+    cur.execute("""
+        UPDATE loan_requests
+        SET status='Rejected', updated_at=NOW()
+        WHERE request_id=%s
+    """, (request_id,))
+ 
+    # Map loan type to table
+    table_map = {
+        'home': 'home_loan_applications',
+        'personal': 'personal_loan_applications',
+        'business': 'business_loan_applications'
+    }
+ 
+    # Update respective loan table
+    if loan_type in table_map:
+        cur.execute(f"""
+            UPDATE {table_map[loan_type]}
+            SET status='Rejected'
+            WHERE request_id=%s
+        """, (request_id,))
+        if cur.rowcount == 0:
+            flash(f"⚠ No matching record in {table_map[loan_type]} for request_id {request_id}", "warning")
+ 
+    mysql.connection.commit()
+    cur.close()
+ 
+    flash("Loan Request has been Rejected", "success")
+    return redirect(url_for('manage_loans'))
+  
+ 
+
 
    
 #Dashboard - user->Investment
@@ -2750,8 +3983,399 @@ def userdashinvest():
     cur.close()
     return render_template('userdashinvest.html',user=user)
 
-@app.route('/userpfform')
+# ========== FIXED: userpfform now handles POST and inserts into DB ==========
+
+#Dashboard - user->Investment
+def _role(u:dict) -> str:
+    return (u.get('role') or session.get('user_role') or '').strip()
+ 
+def _current_user():
+    """
+    Works with either session['user_id'] or session['user_email'].
+    """
+    uid = session.get('user_id')
+    email = session.get('user_email')
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    try:
+        if uid:
+            cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (uid,))
+        elif email:
+            cur.execute("SELECT * FROM bank_users WHERE email=%s", (email,))
+        else:
+            return None
+        return cur.fetchone()
+    finally:
+        cur.close()
+ 
+def _status_label(s):
+    return {
+        'pending_manager': 'Pending',
+        'approved': 'Approved',
+        'declined': 'Declined',
+        'issued': 'Issued',
+        'active': 'Active',
+        'closed': 'Closed',
+    }.get((s or '').lower(), s or '—')
+ 
+def _gen_inv_app_no() -> str:
+    """
+    INV + YYMMDD + '-' + 4-hex, e.g., INV250912-7A3F
+    """
+    return f"INV{datetime.now().strftime('%y%m%d')}-{uuid.uuid4().hex[:4].upper()}"
+ 
+def _canon_invest_type(raw: str) -> str:
+    s = (raw or "").strip().lower()
+    if "provident" in s or "ppf" in s: return "PPF"
+    if "bond" in s or "frsb" in s or "saving bond" in s: return "FRSB"
+    if "pension" in s or "nps" in s: return "NPS"
+    return (raw or "PPF")
+ 
+def _parse_years(raw: str) -> int:
+    if raw is None: return 0
+    m = re.search(r'(\d+)', str(raw))
+    return int(m.group(1)) if m else 0
+
+def generate_invest_request_id():
+    """
+    Generate unique IR + 3 digit request id for investments
+    """
+    cur = mysql.connection.cursor()
+    while True:
+        rid = "IR" + f"{random.randint(0, 999):03d}"
+        cur.execute("SELECT 1 FROM investment_applications WHERE request_id=%s", (rid,))
+        if not cur.fetchone():
+            break
+    cur.close()
+    return rid
+ 
+# ========== Your existing dashboard route (unchanged) ==========
+ 
+
+ 
+ 
+@app.route('/userpfform', methods=['GET', 'POST'])
 def userpfform():
+    user = _current_user()
+    if not user:
+        flash('Please login first.', 'danger')
+        return redirect(url_for('login'))
+ 
+    if request.method == 'GET':
+        # Render your existing user investment form
+        return render_template('invest_apply_user.html', user=user)
+ 
+    # POST -> insert investment application
+    f = request.form
+    try:
+        full_name   = (f.get('full_name') or '').strip()
+        pan         = (f.get('pan') or '').strip()
+        initial_dep = Decimal(f.get('initial_deposit') or '0')
+        inv_type_ui = (f.get('investment_type') or '').strip()
+        inv_type    = _canon_invest_type(inv_type_ui)
+        tenure_yrs  = _parse_years(f.get('investment_tenure') or '')
+        app_date    = datetime.today().strftime('%Y-%m-%d')
+ 
+        if not full_name or not pan or initial_dep <= 0 or tenure_yrs <= 0:
+            raise ValueError("Please fill all required fields with valid values.")
+ 
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+ 
+        # ensure table exists (optional safety; remove if you already created it)
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS investment_applications (
+              id INT AUTO_INCREMENT PRIMARY KEY,
+              application_number VARCHAR(24) NOT NULL UNIQUE,
+              user_id VARCHAR(100) NOT NULL,
+              full_name VARCHAR(150) NOT NULL,
+              pan VARCHAR(20) NOT NULL,
+              initial_deposit DECIMAL(12,2) NOT NULL,
+              investment_type VARCHAR(60) NOT NULL,
+              investment_tenure_years INT NOT NULL,
+              application_date DATE NOT NULL,
+              submitted_by_role ENUM('User','Investment_Agent') NOT NULL DEFAULT 'User',
+              submitted_by_user_id VARCHAR(100) NULL,
+              status ENUM('pending_manager','approved','declined','active','closed')
+                     NOT NULL DEFAULT 'pending_manager',
+              created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
+              INDEX idx_inv_user (user_id),
+              INDEX idx_inv_status (status, created_at)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+        """)
+ 
+        # generate a unique application number (retry on rare collision)
+        for _ in range(3):
+            app_no = _gen_inv_app_no()
+            req_id = generate_invest_request_id()
+            try:
+                cur.execute("""
+                    INSERT INTO investment_applications
+                    (application_number, request_id, user_id, full_name, pan, initial_deposit,
+                    investment_type, investment_tenure_years, application_date,
+                    submitted_by_role, submitted_by_user_id, status)
+                    VALUES
+                    (%s,%s,%s,%s,%s,%s,%s,%s,%s,'User',%s,'pending_manager')
+                """, (app_no, req_id, user['user_id'], full_name, pan,
+                    str(initial_dep), inv_type, tenure_yrs, app_date, user['user_id']))
+                mysql.connection.commit()
+                break
+            except Exception as e:
+                mysql.connection.rollback()
+                # try again on unique collision
+                if "Duplicate" in str(e) or "UNIQUE" in str(e):
+                    continue
+                raise
+ 
+        cur.close()
+        flash(f'Investment application submitted successfully. Ref {app_no}', 'success')
+    except Exception as e:
+        try: cur.close()
+        except: pass
+        mysql.connection.rollback()
+        flash(f'Could not submit investment application: {e}', 'danger')
+ 
+    # Back to the same form
+    return redirect(url_for('userpfform'))
+ 
+ 
+# ---------- USER: Apply for Investment ----------
+ 
+@app.route('/investments/apply', methods=['GET', 'POST'])
+def invest_apply():
+    user = _current_user()
+    if not user:
+        flash('Please login first.', 'danger')
+        return redirect(url_for('login'))
+ 
+    if request.method == 'GET':
+        return render_template('invest_apply_user.html', user=user)
+ 
+    # POST
+    f = request.form
+    try:
+        full_name   = (f.get('full_name') or f.get('Full Name') or '').strip()
+        pan         = (f.get('pan') or f.get('PAN Number') or '').strip()
+        initial_dep = Decimal(f.get('initial_deposit') or f.get('Initial Deposit Amount (₹)') or '0')
+        inv_type    = _canon_invest_type(f.get('investment_type') or f.get('Investment Type'))
+        tenure_yrs  = _parse_years(f.get('investment_tenure') or f.get('Investment Tenure'))
+        app_date    = datetime.today().strftime('%Y-%m-%d')
+ 
+        if initial_dep <= 0:
+            raise ValueError("Initial deposit must be greater than 0.")
+ 
+        # Insert with unique application number (retry if collision)
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        for _ in range(3):
+            app_no = _gen_inv_app_no()
+            req_id = generate_invest_request_id()
+            try:
+                cur.execute("""
+                    INSERT INTO investment_applications
+                    (application_number, request_id, user_id, full_name, pan, initial_deposit,
+                    investment_type, investment_tenure_years, application_date,
+                    submitted_by_role, submitted_by_user_id, status)
+                    VALUES
+                    (%s,%s,%s,%s,%s,%s,%s,%s,%s,'User',%s,'pending_manager')
+                """, (app_no, req_id, user['user_id'], full_name, pan,
+                    str(initial_dep), inv_type, tenure_yrs, app_date, user['user_id']))
+                mysql.connection.commit()
+                break
+            except Exception as e:
+                # Duplicate application_number? regenerate and retry once more
+                mysql.connection.rollback()
+                if "Duplicate" in str(e) or "UNIQUE" in str(e):
+                    continue
+                raise
+ 
+        cur.close()
+        flash(f'Investment application submitted. Ref {app_no}', 'success')
+    except Exception as e:
+        try: cur.close()
+        except: pass
+        mysql.connection.rollback()
+        flash(f'Could not submit investment application: {e}', 'danger')
+ 
+    return redirect(url_for('invest_apply'))
+ 
+ 
+# ---------- AGENT: Apply for Investment on behalf of customer ----------
+
+
+ 
+@app.route('/investment-agent/apply', methods=['GET', 'POST'])
+def invest_agent_apply():
+    agent = _current_user()
+    if not agent or _role(agent).lower() not in {'investment_agent', 'investment agent', 'investment-agent'}:
+        flash('Only Investment Agents can access this page.', 'danger')
+        return redirect(url_for('login'))
+ 
+    if request.method == 'GET':
+        return render_template('invest_apply_agent.html', user=agent)
+ 
+    f = request.form
+    try:
+        # Find the customer (target) by email
+        customer_email = (f.get('customer_email') or '').strip().lower()
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cur.execute("SELECT user_id, name FROM bank_users WHERE email=%s", (customer_email,))
+        cust = cur.fetchone()
+        if not cust:
+            cur.close()
+            flash('Customer email not found.', 'danger')
+            return redirect(url_for('invest_agent_apply'))
+ 
+        # Read form fields
+        full_name   = (f.get('full_name') or f.get('Full Name') or '').strip()
+        pan         = (f.get('pan') or f.get('PAN Number') or '').strip()
+        initial_dep = Decimal(f.get('initial_deposit') or f.get('Initial Deposit Amount (₹)') or '0')
+        inv_type    = _canon_invest_type(f.get('investment_type') or f.get('Investment Type'))
+        tenure_yrs  = _parse_years(f.get('investment_tenure') or f.get('Investment Tenure'))
+        app_date    = datetime.today().strftime('%Y-%m-%d')
+ 
+        if initial_dep <= 0:
+            raise ValueError("Initial deposit must be greater than 0.")
+ 
+        # Insert w/ unique app number & role
+        for _ in range(3):
+            app_no = _gen_inv_app_no()
+            req_id = generate_invest_request_id()
+            try:
+                cur.execute("""
+                    INSERT INTO investment_applications
+                    (application_number, request_id,user_id, full_name, pan, initial_deposit,
+                     investment_type, investment_tenure_years, application_date,
+                     submitted_by_role, submitted_by_user_id, status)
+                    VALUES
+                    (%s,%s,%s,%s,%s,%s,%s,%s,%s,'Investment_Agent',%s,'pending_manager')
+                """, (app_no,req_id, cust['user_id'], full_name, pan, str(initial_dep),
+                      inv_type, tenure_yrs, app_date, agent['user_id']))
+                mysql.connection.commit()
+                break
+            except Exception as e:
+                mysql.connection.rollback()
+                if "Duplicate" in str(e) or "UNIQUE" in str(e):
+                    continue
+                raise
+ 
+        cur.close()
+        flash(f'Investment application for {cust["name"]} submitted. Ref {app_no}', 'success')
+    except Exception as e:
+        try: cur.close()
+        except: pass
+        mysql.connection.rollback()
+        flash(f'Could not submit investment application: {e}', 'danger')
+ 
+    return redirect(url_for('invest_agent_apply'))
+ 
+ 
+# ---------- (Optional) Agent view: minimal list of investment applications ----------
+ 
+@app.route('/investment-agent/applications')
+def invest_agent_list():
+    agent = _current_user()
+    if not agent or _role(agent).lower() not in {'investment_agent', 'investment agent', 'investment-agent'}:
+        flash('Only Investment Agents can view this page.', 'danger')
+        return redirect(url_for('login'))
+ 
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("""
+        SELECT ia.application_number, ia.user_id, u.name AS customer_name,
+               ia.investment_type, ia.initial_deposit, ia.investment_tenure_years,
+               ia.status, ia.application_date
+        FROM investment_applications ia
+        LEFT JOIN bank_users u ON u.user_id = ia.user_id
+        WHERE ia.submitted_by_role = 'Investment_Agent'
+        ORDER BY ia.application_date DESC, ia.id DESC
+    """)
+    rows = cur.fetchall() or []
+    cur.close()
+ 
+    # Normalize for template
+    apps = [{
+        'application_number': r['application_number'],
+        'customer_user_id': r['user_id'],
+        'customer_name': r.get('customer_name') or '—',
+        'investment_type': r['investment_type'],
+        'initial_deposit': r['initial_deposit'],
+        'tenure_years': r['investment_tenure_years'],
+        'status': r['status'],
+        'status_label': _status_label(r['status']),
+        'application_date': r['application_date'],
+    } for r in rows]
+ 
+    return render_template('agent_view_investments.html', apps=apps)
+ 
+ 
+ 
+@app.route('/view_investments')
+def view_investments():
+    email = session.get('user_email')
+    if not email:
+        flash('Please login first.', 'danger')
+        return redirect(url_for('login'))
+ 
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    # get logged-in user
+    cur.execute("SELECT user_id, name FROM bank_users WHERE email=%s", (email,))
+    user = cur.fetchone()
+    if not user:
+        cur.close()
+        flash('User not found.', 'danger')
+        return redirect(url_for('login'))
+ 
+    # fetch this user's investment applications
+    cur.execute("""
+        SELECT
+            application_number,
+            investment_type,
+            investment_tenure_years,
+            initial_deposit,
+            status,
+            submitted_by_role,
+            created_at
+        FROM investment_applications
+        WHERE user_id=%s
+        ORDER BY created_at DESC
+    """, (user['user_id'],))
+    investments = cur.fetchall() or []
+    cur.close()
+ 
+    return render_template('view_investments.html', user=user, investments=investments)
+ 
+@app.route('/viewinvestments')
+def viewinvestments():
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("""
+        SELECT ia.id, ia.request_id, ia.application_number,
+               u.name AS customer, ia.investment_type,
+               ia.initial_deposit, ia.application_date,
+               ia.status
+        FROM investment_applications ia
+        LEFT JOIN bank_users u ON u.user_id = ia.user_id
+        ORDER BY ia.created_at DESC
+    """)
+    rows = cur.fetchall()
+    cur.close()
+    return render_template('view-investments.html', investments=rows)
+ 
+@app.post('/investments/<int:inv_id>/<string:action>')
+def update_investment_status(inv_id, action):
+    if action not in ('approve','reject'):
+        abort(400)
+    new_status = 'approved' if action == 'approve' else 'declined'
+    cur = mysql.connection.cursor()
+    cur.execute("UPDATE investment_applications SET status=%s WHERE id=%s",
+                (new_status, inv_id))
+    mysql.connection.commit()
+    cur.close()
+    flash('Status updated', 'success')
+    return redirect(url_for('viewinvestments'))
+ 
+
+#Dashboard - user->forex
+
+@app.route('/userdashforex')
+def userdashforex():
     user_id = session.get('user_id')
     # session['cust_id'] = user['cust_id']
     # print("Logged in cust_id:", cust_id)   # debug
@@ -2759,9 +4383,7 @@ def userpfform():
     cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
     user = cur.fetchone()
     cur.close()
-    return render_template('userpfform.html',user=user)
-
-
+    return render_template('userdashforex.html',user=user)
 
 @app.route('/logout')
 def logout():
@@ -2769,10 +4391,15 @@ def logout():
 
 #Agent Dashboard(Card_Agent)
 
-
-
+ 
 @app.route('/cardapplications', methods=['GET'])
 def cardapplications():
+    user_id = session.get('user_id')
+    
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
     email = session.get('user_email')
     if not email:
         flash('Please login first', 'danger')
@@ -2809,7 +4436,7 @@ def cardapplications():
     # status, created_at, manager_approval_date
     sql = f"""
         SELECT id, application_ref, customer_user_id, customer_name,
-               card_type, card_subtype, status_flag,
+               card_type, card_subtype, status,
                created_at, manager_approval_date
         FROM card_applications
         {where_sql}
@@ -2822,17 +4449,21 @@ def cardapplications():
     # Decorate rows for display labels
     type_map = {'credit': 'Credit Card', 'debit': 'Debit Card', 'prepaid': 'Prepaid Card'}
     status_map = {
-        None : 'Pending',
-        'A': 'Approved',
+        'pending_manager': 'Pending',
+        'approved': 'Approved',
         'issued': 'Issued',
-        'R': 'Declined'
+        'declined': 'Declined'
     }
     for r in rows:
         r['card_type_label'] = type_map.get((r.get('card_type') or '').lower(), r.get('card_type'))
-        r['status_label'] = status_map.get((r.get('status_flag') or '').lower(), r.get('status_flag') or '—')
+        r['status_label'] = status_map.get((r.get('status') or '').lower(), r.get('status') or '—')
  
     # Pass list to template; your template should render `created_at` as Applied Date
-    return render_template('cardapplications.html', apps=rows, agent=me)
+    return render_template('cardapplications.html', apps=rows, agent=me, user=user)
+ 
+ 
+ 
+
  
 @app.route('/applycardagent')
 def applycardagent():
@@ -2853,6 +4484,70 @@ def cardperformance():
     return render_template('cardperformance.html',user=user)
 
 
+@app.route('/customer_count')
+def customer_count():
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT COUNT(*) AS total_customers FROM bank_users WHERE role = 'User'")
+    result = cur.fetchone()
+    cur.close()
+    return {"total_customers": result['total_customers']}
+ 
+# --- SearchBar ---
+ 
+@app.route('/searchprofile', methods=['GET'])
+def searchprofile():
+    query = request.args.get('query', '').strip()
+    search_by = request.args.get('search_by', 'name')  # default to name
+ 
+    if not query:
+        flash("Please enter a search term.")
+        return redirect(url_for('dashboard'))
+ 
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+ 
+    if search_by == "user_id":
+        sql = "SELECT * FROM bank_users WHERE user_id LIKE %s"
+    else:  # default search by name
+        sql = "SELECT * FROM bank_users WHERE name LIKE %s"
+ 
+    like_query = f"%{query}%"
+    cur.execute(sql, (like_query,))
+    user = cur.fetchone()
+    cur.close()
+ 
+    if not user:
+        flash("No user found.")
+        return redirect(url_for('dashboard'))
+ 
+    return render_template('searchprofile.html', user=user)
+ 
+ 
+from flask import jsonify
+import MySQLdb.cursors
+ 
+@app.route('/api/user_suggestions')
+def user_suggestions():
+    q = request.args.get('q', '').strip()
+    if not q:
+        return jsonify([])
+ 
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    # Only fetch users with role 'User'
+    sql = """
+        SELECT user_id, name
+        FROM bank_users
+        WHERE (name LIKE %s OR user_id LIKE %s)
+        LIMIT 10
+    """
+    like_q = f"%{q}%"
+    cur.execute(sql, (like_q, like_q))
+    rows = cur.fetchall()
+    cur.close()
+ 
+    return jsonify(rows)
+ 
+
+
 #Loan Agent Dashboard
 
 # @app.route('/loanagentprofile')
@@ -2865,33 +4560,33 @@ def cardperformance():
 
 #     return render_template('agentprofile.html',user=user)
 
-@app.route('/agentapplyloan')
-def agentapplyloan():
+# @app.route('/agentapplyloan')
+# def agentapplyloan():
 
-    user_id = session.get('user_id')
-    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute("SELECT email FROM bank_users WHERE user_id=%s", (user_id,))
-    user = cur.fetchone()
-    cur.close()
-    return render_template('agentapplyloan.html',user=user)
+#     user_id = session.get('user_id')
+#     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#     cur.execute("SELECT email FROM bank_users WHERE user_id=%s", (user_id,))
+#     user = cur.fetchone()
+#     cur.close()
+#     return render_template('loan_apply.html',user=user)
 
-@app.route('/agentloanapproval')
-def agentloanapproval():
-    user_id = session.get('user_id')
-    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute("SELECT email FROM bank_users WHERE user_id=%s", (user_id,))
-    user = cur.fetchone()
-    cur.close()
-    return render_template('agentloanapproval.html',user=user)
+# @app.route('/agentloanapproval')
+# def agentloanapproval():
+#     user_id = session.get('user_id')
+#     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#     cur.execute("SELECT email FROM bank_users WHERE user_id=%s", (user_id,))
+#     user = cur.fetchone()
+#     cur.close()
+#     return render_template('agentloanapproval.html',user=user)
 
-@app.route('/loanperformance')
-def loanperformance():
-    user_id = session.get('user_id')
-    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute("SELECT email FROM bank_users WHERE user_id=%s", (user_id,))
-    user = cur.fetchone()
-    cur.close()
-    return render_template('loanperformance.html',user=user)
+# @app.route('/loanperformance')
+# def loanperformance():
+#     user_id = session.get('user_id')
+#     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#     cur.execute("SELECT email FROM bank_users WHERE user_id=%s", (user_id,))
+#     user = cur.fetchone()
+#     cur.close()
+#     return render_template('loanperformance.html',user=user)
 
    
 if __name__ == '__main__':

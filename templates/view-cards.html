@@ -79,7 +79,7 @@
           <tr>
             <th>Request ID</th>
             <th>Customer</th>
-            <th>Submitted By</th>
+            <th>Card Type</th>
             <th>Application Ref</th>
             <th>Date</th>
             <th>Status</th>
@@ -91,7 +91,7 @@
           <tr>
             <td>{{ r.request_id }}</td>
             <td>{{ r.customer_name }}</td>
-            <td>{{ r.submitted_by_role }}</td>
+            <td>{{ r.card_type }}</td>
             <td>{{ r.application_ref or '—' }}</td>
             <td>{{ r.created_at.strftime('%Y-%m-%d %H:%M') if r.created_at else '—' }}</td>
             <td><span class="badge badge-pending">Pending</span></td>

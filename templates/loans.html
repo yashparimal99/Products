@@ -2,263 +2,210 @@
 <html lang="en">
 
 <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
-    <title>DiGi Bank Products</title>
+  <title>DiGi Bank Products</title>
 
+  <style>
+    :root {
+      --primary-color: #0B4D83;
+      --secondary-color: #1976D2;
+    }
+
+    .navbar {
+      background-color: var(--primary-color) !important;
+    }
+
+    .breadcrumb .breadcrumb-item a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .breadcrumb .breadcrumb-item a:hover {
+      text-decoration: underline;
+    }
+
+    .breadcrumb .breadcrumb-item {
+      color: var(--primary-color);
+    }
+
+    .brand-text,
+    .card-title,
+    h3 span {
+      color: var(--primary-color);
+    }
+
+    .loan-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 25px;
+      border: 1px solid #ddd;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 2px solid var(--primary-color);
+    }
+
+    .loan-card h5 {
+      color: var(--primary-color);
+    }
+
+    .loan-buttons {
+      margin-top: 20px;
+    }
+
+    .btn-maroon {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      transition: 0.3s;
+    }
+
+    .btn-maroon:hover {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+
+    .text-danger {
+      color: var(--secondary-color) !important;
+    }
+  </style>
 </head>
 
 <body>
-    <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-dark"> -->
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important;">
-  <div class="container-fluid">
-    <img src="{{ url_for('static', filename='images/Digilogo.jpg') }}"
-         alt="DiGi Bank" height="60" class="my-2">
- 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-            aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
- 
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <!-- your existing nav items -->
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page"
-             href="{{ url_for('home') }}">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link"
-             href="{{ url_for('exploreproduct') }}">Explore Products</a>
-        </li>
-        <li class="nav-item"><a class="nav-link" href="#">Grab Deals</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Make Payments</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Bank Smart</a></li>
-      </ul>
- 
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="btn btn-outline-light me-2 navbar-btn"
-             href="{{ url_for('login') }}">Login</a>
-        </li>
-        <li class="nav-item">
-          <a class="btn btn-light navbar-btn"
-             href="{{ url_for('signup') }}">Sign Up</a>
-        </li>
-      </ul>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+      <img src="{{ url_for('static', filename='images/Digilogo.jpg') }}" alt="DiGi Bank" height="60" class="my-2">
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+        aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('exploreproduct') }}">Explore Products</a>
+          </li>
+          <li class="nav-item"><a class="nav-link" href="#">Grab Deals</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Make Payments</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Bank Smart</a></li>
+        </ul>
+
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="btn btn-outline-light me-2 navbar-btn" href="{{ url_for('login') }}">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-light navbar-btn" href="{{ url_for('signup') }}">Sign Up</a>
+          </li>
+        </ul>
+      </div>
     </div>
-  </div>
-</nav>
- 
-
-    <style>
-        .breadcrumb .breadcrumb-item a {
-            color: #97144D;
-            text-decoration: none;
-        }
-
-        .breadcrumb .breadcrumb-item a:hover {
-            text-decoration: underline;
-        }
-
-        .breadcrumb .breadcrumb-item {
-            color: #97144D;
-        }
-    </style>
-
-    <div class="card mt-4 border-0"></div>
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
-            <li class="breadcrumb-item"><a href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
-            <li class="breadcrumb-item"><a href="loans.html">Loans</a></li>
-
-        </ol>
-    </nav>
-  <!-- Navigation Bar -->
-  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important;">
-    <!-- your nav content -->
   </nav>
 
-  <!-- ✅ Full-width Ad Banner After Navbar -->
-<div class="container-fluid p-0">
-  <img src="{{ url_for('static', filename='Loan/Homepageloan.jpg') }}"
-       class="img-fluid w-100"
-       style="height: 600px; object-fit: cover;"
-       alt="Advertising Banner">
-</div>
+  <!-- Breadcrumb -->
+  <div class="card mt-4 border-0"></div>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
+      <li class="breadcrumb-item"><a href="loans.html">Loans</a></li>
+    </ol>
+  </nav>
 
+  <!-- Full-width Ad Banner -->
+  <div class="container-fluid p-0">
+    <img src="{{ url_for('static', filename='Loan/Homepageloan.jpg') }}" class="img-fluid w-100"
+      style="height: 600px; object-fit: cover;" alt="Advertising Banner">
+  </div>
 
-    <!-- Cards -->
+  <!-- Intro Section -->
+  <div class="card mt-4 border-0">
+    <div class="card-body" style="margin-left: 0.5in;">
+      <h3><span style="font-style: italic;">DiGi Bank Loans</span></h3><br>
+      <p>
+        We understand that your journey should be smooth and uninterrupted, which is why we offer customized
+        bank loans with competitive interest rates.
+        Start by checking your loan eligibility with our straightforward loan calculators.
+        Easily apply for your bank loan online in three simple steps, securing attractive interest rates and
+        flexible repayment terms.
+      </p>
+    </div>
+  </div>
 
-    <style>
-        .card-hover .features {
-            display: none;
-            font-size: 14px;
-            padding-top: 10px;
-        }
+  <div class="card mt-4 border-0">
+    <div class="card-body" style="margin-left: 0.5in;">
+      <h3>Explore our range of loans designed for your unique needs.</h3>
+    </div>
+  </div>
 
-        .card-hover:hover .features {
-            display: block;
-        }
+  <!-- Loan Cards Section -->
+  <div class="container mt-5">
+    <div class="row row-cols-1 row-cols-md-3 g-4">
 
-        .card-hover:hover .btn {
-            display: none;
-        }
-
-        .brand-text {
-            font-weight: bold;
-            font-size: 24px;
-            color: #8b0042;
-        }
-
-        .card-title {
-            color: #8b0042;
-        }
-
-        .container h2,
-        .container h3 {
-            color: #2c2c2c;
-        }
-    </style>
-    </head>
-
-    <body>
-
-        <div class="card mt-4 border-0">
-            <div class="card-body" style="margin-left: 0.5in;">
-                <h3>
-                    <span style="color: #97144D; font-style: italic;">DiGi Bank Loans</span>
-                </h3><br>
-                <p>
-                    We understand that your journey should be smooth and uninterrupted, which is why we offer customized
-                    bank loans with competitive interest rates.
-                    Start by checking your loan eligibility with our straightforward loan calculators.
-                    Easily apply for your bank loan online in three simple steps, securing attractive interest rates and
-                    flexible repayment terms.
-                </p>
-                
-
-            </div>
+      <!-- Home Loan -->
+      <div class="col">
+        <div class="loan-card">
+          <img src="{{ url_for('static', filename='Loan/2148793806.jpg') }}" alt="Home Loan"
+            style="width: 100%; height: auto; border-bottom: 1px solid #ccc;">
+          <h5><strong>Home</strong> Loan</h5>
+          <p>Explore a diverse array of home loan options tailored to meet your specific needs.</p>
+          <a href="{{ url_for('login') }}" class="text-danger">Explore More</a>
+          <div class="loan-buttons">
+            <a href="{{ url_for('login') }}" class="btn btn-maroon w-100">Apply Online</a>
+          </div>
         </div>
+      </div>
 
-        <div class="card mt-4 border-0">
-            <div class="card-body" style="margin-left: 0.5in;">
-                <h3>
-                    <span >Explore our range of loans designed for your unique needs.</span>
-                </h3><br>
-                
-                
-
-            </div>
+      <!-- Personal Loan -->
+      <div class="col">
+        <div class="loan-card">
+          <img src="{{ url_for('static', filename='Loan/2148738291.jpg') }}" alt="Personal Loan"
+            style="width: 100%; height: auto; border-bottom: 1px solid #ccc;">
+          <h5><strong>Personal</strong> Loan</h5>
+          <p>Secure a personal loan for holidays, home renovations, or weddings.</p>
+          <a href="{{ url_for('login') }}" class="text-danger">Explore More</a>
+          <div class="loan-buttons">
+            <a href="{{ url_for('login') }}" class="btn btn-maroon w-100">Apply Online</a>
+          </div>
         </div>
+      </div>
 
+      <!-- Business Loan -->
+      <div class="col">
+        <div class="loan-card">
+          <img src="{{ url_for('static', filename='Loan/37745.jpg') }}" alt="Business Loan"
+            style="width: 100%; height: auto; border-bottom: 1px solid #ccc;">
+          <h5><strong>Business</strong> Loan</h5>
+          <p>Expand your business with minimal paperwork and rapid approval.</p>
+          <a href="{{ url_for('login') }}" class="text-danger">Explore More</a>
+          <div class="loan-buttons mt-2">
+            <a href="{{ url_for('login') }}" class="btn btn-maroon w-100">Apply Online</a>
+          </div>
+        </div>
+      </div>
 
-        
-        
-            <style>
-                .loan-card {
-                    background: #fff;
-                    border-radius: 12px;
-                    padding: 25px;
-                    border: 1px solid #ddd;
-                    height: 100%;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: space-between;
-                }
+    </div>
+  </div>
 
-                .loan-card h5 {
-                    color: #7a004c;
-                }
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
 
-                .loan-buttons {
-                    margin-top: 20px;
-                }
-
-                .btn-maroon {
-                    background-color: #7a004c;
-                    color: white;
-                }
-
-                .btn-maroon:hover {
-                    background-color: #9a005d;
-                    color: white;
-                }
-
-                .text-danger {
-                    color: #dc3545 !important;
-                }
-            </style>
-        </head>
-
-        <body>
-            <div class="container mt-5">
-                <div class="row row-cols-1 row-cols-md-3 g-4">
- 
-                    <!-- Home Loan -->
-                    <div class="col">
-                        <div class="loan-card" style="width: 100%; border: 2px solid #97144D";>
-                            <img src="{{ url_for('static', filename='Loan/2148793806.jpg') }}" alt="Home Loan" style="width: 100%; height: auto; border-bottom: 1px solid #ccc;">
-                            <h5><strong>Home</strong> Loan</h5>
-                            <p>Explore a diverse array of home loan options tailored to meet your specific needs.</p>
-                            <a href="{{ url_for('login') }}" class="text-danger">Explore More</a>
-                            <div class="loan-buttons">
-                            <a href="{{ url_for('login') }}" class="btn btn-maroon w-100">Apply Online</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Personal Loan -->
-                    <div class="col">
-                        <div class="loan-card" style="width: 100%; border: 2px solid #97144D";>
-                            <img src="{{ url_for('static', filename='Loan/2148738291.jpg') }}" alt="Personal Loan" style="width: 100%; height: auto; border-bottom: 1px solid #ccc;">
-                            <h5><strong>Personal</strong> Loan</h5>
-                            <p>Secure a personal loan for holidays, home renovations, or weddings.</p>
-                            <a href="{{ url_for('login') }}" class="text-danger">Explore More</a>
-                            <div class="loan-buttons">
-                            <a href="{{ url_for('login') }}" class="btn btn-maroon w-100">Apply Online</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Business Loan -->
-                    <div class="col">
-                        <div class="loan-card" style="width: 100%; border: 2px solid #97144D";>
-                            <img src="{{ url_for('static', filename='Loan/37745.jpg') }}" alt="Business Loan" style="width: 100%; height: auto; border-bottom: 1px solid #ccc;">
-                            <h5><strong>Business</strong> Loan</h5>
-                            <p>Expand your business with minimal paperwork and rapid approval.</p>
-                            <a href="{{ url_for('login') }}" class="text-danger">Explore More</a>
-                            <div class="loan-buttons mt-2">
-                                <a href="{{ url_for('login') }}" class="btn btn-maroon w-100">Apply Online</a>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </body>
-
-
-        <!-- Optional JavaScript; choose one of the two! -->
-
-        <!-- Option 1: Bootstrap Bundle with Popper -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-            crossorigin="anonymous"></script>
-
-        <!-- Option 2: Separate Popper and Bootstrap JS -->
-        <!--
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
-    -->
-    </body>
+</body>
 
 </html>

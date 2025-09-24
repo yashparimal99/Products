@@ -3,496 +3,498 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PersonalLoan Application Form</title>
-
-  <!-- Bootstrap CSS -->
+  <title>Home Loan Application Form</title>
+ 
+  <!-- Bootstrap CSS & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-
+ 
   <style>
-    body {
-      background: #f8f9fa;
-      font-family: Arial, sans-serif;
-    }
-    h1 {
-      color: #97144D;
-      margin-bottom: 30px;
-      font-weight: 700;
-    }
-    label { font-weight: 600; }
-    .section-title {
-      background: #97144D;
-      color: white;
-      padding: 10px 15px;
-      margin-bottom: 20px;
-      border-radius: 5px;
-      font-size: 1.25rem;
-    }
-    .required::after { content: "*"; color: red; margin-left: 3px; }
-    .btn-custom { background-color: #97144D; color: white; border: none; }
-    .btn-custom:hover { background-color: #7a0f39; color: white; }
+    body { background:#f8f9fa; font-family: Arial, sans-serif; }
+    h1 { color:#97144D; margin-bottom:16px; font-weight:700; }
+    label { font-weight:600; }
+    .section-title { background:#97144D; color:#fff; padding:10px 15px; margin:24px 0 16px; border-radius:6px; font-size:1.1rem; }
+    .required::after { content:" *"; color:#dc3545; }
+    .btn-custom { background:#97144D; color:#fff; border:none; }
+    .btn-custom:hover { background:#7a0f39; color:#fff; }
     .navbar { position: sticky; top: 0; z-index: 1000; }
-    nav.breadcrumb-container { padding: 10px 20px; background: #fff; }
+    nav.breadcrumb-container { padding:10px 20px; background:#fff; }
   </style>
 </head>
 <body>
-
-<!-- <nav class="navbar navbar-expand-lg navbar-dark" 
-     style="background-color: #97144D !important; width: 100%; height: 80px;"> -->
-
-  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important; width: 100%; height: 80px;">
-      <div class="container-fluid">
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <!-- <li class="nav-item"><a class="nav-link active" href="{{ url_for('home') }}">Home</a></li> -->
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">My Activities</a>
-            </li>
-            <!-- Open Account Dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Open Account</a>
-              <ul class="dropdown-menu" aria-labelledby="accountDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Savings
-                    Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Salary Account</a>
-                </li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Current
-                    Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Safe Custody
-                    Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Pension
-                    Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">PMJDY Account</a>
-                </li>
-              </ul>
-            </li>
-            <!-- Deposits Dropdown -->
-            <li class="nav-item dropdown">
-              <button class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Deposits</button>
-              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Digital Fixed
-                    Deposits</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Fixed
-                    Deposits</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Recurring
-                    Deposits</a></li>
-              </ul>
-            </li>
-            <!-- Deposits Dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="loanDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Loans</a>
-              <ul class="dropdown-menu" aria-labelledby="loanDropdown">
-                <li><a class="dropdown-item" href="#">PersonalLoan</a></li>
-                <li><a class="dropdown-item" href="#">Personal Loan</a></li>
-                <li><a class="dropdown-item" href="#">Busniness Loan</a></li>
-
-
-              </ul>
-            </li>
-            <!-- Deposits Dropdown -->
-            <li class="nav-item dropdown">
-              <button class="nav-link dropdown-toggle" id="cardDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false" type="button">Cards</button>
-              <ul class="dropdown-menu" aria-labelledby="cardDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Credit Cards</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('userdebitform') }}">Debit Cards</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('userprepaidform') }}">Prepaid Cards</a></li>
-              </ul>
-            </li>
-            <!-- Deposits Dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="forexDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Forex</a>
-              <ul class="dropdown-menu" aria-labelledby="forexDropdown">
-                <li><a class="dropdown-item" href="#">Travel Forex Cards</a></li>
-                <li><a class="dropdown-item" href="#">Send Money Abroad</a></li>
-                <li><a class="dropdown-item" href="#">Send Money India</a></li>
-                <li><a class="dropdown-item" href="#">Foregin Currency Exchange</a></li>
-              </ul>
-            </li>
-            <!-- Deposits Dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="investDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Investments</a>
-              <ul class="dropdown-menu" aria-labelledby="investDropdown">
-                <li><a class="dropdown-item" href="#">Public Provident Fund</a></li>
-                <li><a class="dropdown-item" href="#">Floating Rate Saving Bonds</a></li>
-                <li><a class="dropdown-item" href="#">National Pension System</a></li>
-              </ul>
-            </li>
+ 
+<!-- Top Nav -->
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#97144D; height:70px;">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="{{ url_for('dashboard') }}">DigiBank</a>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">My Activities</a></li>
+ 
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown">Open Account</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Savings Account</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Salary Account</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Current Account</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Safe Custody Account</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Pension Account</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('open_account') }}">PMJDY Account</a></li>
           </ul>
-          <div class="d-flex align-items-center">
-            <h5 class="m-0 me-2 fs-5">Welcome, </h5>
-            <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-lg">
-              Logout
-            </a>
+        </li>
+ 
+        <li class="nav-item dropdown">
+          <button class="nav-link dropdown-toggle btn btn-link text-white" id="depositsDropdown" data-bs-toggle="dropdown">Deposits</button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Digital Fixed Deposits</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Fixed Deposits</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Recurring Deposits</a></li>
+          </ul>
+        </li>
+ 
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" id="loanDropdown" role="button" data-bs-toggle="dropdown">Loans</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{{ url_for('homeloan') }}">Home Loan</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('personal_loan') }}">Personal Loan</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('Business_loan') }}">Business Loan</a></li>
+          </ul>
+        </li>
+ 
+        <li class="nav-item dropdown">
+          <button class="nav-link dropdown-toggle btn btn-link text-white" id="cardDropdown" data-bs-toggle="dropdown">Cards</button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{{ url_for('open_cards', preset='credit') }}">Credit Cards</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('open_cards', preset='debit') }}">Debit Cards</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('open_cards', preset='prepaid') }}">Prepaid Cards</a></li>
+          </ul>
+        </li>
+      </ul>
+      <div class="d-flex align-items-center">
+        <span class="text-white me-3 small">Welcome, {{ user.name if user else '' }}</span>
+        <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">Logout</a>
+      </div>
+    </div>
+  </div>
+</nav>
+ 
+<!-- Breadcrumb -->
+<nav class="breadcrumb-container">
+  <ol class="breadcrumb mb-0">
+    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#97144D;">Dashboard</a></li>
+    <li class="breadcrumb-item active">Home Loan</li>
+  </ol>
+</nav>
+ 
+<!-- Page -->
+<div class="container px-3 px-md-4 mt-3 mb-5">
+  <h1>Personal Loan Application Form</h1>
+ 
+  <!-- Flash Messages -->
+  {% with msgs = get_flashed_messages(with_categories=true) %}
+    {% if msgs %}
+      <div class="mt-2">
+        {% for cat, msg in msgs %}
+          <div class="alert alert-{{ 'success' if cat=='success' else 'danger' }} alert-dismissible fade show" role="alert">
+            {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
           </div>
-          </div>
+        {% endfor %}
       </div>
-    </nav>
-  <!-- ===== /Header ===== -->
-
-  <!-- ===== Breadcrumb ===== -->
-  <nav class="breadcrumb-container">
-    <ol class="breadcrumb mb-0">
-      <li class="breadcrumb-item"><a href="{{ url_for('userdashloan') }}" style="color:#97144D;">Home</a></li>
-      <li class="breadcrumb-item"><a href="{{ url_for('userpersonalloan') }}" style="color:#97144D;">PersonalLoan</a></li>     
-      
-    </ol>
-  </nav>
-
-  <!-- ===== Loan Form ===== -->
-  <div class="container-fluid px-4 mt-3">
-    <h1>Personal Loan Application Form</h1>
-
-    <p><strong>The Branch Manager,</strong><br>
-      DigiBank,<br>
-      ______________ Branch,<br>
-      ____________________.<br><br>
-      Dear Sir/Madam,<br>
-      I wish to apply for a Personal loan of Rs._____________(Rs._________________________________________________)<br>
-      for the purpose of purchasing/constructing/renovating a residential property located at ______________.<br>
-      The details of the property and my financial position are given in this application.<br>
-      I undertake to repay the loan in ____________ monthly installments as per the terms agreed upon.<br>
-      Please complete all sections in BLOCK LETTERS and tick √ boxes wherever applicable.
-    </p>
-
-    <!-- Application Form -->
-    <form>
-      <!-- Applicant Details -->
-      <div class="section-title">A) PARTICULARS OF THE APPLICANT</div>
-
-      <div class="mb-3">
-        <label for="applicantName" class="form-label required">Full Name</label>
-        <input type="text" class="form-control" id="applicantName" name="applicantName" required />
+    {% endif %}
+  {% endwith %}
+ 
+  <p class="mb-4">
+    <strong>The Branch Manager,</strong><br>
+    DigiBank,<br>
+    ______________ Branch,<br>
+    ____________________.<br><br>
+    Dear Sir/Madam,<br>
+    I wish to apply for a home loan of Rs._____________(Rs._________________________________________________) for the purpose
+    of purchasing/constructing/renovating a residential property located at ______________. I undertake to repay the loan
+    in ____________ monthly installments as per the terms agreed upon. Please complete all sections in BLOCK LETTERS and tick √ boxes wherever applicable.
+  </p>
+ 
+  <!-- NOTE: Correct route + multipart -->
+  <form action="{{ url_for('personal_loan') }}" method="POST" enctype="multipart/form-data">
+    <!-- A) Applicant -->
+    <div class="section-title">A) PARTICULARS OF THE APPLICANT</div>
+ 
+    <div class="mb-3">
+      <label for="applicantName" class="form-label required">Full Name</label>
+      <input type="text" class="form-control" id="applicantName" name="applicantName" required />
+    </div>
+ 
+    <div class="row mb-3">
+      <div class="col-md-3">
+        <label for="dob" class="form-label required">Date of Birth</label>
+        <input type="date" class="form-control" id="dob" name="dob" required />
       </div>
-
-      <div class="row mb-3">
-        <div class="col-md-3">
-          <label for="dob" class="form-label required">Date of Birth</label>
-          <input type="date" class="form-control" id="dob" name="dob" required />
-        </div>
-        <div class="col-md-2">
-          <label for="age" class="form-label">Age</label>
-          <input type="number" class="form-control" id="age" name="age" min="0" />
-        </div>
-        <div class="col-md-3">
-          <label for="gender" class="form-label required">Gender</label>
-          <select class="form-select" id="gender" name="gender" required>
-            <option value="">Select</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
+      <div class="col-md-2">
+        <label for="age" class="form-label">Age</label>
+        <input type="number" class="form-control" id="age" name="age" min="0" />
       </div>
-
-      <div class="mb-3">
-        <label for="address" class="form-label required">Current Address</label>
-        <textarea class="form-control" id="address" name="address" rows="2" required></textarea>
-      </div>
-
-      <div class="row mb-3">
-        <div class="col-md-3">
-          <label for="pin" class="form-label required">PIN Code</label>
-          <input type="text" class="form-control" id="pin" name="pin" required />
-        </div>
-        <div class="col-md-3">
-          <label for="telephone" class="form-label">Telephone</label>
-          <input type="tel" class="form-control" id="telephone" name="telephone" />
-        </div>
-        <div class="col-md-3">
-          <label for="mobile" class="form-label required">Mobile No.</label>
-          <input type="tel" class="form-control" id="mobile" name="mobile" required />
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <div class="col-md-3">
-          <label for="nationality" class="form-label required">Nationality</label>
-          <input type="text" class="form-control" id="nationality" name="nationality" required />
-        </div>
-        <div class="col-md-3">
-          <label for="maritalStatus" class="form-label required">Marital Status</label>
-          <select class="form-select" id="maritalStatus" name="maritalStatus" required>
-            <option value="">Select</option>
-            <option value="Single">Single</option>
-            <option value="Married">Married</option>
-            <option value="Divorced">Divorced</option>
-            <option value="Widowed">Widowed</option>
-          </select>
-        </div>
-        <div class="col-md-3">
-          <label for="pan" class="form-label required">PAN Number</label>
-          <input type="text" class="form-control" id="pan" name="pan" required />
-        </div>
-      </div>
-
-      <!-- Employment Details -->
-      <div class="section-title">Employment Details</div>
-      <div class="mb-3">
-        <label for="employmentType" class="form-label required">Employment Type</label>
-        <select class="form-select" id="employmentType" name="employmentType" required>
+      <div class="col-md-3">
+        <label for="gender" class="form-label required">Gender</label>
+        <select class="form-select" id="gender" name="gender" required>
           <option value="">Select</option>
-          <option value="Salaried">Salaried</option>
-          <option value="Self-Employed">Self-Employed</option>
-          <option value="Professional">Professional</option>
-          <option value="Business">Business</option>
+          <option>Male</option><option>Female</option><option>Other</option>
         </select>
       </div>
-
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <label for="companyName" class="form-label required">Company/Business Name</label>
-          <input type="text" class="form-control" id="companyName" name="companyName" required />
-        </div>
-        <div class="col-md-6">
-          <label for="designation" class="form-label required">Designation/Profession</label>
-          <input type="text" class="form-control" id="designation" name="designation" required />
-        </div>
+    </div>
+ 
+    <div class="mb-3">
+      <label for="address" class="form-label required">Current Address</label>
+      <textarea class="form-control" id="address" name="address" rows="2" required></textarea>
+    </div>
+ 
+    <div class="row mb-3">
+      <div class="col-md-3">
+        <label for="pin" class="form-label required">PIN Code</label>
+        <input type="text" class="form-control" id="pin" name="pin" required />
       </div>
-
-      <div class="row mb-3">
-        <div class="col-md-4">
-          <label for="grossIncome" class="form-label required">Gross Annual Income (₹)</label>
-          <input type="number" class="form-control" id="grossIncome" name="grossIncome" required />
-        </div>
-        <div class="col-md-4">
-          <label for="experience" class="form-label required">Total Work Experience (Years)</label>
-          <input type="number" class="form-control" id="experience" name="experience" required />
-        </div>
-        <div class="col-md-4">
-          <label for="currentExp" class="form-label">Current Company Experience (Years)</label>
-          <input type="number" class="form-control" id="currentExp" name="currentExp" />
-        </div>
+      <div class="col-md-3">
+        <label for="telephone" class="form-label">Telephone</label>
+        <input type="tel" class="form-control" id="telephone" name="telephone" />
       </div>
-
-      <!-- Property Details -->
-      <div class="section-title">B) PROPERTY DETAILS</div>
-
-      <div class="mb-3">
-        <label for="propertyAddress" class="form-label required">Property Address</label>
-        <textarea class="form-control" id="propertyAddress" name="propertyAddress" rows="2" required></textarea>
+      <div class="col-md-3">
+        <label for="mobile" class="form-label required">Mobile No.</label>
+        <input type="tel" class="form-control" id="mobile" name="mobile" required />
       </div>
-
-      <div class="row mb-3">
-        <div class="col-md-3">
-          <label for="propertyType" class="form-label required">Property Type</label>
-          <select class="form-select" id="propertyType" name="propertyType" required>
-            <option value="">Select</option>
-            <option value="Flat/Apartment">Flat/Apartment</option>
-            <option value="Independent House">Independent House</option>
-            <option value="Plot">Plot</option>
-            <option value="Villa">Villa</option>
-          </select>
-        </div>
-        <div class="col-md-3">
-          <label for="propertyAge" class="form-label">Property Age (Years)</label>
-          <input type="number" class="form-control" id="propertyAge" name="propertyAge" />
-        </div>
-        <div class="col-md-3">
-          <label for="builtUpArea" class="form-label required">Built-up Area (sq.ft)</label>
-          <input type="number" class="form-control" id="builtUpArea" name="builtUpArea" required />
-        </div>
+    </div>
+ 
+    <div class="row mb-3">
+      <div class="col-md-3">
+        <label for="nationality" class="form-label required">Nationality</label>
+        <input type="text" class="form-control" id="nationality" name="nationality" required />
       </div>
-
-      <div class="row mb-3">
-        <div class="col-md-4">
-          <label for="propertyValue" class="form-label required">Property Value (₹)</label>
-          <input type="number" class="form-control" id="propertyValue" name="propertyValue" required />
-        </div>
-        <div class="col-md-4">
-          <label for="loanAmount" class="form-label required">Loan Amount Required (₹)</label>
-          <input type="number" class="form-control" id="loanAmount" name="loanAmount" required />
-        </div>
-        <div class="col-md-4">
-          <label for="loanTenure" class="form-label required">Loan Tenure (Years)</label>
-          <input type="number" class="form-control" id="loanTenure" name="loanTenure" required />
-        </div>
+      <div class="col-md-3">
+        <label for="maritalStatus" class="form-label required">Marital Status</label>
+        <select class="form-select" id="maritalStatus" name="maritalStatus" required>
+          <option value="">Select</option>
+          <option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option>
+        </select>
       </div>
-
-      <div class="mb-3">
-        <label for="builderName" class="form-label">Builder/Developer Name</label>
-        <input type="text" class="form-control" id="builderName" name="builderName" />
+      <div class="col-md-3">
+        <label for="pan" class="form-label required">PAN Number</label>
+        <input type="text" class="form-control" id="pan" name="pan" required />
       </div>
-
-      <!-- Loan Details -->
-      <div class="section-title">C) LOAN DETAILS</div>
-
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <label for="purpose" class="form-label required">Purpose of Loan</label>
-          <select class="form-select" id="purpose" name="purpose" required onchange="showLoanDetails(this.value)">
-            <option value="">Select Loan Type</option>
-            <option value="dream-home">Dream PersonalLoan</option>
-            <option value="home-improvement">PersonalImprovement Loan</option>
-            <option value="plot-loan">Plot Loan</option>
-            <option value="pmay">PMAY Subsidy Scheme</option>
-            <option value="balance-transfer">PersonalLoan Balance Transfer</option>
-            <option value="nri">NRI PersonalLoan</option>
-          </select>
-        </div>
-        <div class="col-md-6">
-          <label for="loanAmount" class="form-label required">Loan Amount Required (₹)</label>
-          <input type="number" class="form-control" id="loanAmount" name="loanAmount" required />
-        </div>
+    </div>
+ 
+    <!-- Employment -->
+    <div class="section-title">Employment Details</div>
+    <div class="mb-3">
+      <label for="employmentType" class="form-label required">Employment Type</label>
+      <select class="form-select" id="employmentType" name="employmentType" required>
+        <option value="">Select</option>
+        <option>Salaried</option><option>Self-Employed</option><option>Professional</option><option>Business</option>
+      </select>
+    </div>
+ 
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="companyName" class="form-label required">Company/Business Name</label>
+        <input type="text" class="form-control" id="companyName" name="companyName" required />
       </div>
-
-      <div class="row mb-3">
-        <div class="col-md-4">
-          <label for="interestType" class="form-label required">Interest Type</label>
-          <select class="form-select" id="interestType" name="interestType" required>
-            <option value="">Select</option>
-            <option value="Floating">Floating</option>
-            <option value="Fixed">Fixed</option>
-          </select>
-        </div>
-        <div class="col-md-4">
-          <label for="loanTenure" class="form-label required">Loan Tenure (Years)</label>
-          <input type="number" class="form-control" id="loanTenure" name="loanTenure" required />
-        </div>
+      <div class="col-md-6">
+        <label for="designation" class="form-label required">Designation/Profession</label>
+        <input type="text" class="form-control" id="designation" name="designation" required />
       </div>
-
-      <!-- Financial Details -->
-      <div class="section-title">D) FINANCIAL DETAILS</div>
-
-      <div class="row mb-3">
-        <div class="col-md-4">
-          <label for="existingLoan" class="form-label">Existing PersonalLoan (₹)</label>
-          <input type="number" class="form-control" id="existingLoan" name="existingLoan" />
-        </div>
-        <div class="col-md-4">
-          <label for="otherLoan" class="form-label">Other Loans (₹)</label>
-          <input type="number" class="form-control" id="otherLoan" name="otherLoan" />
-        </div>
-        <div class="col-md-4">
-          <label for="creditCard" class="form-label">Credit Card Limits (₹)</label>
-          <input type="number" class="form-control" id="creditCard" name="creditCard" />
-        </div>
+    </div>
+ 
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label for="grossIncome" class="form-label required">Gross Annual Income (₹)</label>
+        <input type="number" class="form-control" id="grossIncome" name="grossIncome" required />
       </div>
-
-      <div class="row mb-3">
-        <div class="col-md-4">
-          <label for="savings" class="form-label">Savings/Investments (₹)</label>
-          <input type="number" class="form-control" id="savings" name="savings" />
-        </div>
-        <div class="col-md-4">
-          <label for="otherAssets" class="form-label">Other Assets (₹)</label>
-          <input type="number" class="form-control" id="otherAssets" name="otherAssets" />
-        </div>
+      <div class="col-md-4">
+        <label for="experience" class="form-label required">Total Work Experience (Years)</label>
+        <input type="number" class="form-control" id="experience" name="experience" required />
       </div>
-
-      <!-- Bank Account Details -->
-      <div class="section-title">E) BANK ACCOUNT DETAILS</div>
-
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <label for="bankName" class="form-label required">Bank Name</label>
-          <input type="text" class="form-control" id="bankName" name="bankName" required />
-        </div>
-        <div class="col-md-6">
-          <label for="accountNumber" class="form-label required">Account Number</label>
-          <input type="text" class="form-control" id="accountNumber" name="accountNumber" required />
-        </div>
+      <div class="col-md-4">
+        <label for="currentExp" class="form-label">Current Company Experience (Years)</label>
+        <input type="number" class="form-control" id="currentExp" name="currentExp" />
       </div>
-
-      <div class="row mb-3">
-        <div class="col-md-4">
-          <label for="accountType" class="form-label required">Account Type</label>
-          <select class="form-select" id="accountType" name="accountType" required>
-            <option value="">Select</option>
-            <option value="Savings">Savings</option>
-            <option value="Current">Current</option>
-          </select>
-        </div>
-        <div class="col-md-4">
-          <label for="accountYears" class="form-label required">Years with Bank</label>
-          <input type="number" class="form-control" id="accountYears" name="accountYears" required />
-        </div>
+    </div>
+ 
+    <!-- Property -->
+    <div class="section-title">B) PROPERTY DETAILS</div>
+    <div class="mb-3">
+      <label for="propertyAddress" class="form-label required">Property Address</label>
+      <textarea class="form-control" id="propertyAddress" name="propertyAddress" rows="2" required></textarea>
+    </div>
+ 
+    <div class="row mb-3">
+      <div class="col-md-3">
+        <label for="propertyType" class="form-label required">Property Type</label>
+        <select class="form-select" id="propertyType" name="propertyType" required>
+          <option value="">Select</option>
+          <option>Flat/Apartment</option><option>Independent House</option><option>Plot</option><option>Villa</option>
+        </select>
       </div>
-
-      <!-- Co-Applicant Details -->
-      <div class="section-title">F) CO-APPLICANT DETAILS (If any)</div>
-
-      <div class="mb-3">
-        <label for="coApplicantName" class="form-label">Full Name</label>
-        <input type="text" class="form-control" id="coApplicantName" name="coApplicantName" />
+      <div class="col-md-3">
+        <label for="propertyAge" class="form-label">Property Age (Years)</label>
+        <input type="number" class="form-control" id="propertyAge" name="propertyAge" />
       </div>
-
-      <div class="row mb-3">
-        <div class="col-md-3">
-          <label for="coApplicantRelation" class="form-label">Relationship</label>
-          <input type="text" class="form-control" id="coApplicantRelation" name="coApplicantRelation" />
-        </div>
-        <div class="col-md-3">
-          <label for="coApplicantIncome" class="form-label">Annual Income (₹)</label>
-          <input type="number" class="form-control" id="coApplicantIncome" name="coApplicantIncome" />
-        </div>
+      <div class="col-md-3">
+        <label for="builtUpArea" class="form-label required">Built-up Area (sq.ft)</label>
+        <input type="number" class="form-control" id="builtUpArea" name="builtUpArea" required />
       </div>
-
-      <!-- Documents -->
-      <div class="section-title">G) DOCUMENTS TO BE ATTACHED</div>
-
-      <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" id="idProof" name="idProof" required />
-        <label class="form-check-label required" for="idProof">Identity Proof (PAN Card/Aadhaar/Passport)</label>
+    </div>
+ 
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label for="propertyValue" class="form-label required">Property Value (₹)</label>
+        <input type="number" class="form-control" id="propertyValue" name="propertyValue" required />
       </div>
-
-      <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" id="addressProof" name="addressProof" required />
-        <label class="form-check-label required" for="addressProof">Address Proof</label>
+      <div class="col-md-4">
+        <label for="loanAmount" class="form-label required">Loan Amount Required (₹)</label>
+        <input type="number" class="form-control" id="loanAmount" name="loanAmount" required />
       </div>
-
-      <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" id="incomeProof" name="incomeProof" required />
-        <label class="form-check-label required" for="incomeProof">Income Proof (Salary slips/IT Returns)</label>
+      <div class="col-md-4">
+        <label for="loanTenure" class="form-label required">Loan Tenure (Years)</label>
+        <input type="number" class="form-control" id="loanTenure" name="loanTenure" required />
       </div>
-
-      <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" id="propertyDocs" name="propertyDocs" required />
-        <label class="form-check-label required" for="propertyDocs">Property Documents</label>
+    </div>
+ 
+    <!-- Loan Details -->
+    <div class="section-title">C) LOAN DETAILS</div>
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="purpose" class="form-label required">Purpose of Loan</label>
+        <select class="form-select" id="purpose" name="purpose" required>
+          <option value="">Select Loan Type</option>
+          <option value="dream-home">Dream Home Loan</option>
+          <option value="home-improvement">Home Improvement Loan</option>
+          <option value="plot-loan">Plot Loan</option>
+          <option value="pmay">PMAY Subsidy Scheme</option>
+          <option value="balance-transfer">Home Loan Balance Transfer</option>
+          <option value="nri">NRI Home Loan</option>
+        </select>
       </div>
-
-      <!-- Declaration -->
-      <div class="section-title">H) DECLARATION</div>
-      <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" id="declaration" name="declaration" required />
-        <label class="form-check-label required" for="declaration">
-          I hereby declare that the information provided in this application is true and correct to the best of my knowledge.
-          I understand that any false information may result in rejection of my application.
-        </label>
+      <div class="col-md-6">
+        <label for="interestType" class="form-label required">Interest Type</label>
+        <select class="form-select" id="interestType" name="interestType" required>
+          <option value="">Select</option>
+          <option>Floating</option><option>Fixed</option>
+        </select>
       </div>
-
-      <div class="mb-3">
-        <label for="applicantSignature" class="form-label required">Applicant Signature</label>
-        <input type="file" class="form-control" id="applicantSignature" name="applicantSignature" accept="image/*" required />
+    </div>
+ 
+    <!-- LIVE Calculations -->
+    <div class="row g-3 mb-3">
+      <div class="col-md-3">
+        <label class="form-label">Calculated Interest Rate (%)</label>
+        <input class="form-control" id="calcRate" readonly>
       </div>
-
-      <div class="mb-3">
-        <label for="coApplicantSignature" class="form-label">Co-Applicant Signature (If applicable)</label>
-        <input type="file" class="form-control" id="coApplicantSignature" name="coApplicantSignature" accept="image/*" />
+      <div class="col-md-3">
+        <label class="form-label">Estimated EMI (₹ / month)</label>
+        <input class="form-control" id="calcEMI" readonly>
       </div>
-
-      <div class="mb-3">
+    </div>
+    <input type="hidden" name="interest_rate" id="interest_rate">
+    <input type="hidden" name="emi_amount" id="emi_amount">
+ 
+    <!-- Financial -->
+    <div class="section-title">D) FINANCIAL DETAILS</div>
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label for="existingLoan" class="form-label">Existing Home Loan (₹)</label>
+        <input type="number" class="form-control" id="existingLoan" name="existingLoan" />
+      </div>
+      <div class="col-md-4">
+        <label for="otherLoan" class="form-label">Other Loans (₹)</label>
+        <input type="number" class="form-control" id="otherLoan" name="otherLoan" />
+      </div>
+      <div class="col-md-4">
+        <label for="creditCard" class="form-label">Credit Card Limits (₹)</label>
+        <input type="number" class="form-control" id="creditCard" name="creditCard" />
+      </div>
+    </div>
+ 
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label for="savings" class="form-label">Savings/Investments (₹)</label>
+        <input type="number" class="form-control" id="savings" name="savings" />
+      </div>
+      <div class="col-md-4">
+        <label for="otherAssets" class="form-label">Other Assets (₹)</label>
+        <input type="number" class="form-control" id="otherAssets" name="otherAssets" />
+      </div>
+    </div>
+ 
+    <!-- Bank Account -->
+    <div class="section-title">E) BANK ACCOUNT DETAILS</div>
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="bankName" class="form-label required">Bank Name</label>
+        <input type="text" class="form-control" id="bankName" name="bankName" required />
+      </div>
+      <div class="col-md-6">
+        <label for="accountNumber" class="form-label required">Account Number</label>
+        <input type="text" class="form-control" id="accountNumber" name="accountNumber" required />
+      </div>
+    </div>
+ 
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label for="accountType" class="form-label required">Account Type</label>
+        <select class="form-select" id="accountType" name="accountType" required>
+          <option value="">Select</option>
+          <option>Savings</option><option>Current</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label for="accountYears" class="form-label required">Years with Bank</label>
+        <input type="number" class="form-control" id="accountYears" name="accountYears" required />
+      </div>
+    </div>
+ 
+    <!-- Co-Applicant -->
+    <div class="section-title">F) CO-APPLICANT DETAILS (If any)</div>
+    <div class="mb-3">
+      <label for="coApplicantName" class="form-label">Full Name</label>
+      <input type="text" class="form-control" id="coApplicantName" name="coApplicantName" />
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-3">
+        <label for="coApplicantRelation" class="form-label">Relationship</label>
+        <input type="text" class="form-control" id="coApplicantRelation" name="coApplicantRelation" />
+      </div>
+      <div class="col-md-3">
+        <label for="coApplicantIncome" class="form-label">Annual Income (₹)</label>
+        <input type="number" class="form-control" id="coApplicantIncome" name="coApplicantIncome" />
+      </div>
+    </div>
+ 
+    <!-- Documents -->
+    <div class="section-title">G) DOCUMENTS TO BE ATTACHED</div>
+    <div class="mb-3 form-check">
+      <input type="checkbox" class="form-check-input" id="idProof" name="idProof" required />
+      <label class="form-check-label required" for="idProof">Identity Proof (PAN/Aadhaar/Passport)</label>
+    </div>
+    <div class="mb-3 form-check">
+      <input type="checkbox" class="form-check-input" id="addressProof" name="addressProof" required />
+      <label class="form-check-label required" for="addressProof">Address Proof</label>
+    </div>
+    <div class="mb-3 form-check">
+      <input type="checkbox" class="form-check-input" id="incomeProof" name="incomeProof" required />
+      <label class="form-check-label required" for="incomeProof">Income Proof (Salary slips/ITR)</label>
+    </div>
+    <div class="mb-3 form-check">
+      <input type="checkbox" class="form-check-input" id="propertyDocs" name="propertyDocs" required />
+      <label class="form-check-label required" for="propertyDocs">Property Documents</label>
+    </div>
+ 
+    <!-- Declaration -->
+    <div class="section-title">H) DECLARATION</div>
+    <div class="mb-3 form-check">
+      <input type="checkbox" class="form-check-input" id="declaration" name="declaration" required />
+      <label class="form-check-label required" for="declaration">
+        I declare the information provided is true and correct to the best of my knowledge.
+      </label>
+    </div>
+ 
+    <!-- Signatures -->
+    <div class="mb-3">
+      <label for="applicantSignature" class="form-label required">Applicant Signature</label>
+      <input type="file" class="form-control" id="applicantSignature" name="applicantSignature" accept="image/*" required />
+    </div>
+    <div class="mb-3">
+      <label for="coApplicantSignature" class="form-label">Co-Applicant Signature (If applicable)</label>
+      <input type="file" class="form-control" id="coApplicantSignature" name="coApplicantSignature" accept="image/*" />
+    </div>
+ 
+    <!-- Place/Date -->
+    <div class="row mb-3">
+      <div class="col-md-4">
         <label for="date" class="form-label required">Date</label>
         <input type="date" class="form-control" id="date" name="date" required />
       </div>
-
-      <div class="mb-3">
+      <div class="col-md-4">
         <label for="place" class="form-label required">Place</label>
         <input type="text" class="form-control" id="place" name="place" required />
       </div>
-
-      <button type="submit" class="btn btn-custom mb-5">Submit Application</button>
-
-    </form>
-  </div>
-
-  <!-- Bootstrap JS Bundle -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
+ 
+    <button type="submit" class="btn btn-custom mb-5">Submit Application</button>
+  </form>
+</div>
+ 
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+ 
+<!-- Auto-calc age from DOB + Interest/EMI preview -->
+<script>
+  // Age helper
+  (function(){
+    const dob = document.getElementById('dob');
+    const age = document.getElementById('age');
+    if (dob && age) {
+      dob.addEventListener('change', () => {
+        const d = new Date(dob.value);
+        if (isNaN(d)) return;
+        const now = new Date();
+        let years = now.getFullYear() - d.getFullYear();
+        const m = now.getMonth() - d.getMonth();
+        if (m < 0 || (m === 0 && now.getDate() < d.getDate())) years--;
+        age.value = years >= 0 ? years : '';
+      });
+    }
+  })();
+ 
+  // Interest/EMI logic (client-side preview to match server defaults)
+  (function(){
+    const amountEl = document.getElementById('loanAmount');
+    const tenureEl = document.getElementById('loanTenure');
+    const typeEl   = document.getElementById('interestType');
+    const rateOut  = document.getElementById('calcRate');
+    const emiOut   = document.getElementById('calcEMI');
+    const rateHidden = document.getElementById('interest_rate');
+    const emiHidden  = document.getElementById('emi_amount');
+ 
+    function compute() {
+      const P = parseFloat(amountEl.value) || 0;
+      const years = parseInt(tenureEl.value, 10) || 0;
+      const n = years * 12;
+      const interestType = (typeEl.value || '').toLowerCase();
+ 
+      // Base rates (HOME)
+      let rate = 0;
+      if (interestType === 'floating') rate = 8.49;
+      else if (interestType === 'fixed') rate = 9.25;
+ 
+      // Simple adjustments (optional)
+      if (years > 20) rate += 0.25;
+      if (P > 10000000) rate += 0.25;
+ 
+      let emi = 0;
+      if (rate > 0 && n > 0 && P > 0) {
+        const r = rate / 1200.0;
+        const pow = Math.pow(1 + r, n);
+        emi = P * r * pow / (pow - 1);
+      }
+ 
+      rateOut.value = rate ? rate.toFixed(2) : '';
+      emiOut.value  = emi  ? emi.toFixed(2)  : '';
+ 
+      // set hidden fields so backend can store them
+      rateHidden.value = rateOut.value;
+      emiHidden.value  = emiOut.value;
+    }
+ 
+    ['input', 'change'].forEach(ev => {
+      amountEl.addEventListener(ev, compute);
+      tenureEl.addEventListener(ev, compute);
+      typeEl.addEventListener(ev, compute);
+    });
+    compute();
+ 
+    // ensure latest values go with the form
+    document.querySelector('form').addEventListener('submit', compute);
+  })();
+</script>
 </body>
-
 </html>
+ 
+ 

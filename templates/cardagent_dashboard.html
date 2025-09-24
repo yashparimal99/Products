@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Agent Dashboard - DigiBank</title>
@@ -14,43 +15,52 @@
       background-color: #f8f9fa;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
+
     .navbar {
       background-color: #97144D;
     }
+
     .navbar-brand {
       font-weight: bold;
       color: white !important;
     }
+
     .logout-btn {
       background-color: #97144D;
       border: 1px solid white;
       color: white;
       transition: 0.3s;
     }
+
     .logout-btn:hover {
       background-color: white;
       color: #97144D;
       border: 1px solid #97144D;
     }
+
     .dashboard-card {
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       transition: transform 0.2s, box-shadow 0.2s;
     }
+
     .dashboard-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     }
+
     .nav-btn {
       background-color: #97144D;
       color: white;
       border: 1px solid white;
       transition: 0.3s;
     }
+
     .nav-btn:hover {
       background-color: white;
       color: #97144D;
     }
+
     footer {
       background-color: #97144D;
       color: white;
@@ -58,46 +68,52 @@
       padding: 15px;
       margin-top: 40px;
     }
+
     .icon-color {
       color: #97144D !important;
     }
+
     .breadcrumb {
       margin-bottom: 0;
     }
+
     .breadcrumb .active {
       color: #97144D;
       font-weight: 500;
     }
+
     .breadcrumb a {
       text-decoration: none;
       color: #97144D;
     }
+
     .breadcrumb a:hover {
       text-decoration: underline;
     }
   </style>
 </head>
+
 <body>
 
-<!-- Top Bar -->
-<div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#8B0A50; color:white;">
-  
+  <!-- Top Bar -->
+  <div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#8B0A50; color:white;">
 
-  <!-- Logo / Image -->
-  <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo" 
-       style="height: 40px; width:auto; background-color:#fff; border-radius:5px; padding:2px;" class="me-3">
 
-  <!-- Title -->
-  <h5 class="flex-grow-1 text-center m-0">Welcome To Cards Agent Dashboard - DigiBank</h5>
+    <!-- Logo / Image -->
+    <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo"
+      style="height: 40px; width:auto; background-color:#fff; border-radius:5px; padding:2px;" class="me-3">
 
-  <!-- Logout Button -->
-  <div class="d-flex align-items-center">
-  <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }} </h5>
-  <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
-    Logout
-  </a>
-</div>
-</div>
+    <!-- Title -->
+    <h5 class="flex-grow-1 text-center m-0">Welcome To Cards Agent Dashboard - DigiBank</h5>
+
+    <!-- Logout Button -->
+    <div class="d-flex align-items-center">
+      <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }} </h5>
+      <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
+        Logout
+      </a>
+    </div>
+  </div>
 
 
 
@@ -105,7 +121,8 @@
   <nav aria-label="breadcrumb" class="bg-light px-3 py-2">
     <ol class="breadcrumb mb-0">
       <li class="breadcrumb-item"><a href="{{ url_for('login') }}">Login</a></li>
-      <li class="breadcrumb-item active" aria-current="page"><a href="{{ url_for('dashboard') }}">Cards_Dashboard</a></li>
+      <li class="breadcrumb-item active" aria-current="page"><a href="{{ url_for('dashboard') }}">Cards_Dashboard</a>
+      </li>
     </ol>
   </nav>
 
@@ -149,7 +166,8 @@
             <div class="card-body">
               <i class="bi bi-file-earmark-plus display-4 icon-color mb-3"></i>
               <h5 class="card-title">Apply Card</h5>
-              <p class="card-text text-muted">Submit a new credit, debit, or international card application for a customer.</p>
+              <p class="card-text text-muted">Submit a new credit, debit, or international card application for a
+                customer.</p>
             </div>
             <div class="card-footer bg-transparent border-0 d-grid">
               <a href="{{ url_for('applycardagent') }}" class="btn nav-btn">Apply for Card</a>
@@ -192,7 +210,8 @@
           Successfully logged out...!!
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn" style="background-color: #97144D; color: white;" data-bs-dismiss="modal">OK</button>
+          <button type="button" class="btn" style="background-color: #97144D; color: white;"
+            data-bs-dismiss="modal">OK</button>
         </div>
       </div>
     </div>
@@ -203,16 +222,17 @@
 
   <!-- Logout Script -->
   <script>
-    document.getElementById('logoutBtn').addEventListener('click', function() {
+    document.getElementById('logoutBtn').addEventListener('click', function () {
       var myModal = new bootstrap.Modal(document.getElementById('logoutModal'));
       myModal.show();
 
       // Redirect after 2 seconds
-      setTimeout(function() {
-        window.location.href ='login';
+      setTimeout(function () {
+        window.location.href = 'login';
       }, 2000);
     });
   </script>
 
 </body>
+
 </html>

@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <title>Manager Dashboard - DigiBank</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+ 
   <!-- Bootstrap CSS & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-
+ 
   <style>
     body {
       background-color: #f8f9fa;
@@ -20,7 +20,7 @@
       flex-direction: column;
       height: 100vh;
     }
-
+ 
     /* Sidebar Offcanvas */
     #sidebarMenu.offcanvas-start {
       width: 250px;
@@ -51,7 +51,7 @@
       background-color: #f9e5ef;
       border-radius: 4px;
     }
-
+ 
     .top-bar button.btn-outline-light {
       border: 1.5px solid white;
       color: white;
@@ -66,7 +66,7 @@
       background-color: white;
       color: #97144D;
     }
-
+ 
     /* Top Bar */
     .top-bar {
       background-color: #97144D;
@@ -102,7 +102,7 @@
       background-color: white;
       color: #97144D;
     }
-
+ 
     /* Search Bar Row with Sidebar Toggle & Chatbot */
     .search-chatbar {
       max-width: 900px;
@@ -141,7 +141,7 @@
       font-size: 1rem;
       outline-offset: 0;
       transition: border-color 0.3s;
-      width: 9000px; 
+      width: 9000px;
       margin: 0 auto;
       display: block;
     }
@@ -167,7 +167,7 @@
     .search-chatbar .chatbot-btn:hover {
       background-color: #7a0f3e;
     }
-
+ 
     /* Dashboard Cards */
     .dashboard-card {
       transition: 0.3s;
@@ -213,7 +213,7 @@
       background-color: #7a0f3e;
       color: white;
     }
-
+ 
     /* Stats Cards */
     .stats-card {
       background: white;
@@ -242,7 +242,7 @@
     .negative {
       color: #dc3545;
     }
-
+ 
     /* Additional manager-specific styles */
     .table-responsive {
       border-radius: 8px;
@@ -304,7 +304,7 @@
       background: #f8f9fa;
       border-radius: 8px;
     }
-
+ 
     /* Footer */
     footer.bg-custom {
       background-color: #97144D;
@@ -312,7 +312,7 @@
   </style>
 </head>
 <body>
-
+ 
   <!-- Sidebar Offcanvas -->
   <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
     <div class="offcanvas-header">
@@ -369,7 +369,7 @@
       </ul>
     </div>
   </div>
-
+ 
   <!-- Top Bar -->
   <div class="top-bar d-flex align-items-center">
   <button class="btn btn-outline-light btn-sm me-3"
@@ -377,66 +377,109 @@
           aria-controls="sidebarMenu" aria-label="Toggle sidebar">
     <i class="bi bi-list"></i>
   </button>
-
+ 
   <h5 class="me-auto mb-0">DigiBank Manager Dashboard</h5>
-
+ 
   <div class="d-flex align-items-center">
     <p class="navbar-text text-white mb-0">
       Welcome, <strong>{{ user.name }}</strong>
     </p>
   </div>
-
+ 
   <!-- Ensuring contrast with .text-white -->
   <a href="{{ url_for('logout') }}" class="logout-btn ms-3">
     Logout
   </a>
 </div>
-
-  <!-- Search Bar and Chatbot with Sidebar Toggle -->
-  <div class="search-chatbar">
-    <input type="text" placeholder="Search customers, accounts..." aria-label="Search" />
-    <button class="chatbot-btn" aria-label="Chatbot">
-      <i class="bi bi-chat-dots-fill"></i>
+ 
+<!-- Search Bar with Live Suggestions -->
+<div class="search-chatbar position-relative">
+  <form id="searchForm" class="d-flex w-100 align-items-center"
+        action="{{ url_for('searchprofile') }}" method="get" autocomplete="off">
+    <input id="searchInput" type="text" name="query"
+           class="form-control me-2"
+           placeholder="Search by Name or User ID" required>
+    <input type="hidden" name="search_by" id="searchBy" value="name">
+    <button class="btn btn-manager" type="submit">
+      <i class="bi bi-search"></i>
     </button>
+  </form>
+ 
+        <!-- Suggestions dropdown anchored here -->
+        <ul id="suggestions"
+            class="list-group position-absolute w-100"
+            style="top:100%; left:0; margin-top:4px; z-index:1000;"></ul>
+      </div>
+    </form>
   </div>
-
+ 
+  <!-- JavaScript for live suggestions -->
+  <script>
+  const input = document.getElementById('searchInput');
+  const list  = document.getElementById('suggestions');
+  const searchBy = document.getElementById('searchBy');
+ 
+  input.addEventListener('input', async () => {
+    const q = input.value.trim();
+    list.innerHTML = '';
+    if (q.length < 2) return;
+    const res = await fetch(`/api/user_suggestions?q=${encodeURIComponent(q)}`);
+    const data = await res.json();
+ 
+    data.forEach(user => {
+      const li = document.createElement('li');
+      li.className = 'list-group-item list-group-item-action';
+      li.innerHTML = `<strong>${user.name}</strong><br>
+                      <small class="text-muted">ID: ${user.user_id}</small>`;
+      li.addEventListener('click', () => {
+        input.value = user.user_id;  // search by user_id directly
+        searchBy.value = 'user_id';
+        list.innerHTML = '';
+      });
+      list.appendChild(li);
+    });
+  });
+ 
+  // Hide suggestions when clicking outside
+  document.addEventListener('click', e => {
+    if (!list.contains(e.target) && e.target !== input) list.innerHTML = '';
+  });
+  </script>
+ 
+ 
   <!-- Dashboard Content -->
   <div class="container my-4 flex-grow-1">
     <!-- Quick Stats Row -->
     <div class="row mb-4">
       <div class="col-md-3">
         <div class="stats-card">
-          <h6>Total Customers</h6>
-          <div class="value">1,842</div>
-          <div class="change positive">+12 this week</div>
+          <h6>Total Users</h6>
+          <div class="value">{{ total_customers }}</div>
         </div>
       </div>
       <div class="col-md-3">
         <div class="stats-card">
           <h6>Pending Approvals</h6>
-          <div class="value">23</div>
-          <div class="change negative">+5 since yesterday</div>
+          <div class="value">{{ total_pending }}</div>
         </div>
       </div>
       <div class="col-md-3">
         <div class="stats-card">
-          <h6>Branch Deposits</h6>
-          <div class="value">₹8.2M</div>
-          <div class="change positive">+2.1% from last month</div>
+          <h6>Total Deposits (Principal)</h6>
+          <div class="value">₹ {{ "{:,.2f}".format(total_deposits) }}</div>
         </div>
       </div>
       <div class="col-md-3">
         <div class="stats-card">
-          <h6>Fraud Alerts</h6>
-          <div class="value">4</div>
-          <div class="change negative">+1 today</div>
+          <h6>Total Funded Amount</h6>
+          <div class="value">₹ {{ "{:,.2f}".format(total_funded) }}</div>
         </div>
       </div>
     </div>
-
+ 
     <h3 class="mb-4 text-center">Management Tools</h3>
     <div class="row g-4 justify-content-center">
-
+ 
       <!-- Manage Accounts -->
       <div class="col-md-4 col-sm-6">
         <div class="card dashboard-card p-4 text-center">
@@ -446,7 +489,7 @@
           <a href="{{ url_for('manprofile') }}" class="btn btn-manager">Manage Accounts</a>
         </div>
       </div>
-
+ 
       <!-- Loan Approvals -->
       <div class="col-md-4 col-sm-6">
         <div class="card dashboard-card p-4 text-center">
@@ -456,7 +499,7 @@
           <a href="{{ url_for('managerapprovals') }}" class="btn btn-manager">View Applications</a>
         </div>
       </div>
-
+ 
       <!-- Transaction Review -->
       <div class="col-md-4 col-sm-6">
         <div class="card dashboard-card p-4 text-center">
@@ -466,7 +509,7 @@
           <a href="{{ url_for('transactions_review') }}" class="btn btn-manager">Review Transactions</a>
         </div>
       </div>
-
+ 
       <!-- Reports & Analytics -->
       <div class="col-md-4 col-sm-6">
         <div class="card dashboard-card p-4 text-center">
@@ -476,7 +519,7 @@
           <a href="{{ url_for('manreport') }}" class="btn btn-manager">View Reports</a>
         </div>
       </div>
-
+ 
       <!-- Staff Management -->
       <div class="col-md-4 col-sm-6">
         <div class="card dashboard-card p-4 text-center">
@@ -486,7 +529,7 @@
           <a href="{{ url_for('manstaff') }}" class="btn btn-manager">Manage Staff</a>
         </div>
       </div>
-
+ 
       <!-- Branch Performance -->
       <div class="col-md-4 col-sm-6">
         <div class="card dashboard-card p-4 text-center">
@@ -496,18 +539,18 @@
           <a href="{{ url_for('branchperformance') }}" class="btn btn-manager">View Performance</a>
         </div>
       </div>
-
+ 
     </div>
   </div>
-
+ 
   <!-- Footer -->
   <footer class="bg-custom text-white text-center py-3 mt-auto">
     © 2025 DigiBank. Manager Dashboard. All rights reserved.
   </footer>
-
+ 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+ 
   <script>
     function logout() {
       alert("Manager logout clicked! Implement logout logic here.");
@@ -516,3 +559,4 @@
   </script>
 </body>
 </html>
+ 

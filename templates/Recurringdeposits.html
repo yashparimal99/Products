@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recurring Deposit - Digi Bank</title>
+ 
+  <!-- Fonts & Icons -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+
+    rel="stylesheet">
+ 
+  <!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+ 
+  <style>
+
+    :root {
+
+      --primary-color: #0B4D83;
+
+      --secondary-color: #1976D2;
+
+      --accent-color: #FF6B35;
+
+      --success-color: #00C853;
+
+      --warning-color: #FF8F00;
+
+      --dark-color: #263238;
+
+      --light-color: #F8F9FA;
+
+      --gradient-primary: linear-gradient(135deg, #0B4D83 0%, #1976D2 100%);
+
+      --gradient-secondary: linear-gradient(135deg, #FF6B35 0%, #FF8F00 100%);
+
+      --shadow-light: 0 4px 20px rgba(11, 77, 131, 0.1);
+
+      --shadow-medium: 0 8px 30px rgba(11, 77, 131, 0.15);
+
+      --shadow-heavy: 0 15px 40px rgba(11, 77, 131, 0.2);
+
+    }
+ 
+    * {
+
+      margin: 0;
+
+      padding: 0;
+
+      box-sizing: border-box;
+
+    }
+ 
+    body {
+
+      font-family: 'Poppins', sans-serif;
+
+      line-height: 1.6;
+
+      color: var(--dark-color);
+
+      background: linear-gradient(135deg, rgba(11, 77, 131, 0.02), rgba(25, 118, 210, 0.02));
+
+    }
+ 
+    /* Navbar */
+
+    .navbar {
+
+      background: var(--gradient-primary) !important;
+
+      backdrop-filter: blur(10px);
+
+      box-shadow: var(--shadow-medium);
+
+      padding: 1rem 0;
+
+    }
+ 
+    .navbar-nav .nav-link {
+
+      transition: all 0.3s ease;
+
+      position: relative;
+
+    }
+ 
+    .navbar-nav .nav-link::after {
+
+      content: '';
+
+      position: absolute;
+
+      width: 0;
+
+      height: 2px;
+
+      bottom: -5px;
+
+      left: 50%;
+
+      background-color: white;
+
+      transition: all 0.3s ease;
+
+    }
+ 
+    .navbar-nav .nav-link:hover::after {
+
+      width: 100%;
+
+      left: 0;
+
+    }
+ 
+    /* Breadcrumb */
+
+    .breadcrumb {
+
+      background: linear-gradient(135deg, rgba(11, 77, 131, 0.05), rgba(25, 118, 210, 0.05));
+
+      border-radius: 15px;
+
+      padding: 1rem 1.5rem;
+
+      margin: 1.5rem;
+
+      box-shadow: var(--shadow-light);
+
+    }
+ 
+    .breadcrumb .breadcrumb-item a {
+
+      color: var(--primary-color);
+
+      text-decoration: none;
+
+      font-weight: 500;
+
+      transition: all 0.3s ease;
+
+    }
+ 
+    .breadcrumb .breadcrumb-item a:hover {
+
+      text-decoration: underline;
+
+      color: var(--secondary-color);
+
+    }
+ 
+    .breadcrumb .breadcrumb-item {
+
+      color: var(--primary-color);
+
+      font-weight: 500;
+
+    }
+ 
+    /* Section Title */
+
+    .section-title {
+
+      color: var(--primary-color);
+
+      text-align: center;
+
+      margin: 3rem 0 2rem 0;
+
+      font-size: 2.5rem;
+
+      font-weight: 700;
+
+      position: relative;
+
+    }
+ 
+    .section-title::after {
+
+      content: '';
+
+      position: absolute;
+
+      bottom: -10px;
+
+      left: 50%;
+
+      transform: translateX(-50%);
+
+      width: 120px;
+
+      height: 4px;
+
+      background: var(--gradient-primary);
+
+      border-radius: 2px;
+
+    }
+ 
+    /* Card */
+
+    .custom-card {
+
+      border-radius: 20px;
+
+      box-shadow: var(--shadow-light);
+
+      transition: all 0.4s ease;
+
+      background: linear-gradient(145deg, #ffffff, #f8f9fa);
+
+      padding: 2rem;
+
+      margin-bottom: 2rem;
+
+      animation: fadeInUp 0.6s ease-out;
+
+    }
+ 
+    .custom-card:hover {
+
+      transform: translateY(-10px) scale(1.02);
+
+      box-shadow: var(--shadow-heavy);
+
+      background: linear-gradient(145deg, #ffffff, #f0f4ff);
+
+    }
+ 
+    .custom-card h3 {
+
+      color: var(--primary-color);
+
+      font-weight: 700;
+
+      margin-bottom: 1rem;
+
+    }
+ 
+    .custom-card p {
+
+      color: #555;
+
+      line-height: 1.7;
+
+    }
+ 
+    /* Buttons */
+
+    .btn-apply {
+
+      border: 1px solid var(--secondary-color);
+
+      color: var(--secondary-color);
+
+      padding: 12px 30px;
+
+      border-radius: 8px;
+
+      font-size: 1rem;
+
+      transition: all 0.3s ease;
+
+      margin-top: 20px;
+
+      text-decoration: none;
+
+    }
+ 
+    .btn-apply:hover {
+
+      background: var(--secondary-color);
+
+      color: white;
+
+    }
+ 
+    /* Animations */
+
+    @keyframes fadeInUp {
+
+      from {
+
+        opacity: 0;
+
+        transform: translateY(30px);
+
+      }
+ 
+      to {
+
+        opacity: 1;
+
+        transform: translateY(0);
+
+      }
+
+    }
+</style>
+</head>
+ 
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+<div class="container-fluid">
+<img src="axislogo1.png" alt="Digi Bank" height="60" class="my-2">
+<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarSupportedContent">
+<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+<li class="nav-item"><a class="nav-link active" href="index.html">Home</a></li>
+<li class="nav-item"><a class="nav-link" href="ExploreP.html">Explore Products</a></li>
+<li class="nav-item"><a class="nav-link" href="#">Grab Deals</a></li>
+<li class="nav-item"><a class="nav-link" href="#">Make Payments</a></li>
+<li class="nav-item"><a class="nav-link" href="#">Bank Smart</a></li>
+</ul>
+<form class="d-flex">
+<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+<button class="btn btn-light" type="submit">Search</button>
+</form>
+</div>
+</div>
+</nav>
+ 
+  <!-- Breadcrumb -->
+<nav aria-label="breadcrumb">
+<ol class="breadcrumb">
+<li class="breadcrumb-item"><a href="index.html">Home</a></li>
+<li class="breadcrumb-item"><a href="deposits.html">Deposits</a></li>
+<li class="breadcrumb-item active" aria-current="page">Recurring Deposit Account</li>
+</ol>
+</nav>
+ 
+  <!-- Page Title -->
+<h1 class="section-title">Recurring Deposit Account</h1>
+ 
+  <!-- Content -->
+<div class="container mb-5">
+<div class="custom-card">
+<img src="recd.png" class="img-fluid rounded mb-3" alt="Recurring Deposit">
+<h3><span style="font-style: italic;">Digi Bank</span> Recurring Deposits</h3>
+<p>
+
+        Saving money does not have to be complicated. With Digi Bank's Recurring Deposit, you can make saving rewarding
+
+        and get closer to your dreams with every deposit. A Recurring Deposit (RD) account is a type of savings plan
+
+        where you deposit a fixed amount of money every month for a specified period. It helps you build savings over
+
+        time with regular deposits and offers guaranteed returns. Plus, the power of compounding ensures that your money
+
+        grows faster, and you achieve your financial goals.
+</p>
+</div>
+ 
+    <div class="custom-card">
+<h3>Maximise your savings with competitive RD interest rates</h3>
+<p>
+
+        We offer attractive interest rates on Recurring Deposits to help you maximise your savings over the selected
+
+        tenure. Start an RD with Digi Bank to achieve your financial goals. Explore our latest Recurring Deposit
+
+        interest rates and their benefits.
+</p>
+<div class="mt-4">
+<a href="{{ url_for('login') }}" class="btn btn-apply">Apply Now</a>
+</div>
+</div>
+</div>
+ 
+  <!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+ 
+</html>
+
+ 

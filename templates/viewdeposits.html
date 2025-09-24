@@ -159,7 +159,7 @@
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="loansDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Loans</a>
             <ul class="dropdown-menu" aria-labelledby="loansDropdown">
-              <li><a class="dropdown-item" href="{{ url_for('home_loan') }}">Home Loan</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('homeloan') }}">Home Loan</a></li>
               <li><a class="dropdown-item" href="{{ url_for('personal_loan') }}">Personal Loan</a></li>
               <li><a class="dropdown-item" href="{{ url_for('Business_loan') }}">Business Loan</a></li>
             </ul>
@@ -221,14 +221,32 @@
     <ul class="nav nav-tabs" id="accountTabs" role="tablist">
       <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('viewaccounts') }}">My Accounts</a></li>
       <li class="nav-item" role="presentation"><a href="{{ url_for('viewdeposits') }}" class="nav-link active">My Deposits</a></li>
-      <li class="nav-item" role="presentation"><button class="nav-link" id="borrowings-tab" data-bs-toggle="tab" data-bs-target="#borrowings" type="button" role="tab" aria-controls="borrowings" aria-selected="false">My Borrowings</button></li>
-      <li class="nav-item" role="presentation"><button class="nav-link" id="investments-tab" data-bs-toggle="tab" data-bs-target="#investments" type="button" role="tab" aria-controls="investments" aria-selected="false">My Investments</button></li>
+      <li class="nav-item" role="presentation">
+      <a class="nav-link" href="{{ url_for('view_loans') }}">My Loans</a>
+      </li>
+      <li class="nav-item" role="presentation">
+      <a class="nav-link" href="{{ url_for('view_investments') }}">My Investments</a>
+   </li>
       <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('view_cards') }}">My Cards</a></li>
     </ul>
+    <div class="tab-content mt-3" id="accountTabsContent">
+      <div class="tab-pane fade show active" id="balance" role="tabpanel" aria-labelledby="balance-tab">
+        <p class="text-muted">Your Deposit account details are shown below.</p>
+      </div>
+      <div class="tab-pane fade" id="borrowings" role="tabpanel" aria-labelledby="borrowings-tab">
+        <p class="text-muted">Borrowings/loans info coming soon.</p>
+      </div>
+      <div class="tab-pane fade" id="investments" role="tabpanel" aria-labelledby="investments-tab">
+        <p class="text-muted">Investments overview coming soon.</p>
+      </div>
+      <div class="tab-pane fade" id="cards" role="tabpanel" aria-labelledby="cards-tab">
+        <p class="text-muted">Manage your cards here soon.</p>
+      </div>
+    </div>
 
     <!-- Deposit Info Section -->
     {% if deposits %}
-      <h6 class="mt-3 mb-2 text-muted">My Deposits</h6>
+      <!-- <h6 class="mt-3 mb-2 text-muted">My Deposits</h6> -->
       {% for d in deposits %}
         <div class="deposit-info-section row">
           <!-- Left Side -->

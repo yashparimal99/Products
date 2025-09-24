@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>My Loans - DigiBank</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Bootstrap CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Offcanvas */
+    #sidebarMenu.offcanvas-start {
+      width: 250px;
+    }
+
+    #sidebarMenu .nav-link {
+      font-size: .9rem;
+      padding: 8px 12px;
+      color: #333;
+      display: flex;
+      gap: 8px;
+    }
+
+    #sidebarMenu .nav-link.active {
+      font-weight: 700;
+      color: #97144D !important;
+      background: #f0d7e0;
+      border-radius: 4px;
+    }
+
+    #sidebarMenu .nav-link:hover {
+      color: #7a0f3e;
+      background: #f9e5ef;
+      border-radius: 4px;
+    }
+
+    /* Top bar */
+    .top-bar {
+      background: #97144D;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+    }
+
+    .top-bar h5 {
+      margin: 0;
+      font-weight: 700;
+      flex-grow: 1;
+      text-align: center;
+    }
+
+    .logout-btn {
+      background: transparent;
+      border: 1.5px solid #fff;
+      color: #fff;
+      padding: 5px 15px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .logout-btn:hover {
+      background: #fff;
+      color: #97144D;
+    }
+
+    /* Filters */
+    .filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Loan row card */
+    .loan-row {
+      background: #fff;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 14px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+    }
+
+    .loan-left {
+      border-right: 1px solid #eee;
+      padding-right: 14px;
+    }
+
+    .loan-amount {
+      font-weight: 700;
+      color: #97144D;
+    }
+
+    .meta {
+      color: #666;
+      font-size: .9rem;
+    }
+
+    .badge {
+      font-size: .75rem;
+    }
+
+    @media (max-width: 768px) {
+      .loan-left {
+        border-right: none;
+        padding-right: 0;
+        margin-bottom: 10px;
+      }
+    }
+
+    footer.bg-custom {
+      background: #97144D;
+    }
+  </style>
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px 0 0 0;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    /* Sidebar Offcanvas */
+    #sidebarMenu.offcanvas-start {
+      width: 250px;
+    }
+
+    #sidebarMenu .offcanvas-body {
+      padding: 0.5rem 1rem;
+    }
+
+    #sidebarMenu .nav-link {
+      font-size: 0.9rem;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #333;
+      transition: color 0.3s;
+    }
+
+    #sidebarMenu .nav-link i {
+      font-size: 1.1rem;
+    }
+
+    #sidebarMenu .nav-link.active {
+      font-weight: 700;
+      color: #97144D !important;
+      background-color: #f0d7e0;
+      border-radius: 4px;
+    }
+
+    #sidebarMenu .nav-link:hover {
+      color: #7a0f3e;
+      background-color: #f9e5ef;
+      border-radius: 4px;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      background-color: #97144D;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      user-select: none;
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+    }
+
+    .top-bar h5 {
+      margin: 0;
+      font-weight: 700;
+      flex-grow: 1;
+      text-align: center;
+    }
+
+    .top-bar button.btn-outline-light {
+      border: 1.5px solid white;
+      color: white;
+      background: transparent;
+      padding: 4px 10px;
+      font-size: 1.3rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .top-bar button.btn-outline-light:hover {
+      background-color: white;
+      color: #97144D;
+    }
+
+    .logout-btn {
+      background: transparent;
+      border: 1.5px solid white;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+      flex-shrink: 0;
+    }
+
+    .logout-btn:hover {
+      background-color: white;
+      color: #97144D;
+    }
+
+    /* Tabs */
+    .nav-tabs .nav-link {
+      color: #97144D;
+      font-weight: 600;
+    }
+
+    .nav-tabs .nav-link.active {
+      background-color: #97144D;
+      color: white;
+      border-color: #97144D #97144D #fff;
+    }
+
+    /* Deposit Card */
+    .deposit-info-section {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .deposit-info-left {
+      border-right: 1px solid #ddd;
+      padding-right: 20px;
+    }
+
+    .deposit-info-right {
+      padding-left: 20px;
+    }
+
+    .deposit-label {
+      font-weight: 600;
+      color: #444;
+    }
+
+    .deposit-value {
+      font-size: 1.1rem;
+      color: #97144D;
+      font-weight: 700;
+    }
+
+    @media (max-width: 576px) {
+      .deposit-info-left {
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+        padding-right: 0;
+        padding-bottom: 15px;
+        margin-bottom: 15px;
+      }
+
+      .deposit-info-right {
+        padding-left: 0;
+      }
+    }
+
+    /* Footer */
+    footer.bg-custom {
+      background-color: #97144D;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+    <div class="offcanvas-header">
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item mb-2"><a class="nav-link text-dark active" href="{{ url_for('dashboard') }}
+          "><i class="bi bi-speedometer2 me-2"></i> Home</a></li>
+        <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('viewaccounts') }}"><i
+              class="bi bi-person-lines-fill me-2"></i> View Accounts</a></li>
+        <li class="nav-item mb-2"><a class="nav-link text-dark" href="loans.html"><i class="bi bi-cash-coin me-2"></i>
+            Loans</a></li>
+        <li class="nav-item mb-2"><a class="nav-link text-dark" href="transactions.html"><i
+              class="bi bi-clock-history me-2"></i> Transaction History</a></li>
+        <li class="nav-item mb-2"><a class="nav-link text-dark" href="balance.html"><i class="bi bi-wallet2 me-2"></i>
+            Check Balance</a></li>
+        <li class="nav-item mb-2"><a class="nav-link text-dark" href="rewards.html"><i class="bi bi-gift-fill me-2"></i>
+            Rewards</a></li>
+        <li class="nav-item mb-2"><a class="nav-link text-dark" href="paybill.html"><i
+              class="bi bi-credit-card me-2"></i> Pay Bill</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Top Bar -->
+  <!-- <div class="top-bar d-flex align-items-center">
+    <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-label="Toggle sidebar"><i class="bi bi-list"></i></button>
+    <h5 class="m-0 text-center flex-grow-1">DigiBank User Dashboard</h5>
+    <div class="d-flex align-items-center">
+      <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name }} !</h5>
+      <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">Logout</a>
+    </div>
+  </div> -->
+  <div class="top-bar">
+    <button class="btn btn-outline-light btn-sm" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
+      aria-controls="sidebarMenu" aria-label="Toggle sidebar">
+      <i class="bi bi-list"></i>
+    </button>
+
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#97144D; width:100%;">
+      <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">My Activities</a></li>
+
+            <!-- Open Account -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Open Account</a>
+              <ul class="dropdown-menu" aria-labelledby="accountDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Savings Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Salary Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Current Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Safe Custody Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Pension Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">PMJDY Account</a></li>
+              </ul>
+            </li>
+
+            <!-- Deposits -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Deposits</a>
+              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Digital Fixed Deposits</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Fixed Deposits</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Recurring Deposits</a></li>
+              </ul>
+            </li>
+
+            <!-- Loans -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="loansDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Loans</a>
+              <ul class="dropdown-menu" aria-labelledby="loansDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('homeloan') }}">Home Loan</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('personal_loan') }}">Personal Loan</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('Business_loan') }}">Business Loan</a></li>
+              </ul>
+            </li>
+
+            <!-- Cards -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="cardsDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Cards</a>
+              <ul class="dropdown-menu" aria-labelledby="cardsDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('open_cards', preset='credit') }}">Credit Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_cards', preset='debit') }}">Debit Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_cards', preset='prepaid') }}">Prepaid Cards</a></li>
+              </ul>
+            </li>
+
+            <!-- Forex -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="forexDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Forex</a>
+              <ul class="dropdown-menu" aria-labelledby="forexDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('travel_forex') }}">Travel Forex Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('send_money_abroad') }}">Send Money Abroad</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('send_money_india') }}">Send Money India</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('currency_exchange') }}">Foreign Currency Exchange</a>
+                </li>
+              </ul>
+            </li>
+
+            <!-- Investments -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="investDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Investments</a>
+              <ul class="dropdown-menu" aria-labelledby="investDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('pfinvest') }}">Public Provident Fund</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('pfinvest') }}">Floating Rate Saving Bonds</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('pfinvest') }}">National Pension System</a></li>
+              </ul>
+            </li>
+          </ul>
+
+          <div class="d-flex align-items-center">
+            <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name if user else '' }}!</h5>
+            <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">Logout</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="bg-light px-3 py-2 mt-3">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color: #97144D;">Dashboard</a></li>
+      <li class="breadcrumb-item active" aria-current="page" style="color: #97144D; font-weight: bold;">View Loans</li>
+    </ol>
+  </nav>
+  <div class="container mt-4">
+
+
+    <!-- Account Tabs -->
+    <ul class="nav nav-tabs" id="accountTabs" role="tablist">
+      <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('viewaccounts') }}">My Accounts</a>
+      </li>
+      <li class="nav-item" role="presentation"><a href="{{ url_for('viewdeposits') }}" class="nav-link ">My
+          Deposits</a></li>
+      <li class="nav-item" role="presentation">
+        <a class="nav-link active" href="{{ url_for('view_loans') }}">My Loans</a>
+      </li>
+      <li class="nav-item" role="presentation">
+        <a class="nav-link" href="{{ url_for('view_investments') }}">My Investments</a>
+      </li>
+      <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('view_cards') }}">My Cards</a></li>
+    </ul>
+
+    <!-- Tab Content (placeholders for non-navigational tabs) -->
+    <div class="tab-content mt-3" id="accountTabsContent">
+      <div class="tab-pane fade show active" id="balance" role="tabpanel" aria-labelledby="balance-tab">
+        <p class="text-muted">Your loan details are shown below.</p>
+      </div>
+
+
+
+    </div>
+
+
+    <!-- Loans list -->
+    <div id="loanList" class="mt-2">
+      {% if loans %}
+      {% for L in loans %}
+      <div class="loan-row row" data-kind="{{ L.loan_kind }}" data-status="{{ L.status }}">
+        <div class="col-md-5 loan-left">
+          <div style="font-size: 20px;" class="fw-semibold" >
+            {{ L.loan_type_label }}
+            {% if L.loan_kind == 'home' %}<span class="badge bg-info ms-1">Home</span>{% endif %}
+            {% if L.loan_kind == 'personal' %}<span class="badge bg-secondary ms-1">Personal</span>{% endif %}
+            {% if L.loan_kind == 'business' %}<span class="badge bg-dark ms-1">Business</span>{% endif %}
+          </div>
+
+          <div class="meta mt-1">
+            <div style="font-size: 20px;">Purpose: <span class="deposit-label">{{ L.purpose or '—' }}</span></div>
+            <div style="font-size: 20px;">Interest Type: <span class="deposit-value">{{ L.interest_type or '—' }}</span></div>
+            {% if L.interest_rate is not none %}
+            <div style="font-size: 20px;">Interest Rate: <span class="deposit-value">{{ '%.2f'|format(L.interest_rate) }}%</span></div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="col-md-3 text-md-center mt-2 mt-md-0">
+          <div style="font-size: 20px;" class="meta">Loan Amount</div>
+          <div class="deposit-value">₹ {{ '{:,.2f}'.format(L.loan_amount or 0) }}</div>
+
+          {% if L.emi_amount is not none %}
+          <div style="font-size: 20px;">EMI: <span class="deposit-value">₹ {{ '{:,.2f}'.format(L.emi_amount) }}</span></div>
+          {% endif %}
+          {% if L.loan_tenure_years %}
+          <div style="font-size: 20px;">Tenure: <span class="deposit-value">{{ L.loan_tenure_years }}</span> yrs</div>
+          {% endif %}
+        </div>
+
+        <div class="col-md-2 text-md-center mt-2 mt-md-0">
+          <div style="font-size: 15px;" class="meta">Applied Date</div>
+          <div style="font-size: 15px;" class="fw-semibold">
+            {% if L.application_date %}{{ L.application_date }}{% else %}—{% endif %}
+          </div>
+        </div>
+
+        <div class="col-md-2 text-md-end mt-2 mt-md-0">
+          <div style="font-size: 15px;" class="meta mb-1">Manager Decision</div>
+          <div style="font-size: 20px;" class="small text-muted">
+            {% if L.updated_at %}{{ L.updated_at.strftime('%Y-%m-%d %H:%M') }}{% else %}{% endif %}
+          </div>
+          <span class="badge
+            {% if L.status == 'approved' %}bg-success
+            {% elif L.status == 'declined' %}bg-danger
+            {% elif L.status == 'issued' %}bg-primary
+            {% else %}bg-warning text-dark{% endif %}">
+            {{ L.status_label }}
+          </span>
+        </div>
+      </div>
+      {% endfor %}
+      {% else %}
+      <div class="alert alert-info mt-3">No loan applications found.</div>
+      {% endif %}
+    </div>
+
+    <footer class="text-white text-center py-3 mt-5 bg-custom">
+      © 2025 DigiBank. All rights reserved.
+    </footer>
+  </div>
+  </div>
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Robust client-side filters (don’t attach to rows)
+    const list = document.getElementById('loanList');
+    const typeBtn = document.getElementById('typeFilterBtn');
+    const statusBtn = document.getElementById('statusFilterBtn');
+    const typeMenu = document.getElementById('typeMenu');
+    const statusMenu = document.getElementById('statusMenu');
+
+    let activeKind = 'all';
+    let activeStatus = 'all';
+
+    function applyFilters() {
+      const rows = list.querySelectorAll('.loan-row');
+      rows.forEach(r => {
+        const kind = (r.getAttribute('data-kind') || '').toLowerCase();
+        const st = (r.getAttribute('data-status') || '').toLowerCase();
+        const okKind = (activeKind === 'all') || (kind === activeKind);
+        const okSt = (activeStatus === 'all') || (st === activeStatus);
+        r.style.display = (okKind && okSt) ? '' : 'none';
+      });
+    }
+
+    typeMenu.querySelectorAll('[data-kind]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        activeKind = a.getAttribute('data-kind');
+        typeBtn.textContent =
+          activeKind === 'all' ? 'All Loan Types' :
+            activeKind === 'home' ? 'Home Loan' :
+              activeKind === 'personal' ? 'Personal Loan' : 'Business Loan';
+        applyFilters();
+      });
+    });
+
+    statusMenu.querySelectorAll('[data-status]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        activeStatus = a.getAttribute('data-status');
+        statusBtn.textContent =
+          activeStatus === 'all' ? 'All Statuses' :
+            activeStatus === 'pending_manager' ? 'Pending' :
+              activeStatus.charAt(0).toUpperCase() + activeStatus.slice(1);
+        applyFilters();
+      });
+    });
+  </script>
+</body>
+
+</html>

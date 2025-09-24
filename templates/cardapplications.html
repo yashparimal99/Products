@@ -57,21 +57,25 @@
 <body>
  
 <!-- Top Bar -->
-<div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#8B0A50; color:white;">
- 
- 
-  <!-- Logo / Image -->
-  <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo"
-       style="height: 40px; width:auto; background-color:#fff; border-radius:5px; padding:2px;" class="me-3">
- 
-  <!-- Title -->
-  <h5 class="flex-grow-1 text-center m-0">Welcome To Cards Agent Dashboard - DigiBank</h5>
- 
-  <!-- Logout Button -->
-  <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
-    Logout
-  </a>
-</div>
+  <div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#8B0A50; color:white;">
+
+
+    <!-- Logo / Image -->
+    <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo"
+      style="height: 40px; width:auto; background-color:#fff; border-radius:5px; padding:2px;" class="me-3">
+
+    <!-- Title -->
+    <h5 class="flex-grow-1 text-center m-0">Welcome To Cards Agent Dashboard - DigiBank</h5>
+
+    <!-- Logout Button -->
+    <div class="d-flex align-items-center">
+      <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }} </h5>
+      <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
+        Logout
+      </a>
+    </div>
+  </div>
+
       <!-- Breadcrumb -->
      <nav aria-label="breadcrumb" style="background-color:#f8f9fa; padding:8px 15px; border-radius:4px; margin:10px 20px;">
     <ol class="breadcrumb mt-0">

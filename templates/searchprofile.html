@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard - DigiBank</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+ 
+  <!-- Bootstrap CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+ 
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px 0 0 0;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    /* Sidebar Offcanvas */
+    #sidebarMenu.offcanvas-start { width: 250px; }
+    #sidebarMenu .offcanvas-body { padding: 0.5rem 1rem; }
+    #sidebarMenu .nav-link {
+      font-size: 0.9rem; padding: 8px 12px; display: flex; align-items: center; gap: 8px;
+      color: #333; transition: color 0.3s;
+    }
+    #sidebarMenu .nav-link i { font-size: 1.1rem; }
+    #sidebarMenu .nav-link.active {
+      font-weight: 700; color: #97144D !important; background-color: #f0d7e0; border-radius: 4px;
+    }
+    #sidebarMenu .nav-link:hover { color: #7a0f3e; background-color: #f9e5ef; border-radius: 4px; }
+ 
+    .top-bar button.btn-outline-light {
+      border: 1.5px solid white; color: white; background: transparent; padding: 4px 10px;
+      font-size: 1.3rem; border-radius: 4px; cursor: pointer; transition: background-color 0.2s, color 0.2s;
+    }
+    .top-bar button.btn-outline-light:hover { background-color: white; color: #97144D; }
+ 
+    /* Top Bar */
+    .top-bar {
+      background-color: #97144D; color: white; display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 20px; user-select: none; position: sticky; top: 0; z-index: 1030;
+    }
+    .top-bar h5 { margin: 0; font-weight: 700; flex-grow: 1; text-align: center; color: white; }
+    .logout-btn {
+      background: transparent; border: 1.5px solid white; color: white; padding: 5px 15px;
+      border-radius: 4px; font-weight: 600; cursor: pointer; transition: background-color 0.2s, color 0.2s; flex-shrink: 0;
+    }
+    .logout-btn:hover { background-color: white; color: #97144D; }
+ 
+    /* Search Bar Row with Sidebar Toggle & Chatbot */
+    .search-chatbar {
+      max-width: 900px; margin: 15px auto 40px auto; padding: 0 15px; display: flex; align-items: center; gap: 15px;
+    }
+    .search-chatbar .btn-toggle-sidebar {
+      display: flex; align-items: center; justify-content: center; border-radius: 5px; border: 1.5px solid #ccc;
+      color: #444; background: white; transition: border-color 0.3s, color 0.3s; cursor: pointer; flex-shrink: 0;
+      min-width: 42px; padding: 6px 8px; font-size: 1.3rem;
+    }
+    .search-chatbar .btn-toggle-sidebar:hover { border-color: #97144D; color: #97144D; }
+    .search-chatbar input[type="text"] {
+      flex-grow: 1; padding: 10px 14px; border-radius: 5px; border: 1.5px solid #ccc; font-size: 1rem;
+      outline-offset: 0; transition: border-color 0.3s; width: 9000px; margin: 0 auto; display: block;
+    }
+    .search-chatbar input[type="text"]:focus { border-color: #97144D; box-shadow: 0 0 5px rgba(151, 20, 77, 0.5); }
+    .search-chatbar .chatbot-btn {
+      background-color: #97144D; border: none; color: white; padding: 10px 14px; border-radius: 5px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background-color 0.3s ease;
+      font-size: 1.3rem; flex-shrink: 0;
+    }
+    .search-chatbar .chatbot-btn:hover { background-color: #7a0f3e; }
+ 
+    /* Dashboard Cards */
+    .dashboard-card {
+      transition: 0.3s; height: 280px; display: flex; flex-direction: column; justify-content: space-between;
+      padding: 20px 20px 30px 20px; text-align: center; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+    }
+    .dashboard-card:hover { transform: translateY(-5px); box-shadow: 0 0 15px rgba(0, 0, 0, 0.15); }
+    .dashboard-icon { font-size: 32px; color: #97144D; margin-bottom: 15px; }
+    .dashboard-card h5 { font-weight: 600; margin-bottom: 10px; }
+    .dashboard-card p { flex-grow: 1; font-size: 14px; color: #555; margin-bottom: 15px; }
+    .btn-digibank {
+      background-color: #97144D; color: #fff; border: none; padding: 8px 18px; font-size: 0.9rem;
+      border-radius: 25px; transition: background-color 0.3s ease;
+    }
+    .btn-digibank:hover { background-color: #7a0f3e; color: white; }
+ 
+    /* Footer */
+    footer.bg-custom { background-color: #97144D; }
+  </style>
+  <style>
+    body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; margin: 0; }
+    .btn-submit { background-color: #97144D; color: #fff; font-weight: 600; border: none; padding: 10px 0; border-radius: 4px; }
+    .btn-submit:hover { background-color: #7a0f3e; }
+  </style>
+</head>
+ 
+<body>
+ 
+  <!-- Sidebar Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="sidebarMenuLabel">User</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark active" href="userdashboard.html">
+            <i class="bi bi-speedometer2 me-2"></i> Home
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('viewaccounts') }}">
+            <i class="bi bi-person-lines-fill me-2"></i> View Accounts
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="loans.html">
+            <i class="bi bi-cash-coin me-2"></i> Loans
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="transactions.html">
+            <i class="bi bi-clock-history me-2"></i> Transaction History
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="balance.html">
+            <i class="bi bi-wallet2 me-2"></i> Check Balance
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="rewards.html">
+            <i class="bi bi-gift-fill me-2"></i> Rewards
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="paybill.html">
+            <i class="bi bi-credit-card me-2"></i> Pay Bill
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="#">
+            <i class="bi bi-person-rolodex me-2"></i> Get Contact
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="#">
+            <i class="bi bi-shield-lock-fill me-2"></i> Privacy & Security
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+ 
+  <!-- Top bar -->
+  <div class="top-bar d-flex align-items-center">
+    <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
+      aria-controls="sidebarMenu" aria-label="Toggle sidebar">
+      <i class="bi bi-list"></i>
+    </button>
+ 
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important; width: 100%;">
+      <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">My Activities</a></li>
+ 
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Open Account</a>
+              <ul class="dropdown-menu" aria-labelledby="accountDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('savingform') }}">Savings Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Salary Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Current Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Safe Custody Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Pension Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">PMJDY Account</a></li>
+              </ul>
+            </li>
+ 
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Deposits</a>
+              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Digital Fixed Deposits</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Fixed Deposits</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Recurring Deposits</a></li>
+              </ul>
+            </li>
+ 
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="loansDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Loans</a>
+              <ul class="dropdown-menu" aria-labelledby="loansDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Home Loan</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Personal Loan</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Business Loan</a></li>
+              </ul>
+            </li>
+ 
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="cardsDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Cards</a>
+              <ul class="dropdown-menu" aria-labelledby="cardsDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Credit Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Debit Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Prepaid Cards</a></li>
+              </ul>
+            </li>
+ 
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="forexDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Forex</a>
+              <ul class="dropdown-menu" aria-labelledby="forexDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Travel Forex Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Send Money Abroad</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Send Money India</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Foreign Currency Exchange</a></li>
+              </ul>
+            </li>
+ 
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="investDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Investments</a>
+              <ul class="dropdown-menu" aria-labelledby="investDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Public Provident Fund</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Floating Rate Saving Bonds</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">National Pension System</a></li>
+              </ul>
+            </li>
+          </ul>
+ 
+          <div class="d-flex align-items-center">
+            <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name }} !</h5>
+            <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">Logout</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </div>
+ 
+  <nav aria-label="breadcrumb" style="background-color:#f8f9fa; padding:8px 15px; border-radius:4px; margin:10px 20px;">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#97144D;">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page" style="color:#97144D; font-weight:bold;">Profile</li>
+    </ol>
+  </nav>
+ 
+  <!-- Dashboard Content -->
+  <div class="container my-5">
+    <h3 class="mb-4" style="color: #97144D;">User Details</h3>
+ 
+    <form action="#" method="post">
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label for="firstName" class="form-label">Name</label>
+          <input type="text" id="firstName" name="name" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.name }}" readonly>
+        </div>
+        <div class="col-md-4">
+          <label for="middleName" class="form-label">Customer ID</label>
+          <input type="text" id="middleName" name="cid" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.user_id }}" readonly>
+        </div>
+        <div class="col-md-4">
+          <label for="lastName" class="form-label">PAN</label>
+          <input type="text" id="lastName" name="pan" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.pan }}" readonly>
+        </div>
+      </div>
+ 
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label for="mobileNumber" class="form-label">Mobile Number</label>
+          <input type="tel" id="mobileNumber" name="mobile_no" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.mobile }}" readonly>
+        </div>
+        <div class="col-md-4">
+          <label for="emailAddress" class="form-label">Email Address</label>
+          <input type="email" id="emailAddress" name="email" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.email }}" readonly>
+        </div>
+        <div class="col-md-4">
+          <label for="aadharNumber" class="form-label">Aadhar Number</label>
+          <input type="text" id="aadharNumber" name="aadhar_number" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.aadhaar }}" readonly>
+        </div>
+      </div>
+ 
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label for="dob" class="form-label">Date of Birth</label>
+          <input type="text" id="dob" name="dob" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.dob }}" readonly>
+        </div>
+        <div class="col-md-4">
+          <label for="gender" class="form-label">Gender</label>
+          <input type="text" id="gender" name="gender" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.gender }}" readonly>
+        </div>
+        <div class="col-md-4">
+          <label for="createdAt" class="form-label">User Created at</label>
+          <input type="text" id="createdAt" name="createdAt" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.onboarding_date }}" readonly>
+        </div>
+      </div>
+ 
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label for="city" class="form-label">City</label>
+          <input type="text" id="city" name="city" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.city }}" readonly>
+        </div>
+        <div class="col-md-4">
+          <label for="state" class="form-label">State</label>
+          <input type="text" id="state" name="state" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.state }}" readonly>
+        </div>
+        <div class="col-md-4">
+          <label for="country" class="form-label">Country</label>
+          <input type="text" id="country" name="country" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.country }}" readonly>
+        </div>
+      </div>
+ 
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label for="status" class="form-label">Status</label>
+          <input type="text" id="status" name="status" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.status }}" readonly>
+        </div>
+        <div class="col-md-4">
+          <label for="role" class="form-label">Role</label>
+          <input type="text" id="role" name="role" class="form-control" style="border: 0.5px solid #97144D;" value="{{ user.role }}" readonly>
+        </div>
+        <div class="col-md-4 position-relative">
+          <label class="form-label">Password</label>
+          <div class="input-group">
+            <input type="password" id="passwordField" class="form-control" style="border:0.5px solid #97144D;" value="{{ user.password }}" readonly>
+            <button type="button" class="btn btn-outline-secondary" style="border:0.5px solid #97144D;" onclick="togglePassword()" tabindex="-1">
+              <i id="toggleIcon" class="bi bi-eye"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+ 
+      <script>
+        function togglePassword() {
+          const passwordField = document.getElementById("passwordField");
+          const toggleIcon = document.getElementById("toggleIcon");
+          if (passwordField.type === "password") {
+            passwordField.type = "text";
+            toggleIcon.classList.remove("bi-eye");
+            toggleIcon.classList.add("bi-eye-slash");
+          } else {
+            passwordField.type = "password";
+            toggleIcon.classList.remove("bi-eye-slash");
+            toggleIcon.classList.add("bi-eye");
+          }
+        }
+      </script>
+ 
+      <div class="row mb-3">
+        <div class="col-12">
+          <label for="address" class="form-label">Address</label>
+          <textarea id="address" name="address" class="form-control" rows="3" style="border: 0.5px solid #97144D;" readonly>{{ user.address }}</textarea>
+        </div>
+      </div>
+ 
+      <!-- Display-only: Edit Details button removed -->
+    </form>
+  </div>
+ 
+  <!-- Footer -->
+  <footer class="bg-custom text-white text-center py-3 mt-auto" style="background-color: #97144D;">
+    © 2025 DigiBank. All rights reserved.
+  </footer>
+ 
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+ 
+ 
