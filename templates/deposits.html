@@ -10,72 +10,230 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
  
-    <title>Digi Bank Products</title>
+    <title>DiGi Bank Products</title>
 </head>
- 
+ <style>
+    
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap');
+
+    .DiGi-bank-logo {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 12px;
+
+      text-decoration: none;
+
+      transition: transform 0.3s ease;
+
+    }
+
+    .DiGi-bank-logo:hover {
+
+      transform: scale(1.05);
+
+    }
+
+    .logo-icon {
+
+      width: 50px;
+
+      height: 50px;
+
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 100%);
+
+      border-radius: 12px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      position: relative;
+
+      box-shadow: 0 6px 18px rgba(102, 126, 234, 0.3), 0 2px 6px rgba(0, 0, 0, 0.1);
+
+    }
+
+    .logo-icon::before {
+
+      content: '';
+
+      position: absolute;
+
+      top: 8px;
+
+      left: 8px;
+
+      right: 8px;
+
+      bottom: 8px;
+
+      background: rgba(255, 255, 255, 0.95);
+
+      border-radius: 8px;
+
+    }
+
+    .logo-icon::after {
+
+      content: 'D';
+
+      position: absolute;
+
+      color: transparent;
+
+      background: linear-gradient(135deg, #667eea, #764ba2);
+
+      background-clip: text;
+
+      -webkit-background-clip: text;
+
+      font-weight: 800;
+
+      font-size: 20px;
+
+      z-index: 2;
+
+    }
+
+    .logo-text {
+
+      color: #fff;
+
+    }
+
+    .main-text {
+
+      font-size: 20px;
+
+      font-weight: 800;
+
+      letter-spacing: -0.5px;
+
+      line-height: 1;
+
+    }
+
+    .DiGi {
+
+      background: linear-gradient(135deg, #87CEEB 0%, #98D8E8 25%, #FFF8DC 50%, #87CEFA 100%);
+
+      background-clip: text;
+
+      -webkit-background-clip: text;
+
+      color: transparent;
+
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+
+    }
+
+    .bank {
+
+      color: #ffffff;
+
+      margin-left: 3px;
+
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+
+    }
+
+    .tagline {
+
+      font-size: 9px;
+
+      font-weight: 600;
+
+      color: #e8f4f8;
+
+      letter-spacing: 2px;
+
+      text-transform: uppercase;
+
+      margin-top: 2px;
+
+    }
+    </style>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0B4D83 !important;">
-  <div class="container-fluid">
-    <img src="{{ url_for('static', filename='images/Digilogo.jpg') }}"
-         alt="DiGi Bank" height="60" class="my-2">
- 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-            aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
- 
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <!-- your existing nav items -->
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page"
-             href="{{ url_for('home') }}">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link"
-             href="{{ url_for('exploreproduct') }}">Explore Products</a>
-        </li>
-        <li class="nav-item"><a class="nav-link" href="#">Grab Deals</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Make Payments</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Bank Smart</a></li>
-      </ul>
- 
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="btn btn-outline-light me-2 navbar-btn"
-             href="{{ url_for('login') }}">Login</a>
-        </li>
-        <li class="nav-item">
-          <a class="btn btn-light navbar-btn"
-             href="{{ url_for('signup') }}">Sign Up</a>
-        </li>
-      </ul>
+    <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-dark"> -->
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0B4D83 !important;">
+    <div class="container-fluid">
+      <!-- 🔽 Custom DiGiBank Logo -->
+      <a class="navbar-brand DiGi-bank-logo" href="{{ url_for('home') }}">
+        <div class="logo-icon"></div>
+        <div class="logo-text">
+          <div class="main-text">
+            <span class="DiGi">DiGi</span><span class="bank">Bank</span>
+          </div>
+          <div class="tagline">Smart Banking</div>
+        </div>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link active" href="{{ url_for('home') }}">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Grab Deals</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Make Payments</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Bank Smart</a></li>
+        </ul>
+
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="btn btn-outline-light me-2 navbar-btn" href="{{ url_for('login') }}">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-light navbar-btn" href="{{ url_for('signup') }}">Sign Up</a>
+          </li>
+        </ul>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
     <div class="card mt-4 border-0"></div>
     <style>
-  .breadcrumb .breadcrumb-item a {
-    color: #0B4D83;
-    text-decoration: none;
-  }
- 
-  .breadcrumb .breadcrumb-item a:hover {
-    text-decoration: underline;
-  }
- 
-  .breadcrumb .breadcrumb-item {
-    color: #0B4D83;
-  }
+  /* Breadcrumb */
+    .breadcrumb {
+      background: linear-gradient(135deg, rgba(11, 77, 131, 0.05), rgba(25, 118, 210, 0.05));
+      border-radius: 15px;
+      padding: 1rem 1.5rem;
+      margin: 1.5rem;
+      box-shadow: var(--shadow-light);
+    }
+
+    .breadcrumb .breadcrumb-item a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .breadcrumb .breadcrumb-item a:hover {
+      text-decoration: underline;
+      color: var(--secondary-color);
+    }
+
+    .breadcrumb .breadcrumb-item {
+      color: var(--primary-color);
+      font-weight: 500;
+    }
 </style>
  
-<nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
-    <li class="breadcrumb-item"><a href="{{ url_for('deposits') }}">Deposits</a></li>
-  </ol>
-</nav>
+ <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Deposits</li>
+    </ol>
+  </nav>
  
    
  
@@ -104,7 +262,7 @@
     <div class="card mt-4 border-0">
         <div class="card-body" style="margin-left: 0.5in;">
             <h3>
-                <span style="color: #0B4D83; font-style: italic;">Digi Bank</span> Deposit Services
+                <span style="color: #0B4D83; font-style: italic;">DiGi Bank</span> Deposit Services
             </h3><br>
             <p>
                
@@ -113,12 +271,12 @@
                 or opting for Bank Deposits online, this investment avenue guarantees safety and competitive returns for
                 your money.
  
-                Get the best out of your wealth with Digi Bank's special offers on Fixed and Recurring Deposits that
+                Get the best out of your wealth with DiGi Bank's special offers on Fixed and Recurring Deposits that
                 come with competitive rates of interest. Avail added benefits and tax savings on your money with the
                 <span style="color: #0B4D83;">tax saver fixed deposit.</span>
                 saver fixed deposit. The Encash 24 Flexi Deposit scheme offers you the liquidity of a savings account
-                and the high returns of a Fixed Deposit. Keeping in view, Digi Bank's aim of customer's ease of access,
-                you can now create and manage your deposit accounts online. Watch your money grow with Digi Bank
+                and the high returns of a Fixed Deposit. Keeping in view, DiGi Bank's aim of customer's ease of access,
+                you can now create and manage your deposit accounts online. Watch your money grow with DiGi Bank
                 Deposits
             </p>
  

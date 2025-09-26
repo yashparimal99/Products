@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+ 
 <head>
   <meta charset="UTF-8">
   <title>Team Employees - DigiBank (Investment Department)</title>
@@ -7,93 +8,106 @@
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
+    :root {
+      --primary-color: #0B4D83;
+      --secondary-color: #1976D2;
+    }
+ 
     body {
       background-color: #f8f9fa;
     }
-    .table.table-bordered.table-striped thead.table-header th {background-color: #97144D !important; color: white !important;}
+ 
+    .table.table-bordered.table-striped thead.table-header th {
+      background-color: var(--primary-color) !important;
+      color: white !important;
+    }
+ 
     .btn-digibank {
-      background-color: #97144D;
+      background-color: var(--primary-color);
       color: white;
     }
+ 
     .btn-digibank:hover {
       background-color: #7a103f;
       color: white;
     }
+ 
     footer {
-  background-color: #97144D;
-  color: white;
-  padding: 1rem 0;
-  font-size: 0.9rem;
-  text-align: center;
-  line-height: 1.4;
-}
+      background-color: var(--primary-color);
+      color: white;
+      padding: 1rem 0;
+      font-size: 0.9rem;
+      text-align: center;
+      line-height: 1.4;
+    }
   </style>
 </head>
+ 
 <body>
-
-  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D;">
-  <div class="container-fluid">
-    <!-- Left: Bank Logo -->
-    <a class="navbar-brand d-flex align-items-center" href="#">
-      <img src="bank-logo.png" alt="Bank Logo" style="height: 40px; margin-right: 10px;">
-    </a>
-
-    <!-- Center: Title -->
-    <div class="mx-auto text-white fw-bold fs-5">
-      Hello, User
+ 
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--primary-color);">
+    <div class="container-fluid">
+      <!-- Left: Bank Logo -->
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <img src="bank-logo.png" alt="Bank Logo" style="height: 40px; margin-right: 10px;">
+      </a>
+ 
+      <!-- Center: Title -->
+      <div class="mx-auto text-white fw-bold fs-5">
+        Hello, User
+      </div>
+ 
+      <!-- Right: Login Button -->
+      <div class="d-flex">
+        <a href="{{ url_for('logout') }}" class="btn btn-light btn-sm">Logout</a>
+      </div>
     </div>
-
-    <!-- Right: Login Button -->
-    <div class="d-flex">
-      <a href="{{ url_for('logout') }}" class="btn btn-light btn-sm">Logout</a>
+  </nav>
+ 
+  <!-- Page Header -->
+  <div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <h4 class="mb-0">List of Investment Agents</h4>
+      <div>
+        <a href="/download_excel" class="btn btn-digibank btn-sm me-2">Download</a>
+        <!--<a href="/adduser" class="btn btn-digibank btn-sm me-2">Add Investment Agent</a>-->
+        <a href="{{ url_for('tladduser', origin=request.path) }}" class="btn btn-digibank btn-sm me-2">Add Investment Agent</a>
+        <a href="/tldeleteuser" class="btn btn-danger btn-sm">Delete Investment Agent</a>
+      </div>
     </div>
   </div>
-</nav>
-<!-- Page Header -->
-<div class="container my-4">
-  <div class="d-flex justify-content-between align-items-center">
-    <h4 class="mb-0">List of Investment Agents</h4>
-    <div>
-       <a href="/download_excel" class="btn btn-digibank btn-sm me-2">Download</a>
-      <!--<a href="/adduser" class="btn btn-digibank btn-sm me-2">Add Investment Agent</a> -->
-      <a href="{{ url_for('tladduser', origin=request.path) }}" class="btn btn-digibank btn-sm me-2">Add Investment Agent</a>
-      <a href="/tldeleteuser" class="btn btn-danger btn-sm">Delete Investment Agent</a>
+ 
+  <!-- Table Section -->
+  <div class="container">
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped align-middle">
+        <thead class="table-header">
+          <tr>
+            <th>Agent ID</th>
+            <th>Name</th>
+            <th>Department</th>
+            <th>Agent Onboarding Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for agent in agents %}
+          <tr>
+            <td>{{ agent.user_id }}</td>
+            <td>{{ agent.name }}</td>
+            <td>{{ agent.department }}</td>
+            <td>{{ agent.onboarding_date }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   </div>
-</div>
-
-<!-- Table Section -->
-<div class="container">
-  <div class="table-responsive">
-    <table class="table table-bordered table-striped align-middle">
-      <thead class="table-header">
-        <tr>
-          <th>Agent ID</th>
-          <th>Name</th>
-          
-          <th>Department</th>
-          <th>Agent Onboarding Date</th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for agent in agents %}
-      <tr>
-        <td>{{ agent.user_id }}</td>
-        <td>{{ agent.name }} </td>
-      
-        <td>{{ agent.department }}</td>
-        <td>{{ agent.onboarding_date }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-    </table>
-  </div>
-</div>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+ 
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+ 
 </body>
+ 
 <footer class="bg-custom text-light pt-4 pb-3 mt-5">
   <div class="container">
     <div class="row small">
@@ -109,7 +123,7 @@
           <a href="#" class="text-light text-decoration-none">Disclaimer</a>
         </nav>
       </div>
-
+ 
       <!-- Sub Links -->
       <div class="col-md-12 mb-3 d-flex flex-wrap justify-content-center gap-3 small">
         <a href="#" class="text-light text-decoration-none">Home</a>
@@ -123,17 +137,19 @@
         <a href="#" class="text-light text-decoration-none">DigiBank Wealth</a>
         <a href="#" class="text-light text-decoration-none">Products</a>
       </div>
-
+ 
       <!-- Important Notice -->
       <div class="col-md-12 text-center small text-secondary mb-3">
         <p class="mb-1">
-          <strong>IMPORTANT:</strong> DigiBank never asks for your user id / password / pin no. through phone call / SMSes / e-mails.
-          Any such phone call / SMSes / e-mails asking you to reveal credentials or One Time Password through SMS could be an attempt to withdraw money from your account.
+          <strong>IMPORTANT:</strong> DigiBank never asks for your user id / password / pin no. through phone call /
+          SMSes / e-mails.
+          Any such phone call / SMSes / e-mails asking you to reveal credentials or One Time Password through SMS could
+          be an attempt to withdraw money from your account.
           <br />
-          NEVER share these details to anyone. 
+          NEVER share these details to anyone.
         </p>
       </div>
-
+ 
       <!-- Copyright -->
       <div class="col-md-12 text-center small text-secondary">
         <p class="mb-0" style="color: white;">&copy; Copyright DigiBank</p>
@@ -141,5 +157,7 @@
     </div>
   </div>
 </footer>
-
+ 
 </html>
+ 
+ 

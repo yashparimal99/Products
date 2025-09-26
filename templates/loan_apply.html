@@ -6,21 +6,74 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <style>
+    :root{ --digi-primary:#97144D; --digi-primary-dark:#7a0f3e; }
     body{background:#f8f9fa;font-family:'Segoe UI',sans-serif}
-    .card{border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-    .section-title{background:#97144D;color:#fff;padding:8px 12px;border-radius:6px;margin:20px 0 12px}
-    .btn-digi{background:#97144D;color:#fff;border:none}
-    .btn-digi:hover{background:#7a0f3e;color:#fff}
-    .muted{color:#6c757d}
+    .card{border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.06)}
+    .section-title{
+      background:linear-gradient(90deg,var(--digi-primary) 0%, #b93872 100%);
+      color:#fff;padding:10px 14px;border-radius:8px;margin:24px 0 14px;
+      display:flex;align-items:center;gap:.5rem;font-weight:600
+    }
+    .section-title .dot{width:8px;height:8px;border-radius:50%;background:#fff;opacity:.85}
+    .btn-digi{background:var(--digi-primary);color:#fff;border:none}
+    .btn-digi:hover{background:var(--digi-primary-dark);color:#fff}
+    .legend{background:#fff;border:1px solid #e9ecef;border-left:4px solid var(--digi-primary);
+      border-radius:8px;padding:.55rem .75rem;margin:.5rem 0 1rem;color:#555;font-size:.925rem}
+    .req{color:#dc3545;margin-left:4px;font-weight:700}
+    .form-label{font-weight:600}
+    #liveQuote{font-variant-numeric:tabular-nums}
+    .breadcrumb {
+      margin-bottom: 0;
+    }
+    .breadcrumb .active {
+      color: #0B4D83;
+      font-weight: 500;
+    }
+    .breadcrumb a {
+      text-decoration: none;
+      color: #0B4D83;
+    }
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
+<!-- Top Bar -->
+<div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#0B4D83; color:white;">
+ 
+ 
+  <!-- Logo / Image -->
+  <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo"
+       style="height: 40px; width:auto; background-color:#fff; border-radius:5px; padding:2px;" class="me-3">
+ 
+  <!-- Title -->
+  <h5 class="flex-grow-1 text-center m-0">Welcome To Loan Agent Dashboard - DigiBank</h5>
+ 
+  <!-- Logout Button -->
+  <div class="d-flex align-items-center">
+  <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }}</h5>
+  <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
+    Logout
+  </a>
+</div>
+</div>
+
+<!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="bg-light px-3 py-2">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Login</a></li>
+      <li class="breadcrumb-item active" aria-current="page"><a href="{{ url_for('agentapplyloan') }}">Apply Loan</a></li>
+    </ol>
+  </nav>
 <div class="container my-4">
   <div class="card p-3 p-md-4">
     <div class="d-flex justify-content-between align-items-center mb-2">
       <h4 class="mb-0">Apply for Loan</h4>
       <span class="badge bg-info text-dark">You are applying as LOAN AGENT</span>
     </div>
+ 
+    <div class="legend">Fields marked with <span class="req">*</span> are mandatory.</div>
  
     {% with msgs = get_flashed_messages(with_categories=true) %}
       {% if msgs %}
@@ -33,12 +86,12 @@
       {% endif %}
     {% endwith %}
  
-    <form action="{{ url_for('loan_agent_apply') }}" method="POST" enctype="multipart/form-data" id="loanForm">
+    <form action="{{ url_for('loan_agent_apply') }}" method="POST" enctype="multipart/form-data" id="loanForm" novalidate>
       <!-- Loan type + customer -->
       <div class="row g-3 align-items-end">
         <div class="col-md-4">
-          <label class="form-label">Loan Type</label>
-          <select class="form-select" name="loan_kind" id="loan_kind" required>
+          <label class="form-label" for="loan_kind">Loan Type</label>
+          <select class="form-select" name="loan_kind" id="loan_kind" required aria-required="true">
             <option value="" disabled selected>Select</option>
             <option value="home">Home Loan</option>
             <option value="personal">Personal Loan</option>
@@ -46,92 +99,166 @@
           </select>
         </div>
         <div class="col-md-8">
-          <label class="form-label">Customer Email (registered)</label>
-          <input type="email" class="form-control" name="customer_email" placeholder="customer@example.com" required>
+          <label class="form-label" for="customer_email">Customer Email (registered)</label>
+          <input type="email" class="form-control" id="customer_email" name="customer_email" placeholder="customer@example.com" required aria-required="true">
         </div>
       </div>
  
       <!-- A) Applicant -->
-      <div class="section-title">A) Applicant Details</div>
+      <div class="section-title"><span class="dot"></span> A) Applicant Details</div>
       <div class="row g-3">
         <div class="col-md-6">
-          <label class="form-label">Full Name</label>
-          <input type="text" class="form-control" name="applicantName" required>
+          <label class="form-label" for="applicantName">Full Name</label>
+          <input type="text" class="form-control" id="applicantName" name="applicantName" required aria-required="true">
         </div>
         <div class="col-md-3">
-          <label class="form-label">Date of Birth</label>
-          <input type="date" class="form-control" name="dob" id="dob" required>
+          <label class="form-label" for="dob">Date of Birth</label>
+          <input type="date" class="form-control" name="dob" id="dob" required aria-required="true">
         </div>
         <div class="col-md-3">
-          <label class="form-label">Age</label>
+          <label class="form-label" for="age">Age</label>
           <input type="number" class="form-control" name="age" id="age" min="0">
         </div>
         <div class="col-md-3">
-          <label class="form-label">Gender</label>
-          <select class="form-select" name="gender" required>
-            <option value="">Select</option><option>Male</option><option>Female</option><option>Other</option>
+          <label class="form-label" for="gender">Gender</label>
+          <!-- VALUEs set to lowercase to match typical ENUM('male','female','other') -->
+          <select class="form-select" name="gender" id="gender" required aria-required="true">
+            <option value="">Select</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
           </select>
         </div>
         <div class="col-12">
-          <label class="form-label">Current Address</label>
-          <textarea class="form-control" name="address" rows="2" required></textarea>
+          <label class="form-label" for="address">Current Address</label>
+          <textarea class="form-control" id="address" name="address" rows="2" required aria-required="true"></textarea>
         </div>
-        <div class="col-md-3"><label class="form-label">PIN Code</label><input type="text" class="form-control" name="pin" required></div>
-        <div class="col-md-3"><label class="form-label">Telephone</label><input type="text" class="form-control" name="telephone"></div>
-        <div class="col-md-3"><label class="form-label">Mobile</label><input type="text" class="form-control" name="mobile" required></div>
-        <div class="col-md-3"><label class="form-label">Nationality</label><input type="text" class="form-control" name="nationality" required></div>
         <div class="col-md-3">
-          <label class="form-label">Marital Status</label>
-          <select class="form-select" name="maritalStatus" required>
-            <option value="">Select</option><option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option>
+          <label class="form-label" for="pin">PIN Code</label>
+          <input type="text" class="form-control" id="pin" name="pin" required aria-required="true">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="telephone">Telephone</label>
+          <input type="text" class="form-control" id="telephone" name="telephone">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="mobile">Mobile</label>
+          <input type="text" class="form-control" id="mobile" name="mobile" required aria-required="true">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="nationality">Nationality</label>
+          <input type="text" class="form-control" id="nationality" name="nationality" required aria-required="true">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="maritalStatus">Marital Status</label>
+          <select class="form-select" id="maritalStatus" name="maritalStatus" required aria-required="true">
+            <option value="">Select</option>
+            <option value="single">Single</option>
+            <option value="married">Married</option>
+            <option value="divorced">Divorced</option>
+            <option value="widowed">Widowed</option>
           </select>
         </div>
-        <div class="col-md-3"><label class="form-label">PAN Number</label><input type="text" class="form-control" name="pan" required></div>
+        <div class="col-md-3">
+          <label class="form-label" for="pan">PAN Number</label>
+          <input type="text" class="form-control" id="pan" name="pan" required aria-required="true">
+        </div>
       </div>
  
       <!-- Employment -->
-      <div class="section-title">Employment Details</div>
+      <div class="section-title"><span class="dot"></span> Employment Details</div>
       <div class="row g-3">
-        <div class="col-md-4"><label class="form-label">Employment Type</label>
-          <select class="form-select" name="employmentType" required>
-            <option value="">Select</option><option>Salaried</option><option>Self-Employed</option><option>Professional</option><option>Business</option>
+        <div class="col-md-4">
+          <label class="form-label" for="employmentType">Employment Type</label>
+          <select class="form-select" id="employmentType" name="employmentType" required aria-required="true">
+            <option value="">Select</option>
+            <option value="salaried">Salaried</option>
+            <option value="self_employed">Self-Employed</option>
+            <option value="professional">Professional</option>
+            <option value="business">Business</option>
           </select>
         </div>
-        <div class="col-md-4"><label class="form-label">Company/Business Name</label><input type="text" class="form-control" name="companyName" required></div>
-        <div class="col-md-4"><label class="form-label">Designation/Profession</label><input type="text" class="form-control" name="designation" required></div>
-        <div class="col-md-4"><label class="form-label">Gross Annual Income (₹)</label><input type="number" class="form-control" name="grossIncome" required></div>
-        <div class="col-md-4"><label class="form-label">Total Experience (Years)</label><input type="number" class="form-control" name="experience" required></div>
-        <div class="col-md-4"><label class="form-label">Current Company Experience (Years)</label><input type="number" class="form-control" name="currentExp"></div>
+        <div class="col-md-4">
+          <label class="form-label" for="companyName">Company/Business Name</label>
+          <input type="text" class="form-control" id="companyName" name="companyName" required aria-required="true">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="designation">Designation/Profession</label>
+          <input type="text" class="form-control" id="designation" name="designation" required aria-required="true">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="grossIncome">Gross Annual Income (₹)</label>
+          <input type="number" class="form-control" id="grossIncome" name="grossIncome" required aria-required="true">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="experience">Total Experience (Years)</label>
+          <input type="number" class="form-control" id="experience" name="experience" required aria-required="true">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="currentExp">Current Company Experience (Years)</label>
+          <input type="number" class="form-control" id="currentExp" name="currentExp">
+        </div>
       </div>
  
       <!-- Property (Home only) -->
       <div id="homeFields" style="display:none">
-        <div class="section-title">Property (Home Loan)</div>
+        <div class="section-title"><span class="dot"></span> Property (Home Loan)</div>
         <div class="row g-3">
-          <div class="col-12"><label class="form-label">Property Address</label><textarea class="form-control" name="propertyAddress" rows="2"></textarea></div>
+          <div class="col-12">
+            <label class="form-label" for="propertyAddress">Property Address</label>
+            <textarea class="form-control" id="propertyAddress" name="propertyAddress" rows="2"></textarea>
+          </div>
           <div class="col-md-4">
-            <label class="form-label">Property Type</label>
-            <select class="form-select" name="propertyType">
-              <option value="">Select</option><option>Flat/Apartment</option><option>Independent House</option><option>Plot</option><option>Villa</option>
+            <label class="form-label" for="propertyType">Property Type</label>
+            <select class="form-select" id="propertyType" name="propertyType">
+              <option value="">Select</option>
+              <option value="flat_apartment">Flat/Apartment</option>
+              <option value="independent_house">Independent House</option>
+              <option value="plot">Plot</option>
+              <option value="villa">Villa</option>
             </select>
           </div>
-          <div class="col-md-4"><label class="form-label">Property Age (Years)</label><input type="number" class="form-control" name="propertyAge"></div>
-          <div class="col-md-4"><label class="form-label">Built-up Area (sq.ft)</label><input type="number" class="form-control" name="builtUpArea"></div>
-          <div class="col-md-4"><label class="form-label">Property Value (₹)</label><input type="number" class="form-control" name="propertyValue"></div>
-          <div class="col-md-8"><label class="form-label">Builder/Developer Name</label><input type="text" class="form-control" name="builderName"></div>
+          <div class="col-md-4">
+            <label class="form-label" for="propertyAge">Property Age (Years)</label>
+            <input type="number" class="form-control" id="propertyAge" name="propertyAge">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="builtUpArea">Built-up Area (sq.ft)</label>
+            <input type="number" class="form-control" id="builtUpArea" name="builtUpArea">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="propertyValue">Property Value (₹)</label>
+            <input type="number" class="form-control" id="propertyValue" name="propertyValue">
+          </div>
+          <div class="col-md-8">
+            <label class="form-label" for="builderName">Builder/Developer Name</label>
+            <input type="text" class="form-control" id="builderName" name="builderName">
+          </div>
         </div>
       </div>
  
       <!-- Loan -->
-      <div class="section-title">Loan Details</div>
+      <div class="section-title"><span class="dot"></span> Loan Details</div>
       <div class="row g-3">
-        <div class="col-md-4"><label class="form-label">Purpose</label><input type="text" class="form-control" name="purpose" placeholder="e.g., dream-home / personal / business"></div>
-        <div class="col-md-4"><label class="form-label">Loan Amount (₹)</label><input type="number" class="form-control" name="loanAmount" id="loanAmount" required></div>
-        <div class="col-md-4"><label class="form-label">Tenure (Years)</label><input type="number" class="form-control" name="loanTenure" id="loanTenure" required></div>
         <div class="col-md-4">
-          <label class="form-label">Interest Type</label>
-          <select class="form-select" name="interestType" id="interestType" required>
-            <option value="">Select</option><option>Floating</option><option>Fixed</option>
+          <label class="form-label" for="purpose">Purpose</label>
+          <input type="text" class="form-control" id="purpose" name="purpose" placeholder="e.g., dream-home / personal / business">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="loanAmount">Loan Amount (₹)</label>
+          <input type="number" class="form-control" id="loanAmount" name="loanAmount" required aria-required="true">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="loanTenure">Tenure (Years)</label>
+          <input type="number" class="form-control" id="loanTenure" name="loanTenure" required aria-required="true">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="interestType">Interest Type</label>
+          <!-- VALUEs set to lowercase to match ENUM('floating','fixed') -->
+          <select class="form-select" id="interestType" name="interestType" required aria-required="true">
+            <option value="">Select</option>
+            <option value="floating">Floating</option>
+            <option value="fixed">Fixed</option>
           </select>
         </div>
         <div class="col-md-8 d-flex align-items-end">
@@ -143,68 +270,149 @@
       </div>
  
       <!-- Financial -->
-      <div class="section-title">Financial Details</div>
+      <div class="section-title"><span class="dot"></span> Financial Details</div>
       <div class="row g-3">
-        <div class="col-md-3"><label class="form-label">Existing Home Loan (₹)</label><input type="number" class="form-control" name="existingLoan"></div>
-        <div class="col-md-3"><label class="form-label">Other Loans (₹)</label><input type="number" class="form-control" name="otherLoan"></div>
-        <div class="col-md-3"><label class="form-label">Credit Card Limits (₹)</label><input type="number" class="form-control" name="creditCard"></div>
-        <div class="col-md-3"><label class="form-label">Savings/Investments (₹)</label><input type="number" class="form-control" name="savings"></div>
-        <div class="col-md-3"><label class="form-label">Other Assets (₹)</label><input type="number" class="form-control" name="otherAssets"></div>
+        <div class="col-md-3">
+          <label class="form-label" for="existingLoan">Existing Home Loan (₹)</label>
+          <input type="number" class="form-control" id="existingLoan" name="existingLoan">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="otherLoan">Other Loans (₹)</label>
+          <input type="number" class="form-control" id="otherLoan" name="otherLoan">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="creditCard">Credit Card Limits (₹)</label>
+          <input type="number" class="form-control" id="creditCard" name="creditCard">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="savings">Savings/Investments (₹)</label>
+          <input type="number" class="form-control" id="savings" name="savings">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="otherAssets">Other Assets (₹)</label>
+          <input type="number" class="form-control" id="otherAssets" name="otherAssets">
+        </div>
       </div>
  
       <!-- Bank -->
-      <div class="section-title">Bank Account</div>
+      <div class="section-title"><span class="dot"></span> Bank Account</div>
       <div class="row g-3">
-        <div class="col-md-4"><label class="form-label">Bank Name</label><input type="text" class="form-control" name="bankName" required></div>
-        <div class="col-md-4"><label class="form-label">Account Number</label><input type="text" class="form-control" name="accountNumber" required></div>
         <div class="col-md-4">
-          <label class="form-label">Account Type</label>
-          <select class="form-select" name="accountType" required><option value="">Select</option><option>Savings</option><option>Current</option></select>
+          <label class="form-label" for="bankName">Bank Name</label>
+          <input type="text" class="form-control" id="bankName" name="bankName" required aria-required="true">
         </div>
-        <div class="col-md-4"><label class="form-label">Years with Bank</label><input type="number" class="form-control" name="accountYears" required></div>
+        <div class="col-md-4">
+          <label class="form-label" for="accountNumber">Account Number</label>
+          <input type="text" class="form-control" id="accountNumber" name="accountNumber" required aria-required="true">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="accountType">Account Type</label>
+          <!-- VALUEs set to lowercase to match ENUM('savings','current') -->
+          <select class="form-select" id="accountType" name="accountType" required aria-required="true">
+            <option value="">Select</option>
+            <option value="savings">Savings</option>
+            <option value="current">Current</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="accountYears">Years with Bank</label>
+          <input type="number" class="form-control" id="accountYears" name="accountYears" required aria-required="true">
+        </div>
       </div>
  
       <!-- Co-Applicant -->
-      <div class="section-title">Co-Applicant (Optional)</div>
+      <div class="section-title"><span class="dot"></span> Co-Applicant (Optional)</div>
       <div class="row g-3">
-        <div class="col-md-6"><label class="form-label">Full Name</label><input type="text" class="form-control" name="coApplicantName"></div>
-        <div class="col-md-3"><label class="form-label">Relationship</label><input type="text" class="form-control" name="coApplicantRelation"></div>
-        <div class="col-md-3"><label class="form-label">Annual Income (₹)</label><input type="number" class="form-control" name="coApplicantIncome"></div>
+        <div class="col-md-6">
+          <label class="form-label" for="coApplicantName">Full Name</label>
+          <input type="text" class="form-control" id="coApplicantName" name="coApplicantName">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="coApplicantRelation">Relationship</label>
+          <input type="text" class="form-control" id="coApplicantRelation" name="coApplicantRelation">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="coApplicantIncome">Annual Income (₹)</label>
+          <input type="number" class="form-control" id="coApplicantIncome" name="coApplicantIncome">
+        </div>
       </div>
  
       <!-- Docs & Declaration -->
-      <div class="section-title">Documents & Declaration</div>
+      <div class="section-title"><span class="dot"></span> Documents & Declaration</div>
       <div class="row g-3">
-        <div class="col-md-3 form-check"><input type="checkbox" class="form-check-input" id="idProof" name="idProof" required><label for="idProof" class="form-check-label">Identity Proof</label></div>
-        <div class="col-md-3 form-check"><input type="checkbox" class="form-check-input" id="addressProof" name="addressProof" required><label for="addressProof" class="form-check-label">Address Proof</label></div>
-        <div class="col-md-3 form-check"><input type="checkbox" class="form-check-input" id="incomeProof" name="incomeProof" required><label for="incomeProof" class="form-check-label">Income Proof</label></div>
-        <div class="col-md-3 form-check"><input type="checkbox" class="form-check-input" id="propertyDocs" name="propertyDocs"><label for="propertyDocs" class="form-check-label">Property Docs (Home)</label></div>
-        <div class="col-md-12 form-check"><input type="checkbox" class="form-check-input" id="declaration" name="declaration" required><label for="declaration" class="form-check-label">I declare the information is true and correct.</label></div>
+        <div class="col-md-3 form-check">
+          <input type="checkbox" class="form-check-input" id="idProof" name="idProof" required aria-required="true">
+          <label for="idProof" class="form-check-label">Identity Proof</label>
+        </div>
+        <div class="col-md-3 form-check">
+          <input type="checkbox" class="form-check-input" id="addressProof" name="addressProof" required aria-required="true">
+          <label for="addressProof" class="form-check-label">Address Proof</label>
+        </div>
+        <div class="col-md-3 form-check">
+          <input type="checkbox" class="form-check-input" id="incomeProof" name="incomeProof" required aria-required="true">
+          <label for="incomeProof" class="form-check-label">Income Proof</label>
+        </div>
+        <div class="col-md-3 form-check">
+          <input type="checkbox" class="form-check-input" id="propertyDocs" name="propertyDocs">
+          <label for="propertyDocs" class="form-check-label">Property Docs (Home)</label>
+        </div>
+        <div class="col-md-12 form-check">
+          <input type="checkbox" class="form-check-input" id="declaration" name="declaration" required aria-required="true">
+          <label for="declaration" class="form-check-label">I declare the information is true and correct.</label>
+        </div>
       </div>
  
       <!-- Uploads & Submit -->
       <div class="row g-3 mt-2">
-        <div class="col-md-6"><label class="form-label">Applicant Signature</label><input type="file" class="form-control" name="applicantSignature" accept="image/*" required></div>
-        <div class="col-md-6"><label class="form-label">Co-Applicant Signature</label><input type="file" class="form-control" name="coApplicantSignature" accept="image/*"></div>
-        <div class="col-md-4"><label class="form-label">Date</label><input type="date" class="form-control" name="date" required></div>
-        <div class="col-md-4"><label class="form-label">Place</label><input type="text" class="form-control" name="place" required></div>
+        <div class="col-md-6">
+          <label class="form-label" for="applicantSignature">Applicant Signature</label>
+          <input type="file" class="form-control" id="applicantSignature" name="applicantSignature" accept="image/*" required aria-required="true">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="coApplicantSignature">Co-Applicant Signature</label>
+          <input type="file" class="form-control" id="coApplicantSignature" name="coApplicantSignature" accept="image/*">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="date">Date</label>
+          <input type="date" class="form-control" id="date" name="date" required aria-required="true">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="place">Place</label>
+          <input type="text" class="form-control" id="place" name="place" required aria-required="true">
+        </div>
       </div>
  
       <div class="mt-4 mb-5 d-flex justify-content-center">
-  <button type="submit" class="btn btn-digi btn-lg px-4">Submit Application</button>
-</div>
- 
+        <button type="submit" class="btn btn-digi btn-lg px-4">Submit Application</button>
+      </div>
     </form>
   </div>
 </div>
  
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  // Show/hide home fields
+  // Auto add asterisks to required fields' labels
+  (function attachRequiredAsterisks(){
+    const form = document.getElementById('loanForm');
+    if(!form) return;
+    const requiredInputs = form.querySelectorAll('input[required], select[required], textarea[required]');
+    requiredInputs.forEach(el=>{
+      if(!el.id){ el.id = el.name || ('fld_'+Math.random().toString(36).slice(2,9)); }
+      let label = form.querySelector('label[for="'+el.id+'"]') || el.closest('.col, [class*="col-"], .form-check')?.querySelector('label');
+      if(label && !label.dataset.reqMarked){
+        const star = document.createElement('span');
+        star.className = 'req';
+        star.textContent = ' *';
+        label.appendChild(star);
+        label.dataset.reqMarked = '1';
+      }
+    });
+  })();
+ 
+  // Show/hide home fields & require property docs only for Home loans
   const loanKind   = document.getElementById('loan_kind');
   const homeFields = document.getElementById('homeFields');
   const propertyDocs = document.getElementById('propertyDocs');
- 
   function updateKindUI(){
     const k = (loanKind.value || '').toLowerCase();
     if(k === 'home'){
@@ -237,7 +445,6 @@
   const loanTenure   = document.getElementById('loanTenure');
   const interestType = document.getElementById('interestType');
   const liveQuote    = document.getElementById('liveQuote');
- 
   function quote(){
     const k=(loanKind.value||'').toLowerCase();
     const t=(interestType.value||'').trim();

@@ -47,7 +47,7 @@
  
     #sidebarMenu .nav-link.active {
       font-weight: 700;
-      color: #97144D !important;
+      color: #0B4D83 !important;
       background-color: #f0d7e0;
       border-radius: 4px;
     }
@@ -71,13 +71,13 @@
  
     .top-bar button.btn-outline-light:hover {
       background-color: white;
-      color: #97144D;
+      color: #0B4D83;
     }
  
  
     /* Top Bar */
     .top-bar {
-      background-color: #97144D;
+      background-color: #0B4D83;
       color: white;
       display: flex;
       align-items: center;
@@ -111,7 +111,7 @@
  
     .logout-btn:hover {
       background-color: white;
-      color: #97144D;
+      color: #0B4D83;
     }
  
     /* Search Bar Row with Sidebar Toggle & Chatbot */
@@ -142,8 +142,8 @@
     }
  
     .search-chatbar .btn-toggle-sidebar:hover {
-      border-color: #97144D;
-      color: #97144D;
+      border-color: #0B4D83;
+      color: #0B4D83;
     }
  
     /* Search input centered and wide */
@@ -161,13 +161,13 @@
     }
  
     .search-chatbar input[type="text"]:focus {
-      border-color: #97144D;
+      border-color: #0B4D83;
       box-shadow: 0 0 5px rgba(151, 20, 77, 0.5);
     }
  
     /* Chatbot button right aligned */
     .search-chatbar .chatbot-btn {
-      background-color: #97144D;
+      background-color: #0B4D83;
       border: none;
       color: white;
       padding: 10px 14px;
@@ -206,7 +206,7 @@
  
     .dashboard-icon {
       font-size: 32px;
-      color: #97144D;
+      color: #0B4D83;
       margin-bottom: 15px;
     }
  
@@ -223,7 +223,7 @@
     }
  
     .btn-digibank {
-      background-color: #97144D;
+      background-color: #0B4D83;
       color: #fff;
       border: none;
       padding: 8px 18px;
@@ -239,7 +239,7 @@
  
     /* Footer */
     footer.bg-custom {
-      background-color: #97144D;
+      background-color: #0B4D83;
     }
   </style>
   <style>
@@ -249,7 +249,7 @@
       margin: 0;
     }
     .btn-submit {
-      background-color: #97144D;
+      background-color: #0B4D83;
       color: #fff;
       font-weight: 600;
       border: none;
@@ -332,7 +332,7 @@
  
     <!-- title wrapper with flex-grow to take center space -->
     <!-- <h5 class="m-0 text-center flex-grow-1">DigiBank User Dashboard</h5> -->
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important; width: 100%;">
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0B4D83 !important; width: 100%;">
       <div class="container-fluid">
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -447,7 +447,7 @@
  
         <div class="container my-5">
     <!-- <h3 class="text-danger mb-4">Account Opening Form</h3> -->
- <h3 style="color:#97144D;" class="mb-4">Open a Deposit</h3>
+ <h3 style="color:#0B4D83;" class="mb-4">Open a Deposit</h3>
  
 <form action="{{ url_for('open_deposits') }}" method="POST" class="mb-5 pb-5">
  
@@ -455,37 +455,37 @@
   <div class="row mb-3">
     <label for="fName" class="col-sm-2 col-form-label">First Name</label>
     <div class="col-sm-4">
-      <input type="text" id="fName" name="first_name" class="form-control" style="border:0.5px solid #97144D;" required>
+      <input type="text" id="fName" name="first_name" class="form-control" style="border:0.5px solid #0B4D83;" required>
     </div>
  
     <label for="mName" class="col-sm-2 col-form-label">Middle Name</label>
     <div class="col-sm-4">
       <!-- middle name is optional in the route -->
-      <input type="text" id="mName" name="middle_name" class="form-control" style="border:0.5px solid #97144D;">
+      <input type="text" id="mName" name="middle_name" class="form-control" style="border:0.5px solid #0B4D83;">
     </div>
   </div>
  
   <div class="row mb-3">
     <label for="lName" class="col-sm-2 col-form-label">Last Name</label>
     <div class="col-sm-4">
-      <input type="text" id="lName" name="last_name" class="form-control" style="border:0.5px solid #97144D;" required>
+      <input type="text" id="lName" name="last_name" class="form-control" style="border:0.5px solid #0B4D83;" required>
     </div>
  
     <label for="emailAddress" class="col-sm-2 col-form-label">Email Address</label>
     <div class="col-sm-4">
-      <input type="email" id="emailAddress" name="email" class="form-control" style="border:0.5px solid #97144D;" value="{{ user.email if user else '' }}" required>
+      <input type="email" id="emailAddress" name="email" class="form-control" style="border:0.5px solid #0B4D83;" value="{{ user.email if user else '' }}" required>
     </div>
   </div>
  
   <div class="row mb-3">
     <label for="mobileNumber" class="col-sm-2 col-form-label">Mobile Number</label>
     <div class="col-sm-4">
-      <input type="tel" id="mobileNumber" name="mobile" class="form-control" style="border:0.5px solid #97144D;" required>
+      <input type="tel" id="mobileNumber" name="mobile" class="form-control" style="border:0.5px solid #0B4D83;" required>
     </div>
  
     <label for="ANumber" class="col-sm-2 col-form-label">Aadhar Number</label>
     <div class="col-sm-4">
-      <input type="text" id="ANumber" name="aadhar" class="form-control" style="border:0.5px solid #97144D;" pattern="\d{12}" title="12 digit Aadhaar" required>
+      <input type="text" id="ANumber" name="aadhar" class="form-control" style="border:0.5px solid #0B4D83;" pattern="\d{12}" title="12 digit Aadhaar" required>
     </div>
   </div>
  
@@ -516,13 +516,13 @@
         class="form-control"
         value="6"
         readonly
-        style="border:0.5px solid #97144D;"
+        style="border:0.5px solid #0B4D83;"
       >
     </div>
  
       <label for="compounding" class="col-sm-2 col-form-label">Compounding</label>
       <div class="col-sm-4">
-        <select id="compounding" name="compounding" class="form-select" style="border:0.5px solid #97144D;">
+        <select id="compounding" name="compounding" class="form-select" style="border:0.5px solid #0B4D83;">
           <option value="MONTHLY">MONTHLY</option>
           <option value="QUARTERLY" selected>QUARTERLY</option>
           <option value="HALF_YEARLY">HALF_YEARLY</option>
@@ -534,7 +534,7 @@
     <div class="row mb-3">
       <label for="tenure" class="col-sm-2 col-form-label">Tenure (months)</label>
       <div class="col-sm-4">
-        <input type="number" id="tenure" name="tenure_months" class="form-control" min="1" step="1" style="border:0.5px solid #97144D;" required>
+        <input type="number" id="tenure" name="tenure_months" class="form-control" min="1" step="1" style="border:0.5px solid #0B4D83;" required>
       </div>
     </div>
   </div>
@@ -544,7 +544,7 @@
     <div class="row">
       <label for="principal" class="col-sm-2 col-form-label">Principal Amount (₹)</label>
       <div class="col-sm-4">
-        <input type="number" id="principal" name="principal_amount" class="form-control" step="0.01" min="0.01" style="border:0.5px solid #97144D;">
+        <input type="number" id="principal" name="principal_amount" class="form-control" step="0.01" min="0.01" style="border:0.5px solid #0B4D83;">
       </div>
     </div>
   </div>
@@ -554,7 +554,7 @@
     <div class="row">
       <label for="installment" class="col-sm-2 col-form-label">Monthly Installment (₹)</label>
       <div class="col-sm-4">
-        <input type="number" id="installment" name="monthly_installment" class="form-control" step="0.01" min="0.01" style="border:0.5px solid #97144D;">
+        <input type="number" id="installment" name="monthly_installment" class="form-control" step="0.01" min="0.01" style="border:0.5px solid #0B4D83;">
       </div>
     </div>
   </div>
@@ -605,7 +605,7 @@
  
  
   <!-- Footer -->
-  <footer class="bg-custom text-white text-center py-3 mt-auto" style="background-color: #97144D;">
+  <footer class="bg-custom text-white text-center py-3 mt-auto" style="background-color: #0B4D83;">
     © 2025 DigiBank. All rights reserved.
   </footer>
  
@@ -621,4 +621,6 @@
 </body>
  
 </html>
+ 
+ 
  

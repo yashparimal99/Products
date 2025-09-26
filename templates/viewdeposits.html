@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <title>My Accounts - DigiBank</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+ 
   <!-- Bootstrap CSS & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-
+ 
   <style>
     body {
       background-color: #f8f9fa;
@@ -20,7 +20,7 @@
       flex-direction: column;
       height: 100vh;
     }
-
+ 
     /* Sidebar Offcanvas */
     #sidebarMenu.offcanvas-start { width: 250px; }
     #sidebarMenu .offcanvas-body { padding: 0.5rem 1rem; }
@@ -30,13 +30,13 @@
     }
     #sidebarMenu .nav-link i { font-size: 1.1rem; }
     #sidebarMenu .nav-link.active {
-      font-weight: 700; color: #97144D !important; background-color: #f0d7e0; border-radius: 4px;
+      font-weight: 700; color: #0B4D83 !important; background-color: #f0d7e0; border-radius: 4px;
     }
     #sidebarMenu .nav-link:hover { color: #7a0f3e; background-color: #f9e5ef; border-radius: 4px; }
-
+ 
     /* Top Bar */
     .top-bar {
-      background-color: #97144D; color: white; display: flex; align-items: center; justify-content: space-between;
+      background-color: #0B4D83; color: white; display: flex; align-items: center; justify-content: space-between;
       padding: 10px 20px; user-select: none; position: sticky; top: 0; z-index: 1030;
     }
     .top-bar h5 { margin: 0; font-weight: 700; flex-grow: 1; text-align: center; }
@@ -44,17 +44,17 @@
       border: 1.5px solid white; color: white; background: transparent; padding: 4px 10px; font-size: 1.3rem;
       border-radius: 4px; cursor: pointer; transition: background-color 0.2s, color 0.2s;
     }
-    .top-bar button.btn-outline-light:hover { background-color: white; color: #97144D; }
+    .top-bar button.btn-outline-light:hover { background-color: white; color: #0B4D83; }
     .logout-btn {
       background: transparent; border: 1.5px solid white; color: white; padding: 5px 15px; border-radius: 4px;
       font-weight: 600; cursor: pointer; transition: background-color 0.2s, color 0.2s; flex-shrink: 0;
     }
-    .logout-btn:hover { background-color: white; color: #97144D; }
-
+    .logout-btn:hover { background-color: white; color: #0B4D83; }
+ 
     /* Tabs */
-    .nav-tabs .nav-link { color: #97144D; font-weight: 600; }
-    .nav-tabs .nav-link.active { background-color: #97144D; color: white; border-color: #97144D #97144D #fff; }
-
+    .nav-tabs .nav-link { color: #0B4D83; font-weight: 600; }
+    .nav-tabs .nav-link.active { background-color: #0B4D83; color: white; border-color: #0B4D83 #0B4D83 #fff; }
+ 
     /* Deposit Card */
     .deposit-info-section {
       background: white; border-radius: 8px; padding: 20px; margin-top: 20px;
@@ -69,8 +69,8 @@
       padding-left: 20px;
     }
     .deposit-label { font-weight: 600; color: #444; }
-    .deposit-value { font-size: 1.1rem; color: #97144D; font-weight: 700; }
-
+    .deposit-value { font-size: 1.1rem; color: #0B4D83; font-weight: 700; }
+ 
     @media (max-width: 576px) {
       .deposit-info-left {
         border-right: none;
@@ -83,13 +83,13 @@
         padding-left: 0;
       }
     }
-
+ 
     /* Footer */
-    footer.bg-custom { background-color: #97144D; }
+    footer.bg-custom { background-color: #0B4D83; }
   </style>
 </head>
 <body>
-
+ 
   <!-- Sidebar Offcanvas -->
   <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
     <div class="offcanvas-header">
@@ -108,7 +108,7 @@
       </ul>
     </div>
   </div>
-
+ 
   <!-- Top Bar -->
   <!-- <div class="top-bar d-flex align-items-center">
     <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-label="Toggle sidebar"><i class="bi bi-list"></i></button>
@@ -124,12 +124,12 @@
     <i class="bi bi-list"></i>
   </button>
  
-  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#97144D; width:100%;">
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#0B4D83; width:100%;">
     <div class="container-fluid">
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
  
-          
+         
           <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">My Activities</a></li>
  
           <!-- Open Account -->
@@ -175,24 +175,15 @@
             </ul>
           </li>
  
-          <!-- Forex -->
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="forexDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Forex</a>
-            <ul class="dropdown-menu" aria-labelledby="forexDropdown">
-              <li><a class="dropdown-item" href="{{ url_for('travel_forex') }}">Travel Forex Cards</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('send_money_abroad') }}">Send Money Abroad</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('send_money_india') }}">Send Money India</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('currency_exchange') }}">Foreign Currency Exchange</a></li>
-            </ul>
-          </li>
+          
  
           <!-- Investments -->
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="investDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Investments</a>
             <ul class="dropdown-menu" aria-labelledby="investDropdown">
-              <li><a class="dropdown-item" href="{{ url_for('pfinvest') }}">Public Provident Fund</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('pfinvest') }}">Floating Rate Saving Bonds</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('pfinvest') }}">National Pension System</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('userdashinvest') }}">Public Provident Fund</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('userdashinvest') }}">Floating Rate Saving Bonds</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('userdashinvest') }}">National Pension System</a></li>
             </ul>
           </li>
         </ul>
@@ -205,18 +196,18 @@
     </div>
   </nav>
 </div>
-
-
+ 
+ 
   <!-- Breadcrumb -->
   <nav aria-label="breadcrumb" class="bg-light px-3 py-2 mt-3">
     <ol class="breadcrumb mb-0">
-      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color: #97144D;">Dashboard</a></li>
-      <li class="breadcrumb-item active" aria-current="page" style="color: #97144D; font-weight: bold;">View Deposits</li>
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color: #0B4D83;">Dashboard</a></li>
+      <li class="breadcrumb-item active" aria-current="page" style="color: #0B4D83; font-weight: bold;">View Deposits</li>
     </ol>
   </nav>
-
+ 
   <div class="container mt-4">
-
+ 
     <!-- Account Tabs -->
     <ul class="nav nav-tabs" id="accountTabs" role="tablist">
       <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('viewaccounts') }}">My Accounts</a></li>
@@ -243,7 +234,7 @@
         <p class="text-muted">Manage your cards here soon.</p>
       </div>
     </div>
-
+ 
     <!-- Deposit Info Section -->
     {% if deposits %}
       <!-- <h6 class="mt-3 mb-2 text-muted">My Deposits</h6> -->
@@ -262,7 +253,7 @@
                 <div class="deposit-value">{{ d.interest_rate }}%</div>
               </div>
             </div>
-
+ 
             <!-- Row 2: Account Type + Tenure -->
             <div class="row mt-2">
               <div class="col-6">
@@ -274,7 +265,7 @@
                 <div class="deposit-value">{{ d.tenure_months }} months</div>
               </div>
             </div>
-
+ 
             <!-- Status -->
             <div class="mt-2">
               <span class="badge
@@ -285,12 +276,12 @@
               </span>
             </div>
           </div>
-
+ 
           <!-- Right Side -->
           <div class="deposit-info-right col-md-6 col-12 text-md-end mt-3 mt-md-0">
             <div class="deposit-label">Balance:</div>
             <div class="deposit-value">₹ {{ '{:,.2f}'.format(d.current_balance or 0) }}</div>
-
+ 
             <div class="deposit-label mt-2">Maturity{% if d.maturity_date %} ({{ d.maturity_date }}){% endif %}:</div>
             <div class="deposit-value">₹ {{ '{:,.2f}'.format(d.maturity_amount or 0) }}</div>
           </div>
@@ -299,14 +290,17 @@
     {% else %}
       <p>No deposits found for your profile.</p>
     {% endif %}
-
+ 
     <!-- Footer -->
     <footer class="text-white text-center py-3 mt-5 bg-custom">
       © 2025 DigiBank. All rights reserved.
     </footer>
   </div>
-
+ 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+ 
+ 
+ 

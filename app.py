@@ -1420,19 +1420,154 @@ def manageaccounts():
 
 @app.route('/manprofile')
 def manprofile():
-    return render_template('manprofile.html')
+    user_id = session.get('user_id')
+    
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    return render_template('manprofile.html',user=user)
+
+@app.route('/manupdate_profile', methods=['GET', 'POST'])
+def manupdate_profile():
+    email = session.get('user_email')
+    if not email:
+        flash('Please login first', 'danger')
+        return redirect(url_for('login'))
+ 
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+ 
+    # GET → load edit form
+    if request.method == 'GET':
+        cur.execute("""
+            SELECT user_id, name, email, mobile,
+                   COALESCE(address,'') AS address,
+                   COALESCE(city,'')    AS city,
+                   COALESCE(state,'')   AS state,
+                   COALESCE(country,'') AS country
+            FROM bank_users
+            WHERE email=%s
+        """, (email,))
+        user = cur.fetchone()
+        cur.close()
+        return render_template('manupdateprofile.html', user=user)
+ 
+    # POST → save changes
+    cur.execute("""
+        SELECT mobile, address, city, state, country, password
+        FROM bank_users
+        WHERE email=%s
+    """, (email,))
+    current = cur.fetchone()
+ 
+    mobile   = (request.form.get('mobile')   or '').strip()
+    address  = (request.form.get('address')  or '').strip()
+    city     = (request.form.get('city')     or '').strip()
+    state    = (request.form.get('state')    or '').strip()
+    country  = (request.form.get('country')  or '').strip()
+ 
+    curr_pw  = (request.form.get('current_password') or '').strip()
+    new_pw   = (request.form.get('new_password')     or '').strip()
+    conf_pw  = (request.form.get('confirm_password') or '').strip()
+ 
+    updates = {}
+ 
+    # Only update changed & non-empty values
+    if mobile and mobile != (current['mobile'] or ''):
+        if not (len(mobile) == 10 and mobile.isdigit()):
+            flash('Mobile must be exactly 10 digits.', 'danger')
+            cur.close()
+            return redirect(url_for('tlupdate_profile'))
+        updates['mobile'] = mobile
+    if address and address != (current['address'] or ''):
+        updates['address'] = address
+    if city and city != (current['city'] or ''):
+        updates['city'] = city
+    if state and state != (current['state'] or ''):
+        updates['state'] = state
+    if country and country != (current['country'] or ''):
+        updates['country'] = country
+ 
+    # Optional password change
+    if curr_pw or new_pw or conf_pw:
+        if not current or current['password'] != curr_pw:
+            flash('Current password is incorrect.', 'danger')
+            cur.close()
+            return redirect(url_for('manupdate_profile'))
+        if not new_pw or new_pw != conf_pw or len(new_pw) < 8:
+            flash('New password mismatch or too short (min 8).', 'danger')
+            cur.close()
+            return redirect(url_for('manupdate_profile'))
+        updates['password'] = new_pw
+ 
+    # Helper: human list join
+    def human_join(items):
+        if not items:
+            return ''
+        if len(items) == 1:
+            return items[0]
+        return ', '.join(items[:-1]) + ' and ' + items[-1]
+ 
+    labels = {
+        'mobile': 'mobile number',
+        'address': 'address',
+        'city': 'city',
+        'state': 'state',
+        'country': 'country',
+        'password': 'password'
+    }
+ 
+    try:
+        if updates:
+            set_clause = ", ".join([f"{k}=%s" for k in updates.keys()])
+            params = list(updates.values()) + [email]
+            cur.execute(f"UPDATE bank_users SET {set_clause} WHERE email=%s", params)
+            mysql.connection.commit()
+ 
+            changed = [labels[k] for k in updates.keys()]
+            msg = f"Updated {human_join(changed)}."
+            # Make password updates feel more “done”
+            if 'password' in updates and len(updates) == 1:
+                msg = "Password changed successfully."
+            flash(msg, 'success')
+        else:
+            flash('No changes to update.', 'info')
+ 
+    except Exception as e:
+        mysql.connection.rollback()
+        flash(f"Couldn't save your changes. Error: {e}", 'danger')
+    finally:
+        cur.close()
+ 
+    return redirect(url_for('manprofile'))
+
+
 
 @app.route('/managerapprovals')
 def managerapprovals():
-    return render_template('managerapprove.html')
+    user_id = session.get('user_id')
+    # session['cust_id'] = user['cust_id']
+    # print("Logged in cust_id:", cust_id)   # debug
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    return render_template('managerapprove.html',user=user)
 
 @app.route('/manage_accounts')
 def manage_accounts():
+    user_id = session.get('user_id')
+    # session['cust_id'] = user['cust_id']
+    # print("Logged in cust_id:", cust_id)   # debug
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("SELECT * FROM accounts_requests WHERE status_flag IS NULL")
     requests = cur.fetchall()
     cur.close()
-    return render_template("manage-accounts.html", requests=requests)
+    return render_template("manage-accounts.html", requests=requests,user=user)
  
  
 @app.route('/update_request/<request_id>/<action>', methods=['POST'])
@@ -1505,6 +1640,13 @@ def update_request(request_id, action):
 
 @app.route('/manview_deposits')
 def manview_deposits():
+    user_id = session.get('user_id')
+    # session['cust_id'] = user['cust_id']
+    # print("Logged in cust_id:", cust_id)   # debug
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("""
         SELECT request_id, deposit_type, account_number,
@@ -1519,7 +1661,7 @@ def manview_deposits():
     """)
     deposits = cur.fetchall()
     cur.close()
-    return render_template('manviewdeposits.html', deposits=deposits)
+    return render_template('manviewdeposits.html', deposits=deposits,user=user)
  
  
 @app.route('/update_deposit_request/<request_id>/<action>', methods=['POST'])
@@ -1565,15 +1707,35 @@ def update_deposit_request(request_id, action):
 
 @app.route('/manage_loans')
 def manage_loans():
+    user_id = session.get('user_id')
+    # session['cust_id'] = user['cust_id']
+    # print("Logged in cust_id:", cust_id)   # debug
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("SELECT * FROM loan_requests")
     loans = cur.fetchall()
-    return render_template('manage-loans.html', loans=loans)
+    return render_template('manage-loans.html', loans=loans,user=user)
 
 
 
 @app.route('/viewcards')
 def viewcards():
+    user_id = session.get('user_id')
+    # session['cust_id'] = user['cust_id']
+    # print("Logged in cust_id:", cust_id)   # debug
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+
+
     email = session.get('user_email')
     if not email:
         flash("Please login first", "danger")
@@ -1595,7 +1757,7 @@ def viewcards():
     requests = cur.fetchall()
     cur.close()
  
-    return render_template("view-cards.html", requests=requests)
+    return render_template("view-cards.html", requests=requests, user=user)
  
 @app.route('/card_request/<request_id>/<action>', methods=['POST'])
 def card_request(request_id, action):
@@ -1711,7 +1873,211 @@ def manreport():
 
 @app.route('/manstaff')
 def manstaff():
-    return render_template('staff-management.html')
+    user_id = session.get('user_id')
+    # session['cust_id'] = user['cust_id']
+    # print("Logged in cust_id:", cust_id)   # debug
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM bank_users WHERE role IN (%s, %s, %s, %s)", ("tl", "Loan_Agent", "Card_Agent", "Investment_Agent"))
+    users = cur.fetchall()
+    user_list = []
+    for u in users:
+        user_list.append({
+            'user_id': u[0],
+            'name': u[1],
+            'pan': u[2],
+            'aadhaar': u[3],
+            'dob': u[4],
+            'mobile': u[5],
+            'email': u[6],
+            'gender': u[7],
+            'address': u[8],
+            'city': u[9],
+            'state': u[10],
+            'country': u[11],
+            'department': u[12],
+            'onboarding_date': u[13],
+            'status': u[14],
+            'role': u[15],
+            'password': u[16],
+            'deleted_date': u[17]
+        })
+ 
+ 
+  # ===== Stats =====
+    # Total staff count
+    cur.execute(
+        "SELECT COUNT(*) FROM bank_users WHERE role IN (%s, %s, %s, %s)",
+        ("tl", "Loan_Agent", "Card_Agent", "Investment_Agent")
+    )
+    total_staff = cur.fetchone()[0]
+ 
+    # Active staff today (status = 'Active')
+    cur.execute(
+        "SELECT COUNT(*) FROM bank_users WHERE status = %s AND role IN (%s, %s, %s, %s)",
+        ("Active", "tl", "Loan_Agent", "Card_Agent", "Investment_Agent")
+    )
+    active_today = cur.fetchone()[0]
+ 
+    # New this month
+    cur.execute("""
+        SELECT COUNT(*) FROM bank_users
+        WHERE MONTH(onboarding_date) = MONTH(CURDATE())
+          AND YEAR(onboarding_date) = YEAR(CURDATE())
+          AND role IN (%s, %s, %s, %s)
+    """, ("tl", "Loan_Agent", "Card_Agent", "Investment_Agent"))
+    new_this_month = cur.fetchone()[0]
+ 
+    return render_template(
+        'staff-management.html',
+        staff=user_list,
+        total_staff=total_staff,
+        active_today=active_today,
+        new_this_month=new_this_month,user=user
+    )
+ 
+    
+ 
+ 
+# Fetch single staff details (AJAX)
+@app.route('/staff-details/<user_id>')
+def staff_details(user_id):
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    u = cur.fetchone()
+    if u:
+        user_data = {
+            'user_id': u[0],
+            'name': u[1],
+            'pan': u[2],
+            'aadhaar': u[3],
+            'dob': u[4],
+            'mobile': u[5],
+            'email': u[6],
+            'gender': u[7],
+            'address': u[8],
+            'city': u[9],
+            'state': u[10],
+            'country': u[11],
+            'department': u[12],
+            'onboarding_date': u[13],
+            'status': u[14],
+            'role': u[15],
+            'password': u[16],
+            'deleted_date': u[17]
+        }
+        return jsonify(user_data)
+    return jsonify({'error': 'Staff not found'}), 404
+ 
+ 
+# Add new staff
+@app.route('/add-staff', methods=['POST'])
+def add_staff():
+    data = request.form
+    cur = mysql.connection.cursor()
+    cur.execute("""
+        INSERT INTO bank_users (user_id, name, role, department, status, last_active, email, mobile, dob, city, state, country, address)
+        VALUES (%s, %s, %s, %s, %s, NOW(), %s, %s, %s, %s, %s, %s, %s)
+    """, (
+        data['user_id'], data['name'], data['role'], data['department'], data['status'],
+        data['email'], data['mobile'], data['dob'], data['city'], data['state'], data['country'], data['address']
+    ))
+    mysql.connection.commit()
+    flash('Staff added successfully!', 'success')
+    return redirect(url_for('staff_management'))
+ 
+# Edit staff
+@app.route('/edit-staff/<user_id>', methods=['POST'])
+def edit_staff(user_id):
+    data = request.form
+    cur = mysql.connection.cursor()
+    cur.execute("""
+        UPDATE bank_users SET name=%s, role=%s, department=%s, status=%s, email=%s, mobile=%s, dob=%s, city=%s, state=%s, country=%s, address=%s
+        WHERE user_id=%s
+    """, (
+        data['name'], data['role'], data['department'], data['status'], data['email'], data['mobile'],
+        data['dob'], data['city'], data['state'], data['country'], data['address'], user_id
+    ))
+    mysql.connection.commit()
+    flash('Staff updated successfully!', 'success')
+    return redirect(url_for('staff_management'))
+ 
+# Delete staff
+@app.route('/delete-staff/<user_id>', methods=['POST'])
+def delete_staff(user_id):
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM bank_users WHERE user_id=%s", (user_id,))
+    mysql.connection.commit()
+    flash('Staff deleted successfully!', 'success')
+    return redirect(url_for('staff_management'))
+ 
+ 
+ 
+ 
+# Edit staff
+
+@app.route('/agent_searchprofile', methods=['GET'])
+def agent_searchprofile():
+    query = request.args.get('query', '').strip()
+    search_by = request.args.get('search_by', 'name')  # default to name
+ 
+    if not query:
+        flash("Please enter a search term.")
+        return redirect(url_for('dashboard'))
+ 
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+ 
+# Restrict search only to TL and Loan_Agent roles
+    if search_by == "user_id":
+        sql = """
+            SELECT * FROM bank_users
+            WHERE user_id LIKE %s AND role IN (%s, %s, %s, %s)
+        """
+    else:  # default search by name
+        sql = """
+            SELECT * FROM bank_users
+            WHERE name LIKE %s AND role IN (%s, %s, %s, %s)
+        """
+ 
+    like_query = f"%{query}%"
+    cur.execute(sql, (like_query, "tl", "Loan_Agent", "Card_Agent", "Investment_Agent"))
+    user = cur.fetchone()
+    cur.close()
+ 
+    if not user:
+        flash("No user found.")
+        return redirect(url_for('dashboard'))
+ 
+    return render_template('agentprofile.html', user=user)
+
+@app.route('/api/agent_suggestions')
+def agent_suggestions():
+    q = request.args.get('q', '').strip()
+    if not q:
+        return jsonify([])
+ 
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    # Only fetch TL and Loan_Agent
+    sql = """
+        SELECT user_id, name
+        FROM bank_users
+        WHERE (name LIKE %s OR user_id LIKE %s)
+          AND role IN (%s, %s, %s, %s)
+        LIMIT 10
+    """
+    like_q = f"%{q}%"
+    cur.execute(sql, (like_q, like_q, "tl", "Loan_Agent", "Card_Agent", "Investment_Agent"))
+    rows = cur.fetchall()
+    cur.close()
+ 
+    return jsonify(rows)
+ 
+ 
+
+ 
 
 @app.route('/branchperformance')
 def branchperformance():
@@ -2338,6 +2704,17 @@ def agentupdate_profile():
         cur.close()
  
     return redirect(url_for('agentprofile'))
+
+
+# @app.route('/tlprofile')
+# def tlprofile():
+#     user_id = session.get('user_id')
+    
+#     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#     cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+#     user = cur.fetchone()
+#     cur.close()
+#     return render_template("tlprofile.html",user=user)
  
  
 
@@ -2771,7 +3148,14 @@ def userprepaidform():
 
 @app.route('/paybill')
 def paybill():
-    return render_template('paybill.html')
+    user_id = session.get('user_id')
+    # session['cust_id'] = user['cust_id']
+    # print("Logged in cust_id:", cust_id)   # debug
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    return render_template('paybill.html',user=user)
 
 
 
@@ -2799,15 +3183,37 @@ def banktransfer():
 
 @app.route('/userdashloan')
 def userdashloan():
-    return render_template('userloand.html')
+    user_id = session.get('user_id')
+    # session['cust_id'] = user['cust_id']
+    # print("Logged in cust_id:", cust_id)   # debug
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    return render_template('userloand.html',user=user)
  
 @app.route('/userpersonalloan')
 def userpersonalloan():
-    return render_template('userpersonalloan.html')
+    user_id = session.get('user_id')
+    # session['cust_id'] = user['cust_id']
+    # print("Logged in cust_id:", cust_id)   # debug
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    return render_template('userpersonalloan.html',user=user)
  
 @app.route('/userbusinessloan')
 def userbusinessloan():
-    return render_template('userbusinessloan.html')
+    user_id = session.get('user_id')
+    # session['cust_id'] = user['cust_id']
+    # print("Logged in cust_id:", cust_id)   # debug
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    
+    return render_template('userbusinessloan.html',user=user)
 
 #Loan Agent Dashboard
  
@@ -4272,6 +4678,13 @@ def invest_agent_apply():
  
 @app.route('/investment-agent/applications')
 def invest_agent_list():
+    user_id = session.get('user_id')
+    # session['cust_id'] = user['cust_id']
+    # print("Logged in cust_id:", cust_id)   # debug
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
     agent = _current_user()
     if not agent or _role(agent).lower() not in {'investment_agent', 'investment agent', 'investment-agent'}:
         flash('Only Investment Agents can view this page.', 'danger')
@@ -4303,7 +4716,7 @@ def invest_agent_list():
         'application_date': r['application_date'],
     } for r in rows]
  
-    return render_template('agent_view_investments.html', apps=apps)
+    return render_template('agent_view_investments.html', apps=apps,user=user)
  
  
  
@@ -4344,6 +4757,13 @@ def view_investments():
  
 @app.route('/viewinvestments')
 def viewinvestments():
+    user_id = session.get('user_id')
+    # session['cust_id'] = user['cust_id']
+    # print("Logged in cust_id:", cust_id)   # debug
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("""
         SELECT ia.id, ia.request_id, ia.application_number,
@@ -4356,7 +4776,7 @@ def viewinvestments():
     """)
     rows = cur.fetchall()
     cur.close()
-    return render_template('view-investments.html', investments=rows)
+    return render_template('view-investments.html', investments=rows,user=user)
  
 @app.post('/investments/<int:inv_id>/<string:action>')
 def update_investment_status(inv_id, action):

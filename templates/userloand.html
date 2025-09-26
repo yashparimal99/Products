@@ -9,54 +9,54 @@
   <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-
+ 
   <style>
     :root {
-      --primary-color: #97144D;
+      --primary-color: #0B4D83;
       --gray-color: #f1f1f1;
       --dark-gray: #444;
     }
-
+ 
     body {
       background-color: white;
       font-family: 'Segoe UI', sans-serif;
       color: #333;
     }
-
+ 
     .top-bar {
       background-color: var(--primary-color);
       color: white;
       padding: 20px;
     }
-
+ 
     .top-bar h4 {
       margin: 0;
       font-weight: 600;
     }
-
+ 
     .card {
       border: none;
       border-radius: 15px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     }
-
+ 
     .section-title {
       font-size: 18px;
       font-weight: bold;
       margin-bottom: 10px;
       color: var(--primary-color);
     }
-
+ 
     .status-approved {
       color: green;
       font-weight: 500;
     }
-
+ 
     .status-pending {
       color: orange;
       font-weight: 500;
     }
-
+ 
     .highlight-box {
       background-color: var(--primary-color);
       color: white;
@@ -64,30 +64,30 @@
       border-radius: 12px;
       text-align: center;
     }
-
+ 
     .highlight-box h5 {
       font-size: 20px;
       margin-bottom: 0;
     }
-
+ 
     .nav-btns button {
       background-color: white;
       border: 1px solid var(--primary-color);
       color: var(--primary-color);
       margin-right: 10px;
     }
-
+ 
     .nav-btns button:hover {
       background-color: var(--primary-color);
       color: white;
     }
-
+ 
     .calendar-box {
       border: 1px solid var(--primary-color);
       border-radius: 10px;
       padding: 15px;
     }
-
+ 
     .graph-placeholder, .map-placeholder {
       height: 200px;
       background: repeating-linear-gradient(
@@ -99,14 +99,14 @@
       );
       border-radius: 10px;
     }
-
+ 
     .user-img {
       width: 40px;
       height: 40px;
       border-radius: 50%;
       object-fit: cover;
     }
-
+ 
     .pending-list li {
       display: flex;
       justify-content: space-between;
@@ -120,18 +120,18 @@
     transition: 0.2s ease-in-out;
   }
   .border-custom-left {
-  border-left: 6px solid #97144D;
+  border-left: 6px solid #0B4D83;
   }
   .card.custom-bordered {
-      border: 1px solid #97144D;
+      border: 1px solid #0B4D83;
       border-radius: 8px;
   }
   .border-custom-left {
-     border: 1px solid #97144D;
+     border: 1px solid #0B4D83;
     border-radius: 5px;
   }
   footer {
-  background-color: #97144D;
+  background-color: #0B4D83;
   color: white;
   padding: 1rem 0;
   font-size: 0.9rem;
@@ -139,40 +139,177 @@
   line-height: 1.4;
 }
 </style>
-
-
-
+ 
+ 
+ 
   </style>
 </head>
 <body>
-  
-
-  <!-- Top Bar -->
-  <div class="top-bar d-flex justify-content-between align-items-center">
-    <div>
-      <h4>Hello It's DigiBank Loan..!!</h4>
-      <p class="mb-0">We will give wings to your dreams..!!</p>
+ 
+ 
+  <!-- Sidebar Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="sidebarMenuLabel">Welcome, {{ user.name }} ! ({{user.role}})</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
-   <!-- <a href="#" class="btn btn-outline-light rounded-pill px-4 py-2">Education Loan</a>
-   <a href="#" class="btn btn-outline-light rounded-pill px-4 py-2">Personal Loan</a>
-   <a href="#" class="btn btn-outline-light rounded-pill px-4 py-2">Car Loan</a> -->
-
-
-          <!-- Right Section -->
-          <div class="d-flex align-items-center" style="font-size: 1.1rem;">
-            <h5 class="m-0 me-3 fw-bold">Welcome,  !</h5>
-            <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-lg">Logout</a>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark active" href="userdashboard.html">
+            <i class="bi bi-speedometer2 me-2"></i> Home
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('viewaccounts') }}">
+            <i class="bi bi-person-lines-fill me-2"></i> View Accounts
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('userdashloan') }}">
+            <i class="bi bi-cash-coin me-2"></i> Loans
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('Txnhistory') }}">
+            <i class="bi bi-clock-history me-2"></i> Transaction History
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('accountbal') }}">
+            <i class="bi bi-wallet2 me-2"></i> Check Balance
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('profile') }}">
+            <i class="bi bi-gift-fill me-2"></i> Profile
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('paybill') }}">
+            <i class="bi bi-credit-card me-2"></i> Pay Bill
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="#">
+            <i class="bi bi-person-rolodex me-2"></i> Get Contact
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="#">
+            <i class="bi bi-shield-lock-fill me-2"></i> Privacy & Security
+          </a>
+        </li>
+ 
+      </ul>
+    </div>
+  </div>
+ 
+  <!-- ---------------------------- -->
+  <div class="top-bar d-flex align-items-center">
+    <!-- left toggle -->
+    <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
+      aria-controls="sidebarMenu" aria-label="Toggle sidebar">
+      <i class="bi bi-list"></i>
+    </button>
+ 
+    <!-- title wrapper with flex-grow to take center space -->
+    <!-- <h5 class="m-0 text-center flex-grow-1">DigiBank User Dashboard</h5> -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0B4D83 !important; width: 100%;">
+      <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <!-- <li class="nav-item"><a class="nav-link active" href="{{ url_for('home') }}">Home</a></li> -->
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">My Activities</a>
+            </li>
+            <!-- Open Account Dropdown -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Open Account</a>
+              <ul class="dropdown-menu" aria-labelledby="accountDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Savings
+                    Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Salary Account</a>
+                </li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Current
+                    Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Safe Custody
+                    Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Pension
+                    Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">PMJDY Account</a>
+                </li>
+              </ul>
+            </li>
+            <!-- Deposits Dropdown -->
+            <li class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false">Deposits</button>
+              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
+                <li><a class="dropdown-item"  href="{{ url_for('open_deposits') }}">Digital Fixed
+                    Deposits</a></li>
+                <li><a class="dropdown-item"  href="{{ url_for('open_deposits') }}">Fixed
+                    Deposits</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Recurring
+                    Deposits</a></li>
+              </ul>
+            </li>
+            <!-- Loans Dropdown -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="loanDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Loans</a>
+              <ul class="dropdown-menu" aria-labelledby="loanDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('userdashloan') }}">Home Loan</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('userdashloan') }}">Personal Loan</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('userdashloan') }}">Busniness Loan</a></li>
+ 
+ 
+              </ul>
+            </li>
+            <!-- Deposits Dropdown -->
+            <li class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle" id="cardDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false" type="button">Cards</button>
+              <ul class="dropdown-menu" aria-labelledby="cardDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Credit Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Debit Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Prepaid Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Forex Cards</a></li>
+              </ul>
+            </li>
+            
+            <!-- Deposits Dropdown -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="investDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Investments</a>
+              <ul class="dropdown-menu" aria-labelledby="investDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('userdashinvest') }}">Public Provident Fund</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('userdashinvest') }}">Floating Rate Saving Bonds</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('userdashinvest') }}">National Pension System</a></li>
+              </ul>
+            </li>
+          </ul>
+          <div class="d-flex align-items-center">
+            <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name }} ! ({{user.role}})</h5>
+            <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">
+              Logout
+            </a>
           </div>
+ 
         </div>
       </div>
     </nav>
+    <!-- End of custom navbar -->
+ 
   </div>
+ 
+ 
+ 
   </div>
-
   <!-- Main Content -->
   <div class="container-fluid mt-4 px-4">
   <div class="row g-4">
-
+ 
     <!-- Pending Business -->
     <div class="col-md-4">
       <a href="#" class="text-decoration-none text-dark">
@@ -200,7 +337,7 @@
         </div>
       </div>
     </div>
-
+ 
     <!-- Calendar -->
     <div class="col-md-4">
       <div class="card p-3 calendar-box">
@@ -231,7 +368,7 @@
         </div>
       </div>
     </div>
-
+ 
     <!-- Summary Boxes -->
     <div class="col-md-4">
       <div class="row g-3">
@@ -262,7 +399,7 @@
         </div>
       </div>
     </div>
-
+ 
     <!-- Graph -->
     <div class="col-md-6">
       <div class="card p-3">
@@ -273,9 +410,9 @@
         </div>
       </div>
     </div>
-    
-
-
+   
+ 
+ 
     <!-- Loan Calculator -->
     <div class="col-md-6">
       <div class="card p-3">
@@ -296,14 +433,14 @@
           </div>
           <button type="submit" class="btn btn-primary">Calculate EMI</button>
         </form>
-        <div id="emiResult" class="mt-4" style="font-weight: 600; color: #97144D;"></div>
+        <div id="emiResult" class="mt-4" style="font-weight: 600; color: #0B4D83;"></div>
       </div>
     </div>
     <!-- Policies by Location -->
     <div class="col-md-12">
       <div class="card p-3">
         <div class="section-title">New Policies by Location</div>
-
+ 
         <form class="row g-3 mb-4">
           <div class="col-md-3">
             <label for="country" class="form-label">Country</label>
@@ -338,7 +475,7 @@
         </form>
         <div class="map-placeholder mt-4" style="height: 250px; border-radius: 8px; overflow: hidden;">
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.0195409899427!2d-122.41941518468106!3d37.77492927975953!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8085809c2c9338b5%3A0x0!2zMzfCsDQ2JzI5LjciTiAxMjLCsDI1JzA2LjkiVw!5e0!3m2!1sen!2sin!4v1691229451458!5m2!1sen!2sin"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.0195409899427!2d-122.41941518468106!3d37…
             width="100%"
             height="250"
             style="border:0;"
@@ -347,43 +484,43 @@
             referrerpolicy="no-referrer-when-downgrade">
           </iframe>
         </div>
-
+ 
         <div class="contact-us mt-3">
           <h5>Need info on new policies?</h5>
           <p>Contact us for personalized assistance.</p>
-          <a href="Contact" class="btn btn-primary" style="background-color:#97144D; border:none;">Contact Us</a>
+          <a href="Contact" class="btn btn-primary" style="background-color:#0B4D83; border:none;">Contact Us</a>
         </div>
       </div>
     </div>
   </div>
 </div>
-
-
+ 
+ 
   <script>
   <!-- calendercode -->
   const calendarBody = document.getElementById("calendar-body");
   const monthYear = document.getElementById("calendar-month-year");
-
+ 
   let today = new Date();
   let currentMonth = today.getMonth();
   let currentYear = today.getFullYear();
-
+ 
   const months = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
   ];
-
+ 
   function showCalendar(month, year) {
     let firstDay = new Date(year, month).getDay();
     let daysInMonth = 32 - new Date(year, month, 32).getDate();
-
+ 
     calendarBody.innerHTML = "";
     monthYear.innerHTML = `${months[month]} ${year}`;
-
+ 
     let date = 1;
     for (let i = 0; i < 6; i++) {
       let row = document.createElement("tr");
-
+ 
       for (let j = 0; j < 7; j++) {
         if (i === 0 && j < firstDay) {
           let cell = document.createElement("td");
@@ -399,7 +536,7 @@
             year === today.getFullYear() &&
             month === today.getMonth()
           ) {
-            cell.style.background = "#97144D";
+            cell.style.background = "#0B4D83";
             cell.style.color = "white";
             cell.style.borderRadius = "50%";
           }
@@ -410,41 +547,41 @@
       calendarBody.appendChild(row);
     }
   }
-
+ 
   function nextMonth() {
     currentYear = currentMonth === 11 ? currentYear + 1 : currentYear;
     currentMonth = (currentMonth + 1) % 12;
     showCalendar(currentMonth, currentYear);
   }
-
+ 
   function prevMonth() {
     currentYear = currentMonth === 0 ? currentYear - 1 : currentYear;
     currentMonth = currentMonth === 0 ? 11 : currentMonth - 1;
     showCalendar(currentMonth, currentYear);
   }
-
+ 
   showCalendar(currentMonth, currentYear);
-
-
-  //  Loan Calculator 
-
+ 
+ 
+  //  Loan Calculator
+ 
   document.getElementById('emiForm').addEventListener('submit', function(e) {
     e.preventDefault();
-
+ 
     const P = parseFloat(document.getElementById('loanAmount').value);
     const annualRate = parseFloat(document.getElementById('interestRate').value);
     const N = parseInt(document.getElementById('loanTenure').value);
-
+ 
     if (P <= 0 || annualRate < 0 || N <= 0) {
       alert('Please enter valid positive values');
       return;
     }
-
+ 
     const r = annualRate / 12 / 100; // monthly interest rate
     const emi = (P * r * Math.pow(1 + r, N)) / (Math.pow(1 + r, N) - 1);
-
+ 
     if (isFinite(emi)) {
-      document.getElementById('emiResult').textContent = 
+      document.getElementById('emiResult').textContent =
         `Estimated EMI: ₹${emi.toFixed(2)} per month`;
     } else {
       document.getElementById('emiResult').textContent = 'Invalid input or calculation error';
@@ -467,7 +604,7 @@
           <a href="#" class="text-light text-decoration-none">Disclaimer</a>
         </nav>
       </div>
-
+ 
       <!-- Sub Links -->
       <div class="col-md-12 mb-3 d-flex flex-wrap justify-content-center gap-3 small">
         <a href="#" class="text-light text-decoration-none">Home</a>
@@ -481,23 +618,30 @@
         <a href="#" class="text-light text-decoration-none">DigiBank Wealth</a>
         <a href="#" class="text-light text-decoration-none">Products</a>
       </div>
-
+ 
       <!-- Important Notice -->
       <div class="col-md-12 text-center small text-secondary mb-3">
         <p class="mb-1">
           <strong>IMPORTANT:</strong> DigiBank never asks for your user id / password / pin no. through phone call / SMSes / e-mails.
           Any such phone call / SMSes / e-mails asking you to reveal credentials or One Time Password through SMS could be an attempt to withdraw money from your account.
           <br />
-          NEVER share these details to anyone. 
+          NEVER share these details to anyone.
         </p>
       </div>
-
+ 
       <!-- Copyright -->
       <div class="col-md-12 text-center small text-secondary">
         <p class="mb-0" style="color: white;">&copy; Copyright DigiBank</p>
       </div>
     </div>
   </div>
-</footer>
+  <!-- Bootstrap JS Bundle (includes Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+</body>
+</footer>
+ 
 </html>
+ 
+ 
+ 

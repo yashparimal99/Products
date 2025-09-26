@@ -9,13 +9,13 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
  
   <style>
-    
+   
     body {
       background-color: #f8f9fa;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     .navbar {
-      background-color: #97144D;
+      background-color: #0B4D83;
     }
     .navbar-brand {
       font-weight: bold;
@@ -27,16 +27,16 @@
     }
     .nav-btn {
       background-color: white;
-      color: #97144D;
-      border: 1px solid #97144D;
+      color: #0B4D83;
+      border: 1px solid #0B4D83;
       margin: 0 5px;
     }
     .nav-btn:hover {
-      background-color: #97144D;
+      background-color: #0B4D83;
       color: white;
     }
     footer {
-      background-color: #97144D;
+      background-color: #0B4D83;
       color: white;
       text-align: center;
       padding: 15px;
@@ -44,7 +44,7 @@
     }
     /* Breadcrumb styling */
     .breadcrumb-item a {
-      color: #97144D;
+      color: #0B4D83;
       text-decoration: none;
     }
     .breadcrumb-item a:hover {
@@ -54,25 +54,38 @@
 </head>
 <body>
  
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg px-3">
-    <a class="navbar-brand" href="#">DigiBank</a>
-    <div class="mx-auto">
-      <span class="navbar-text text-white h5 me-4">Apply for a New Card</span>
+ <!-- Top Bar -->
+  <div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#0B4D83; color:white;">
+ 
+ 
+    <!-- Logo / Image -->
+    <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo"
+      style="height: 40px; width:auto; background-color:#fff; border-radius:5px; padding:2px;" class="me-3">
+ 
+    <!-- Title -->
+    <h5 class="flex-grow-1 text-center m-0">Welcome To Cards Agent Dashboard - DigiBank</h5>
+ 
+    <!-- Logout Button -->
+    <div class="d-flex align-items-center">
+      <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }} </h5>
+      <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
+        Logout
+      </a>
     </div>
-  </nav>
-
+  </div>
+ 
+ 
   <nav aria-label="breadcrumb" style="background-color:#f8f9fa; padding:8px 15px; border-radius:4px; margin:10px 20px;">
     <ol class="breadcrumb mt-0">
-      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#97144D;">Home</a></li>
-      <li class="breadcrumb-item active" aria-current="page" style="color:#97144D; font-weight:bold;"> Apply new card
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#0B4D83;">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page" style="color:#0B4D83; font-weight:bold;"> Apply new card
       </li>
     </ol>
   </nav>
  
   <!-- Breadcrumb -->
   <div class="container my-4">
-    
+   
  
       <!-- flashes (optional) -->
   {% with msgs = get_flashed_messages(with_categories=true) %}
@@ -197,7 +210,7 @@
  
    <div class="row">
       <div class="col-sm-12 text-center">
-        <button type="submit" class="btn btn-digibank">Submit Application</button>
+        <button type="submit" class="btn btn-digibank px-4 py-2" style="background-color:#0B4D83; border:none; color:white; font-weight:600;">Submit Application</button>
       </div>
   </form>
 </div>
@@ -297,5 +310,7 @@
  
 </body>
 </html>
+ 
+ 
  
  

@@ -8,16 +8,16 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
   <style>
     body{ background:#f8f9fa; font-family:'Segoe UI',sans-serif; min-height:100vh; display:flex; flex-direction:column; }
-    .top-bar{ background:#97144D; color:#fff; padding:10px 20px; position:sticky; top:0; z-index:1030;}
+    .top-bar{ background:#0B4D83; color:#fff; padding:10px 20px; position:sticky; top:0; z-index:1030;}
     .logout-btn{ border:1.5px solid #fff; color:#fff; }
-    .logout-btn:hover{ background:#fff; color:#97144D;}
+    .logout-btn:hover{ background:#fff; color:#0B4D83;}
     table{ width:95%; margin:0 auto 40px auto; border-collapse:collapse; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.1); border-radius:6px; overflow:hidden;}
     table th, table td{ padding:12px 15px; text-align:center; border-bottom:1px solid #ddd;}
-    thead{ background:#97144D; color:#fff;}
+    thead{ background:#0B4D83; color:#fff;}
     .status-success{ color:green; font-weight:600; }
     .status-failed{ color:red; font-weight:600; }
-    footer.bg-custom{ background:#97144D; }
-
+    footer.bg-custom{ background:#0B4D83; }
+ 
   /* Sidebar Offcanvas */
     #sidebarMenu.offcanvas-start {
       width: 250px;
@@ -43,7 +43,7 @@
  
     #sidebarMenu .nav-link.active {
       font-weight: 700;
-      color: #97144D !important;
+      color: #0B4D83 !important;
       background-color: #f0d7e0;
       border-radius: 4px;
     }
@@ -53,7 +53,7 @@
       background-color: #f9e5ef;
       border-radius: 4px;
     }
-    
+   
   </style>
 </head>
 <body>
@@ -111,11 +111,11 @@
             <i class="bi bi-shield-lock-fill me-2"></i> Privacy & Security
           </a>
         </li>
-
+ 
       </ul>
     </div>
   </div>
-
+ 
   <!-- ---------------------------- -->
   <div class="top-bar d-flex align-items-center">
     <!-- left toggle -->
@@ -123,10 +123,10 @@
       aria-controls="sidebarMenu" aria-label="Toggle sidebar">
       <i class="bi bi-list"></i>
     </button>
-
+ 
     <!-- title wrapper with flex-grow to take center space -->
     <!-- <h5 class="m-0 text-center flex-grow-1">DigiBank User Dashboard</h5> -->
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important; width: 100%;">
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0B4D83 !important; width: 100%;">
       <div class="container-fluid">
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -173,8 +173,8 @@
                 <li><a class="dropdown-item" href="{{ url_for('userdashloan') }}">Home Loan</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('userdashloan') }}">Personal Loan</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('userdashloan') }}">Busniness Loan</a></li>
-
-
+ 
+ 
               </ul>
             </li>
             <!-- Deposits Dropdown -->
@@ -215,26 +215,26 @@
               Logout
             </a>
           </div>
-
+ 
         </div>
       </div>
     </nav>
     <!-- End of custom navbar -->
-
+ 
   </div>
-
-
-
-  </div> 
+ 
+ 
+ 
+  </div>
 <nav aria-label="breadcrumb" style="background-color:#f8f9fa; padding:8px 15px; border-radius:4px; margin:10px 20px;">
   <ol class="breadcrumb mb-0">
-    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#97144D;">Home</a></li>
-    <li class="breadcrumb-item active" aria-current="page" style="color:#97144D; font-weight:bold;">Transactions</li>
+    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#0B4D83;">Home</a></li>
+    <li class="breadcrumb-item active" aria-current="page" style="color:#0B4D83; font-weight:bold;">Transactions</li>
   </ol>
 </nav>
  
 <div class="section-header d-flex align-items-center justify-content-between gap-4" style="padding:0 20px;">
-  <h5 class="mb-0" style="color:#97144D; font-weight:700;">Transaction History</h5>
+  <h5 class="mb-0" style="color:#0B4D83; font-weight:700;">Transaction History</h5>
   <div class="d-flex align-items-center gap-3">
     <p class="mb-3">Filter Transactions</p>
     <select id="filterStatus" class="form-select form-select-sm" aria-label="Filter Transactions">
@@ -297,7 +297,7 @@
  
 </table>
  
-<footer class="bg-custom text-white text-center py-3 mt-auto" style="background:#97144D;">© 2025 DigiBank. All rights reserved.</footer>
+<footer class="bg-custom text-white text-center py-3 mt-auto" style="background:#0B4D83;">© 2025 DigiBank. All rights reserved.</footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
   const filter = document.getElementById('filterStatus');
@@ -311,5 +311,7 @@
 </script>
 </body>
 </html>
+ 
+ 
  
  

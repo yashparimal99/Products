@@ -1,238 +1,289 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <title>Agent Dashboard - DigiBank</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Bootstrap CSS & Icons -->
+ 
+  <!-- Fonts & Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+ 
+  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
+ 
   <style>
+    :root {
+      --primary-color: #0B4D83;
+      --secondary-color: #1976D2;
+      --accent-color: #FF6B35;
+      --success-color: #00C853;
+      --warning-color: #FF8F00;
+      --dark-color: #263238;
+      --light-color: #F8F9FA;
+      --gradient-primary: linear-gradient(135deg, #0B4D83 0%, #1976D2 100%);
+      --gradient-secondary: linear-gradient(135deg, #FF6B35 0%, #FF8F00 100%);
+      --shadow-light: 0 4px 20px rgba(11, 77, 131, 0.1);
+      --shadow-medium: 0 8px 30px rgba(11, 77, 131, 0.15);
+      --shadow-heavy: 0 15px 40px rgba(11, 77, 131, 0.2);
+    }
+ 
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+ 
     body {
-      background-color: #f8f9fa;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Poppins', sans-serif;
+      line-height: 1.6;
+      color: var(--dark-color);
+      background: linear-gradient(135deg, rgba(11, 77, 131, 0.02), rgba(25, 118, 210, 0.02));
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
-
-    .navbar {
-      background-color: #97144D;
-    }
-
-    .navbar-brand {
-      font-weight: bold;
-      color: white !important;
-    }
-
-    .logout-btn {
-      background-color: #97144D;
-      border: 1px solid white;
+ 
+    /* Top Bar */
+    .top-bar {
+      background: var(--gradient-primary);
       color: white;
-      transition: 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.8rem 1.5rem;
+      box-shadow: var(--shadow-medium);
     }
-
-    .logout-btn:hover {
-      background-color: white;
-      color: #97144D;
-      border: 1px solid #97144D;
+ 
+    .top-bar img {
+      height: 45px;
+      width: auto;
+      border-radius: 6px;
+      background: #fff;
+      padding: 3px;
     }
-
+ 
+    .top-bar h5 {
+      font-weight: 600;
+      margin: 0;
+    }
+ 
+    .top-bar .btn-outline-light {
+      border: 1.5px solid white;
+      color: white;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+ 
+    .top-bar .btn-outline-light:hover {
+      background: white;
+      color: var(--primary-color);
+    }
+ 
+    /* Breadcrumb */
+    .breadcrumb {
+      background: linear-gradient(135deg, rgba(11, 77, 131, 0.05), rgba(25, 118, 210, 0.05));
+      border-radius: 15px;
+      padding: 1rem 1.5rem;
+      margin: 1.5rem;
+      box-shadow: var(--shadow-light);
+    }
+ 
+    .breadcrumb .breadcrumb-item a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+ 
+    .breadcrumb .breadcrumb-item a:hover {
+      text-decoration: underline;
+      color: var(--secondary-color);
+    }
+ 
+    .breadcrumb .breadcrumb-item.active {
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+ 
+    /* Section Title */
+    .section-title {
+      color: var(--primary-color);
+      text-align: center;
+      margin: 2rem 0;
+      font-size: 2rem;
+      font-weight: 700;
+      position: relative;
+    }
+ 
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 4px;
+      background: var(--gradient-primary);
+      border-radius: 2px;
+    }
+ 
+    /* Dashboard Cards */
     .dashboard-card {
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      transition: transform 0.2s, box-shadow 0.2s;
+      border-radius: 20px;
+      box-shadow: var(--shadow-light);
+      transition: all 0.4s ease;
+      background: linear-gradient(145deg, #ffffff, #f8f9fa);
+      padding: 1rem;
+      animation: fadeInUp 0.6s ease-out;
     }
-
+ 
     .dashboard-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: var(--shadow-heavy);
+      background: linear-gradient(145deg, #ffffff, #f0f4ff);
     }
-
+ 
+    .dashboard-card i {
+      font-size: 3rem;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+ 
+    .dashboard-card .card-title {
+      color: var(--primary-color);
+      font-weight: 700;
+      font-size: 1.3rem;
+      margin-bottom: 0.8rem;
+    }
+ 
+    .dashboard-card .card-text {
+      color: #555;
+      font-size: 0.95rem;
+    }
+ 
     .nav-btn {
-      background-color: #97144D;
-      color: white;
-      border: 1px solid white;
-      transition: 0.3s;
+      border: 1.5px solid var(--secondary-color);
+      color: var(--secondary-color);
+      font-weight: 500;
+      transition: all 0.3s ease;
     }
-
+ 
     .nav-btn:hover {
-      background-color: white;
-      color: #97144D;
+      background: var(--secondary-color);
+      color: white;
     }
-
+ 
     footer {
-      background-color: #97144D;
+      background: var(--gradient-primary);
       color: white;
       text-align: center;
       padding: 15px;
-      margin-top: 40px;
+      margin-top: auto;
+      box-shadow: var(--shadow-medium);
     }
-
-    .icon-color {
-      color: #97144D !important;
-    }
-
-    .breadcrumb {
-      margin-bottom: 0;
-    }
-
-    .breadcrumb .active {
-      color: #97144D;
-      font-weight: 500;
-    }
-
-    .breadcrumb a {
-      text-decoration: none;
-      color: #97144D;
-    }
-
-    .breadcrumb a:hover {
-      text-decoration: underline;
+ 
+    /* Animations */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
-
 <body>
-
-  <!-- Top Bar -->
-  <div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#8B0A50; color:white;">
-
-
-    <!-- Logo / Image -->
-    <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo"
-      style="height: 40px; width:auto; background-color:#fff; border-radius:5px; padding:2px;" class="me-3">
-
-    <!-- Title -->
-    <h5 class="flex-grow-1 text-center m-0">Welcome To Cards Agent Dashboard - DigiBank</h5>
-
-    <!-- Logout Button -->
-    <div class="d-flex align-items-center">
-      <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }} </h5>
-      <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
-        Logout
-      </a>
-    </div>
+ 
+<!-- Top Bar -->
+<div class="top-bar">
+  <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo">
+  <h5 class="flex-grow-1 text-center">Welcome To Cards Agent Dashboard - DigiBank</h5>
+  <div class="d-flex align-items-center">
+    <h6 class="m-0 me-2">Welcome, {{ user.email }}</h6>
+    <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">Logout</a>
   </div>
-
-
-
-  <!-- Breadcrumb -->
-  <nav aria-label="breadcrumb" class="bg-light px-3 py-2">
-    <ol class="breadcrumb mb-0">
-      <li class="breadcrumb-item"><a href="{{ url_for('login') }}">Login</a></li>
-      <li class="breadcrumb-item active" aria-current="page"><a href="{{ url_for('dashboard') }}">Cards_Dashboard</a>
-      </li>
-    </ol>
-  </nav>
-
-  <!-- Dashboard Content -->
-  <div class="container my-5">
-    <div class="card p-4">
-      <h4 class="mb-4 text-center">Welcome,{{ user.name }} <span id="agentName"></span>..!!</h4>
-
-      <div class="row g-4 text-center">
-        <!-- Profile Card (New First Card) -->
-        <div class="col-sm-6 col-md-6 col-lg-6">
-          <div class="card dashboard-card h-100 p-3">
-            <div class="card-body">
-              <i class="bi bi-person-circle display-4 icon-color mb-3"></i>
-              <h5 class="card-title">Profile</h5>
-              <p class="card-text text-muted">View and update your personal information and account settings.</p>
-            </div>
-            <div class="card-footer bg-transparent border-0 d-grid">
-              <a href="{{ url_for('agentprofile') }}" class="btn nav-btn">View Profile</a>
-            </div>
-          </div>
+</div>
+ 
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb mb-0">
+    <li class="breadcrumb-item"><a href="{{ url_for('login') }}">Login</a></li>
+    <li class="breadcrumb-item active" aria-current="page"><a href="{{ url_for('dashboard') }}">Cards_Dashboard</a></li>
+  </ol>
+</nav>
+ 
+<!-- Dashboard Content -->
+<div class="container my-4">
+  <h2 class="section-title">Welcome, {{ user.name }}</h2>
+  <div class="row g-4 text-center">
+ 
+    <!-- Profile -->
+    <div class="col-sm-6 col-lg-6">
+      <div class="card dashboard-card h-100">
+        <div class="card-body">
+          <i class="bi bi-person-circle"></i>
+          <h5 class="card-title">Profile</h5>
+          <p class="card-text">View and update your personal information and account settings.</p>
         </div>
-
-        <!-- Applications -->
-        <div class="col-sm-6 col-md-6 col-lg-6">
-          <div class="card dashboard-card h-100 p-3">
-            <div class="card-body">
-              <i class="bi bi-file-earmark-text display-4 icon-color mb-3"></i>
-              <h5 class="card-title">Applications</h5>
-              <p class="card-text text-muted">View all submitted card applications and their current status.</p>
-            </div>
-            <div class="card-footer bg-transparent border-0 d-grid">
-              <a href="{{ url_for('cardapplications') }}" class="btn nav-btn">View Applications</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Apply Card -->
-        <div class="col-sm-6 col-md-6 col-lg-6">
-          <div class="card dashboard-card h-100 p-3">
-            <div class="card-body">
-              <i class="bi bi-file-earmark-plus display-4 icon-color mb-3"></i>
-              <h5 class="card-title">Apply Card</h5>
-              <p class="card-text text-muted">Submit a new credit, debit, or international card application for a
-                customer.</p>
-            </div>
-            <div class="card-footer bg-transparent border-0 d-grid">
-              <a href="{{ url_for('applycardagent') }}" class="btn nav-btn">Apply for Card</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Performance -->
-        <div class="col-sm-6 col-md-6 col-lg-6">
-          <div class="card dashboard-card h-100 p-3">
-            <div class="card-body">
-              <i class="bi bi-graph-up display-4 icon-color mb-3"></i>
-              <h5 class="card-title">Performance</h5>
-              <p class="card-text text-muted">Track your submission performance, approvals, and key metrics.</p>
-            </div>
-            <div class="card-footer bg-transparent border-0 d-grid">
-              <a href="{{ url_for('cardperformance') }}" class="btn nav-btn">View Performance</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Footer -->
-  <footer>
-    © 2024 DigiBank. All rights reserved.
-  </footer>
-
-  <!-- Logout Modal -->
-  <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header" style="background-color: #97144D; color: white;">
-          <h5 class="modal-title" id="logoutModalLabel">Logout Successful</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          Successfully logged out...!!
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn" style="background-color: #97144D; color: white;"
-            data-bs-dismiss="modal">OK</button>
+        <div class="card-footer bg-transparent border-0 d-grid">
+          <a href="{{ url_for('agentprofile') }}" class="btn nav-btn">View Profile</a>
         </div>
       </div>
     </div>
+ 
+    <!-- Applications -->
+    <div class="col-sm-6 col-lg-6">
+      <div class="card dashboard-card h-100">
+        <div class="card-body">
+          <i class="bi bi-file-earmark-text"></i>
+          <h5 class="card-title">Applications</h5>
+          <p class="card-text">View all submitted card applications and their current status.</p>
+        </div>
+        <div class="card-footer bg-transparent border-0 d-grid">
+          <a href="{{ url_for('cardapplications') }}" class="btn nav-btn">View Applications</a>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- Apply Card -->
+    <div class="col-sm-6 col-lg-6">
+      <div class="card dashboard-card h-100">
+        <div class="card-body">
+          <i class="bi bi-file-earmark-plus"></i>
+          <h5 class="card-title">Apply Card</h5>
+          <p class="card-text">Submit a new credit, debit, or international card application for a customer.</p>
+        </div>
+        <div class="card-footer bg-transparent border-0 d-grid">
+          <a href="{{ url_for('applycardagent') }}" class="btn nav-btn">Apply for Card</a>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- Performance -->
+    <div class="col-sm-6 col-lg-6">
+      <div class="card dashboard-card h-100">
+        <div class="card-body">
+          <i class="bi bi-graph-up"></i>
+          <h5 class="card-title">Performance</h5>
+          <p class="card-text">Track your submission performance, approvals, and key metrics.</p>
+        </div>
+        <div class="card-footer bg-transparent border-0 d-grid">
+          <a href="{{ url_for('cardperformance') }}" class="btn nav-btn">View Performance</a>
+        </div>
+      </div>
+    </div>
+ 
   </div>
-
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-  <!-- Logout Script -->
-  <script>
-    document.getElementById('logoutBtn').addEventListener('click', function () {
-      var myModal = new bootstrap.Modal(document.getElementById('logoutModal'));
-      myModal.show();
-
-      // Redirect after 2 seconds
-      setTimeout(function () {
-        window.location.href = 'login';
-      }, 2000);
-    });
-  </script>
-
+</div>
+ 
+<!-- Footer -->
+<footer>
+  © 2024 DigiBank. All rights reserved.
+</footer>
+ 
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+ 
 </body>
-
 </html>
+ 
+ 

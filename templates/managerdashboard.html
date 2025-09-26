@@ -42,7 +42,7 @@
     }
     #sidebarMenu .nav-link.active {
       font-weight: 700;
-      color: #97144D !important;
+      color: #0B4D83 !important;
       background-color: #f0d7e0;
       border-radius: 4px;
     }
@@ -64,12 +64,12 @@
     }
     .top-bar button.btn-outline-light:hover {
       background-color: white;
-      color: #97144D;
+      color: #0B4D83;
     }
  
     /* Top Bar */
     .top-bar {
-      background-color: #97144D;
+      background-color: #0B4D83;
       color: white;
       display: flex;
       align-items: center;
@@ -100,7 +100,7 @@
     }
     .logout-btn:hover {
       background-color: white;
-      color: #97144D;
+      color: #0B4D83;
     }
  
     /* Search Bar Row with Sidebar Toggle & Chatbot */
@@ -129,8 +129,8 @@
       font-size: 1.3rem;
     }
     .search-chatbar .btn-toggle-sidebar:hover {
-      border-color: #97144D;
-      color: #97144D;
+      border-color: #0B4D83;
+      color: #0B4D83;
     }
     /* Search input centered and wide */
     .search-chatbar input[type="text"] {
@@ -146,12 +146,12 @@
       display: block;
     }
     .search-chatbar input[type="text"]:focus {
-      border-color: #97144D;
+      border-color: #0B4D83;
       box-shadow: 0 0 5px rgba(151, 20, 77, 0.5);
     }
     /* Chatbot button right aligned */
     .search-chatbar .chatbot-btn {
-      background-color: #97144D;
+      background-color: #0B4D83;
       border: none;
       color: white;
       padding: 10px 14px;
@@ -187,7 +187,7 @@
     }
     .dashboard-icon {
       font-size: 32px;
-      color: #97144D;
+      color: #0B4D83;
       margin-bottom: 15px;
     }
     .dashboard-card h5 {
@@ -201,7 +201,7 @@
       margin-bottom: 15px;
     }
     .btn-manager {
-      background-color: #97144D;
+      background-color: #0B4D83;
       color: #fff;
       border: none;
       padding: 8px 18px;
@@ -230,7 +230,7 @@
     .stats-card .value {
       font-size: 1.5rem;
       font-weight: 700;
-      color: #97144D;
+      color: #0B4D83;
     }
     .stats-card .change {
       font-size: 0.8rem;
@@ -255,7 +255,7 @@
       border-left: 4px solid #dc3545;
     }
     .loan-card {
-      border-left: 4px solid #97144D;
+      border-left: 4px solid #0B4D83;
     }
     .badge-pending {
       background-color: #ffc107;
@@ -307,12 +307,160 @@
  
     /* Footer */
     footer.bg-custom {
-      background-color: #97144D;
+      background-color: #0B4D83;
     }
   </style>
+  <style>
+   
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap');
+ 
+    .digi-bank-logo {
+ 
+      display: flex;
+ 
+      align-items: center;
+ 
+      gap: 12px;
+ 
+      text-decoration: none;
+ 
+      transition: transform 0.3s ease;
+ 
+    }
+ 
+    .digi-bank-logo:hover {
+ 
+      transform: scale(1.05);
+ 
+    }
+ 
+    .logo-icon {
+ 
+      width: 50px;
+ 
+      height: 50px;
+ 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 100%);
+ 
+      border-radius: 12px;
+ 
+      display: flex;
+ 
+      align-items: center;
+ 
+      justify-content: center;
+ 
+      position: relative;
+ 
+      box-shadow: 0 6px 18px rgba(102, 126, 234, 0.3), 0 2px 6px rgba(0, 0, 0, 0.1);
+ 
+    }
+ 
+    .logo-icon::before {
+ 
+      content: '';
+ 
+      position: absolute;
+ 
+      top: 8px;
+ 
+      left: 8px;
+ 
+      right: 8px;
+ 
+      bottom: 8px;
+ 
+      background: rgba(255, 255, 255, 0.95);
+ 
+      border-radius: 8px;
+ 
+    }
+ 
+    .logo-icon::after {
+ 
+      content: 'D';
+ 
+      position: absolute;
+ 
+      color: transparent;
+ 
+      background: linear-gradient(135deg, #667eea, #764ba2);
+ 
+      background-clip: text;
+ 
+      -webkit-background-clip: text;
+ 
+      font-weight: 800;
+ 
+      font-size: 20px;
+ 
+      z-index: 2;
+ 
+    }
+ 
+    .logo-text {
+ 
+      color: #fff;
+ 
+    }
+ 
+    .main-text {
+ 
+      font-size: 20px;
+ 
+      font-weight: 800;
+ 
+      letter-spacing: -0.5px;
+ 
+      line-height: 1;
+ 
+    }
+ 
+    .digi {
+ 
+      background: linear-gradient(135deg, #87CEEB 0%, #98D8E8 25%, #FFF8DC 50%, #87CEFA 100%);
+ 
+      background-clip: text;
+ 
+      -webkit-background-clip: text;
+ 
+      color: transparent;
+ 
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+ 
+    }
+ 
+    .bank {
+ 
+      color: #ffffff;
+ 
+      margin-left: 3px;
+ 
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+ 
+    }
+ 
+    .tagline {
+ 
+      font-size: 9px;
+ 
+      font-weight: 600;
+ 
+      color: #e8f4f8;
+ 
+      letter-spacing: 2px;
+ 
+      text-transform: uppercase;
+ 
+      margin-top: 2px;
+ 
+    }
+    </style>
+ 
 </head>
 <body>
  
+  <!-- Sidebar Offcanvas -->
   <!-- Sidebar Offcanvas -->
   <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
     <div class="offcanvas-header">
@@ -322,75 +470,72 @@
     <div class="offcanvas-body">
       <ul class="nav flex-column">
         <li class="nav-item mb-2">
-          <a class="nav-link text-dark active" href="managerdashboard.html">
+          <a class="nav-link text-dark active" href="{{ url_for('dashboard') }}">
             <i class="bi bi-speedometer2 me-2"></i> Dashboard
           </a>
         </li>
         <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="manageaccounts.html">
-            <i class="bi bi-people-fill me-2"></i> Manage Accounts
+          <a class="nav-link text-dark" href="{{ url_for('managerapprovals') }}">
+            <i class="bi bi-people-fill me-2"></i> Manage Approvals
           </a>
         </li>
         <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="loan-approvals.html">
-            <i class="bi bi-file-earmark-check me-2"></i> Loan Approvals
+          <a class="nav-link text-dark" href="{{ url_for('manstaff') }}">
+            <i class="bi bi-file-earmark-check me-2"></i>  Staff Management
           </a>
         </li>
         <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="transactions-review.html">
+          <a class="nav-link text-dark" href="{{ url_for('transactions_review') }}">
             <i class="bi bi-list-check me-2"></i> Transaction Review
           </a>
         </li>
         <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="reports.html">
+          <a class="nav-link text-dark" href="{{ url_for('manreport') }}">
             <i class="bi bi-graph-up me-2"></i> Reports & Analytics
           </a>
         </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="staff-management.html">
-            <i class="bi bi-person-badge me-2"></i> Staff Management
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="branch-performance.html">
-            <i class="bi bi-building me-2"></i> Branch Performance
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="fraud-detection.html">
-            <i class="bi bi-shield-exclamation me-2"></i> Fraud Detection
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="settings.html">
-            <i class="bi bi-gear-fill me-2"></i> Manager Settings
-          </a>
-        </li>
+      
       </ul>
     </div>
   </div>
  
-  <!-- Top Bar -->
-  <div class="top-bar d-flex align-items-center">
+ 
+ 
+ 
+<!-- ✅ Top Bar -->
+<div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#0B4D83; color:white;">
+ 
+  <!-- Sidebar Toggle -->
   <button class="btn btn-outline-light btn-sm me-3"
           data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
           aria-controls="sidebarMenu" aria-label="Toggle sidebar">
-    <i class="bi bi-list"></i>
+    <i class="bi bi-list fs-5"></i>
   </button>
  
-  <h5 class="me-auto mb-0">DigiBank Manager Dashboard</h5>
- 
-  <div class="d-flex align-items-center">
-    <p class="navbar-text text-white mb-0">
-      Welcome, <strong>{{ user.name }}</strong>
-    </p>
-  </div>
- 
-  <!-- Ensuring contrast with .text-white -->
-  <a href="{{ url_for('logout') }}" class="logout-btn ms-3">
-    Logout
+  <!-- DigiBank Logo -->
+  <a class="navbar-brand digi-bank-logo d-flex align-items-center me-3" href="{{ url_for('home') }}">
+    <div class="logo-icon"></div>
+    <div class="logo-text ms-2">
+      <div class="main-text">
+        <span class="digi">DiGi</span><span class="bank">Bank</span>
+      </div>
+      <div class="tagline">Smart Banking</div>
+    </div>
   </a>
+ 
+  <!-- Title -->
+  <h5 class="flex-grow-1 text-center m-0">Welcome Manager Dashboard</h5>
+ 
+  <!-- Right Side: User + Logout -->
+  <div class="d-flex align-items-center">
+    <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }}</h5>
+    <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
+      Logout
+    </a>
+  </div>
 </div>
+ 
+ 
  
 <!-- Search Bar with Live Suggestions -->
 <div class="search-chatbar position-relative">
@@ -559,4 +704,6 @@
   </script>
 </body>
 </html>
+ 
+ 
  

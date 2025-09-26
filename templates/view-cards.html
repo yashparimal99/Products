@@ -15,7 +15,7 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     .navbar {
-      background-color: #97144D;
+      background-color: #0B4D83;
     }
     .navbar-brand {
       font-weight: bold;
@@ -39,7 +39,7 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     footer {
-      background-color: #97144D;
+      background-color: #0B4D83;
       color: white;
       text-align: center;
       padding: 15px;
@@ -52,29 +52,334 @@
       margin-bottom: 30px;
     }
   </style>
+  <style>
+   
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap');
+ 
+    .digi-bank-logo {
+ 
+      display: flex;
+ 
+      align-items: center;
+ 
+      gap: 12px;
+ 
+      text-decoration: none;
+ 
+      transition: transform 0.3s ease;
+ 
+    }
+ 
+    .digi-bank-logo:hover {
+ 
+      transform: scale(1.05);
+ 
+    }
+ 
+    .logo-icon {
+ 
+      width: 50px;
+ 
+      height: 50px;
+ 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 100%);
+ 
+      border-radius: 12px;
+ 
+      display: flex;
+ 
+      align-items: center;
+ 
+      justify-content: center;
+ 
+      position: relative;
+ 
+      box-shadow: 0 6px 18px rgba(102, 126, 234, 0.3), 0 2px 6px rgba(0, 0, 0, 0.1);
+ 
+    }
+ 
+    .logo-icon::before {
+ 
+      content: '';
+ 
+      position: absolute;
+ 
+      top: 8px;
+ 
+      left: 8px;
+ 
+      right: 8px;
+ 
+      bottom: 8px;
+ 
+      background: rgba(255, 255, 255, 0.95);
+ 
+      border-radius: 8px;
+ 
+    }
+ 
+    .logo-icon::after {
+ 
+      content: 'D';
+ 
+      position: absolute;
+ 
+      color: transparent;
+ 
+      background: linear-gradient(135deg, #667eea, #764ba2);
+ 
+      background-clip: text;
+ 
+      -webkit-background-clip: text;
+ 
+      font-weight: 800;
+ 
+      font-size: 20px;
+ 
+      z-index: 2;
+ 
+    }
+ 
+    .logo-text {
+ 
+      color: #fff;
+ 
+    }
+ 
+    .main-text {
+ 
+      font-size: 20px;
+ 
+      font-weight: 800;
+ 
+      letter-spacing: -0.5px;
+ 
+      line-height: 1;
+ 
+    }
+ 
+    .digi {
+ 
+      background: linear-gradient(135deg, #87CEEB 0%, #98D8E8 25%, #FFF8DC 50%, #87CEFA 100%);
+ 
+      background-clip: text;
+ 
+      -webkit-background-clip: text;
+ 
+      color: transparent;
+ 
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+ 
+    }
+ 
+    .bank {
+ 
+      color: #ffffff;
+ 
+      margin-left: 3px;
+ 
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+ 
+    }
+ 
+    .tagline {
+ 
+      font-size: 9px;
+ 
+      font-weight: 600;
+ 
+      color: #e8f4f8;
+ 
+      letter-spacing: 2px;
+ 
+      text-transform: uppercase;
+ 
+      margin-top: 2px;
+ 
+    }
+    </style>
+    <style>
+ /* ============================= */
+/* DigiBank Table & Badge Styling */
+/* ============================= */
+
+/* Table Container */
+.table-responsive {
+    border-radius: 12px;
+    background: #fff;
+    padding: 15px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Table Styling */
+.table-custom thead {
+    background-color: #0B4D83;  /* DigiBank Blue */
+    color: white;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table-custom th,
+.table-custom td {
+    padding: 14px 16px;
+    vertical-align: middle;
+    border-top: none;
+}
+
+/* Alternating row colors */
+.table-custom tbody tr:nth-child(odd) {
+    background-color: #f9fbfd;
+}
+
+.table-custom tbody tr:hover {
+    background-color: #eaf3fc;
+    transition: background 0.3s ease;
+}
+
+/* Rounded table */
+.table-custom {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #dee2e6;
+}
+
+/* Status Badges */
+.badge {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 8px;
+}
+
+.badge-pending {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.badge-approved {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.badge-rejected {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+/* Table Action Buttons */
+.btn-action {
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    margin: 0 3px;
+}
+
+/* Optional: Responsive Font */
+@media (max-width: 768px) {
+    .table-custom th,
+    .table-custom td {
+        font-size: 0.85rem;
+        padding: 10px 12px;
+    }
+
+    .btn-action {
+        font-size: 0.75rem;
+        padding: 3px 8px;
+    }
+}
+</style>
 </head>
 <body>
  
 <!-- Top Bar -->
-<div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#8B0A50; color:white;">
-  <!-- Logo -->
-  <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo"
-       style="height: 40px; width:auto; background-color:#fff; border-radius:5px; padding:2px;" class="me-3">
-  <!-- Title -->
-  <h5 class="flex-grow-1 text-center m-0">Card Requests - DigiBank</h5>
-  <!-- Logout Button -->
-  <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
-    Logout
+<!-- Sidebar Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="sidebarMenuLabel">Manager</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark active" href="{{ url_for('dashboard') }}">
+            <i class="bi bi-speedometer2 me-2"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('managerapprovals') }}">
+            <i class="bi bi-people-fill me-2"></i> Manage Approvals
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('manstaff') }}">
+            <i class="bi bi-file-earmark-check me-2"></i>  Staff Management
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('transactions_review') }}">
+            <i class="bi bi-list-check me-2"></i> Transaction Review
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('manreport') }}">
+            <i class="bi bi-graph-up me-2"></i> Reports & Analytics
+          </a>
+        </li>
+     
+      </ul>
+    </div>
+  </div>
+ 
+  <!-- Top Bar -->
+  <!-- ✅ Top Bar -->
+<div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#0B4D83; color:white;">
+ 
+  <!-- Sidebar Toggle -->
+  <button class="btn btn-outline-light btn-sm me-3"
+          data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
+          aria-controls="sidebarMenu" aria-label="Toggle sidebar">
+    <i class="bi bi-list fs-5"></i>
+  </button>
+ 
+  <!-- DigiBank Logo -->
+  <a class="navbar-brand digi-bank-logo d-flex align-items-center me-3" href="{{ url_for('home') }}">
+    <div class="logo-icon"></div>
+    <div class="logo-text ms-2">
+      <div class="main-text">
+        <span class="digi">DiGi</span><span class="bank">Bank</span>
+      </div>
+      <div class="tagline">Smart Banking</div>
+    </div>
   </a>
+ 
+  <!-- Title -->
+  <h5 class="flex-grow-1 text-center m-0">Manage Approvals</h5>
+ 
+  <!-- Right Side: User + Logout -->
+  <div class="d-flex align-items-center">
+    <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }}</h5>
+    <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
+      Logout
+    </a>
+  </div>
 </div>
  
+<nav aria-label="breadcrumb" style="background-color:#f8f9fa; padding:8px 15px; border-radius:4px; margin:10px 20px;">
+    <ol class="breadcrumb mt-0">
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#0B4D83;">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page" style="color:#0B4D83; font-weight:bold;"> Manage Cards
+      </li>
+    </ol>
+  </nav>
 <div class="container my-4">
  
   <!-- Pending Requests -->
   <div class="card p-4 mb-4">
     <h4 class="mb-4">Pending Card Requests</h4>
     <div class="table-responsive">
-      <table class="table table-hover align-middle">
+      <table class="table table-hover align-middle table-custom">
         <thead class="table-light">
           <tr>
             <th>Request ID</th>
@@ -166,5 +471,7 @@
  
 </body>
 </html>
+ 
+ 
  
  

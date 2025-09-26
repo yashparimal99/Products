@@ -12,24 +12,24 @@
     body { background-color:#f8f9fa; font-family:'Segoe UI', sans-serif; min-height:100vh; display:flex; flex-direction:column; }
     #sidebarMenu.offcanvas-start{ width:250px; }
     #sidebarMenu .nav-link{ font-size:.9rem; padding:8px 12px; display:flex; align-items:center; gap:8px; color:#333; transition:color .3s; }
-    #sidebarMenu .nav-link.active{ font-weight:700; color:#97144D !important; background:#f0d7e0; border-radius:4px; }
+    #sidebarMenu .nav-link.active{ font-weight:700; color:#0B4D83 !important; background:#f0d7e0; border-radius:4px; }
     #sidebarMenu .nav-link:hover{ color:#7a0f3e; background:#f9e5ef; border-radius:4px; }
  
-    .top-bar{ background:#97144D; color:#fff; display:flex; align-items:center; gap:12px; padding:10px 20px; position:sticky; top:0; z-index:1030; }
+    .top-bar{ background:#0B4D83; color:#fff; display:flex; align-items:center; gap:12px; padding:10px 20px; position:sticky; top:0; z-index:1030; }
     .logout-btn{ background:transparent; border:1.5px solid #fff; color:#fff; padding:5px 15px; border-radius:4px; font-weight:600; }
-    .logout-btn:hover{ background:#fff; color:#97144D; }
+    .logout-btn:hover{ background:#fff; color:#0B4D83; }
     .btn-outline-light{ border:1.5px solid #fff; color:#fff; }
  
-    .nav-tabs .nav-link{ color:#97144D; font-weight:600; }
-    .nav-tabs .nav-link.active{ background:#97144D; color:#fff; border-color:#97144D #97144D #fff; }
+    .nav-tabs .nav-link{ color:#0B4D83; font-weight:600; }
+    .nav-tabs .nav-link.active{ background:#0B4D83; color:#fff; border-color:#0B4D83 #0B4D83 #fff; }
  
     .card-item{ background:#fff; border-radius:8px; padding:20px; margin-top:20px; box-shadow:0 0 8px rgba(0,0,0,.1); }
     .card-left{ border-right:1px solid #ddd; padding-right:20px; }
     .label{ font-weight:600; color:#444; }
-    .value{ font-size:1.05rem; color:#97144D; font-weight:700; }
+    .value{ font-size:1.05rem; color:#0B4D83; font-weight:700; }
     .badges .badge{ font-size:.8rem; }
     @media (max-width:576px){ .card-left{ border-right:none; padding-right:0; margin-bottom:15px; } }
-    footer.bg-custom{ background:#97144D; }
+    footer.bg-custom{ background:#0B4D83; }
   </style>
 </head>
 <body>
@@ -59,12 +59,12 @@
     <i class="bi bi-list"></i>
   </button>
  
-  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#97144D; width:100%;">
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#0B4D83; width:100%;">
     <div class="container-fluid">
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
  
-          
+         
           <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">My Activities</a></li>
  
           <!-- Open Account -->
@@ -110,24 +110,15 @@
             </ul>
           </li>
  
-          <!-- Forex -->
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="forexDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Forex</a>
-            <ul class="dropdown-menu" aria-labelledby="forexDropdown">
-              <li><a class="dropdown-item" href="{{ url_for('travel_forex') }}">Travel Forex Cards</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('send_money_abroad') }}">Send Money Abroad</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('send_money_india') }}">Send Money India</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('currency_exchange') }}">Foreign Currency Exchange</a></li>
-            </ul>
-          </li>
+          
  
           <!-- Investments -->
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="investDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Investments</a>
             <ul class="dropdown-menu" aria-labelledby="investDropdown">
-              <li><a class="dropdown-item" href="{{ url_for('pfinvest') }}">Public Provident Fund</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('pfinvest') }}">Floating Rate Saving Bonds</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('pfinvest') }}">National Pension System</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('userdashinvest') }}">Public Provident Fund</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('userdashinvest') }}">Floating Rate Saving Bonds</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('userdashinvest') }}">National Pension System</a></li>
             </ul>
           </li>
         </ul>
@@ -140,11 +131,11 @@
     </div>
   </nav>
 </div>
-
+ 
 <nav aria-label="breadcrumb" class="bg-light px-3 py-2 mt-3">
     <ol class="breadcrumb mb-0">
-      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color: #97144D;">Dashboard</a></li>
-      <li class="breadcrumb-item active" aria-current="page" style="color: #97144D; font-weight: bold;">View Cards</li>
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color: #0B4D83;">Dashboard</a></li>
+      <li class="breadcrumb-item active" aria-current="page" style="color: #0B4D83; font-weight: bold;">View Cards</li>
     </ol>
   </nav>
  
@@ -232,4 +223,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+ 
+ 
  

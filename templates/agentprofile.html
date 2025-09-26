@@ -1,15 +1,17 @@
+
+ 
 <!DOCTYPE html>
 <html lang="en">
-
+ 
 <head>
   <meta charset="UTF-8" />
   <title>Dashboard - DigiBank</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+ 
   <!-- Bootstrap CSS & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-
+ 
   <style>
     body {
       background-color: #f8f9fa;
@@ -21,15 +23,15 @@
       flex-direction: column;
       height: 100vh;
     }
-
+ 
     #sidebarMenu.offcanvas-start {
       width: 250px;
     }
-
+ 
     #sidebarMenu .offcanvas-body {
       padding: 0.5rem 1rem;
     }
-
+ 
     #sidebarMenu .nav-link {
       font-size: 0.9rem;
       padding: 8px 12px;
@@ -39,26 +41,26 @@
       color: #333;
       transition: color 0.3s;
     }
-
+ 
     #sidebarMenu .nav-link i {
       font-size: 1.1rem;
     }
-
+ 
     #sidebarMenu .nav-link.active {
       font-weight: 700;
-      color: #97144D !important;
+      color: #0B4D83 !important;
       background-color: #f0d7e0;
       border-radius: 4px;
     }
-
+ 
     #sidebarMenu .nav-link:hover {
       color: #7a0f3e;
       background-color: #f9e5ef;
       border-radius: 4px;
     }
-
+ 
     .top-bar {
-      background-color: #97144D;
+      background-color: #0B4D83;
       color: white;
       display: flex;
       align-items: center;
@@ -69,7 +71,7 @@
       top: 0;
       z-index: 1030;
     }
-
+ 
     .top-bar h5 {
       margin: 0;
       font-weight: 700;
@@ -77,7 +79,7 @@
       text-align: center;
       color: white;
     }
-
+ 
     .top-bar button.btn-outline-light {
       border: 1.5px solid white;
       color: white;
@@ -88,12 +90,12 @@
       cursor: pointer;
       transition: background-color 0.2s, color 0.2s;
     }
-
+ 
     .top-bar button.btn-outline-light:hover {
       background-color: white;
-      color: #97144D;
+      color: #0B4D83;
     }
-
+ 
     .logout-btn {
       background: transparent;
       border: 1.5px solid white;
@@ -105,14 +107,14 @@
       transition: background-color 0.2s, color 0.2s;
       flex-shrink: 0;
     }
-
+ 
     .logout-btn:hover {
       background-color: white;
-      color: #97144D;
+      color: #0B4D83;
     }
-
+ 
     .btn-digibank {
-      background-color: #97144D;
+      background-color: #0B4D83;
       color: #fff;
       border: none;
       padding: 8px 18px;
@@ -120,64 +122,64 @@
       border-radius: 25px;
       transition: background-color 0.3s ease;
     }
-
+ 
     .btn-digibank:hover {
       background-color: #7a0f3e;
       color: white;
     }
-
+ 
     .btn-submit {
-      background-color: #97144D;
+      background-color: #0B4D83;
       color: #fff;
       font-weight: 600;
       border: none;
       padding: 10px 0;
       border-radius: 4px;
     }
-
+ 
     .btn-submit:hover {
       background-color: #7a0f3e;
     }
-
+ 
     footer.bg-custom {
-      background-color: #97144D;
+      background-color: #0B4D83;
     }
-
+ 
     .breadcrumb {
       margin-bottom: 0;
     }
-
+ 
     .breadcrumb .active {
-      color: #97144D;
+      color: #0B4D83;
       font-weight: 500;
     }
-
+ 
     .breadcrumb a {
       text-decoration: none;
-      color: #97144D;
+      color: #0B4D83;
     }
-
+ 
     .breadcrumb a:hover {
       text-decoration: underline;
     }
   </style>
 </head>
-
+ 
 <body>
-
-
-
+ 
+ 
+ 
   <!-- Top Bar -->
-  <div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#8B0A50; color:white;">
-
-
+  <div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#0B4D83; color:white;">
+ 
+ 
     <!-- Logo / Image -->
     <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo"
       style="height: 40px; width:auto; background-color:#fff; border-radius:5px; padding:2px;" class="me-3">
-
+ 
     <!-- Title -->
     <h5 class="flex-grow-1 text-center m-0">Welcome To Cards Agent Dashboard - DigiBank</h5>
-
+ 
     <!-- Logout Button -->
     <div class="d-flex align-items-center">
       <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }} </h5>
@@ -186,122 +188,154 @@
       </a>
     </div>
   </div>
-
-
-
+ 
+ 
+ 
   <!-- Breadcrumb -->
   <nav aria-label="breadcrumb" style="background-color:#f8f9fa; padding:8px 15px; border-radius:4px; margin:10px 20px;">
     <ol class="breadcrumb mt-0">
-      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#97144D;">Home</a></li>
-      <li class="breadcrumb-item active" aria-current="page" style="color:#97144D; font-weight:bold;"> Profile
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#0B4D83;">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page" style="color:#0B4D83; font-weight:bold;"> Profile
       </li>
     </ol>
   </nav>
-
-
-
+ 
+ 
+ 
   <!-- Dashboard Content -->
-  <div class="container my-5">
-    <h3 class="mb-4" style="color: #97144D;">User Details</h3>
-
-    <form action="#" method="post" novalidate>
-      <!-- All fields readonly -->
-      <div class="row mb-3">
-        <div class="col-md-6"><label class="form-label">User ID</label><input type="text" class="form-control"
-            style="border:0.5px solid #97144D;" value="{{ user.user_id }}" readonly></div>
-        <div class="col-md-6"><label class="form-label">Full Name</label><input type="text" class="form-control"
-            style="border:0.5px solid #97144D;" value="{{ user.name }}" readonly></div>
+<div class="container my-5">
+  <h3 class="mb-4" style="color: #0B4D83;">User Details</h3>
+ 
+  <form action="#" method="post">
+ 
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label for="firstName" class="form-label">Name</label>
+        <input type="text" id="firstName" name="name" class="form-control" style="border: 0.5px solid #0B4D83;" value="{{ user.name }}"  readonly>
       </div>
-      <div class="row mb-3">
-        <div class="col-md-6"><label class="form-label">PAN</label><input type="text" class="form-control"
-            style="border:0.5px solid #97144D;" value="{{ user.pan }}" readonly></div>
-        <div class="col-md-6"><label class="form-label">Aadhar</label><input type="text" class="form-control"
-            style="border:0.5px solid #97144D;" value="{{ user.aadhaar }}" readonly></div>
+      <div class="col-md-4">
+        <label for="middleName" class="form-label">Customer ID</label>
+        <input type="text" id="middleName" name="cid" class="form-control" style="border: 0.5px solid #0B4D83;" value="{{ user.user_id }}" readonly>
       </div>
-      <div class="row mb-3">
-        <div class="col-md-6"><label class="form-label">Date of Birth</label><input type="date" class="form-control"
-            style="border:0.5px solid #97144D;" value="{{ user.dob }}" readonly></div>
-        <div class="col-md-6"><label class="form-label">Mobile Number</label><input type="tel" class="form-control"
-            style="border:0.5px solid #97144D;" value="{{ user.mobile }}" readonly></div>
+      <div class="col-md-4">
+         <label for="lastName" class="form-label">PAN</label>
+        <input type="text" id="lastName" name="pan" class="form-control" style="border: 0.5px solid #0B4D83;" value="{{ user.pan }}" readonly>
       </div>
-      <div class="row mb-3">
-        <div class="col-md-6"><label class="form-label">Email</label><input type="email" class="form-control"
-            style="border:0.5px solid #97144D;" value="{{ user.email }}" readonly></div>
-        <div class="col-md-6"><label class="form-label">Gender</label><input type="text" class="form-control"
-            style="border:0.5px solid #97144D;" value="{{ user.gender }}" readonly></div>
+    </div>
+ 
+    <div class="row mb-3">
+     
+      <div class="col-md-4">
+        <label for="mobileNumber" class="form-label">Mobile Number</label>
+        <input type="tel" id="mobileNumber" name="mobile_no" class="form-control" style="border: 0.5px solid #0B4D83;" value="{{ user.mobile }}" readonly>
       </div>
-      <div class="row mb-3">
-        <div class="col-12"><label class="form-label">Address</label><textarea class="form-control" rows="3"
-            style="border:0.5px solid #97144D;" value="{{ user.address }}" readonly></textarea></div>
+      <div class="col-md-4">
+        <label for="emailAddress" class="form-label">Email Address</label>
+        <input type="email" id="emailAddress" name="email" class="form-control" style="border: 0.5px solid #0B4D83;" value="{{ user.email }}" readonly>
       </div>
-      <div class="row mb-3">
-        <div class="col-md-4"><label class="form-label">City</label><input type="text" class="form-control"
-            style="border:0.5px solid #97144D;" value="{{ user.city }}" readonly></div>
-        <div class="col-md-4"><label class="form-label">State</label><input type="text" class="form-control"
-            style="border:0.5px solid #97144D;" value="{{ user.state }}" readonly></div>
-        <div class="col-md-4"><label class="form-label">Country</label><input type="text" class="form-control"
-            style="border:0.5px solid #97144D;" value="{{ user.country }}" readonly></div>
+      <div class="col-md-4">
+        <label for="aadharNumber" class="form-label">Aadhar Number</label>
+        <input type="text" id="aadharNumber" name="aadhar_number" class="form-control" style="border: 0.5px solid #0B4D83;" value="{{ user.aadhaar }}" readonly>
       </div>
-      <div class="row mb-3">
-        <div class="col-md-6"><label class="form-label">Department</label><input type="text" class="form-control"
-            style="border:0.5px solid #97144D;" value="{{ user.department }}" readonly></div>
-        <div class="col-md-6"><label class="form-label">Onboarding Date</label><input type="date" class="form-control"
-            style="border:0.5px solid #97144D;" value="{{ user.onboarding_date }}" readonly></div>
+    </div>
+ 
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label for="role" class="form-label">Date of Birth</label>
+        <input type="text" id="role" name="role" class="form-control" style="border: 0.5px solid #0B4D83;" value="{{ user.dob }}" readonly>
       </div>
-      <div class="row mb-3">
-        <div class="col-md-6"><label class="form-label">Status</label><input type="text" class="form-control"
-            style="border:0.5px solid #97144D;" value="{{ user.status }}" readonly></div>
-        <div class="col-md-6"><label class="form-label">Role</label><input type="text" class="form-control"
-            style="border:0.5px solid #97144D;" value="{{ user.role }}" readonly></div>
+      <div class="col-md-4">
+        <label for="role" class="form-label">Gender</label>
+        <input type="text" id="gender" name="gender" class="form-control" style="border: 0.5px solid #0B4D83;" value="{{ user.gender }}" readonly>
       </div>
-      <div class="row mb-3">
-        <div class="col-md-6 position-relative">
+      <div class="col-md-4">
+        <label for="role" class="form-label">User Created at</label>
+        <input type="text" id="gender" name="gender" class="form-control" style="border: 0.5px solid #0B4D83;" value="{{ user.onboarding_date }}" readonly>
+      </div>
+     
+    </div>
+ 
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label for="role" class="form-label">City</label>
+        <input type="text" id="role" name="role" class="form-control" style="border: 0.5px solid #0B4D83;" value="{{ user.city }}" readonly>
+      </div>
+      <div class="col-md-4">
+        <label for="role" class="form-label">State</label>
+        <input type="text" id="gender" name="gender" class="form-control" style="border: 0.5px solid #0B4D83;" value="{{ user.state }}" readonly>
+      </div>
+      <div class="col-md-4">
+        <label for="role" class="form-label">Country</label>
+        <input type="text" id="gender" name="gender" class="form-control" style="border: 0.5px solid #0B4D83;" value="{{ user.country }}" readonly>
+      </div>
+     
+    </div>
+ 
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label for="role" class="form-label">Status</label>
+        <input type="text" id="role" name="role" class="form-control" style="border: 0.5px solid #0B4D83;" value="{{ user.status }}" readonly>
+      </div>
+      <div class="col-md-4">
+        <label for="role" class="form-label">Role</label>
+        <input type="text" id="gender" name="gender" class="form-control" style="border: 0.5px solid #0B4D83;" value="{{ user.role }}" readonly>
+      </div>
+      <div class="col-md-4 position-relative">
           <label class="form-label">Password</label>
           <div class="input-group">
-            <input type="password" id="passwordField" class="form-control" style="border:0.5px solid #97144D;"
+            <input type="password" id="passwordField" class="form-control" style="border:0.5px solid #0B4D83;"
               value="{{ user.password }}" readonly>
-            <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()" tabindex="-1">
+            <button type="button" class="btn btn-outline-secondary" style="border:0.5px solid #0B4D83;"  onclick="togglePassword()" tabindex="-1">
               <i id="toggleIcon" class="bi bi-eye"></i>
             </button>
           </div>
         </div>
-
-        <script>
-          function togglePassword() {
-            const passwordField = document.getElementById("passwordField");
-            const toggleIcon = document.getElementById("toggleIcon");
-
-            if (passwordField.type === "password") {
-              passwordField.type = "text";
-              toggleIcon.classList.remove("bi-eye");
-              toggleIcon.classList.add("bi-eye-slash");
-            } else {
-              passwordField.type = "password";
-              toggleIcon.classList.remove("bi-eye-slash");
-              toggleIcon.classList.add("bi-eye");
-            }
-          }
-        </script>
-        <div class="col-md-6">
-          <label class="form-label">Deleted At</label>
-          <input type="text" class="form-control" style="border:0.5px solid #97144D;" value="{{ user.deleted_date }}"
-            readonly>
+       
+    </div>
+    <script>
+  function togglePassword() {
+    const passwordField = document.getElementById("passwordField");
+    const toggleIcon = document.getElementById("toggleIcon");
+ 
+    if (passwordField.type === "password") {
+      passwordField.type = "text";
+      toggleIcon.classList.remove("bi-eye");
+      toggleIcon.classList.add("bi-eye-slash");
+    } else {
+      passwordField.type = "password";
+      toggleIcon.classList.remove("bi-eye-slash");
+      toggleIcon.classList.add("bi-eye");
+    }
+  }
+</script>
+ 
+    <div class="row mb-3">
+      <div class="col-12">
+        <label for="address" class="form-label">Address</label>
+        <textarea id="address" name="address" class="form-control" rows="3" style="border: 0.5px solid #0B4D83;" readonly>{{ user.address }}</textarea>
+ 
         </div>
-      </div> <!-- closes the row -->
-    </form>
-
-    <!-- Edit Details Button -->
-    <div class="mt-3 d-flex justify-content-center">
-      <a href="{{ url_for('agentupdate_profile') }}" class="btn btn-primary"
-        style="background-color:#97144D; border:none;">
+    </div>
+ 
+    <div class="mt-5 d-flex justify-content-center">
+      <a href="{{ url_for('agentupdate_profile') }}" class="btn px-4 py-2" style="background-color:#0B4D83; border:none; color:white; font-weight:600;">
         Edit Details
       </a>
     </div>
-
-
-
-
+ 
+    <!-- <div class="d-flex justify-content-center mt-3">
+          <button id="saveBtn" type="submit" class="btn px-4 py-2"
+            style="background-color:#0B4D83; border:none; color:white; font-weight:600;">
+            Save Changes
+          </button>
+        </div> -->
+ 
+  </form>
+</div>
+ 
     <!-- Footer -->
     <footer class="bg-custom text-white text-center py-3 mt-5">
       © 2025 DigiBank. All rights reserved.
     </footer>
+ 
+ 

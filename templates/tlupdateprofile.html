@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
  
@@ -47,7 +48,7 @@
  
     #sidebarMenu .nav-link.active {
       font-weight: 700;
-      color: #97144D !important;
+      color: #0B4D83 !important;
       background-color: #f0d7e0;
       border-radius: 4px;
     }
@@ -71,13 +72,13 @@
  
     .top-bar button.btn-outline-light:hover {
       background-color: white;
-      color: #97144D;
+      color: #0B4D83;
     }
  
  
     /* Top Bar */
     .top-bar {
-      background-color: #97144D;
+      background-color: #0B4D83;
       color: white;
       display: flex;
       align-items: center;
@@ -111,7 +112,7 @@
  
     .logout-btn:hover {
       background-color: white;
-      color: #97144D;
+      color: #0B4D83;
     }
  
     /* Search Bar Row with Sidebar Toggle & Chatbot */
@@ -142,8 +143,8 @@
     }
  
     .search-chatbar .btn-toggle-sidebar:hover {
-      border-color: #97144D;
-      color: #97144D;
+      border-color: #0B4D83;
+      color: #0B4D83;
     }
  
     /* Search input centered and wide */
@@ -161,13 +162,13 @@
     }
  
     .search-chatbar input[type="text"]:focus {
-      border-color: #97144D;
+      border-color: #0B4D83;
       box-shadow: 0 0 5px rgba(151, 20, 77, 0.5);
     }
  
     /* Chatbot button right aligned */
     .search-chatbar .chatbot-btn {
-      background-color: #97144D;
+      background-color: #0B4D83;
       border: none;
       color: white;
       padding: 10px 14px;
@@ -183,6 +184,20 @@
  
     .search-chatbar .chatbot-btn:hover {
       background-color: #7a0f3e;
+    }
+    .breadcrumb {
+      margin-bottom: 0;
+    }
+    .breadcrumb .active {
+      color: #0B4D83;
+      font-weight: 500;
+    }
+    .breadcrumb a {
+      text-decoration: none;
+      color: #0B4D83;
+    }
+    .breadcrumb a:hover {
+      text-decoration: underline;
     }
  
     /* Dashboard Cards */
@@ -206,7 +221,7 @@
  
     .dashboard-icon {
       font-size: 32px;
-      color: #97144D;
+      color: #0B4D83;
       margin-bottom: 15px;
     }
  
@@ -223,7 +238,7 @@
     }
  
     .btn-digibank {
-      background-color: #97144D;
+      background-color: #0B4D83;
       color: #fff;
       border: none;
       padding: 8px 18px;
@@ -239,7 +254,7 @@
  
     /* Footer */
     footer.bg-custom {
-      background-color: #97144D;
+      background-color: #0B4D83;
     }
   </style>
   <style>
@@ -249,7 +264,7 @@
       margin: 0;
     }
     .btn-submit {
-      background-color: #97144D;
+      background-color: #0B4D83;
       color: #fff;
       font-weight: 600;
       border: none;
@@ -263,102 +278,82 @@
 </head>
  
 <body>
+ <!-- Top Bar -->
+  <div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#0B4D83; color:white;">
  
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D;">
-  <div class="container-fluid">
-    <!-- Left: Bank Logo -->
-    <a class="navbar-brand d-flex align-items-center" href="#">
-      <img src="{{ url_for('static', filename='images/Digilogo.jpg') }}" alt="Bank Logo"
-        style="height: 40px; margin-right: 10px;">
-    </a>
-
-    <!-- Center: Title -->
-    <div class="mx-auto text-white fw-bold fs-5">
-      Teamlead Dashboard
-    </div>
-
-    <!-- Right: Welcome + Logout -->
+ 
+    <!-- Logo / Image -->
+    <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo"
+      style="height: 40px; width:auto; background-color:#fff; border-radius:5px; padding:2px;" class="me-3">
+ 
+    <!-- Title -->
+    <h5 class="flex-grow-1 text-center m-0">Welcome To Team Lead Dashboard - DigiBank</h5>
+ 
+    <!-- Logout Button -->
     <div class="d-flex align-items-center">
-      <span class="text-white me-3 fw-semibold">
-        Welcome, {{ user.email }} !
-      </span>
-      <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">
+      <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }} </h5>
+      <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
         Logout
       </a>
     </div>
   </div>
-</nav>
-    <!-- End of custom navbar -->
- 
-  </div>
  
  
- 
-  </div>
- 
- 
- 
- 
- 
-
-
   <!-- Breadcrumb -->
-  <nav aria-label="breadcrumb"
-        style="background-color:#f8f9fa; padding:8px 15px; border-radius:4px; margin:10px 20px;">
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#97144D;">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page" style="color:#97144D; font-weight:bold;"> Update Profile
-            </li>
-        </ol>
-    </nav>
-
+  <nav aria-label="breadcrumb" style="background-color:#f8f9fa; padding:8px 15px; border-radius:4px; margin:10px 20px;">
+    <ol class="breadcrumb mt-0">
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#0B4D83;">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page" style="color:#0B4D83; font-weight:bold;"> Update Profile
+      </li>
+    </ol>
+  </nav>
+ 
   <!-- Content -->
   <div class="container my-5">
-    <h3 class="mb-4" style="color: #97144D;">User Details</h3>
-
+    <h3 class="mb-4" style="color: #0B4D83;">User Details</h3>
+ 
     <form action="{{ url_for('tlupdate_profile') }}" method="post" id="userForm" novalidate>
-
+ 
       <!-- keep a copy of original mobile for change-detection -->
       <input type="hidden" id="origMobile" value="{{ user.mobile or '' }}">
-
+ 
       <!-- Mobile (no required) -->
       <div class="row mb-3">
         <div class="col-md-6">
           <label for="mobile" class="form-label">Mobile Number</label>
-          <input type="text" id="mobile" name="mobile" class="form-control" style="border: 0.5px solid #97144D;"
+          <input type="text" id="mobile" name="mobile" class="form-control" style="border: 0.5px solid #0B4D83;"
             value="{{ user.mobile or '' }}">
         </div>
       </div>
-
+ 
       <div class="row mb-3">
         <div class="col-md-4">
           <label for="city" class="form-label">City</label>
-          <input type="text" id="city" name="city" class="form-control" style="border: 0.5px solid #97144D;"
+          <input type="text" id="city" name="city" class="form-control" style="border: 0.5px solid #0B4D83;"
             value="{{ user.city or '' }}">
         </div>
         <div class="col-md-4">
           <label for="state" class="form-label">State</label>
-          <input type="text" id="state" name="state" class="form-control" style="border: 0.5px solid #97144D;"
+          <input type="text" id="state" name="state" class="form-control" style="border: 0.5px solid #0B4D83;"
             value="{{ user.state or '' }}">
         </div>
         <div class="col-md-4">
           <label for="country" class="form-label">Country</label>
-          <input type="text" id="country" name="country" class="form-control" style="border: 0.5px solid #97144D;"
+          <input type="text" id="country" name="country" class="form-control" style="border: 0.5px solid #0B4D83;"
             value="{{ user.country or '' }}">
         </div>
       </div>
-
+ 
       <!-- Address (no required) -->
       <div class="row mb-3">
         <div class="col-12">
           <label for="address" class="form-label">Address</label>
-          <textarea id="address" name="address" class="form-control" style="border: 0.5px solid #97144D;"
+          <textarea id="address" name="address" class="form-control" style="border: 0.5px solid #0B4D83;"
             rows="3">{{ user.address or '' }}</textarea>
         </div>
       </div>
-
-
+ 
+ 
       <!-- Change Password (optional) -->
       <div class="mb-3 mt-4">
         <div class="form-check form-switch mb-2">
@@ -366,46 +361,46 @@
           <label class="form-check-label ms-3" for="toggleChangePw">
             Change Password (optional)
           </label>
-
+ 
         </div>
-
-
+ 
+ 
         <!-- hidden/disabled until toggled -->
         <div id="pwBlock" class="d-none mt-4">
           <div class="row mb-3">
             <!-- Current Password -->
             <div class="col-md-4">
               <div class="input-group mb-2">
-                <span class="input-group-text" style="border: 0.5px solid #97144D;">Current</span>
+                <span class="input-group-text" style="border: 0.5px solid #0B4D83;">Current</span>
                 <input type="password" id="currentPassword" name="current_password" class="form-control"
-                  style="border: 0.5px solid #97144D;" autocomplete="current-password" disabled>
-                <button class="btn btn-outline-custom" type="button" style="border: 0.5px solid #97144D;"
+                  style="border: 0.5px solid #0B4D83;" autocomplete="current-password" disabled>
+                <button class="btn btn-outline-custom" type="button" style="border: 0.5px solid #0B4D83;"
                   data-toggle-pass="#currentPassword">
                   <i class="bi bi-eye"></i>
                 </button>
               </div>
             </div>
-
+ 
             <!-- New Password -->
             <div class="col-md-4">
               <div class="input-group mb-2">
-                <span class="input-group-text" style="border: 0.5px solid #97144D;">New</span>
-                <input type="password" id="newPassword" style="border: 0.5px solid #97144D;" name="new_password"
+                <span class="input-group-text" style="border: 0.5px solid #0B4D83;">New</span>
+                <input type="password" id="newPassword" style="border: 0.5px solid #0B4D83;" name="new_password"
                   class="form-control" autocomplete="new-password" disabled>
-                <button class="btn btn-outline-custom" style="border: 0.5px solid #97144D;" type="button"
+                <button class="btn btn-outline-custom" style="border: 0.5px solid #0B4D83;" type="button"
                   data-toggle-pass="#newPassword">
                   <i class="bi bi-eye"></i>
                 </button>
               </div>
             </div>
-
+ 
             <!-- Confirm Password -->
             <div class="col-md-4">
               <div class="input-group mb-2">
-                <span class="input-group-text" style="border: 0.5px solid #97144D;">Confirm</span>
-                <input type="password" id="confirmPassword" style="border: 0.5px solid #97144D;" name="confirm_password"
+                <span class="input-group-text" style="border: 0.5px solid #0B4D83;">Confirm</span>
+                <input type="password" id="confirmPassword" style="border: 0.5px solid #0B4D83;" name="confirm_password"
                   class="form-control" autocomplete="new-password" disabled>
-                <button class="btn btn-outline-custom" style="border: 0.5px solid #97144D;" type="button"
+                <button class="btn btn-outline-custom" style="border: 0.5px solid #0B4D83;" type="button"
                   data-toggle-pass="#confirmPassword">
                   <i class="bi bi-eye"></i>
                 </button>
@@ -413,12 +408,12 @@
             </div>
           </div>
         </div>
-
+ 
         <script>
           // show/hide & enable/disable password fields
           const pwToggle = document.getElementById('toggleChangePw');
           const pwBlock = document.getElementById('pwBlock');
-
+ 
           function setPwEnabled(on) {
             pwBlock.classList.toggle('d-none', !on);
             pwBlock.querySelectorAll('input[type="password"]').forEach(i => {
@@ -428,7 +423,7 @@
           }
           setPwEnabled(false);
           pwToggle.addEventListener('change', e => setPwEnabled(e.target.checked));
-
+ 
           // keep your existing show/hide eye button behavior
           document.querySelectorAll('[data-toggle-pass]').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -443,12 +438,12 @@
               }
             });
           });
-
+ 
           // validate ONLY if mobile changed (and not empty)
           document.getElementById('userForm').addEventListener('submit', (e) => {
             const mobile = document.getElementById('mobile').value.trim();
             const orig = document.getElementById('origMobile').value.trim();
-
+ 
             // validate mobile only when user actually changed it
             if (mobile !== orig && mobile !== '') {
               if (!/^\d{10}$/.test(mobile)) {
@@ -457,13 +452,13 @@
                 return;
               }
             }
-
+ 
             // password validation only when user opted in
             if (pwToggle.checked) {
               const curr = document.getElementById('currentPassword').value;
               const neu = document.getElementById('newPassword').value;
               const conf = document.getElementById('confirmPassword').value;
-
+ 
               if (!curr || !neu || !conf) {
                 e.preventDefault(); e.stopPropagation();
                 alert('To change your password, fill Current, New, and Confirm.');
@@ -482,20 +477,20 @@
             }
           }, true);
         </script>
-
-
+ 
+ 
         <!-- Submit -->
         <div class="d-flex justify-content-center mt-3">
           <button id="saveBtn" type="submit" class="btn px-4 py-2"
-            style="background-color:#97144D; border:none; color:white; font-weight:600;">
+            style="background-color:#0B4D83; border:none; color:white; font-weight:600;">
             Save Changes
           </button>
         </div>
-
+ 
     </form>
   </div>
-
-
+ 
+ 
 <!-- Footer -->
   <footer class="bg-custom text-white text-center py-3 mt-auto">
     © 2025 DigiBank. All rights reserved.
@@ -513,14 +508,14 @@
       </div>
     </div>
   </div>
-
+ 
   <script>
     // show a quick pre-submit toast & lock the button
     (function () {
       const form = document.getElementById('userForm');
       const btn = document.getElementById('saveBtn');
       const toastEl = document.getElementById('preSubmitToast');
-
+ 
       form.addEventListener('submit', function (e) {
         // If you have custom client-side validation that may call preventDefault(),
         // we only show the toast if the form is still submitting.
@@ -546,21 +541,23 @@
     .form-check-input.custom-switch {
       width: 2.5em;
       height: 1.3em;
-      border: 0.5px solid #97144D;
+      border: 0.5px solid #0B4D83;
       background-color: #fff;
       cursor: pointer;
     }
-
+ 
     .form-check-input.custom-switch:checked {
-      background-color: #97144D;
-      border-color: #97144D;
+      background-color: #0B4D83;
+      border-color: #0B4D83;
     }
-
+ 
     .form-check-input.custom-switch:focus {
       box-shadow: 0 0 0 0.2rem rgba(151, 20, 77, 0.25);
     }
   </style>
-
+ 
 </body>
-
+ 
 </html>
+ 
+ 
