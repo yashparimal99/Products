@@ -1,0 +1,1700 @@
+ALTER TABLE bank_accounts
+DROP FOREIGN KEY bank_accounts_ibfk_1;
+
+ALTER TABLE bank_accounts
+CHANGE COLUMN cust_id user_id VARCHAR(100);
+
+ALTER TABLE bank_accounts
+ADD CONSTRAINT fk_bank_accounts_user
+FOREIGN KEY (user_id) REFERENCES bank_users(user_id);
+
+SELECT user_id 
+FROM bank_accounts
+WHERE user_id NOT IN (SELECT user_id FROM bank_users);
+
+DELETE FROM bank_accounts
+WHERE user_id NOT IN (SELECT user_id FROM bank_users);
+
+DELETE bank_accounts
+FROM bank_accounts
+LEFT JOIN bank_users ON bank_accounts.user_id = bank_users.user_id
+WHERE bank_users.user_id IS NULL;
+
+show tables
+CREATE TABLE accounts (
+    user_id VARCHAR(100),
+    first_name VARCHAR(100),
+    middle_name VARCHAR(100),
+    last_name VARCHAR(100),
+    email VARCHAR(100),
+    mobile VARCHAR(15),
+    aadhar VARCHAR(12),
+    account_type VARCHAR(20),
+    account_number VARCHAR(20),   -- use account_number as PK
+    FOREIGN KEY (user_id) REFERENCES bank_users(user_id)
+);
+
+ALTER TABLE accounts
+ADD COLUMN date_of_opening DATE NOT NULL DEFAULT (CURRENT_DATE) AFTER account_number,
+ADD COLUMN date_of_delete DATE DEFAULT NULL AFTER date_of_opening,
+ADD COLUMN date_of_action DATE DEFAULT NULL AFTER date_of_delete,
+ADD COLUMN status_flag CHAR(1) DEFAULT NULL AFTER date_of_action;
+
+CREATE TABLE accounts (
+    user_id VARCHAR(100),
+    first_name VARCHAR(100),
+    middle_name VARCHAR(100),
+    last_name VARCHAR(100),
+    email VARCHAR(100),
+    mobile VARCHAR(15),
+    aadhar VARCHAR(12),
+    account_type VARCHAR(20),
+    account_number VARCHAR(20) PRIMARY KEY,   -- using account_number as PK
+    date_of_opening DATE NOT NULL,            -- mandatory
+    date_of_delete DATE DEFAULT NULL,
+    date_of_action DATE DEFAULT NULL,         -- when account was approved/rejected/updated
+    status_flag CHAR(1) DEFAULT NULL,         -- NULL = pending, 'A' = approved, 'R' = rejected
+    FOREIGN KEY (user_id) REFERENCES 
+    (user_id)
+);
+
+CREATE TABLE deposits (
+    user_id VARCHAR(100),
+    first_name VARCHAR(100),
+    middle_name VARCHAR(100),
+    last_name VARCHAR(100),
+    email VARCHAR(100),
+    mobile VARCHAR(15),
+    aadhar VARCHAR(12),
+    account_type VARCHAR(20),
+    account_number VARCHAR(20) PRIMARY KEY,   -- using account_number as PK
+    date_of_opening DATE NOT NULL,            -- mandatory
+    date_of_delete DATE DEFAULT NULL,
+    date_of_action DATE DEFAULT NULL,         -- when account was approved/rejected/updated
+    status_flag CHAR(1) DEFAULT NULL,         -- NULL = pending, 'A' = approved, 'R' = rejected
+    FOREIGN KEY (user_id) REFERENCES bank_users(user_id)
+);
+use banking_products
+select * from deposits
+select * from bank_users
+
+CREATE TABLE IF NOT EXISTS transactions (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  from_account VARCHAR(20) NULL,
+  to_account   VARCHAR(20) NULL,
+  amount       DECIMAL(14,2) NOT NULL,
+  note         VARCHAR(255),
+  created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  status       ENUM('success','failed') NOT NULL DEFAULT 'success',
+  FOREIGN KEY (from_account) REFERENCES bank_accounts(account_number),
+  FOREIGN KEY (to_account)   REFERENCES bank_accounts(account_number),
+  INDEX idx_created_at (created_at),
+  INDEX idx_from (from_account),
+  INDEX idx_to (to_account)
+);
+
+select * from accounts_requests
+
+
+ALTER TABLE accounts_requests
+drop COLUMN date_of_opening ;
+
+
+
+CREATE TABLE accounts_requests (
+    request_id VARCHAR(20) PRIMARY KEY,
+    first_name VARCHAR(100),
+    middle_name VARCHAR(100),
+    last_name VARCHAR(100),
+    email VARCHAR(100),
+    mobile VARCHAR(15),
+    aadhar VARCHAR(12),
+    account_type VARCHAR(20),
+    account_number VARCHAR(20),   -- using account_number as PK
+    date_of_opening DATE NOT NULL,            -- mandatory
+    date_of_delete DATE DEFAULT NULL,
+    date_of_action DATE DEFAULT NULL,         -- when account was approved/rejected/updated
+    status_flag CHAR(1) DEFAULT NULL
+);
+
+
+
+
+
+CREATE TABLE saving_accounts (
+    user_id VARCHAR(100),
+    first_name VARCHAR(100),
+    middle_name VARCHAR(100),
+    last_name VARCHAR(100),
+    email VARCHAR(100),
+    mobile VARCHAR(15),
+    aadhar VARCHAR(12),
+    account_type VARCHAR(20),
+    account_number VARCHAR(20),
+    FOREIGN KEY (user_id) REFERENCES bank_users(user_id)
+);
+ALTER TABLE saving_accounts
+ADD COLUMN date_of_opening DATE NOT NULL DEFAULT (CURRENT_DATE) AFTER account_number,
+ADD COLUMN date_of_delete DATE DEFAULT NULL AFTER date_of_opening,
+ADD COLUMN date_of_action DATE DEFAULT NULL AFTER date_of_delete,
+ADD COLUMN status_flag CHAR(1) DEFAULT NULL AFTER date_of_action;
+
+CREATE TABLE current_accounts (
+    user_id VARCHAR(100),
+    first_name VARCHAR(100),
+    middle_name VARCHAR(100),
+    last_name VARCHAR(100),
+    email VARCHAR(100),
+    mobile VARCHAR(15),
+    aadhar VARCHAR(12),
+    account_type VARCHAR(20),
+    account_number VARCHAR(20),
+    FOREIGN KEY (user_id) REFERENCES bank_users(user_id)
+);
+ALTER TABLE current_accounts
+ADD COLUMN date_of_opening DATE NOT NULL DEFAULT (CURRENT_DATE) AFTER account_number,
+ADD COLUMN date_of_delete DATE DEFAULT NULL AFTER date_of_opening,
+ADD COLUMN date_of_action DATE DEFAULT NULL AFTER date_of_delete,
+ADD COLUMN status_flag CHAR(1) DEFAULT NULL AFTER date_of_action;
+
+CREATE TABLE salary_accounts (
+    user_id VARCHAR(100),
+    first_name VARCHAR(100),
+    middle_name VARCHAR(100),
+    last_name VARCHAR(100),
+    email VARCHAR(100),
+    mobile VARCHAR(15),
+    aadhar VARCHAR(12),
+    account_type VARCHAR(20),
+    account_number VARCHAR(20),
+    FOREIGN KEY (user_id) REFERENCES bank_users(user_id)
+);
+ALTER TABLE salary_accounts
+ADD COLUMN date_of_opening DATE NOT NULL DEFAULT (CURRENT_DATE) AFTER account_number,
+ADD COLUMN date_of_delete DATE DEFAULT NULL AFTER date_of_opening,
+ADD COLUMN date_of_action DATE DEFAULT NULL AFTER date_of_delete,
+ADD COLUMN status_flag CHAR(1) DEFAULT NULL AFTER date_of_action;
+
+CREATE TABLE pmjdy_accounts (
+    user_id VARCHAR(100),
+    first_name VARCHAR(100),
+    middle_name VARCHAR(100),
+    last_name VARCHAR(100),
+    email VARCHAR(100),
+    mobile VARCHAR(15),
+    aadhar VARCHAR(12),
+    account_type VARCHAR(20),
+    account_number VARCHAR(20),
+    FOREIGN KEY (user_id) REFERENCES bank_users(user_id)
+);
+ALTER TABLE pmjdy_accounts
+ADD COLUMN date_of_opening DATE NOT NULL DEFAULT (CURRENT_DATE) AFTER account_number,
+ADD COLUMN date_of_delete DATE DEFAULT NULL AFTER date_of_opening,
+ADD COLUMN date_of_action DATE DEFAULT NULL AFTER date_of_delete,
+ADD COLUMN status_flag CHAR(1) DEFAULT NULL AFTER date_of_action;
+ 
+CREATE TABLE pension_accounts (
+    user_id VARCHAR(100),
+    first_name VARCHAR(100),
+    middle_name VARCHAR(100),
+    last_name VARCHAR(100),
+    email VARCHAR(100),
+    mobile VARCHAR(15),
+    aadhar VARCHAR(12),
+    account_type VARCHAR(20),
+    account_number VARCHAR(20),
+    FOREIGN KEY (user_id) REFERENCES bank_users(user_id)
+);
+ALTER TABLE pension_accounts
+ADD COLUMN date_of_opening DATE NOT NULL DEFAULT (CURRENT_DATE) AFTER account_number,
+ADD COLUMN date_of_delete DATE DEFAULT NULL AFTER date_of_opening,
+ADD COLUMN date_of_action DATE DEFAULT NULL AFTER date_of_delete,
+ADD COLUMN status_flag CHAR(1) DEFAULT NULL AFTER date_of_action;
+ 
+ 
+CREATE TABLE safecustody_accounts (
+    user_id VARCHAR(100),
+    first_name VARCHAR(100),
+    middle_name VARCHAR(100),
+    last_name VARCHAR(100),
+    email VARCHAR(100),
+    mobile VARCHAR(15),
+    aadhar VARCHAR(12),
+    account_type VARCHAR(20),
+    account_number VARCHAR(20),
+    FOREIGN KEY (user_id) REFERENCES bank_users(user_id)
+);
+ALTER TABLE safecustody_accounts
+ADD COLUMN date_of_opening DATE NOT NULL DEFAULT (CURRENT_DATE) AFTER account_number,
+ADD COLUMN date_of_delete DATE DEFAULT NULL AFTER date_of_opening,
+ADD COLUMN date_of_action DATE DEFAULT NULL AFTER date_of_delete,
+ADD COLUMN status_flag CHAR(1) DEFAULT NULL AFTER date_of_action;
+
+ALTER TABLE saving_accounts ADD COLUMN balance DECIMAL(12,2) NOT NULL DEFAULT 0.00 AFTER account_number;
+ALTER TABLE current_accounts ADD COLUMN balance DECIMAL(12,2) NOT NULL DEFAULT 0.00 AFTER account_number;
+ALTER TABLE salary_accounts  ADD COLUMN balance DECIMAL(12,2) NOT NULL DEFAULT 0.00 AFTER account_number;
+ALTER TABLE pmjdy_accounts   ADD COLUMN balance DECIMAL(12,2) NOT NULL DEFAULT 0.00 AFTER account_number;
+ALTER TABLE pension_accounts ADD COLUMN balance DECIMAL(12,2) NOT NULL DEFAULT 0.00 AFTER account_number;
+ALTER TABLE safecustody_accounts ADD COLUMN balance DECIMAL(12,2) NOT NULL DEFAULT 0.00 AFTER account_number;
+
+ALTER TABLE saving_accounts       ADD CONSTRAINT fk_saving_user       FOREIGN KEY (user_id) REFERENCES bank_users(user_id);
+ALTER TABLE current_accounts      ADD CONSTRAINT fk_current_user      FOREIGN KEY (user_id) REFERENCES bank_users(user_id);
+ALTER TABLE salary_accounts       ADD CONSTRAINT fk_salary_user       FOREIGN KEY (user_id) REFERENCES bank_users(user_id);
+ALTER TABLE pmjdy_accounts        ADD CONSTRAINT fk_pmjdy_user        FOREIGN KEY (user_id) REFERENCES bank_users(user_id);
+ALTER TABLE pension_accounts      ADD CONSTRAINT fk_pension_user      FOREIGN KEY (user_id) REFERENCES bank_users(user_id);
+ALTER TABLE safecustody_accounts  ADD CONSTRAINT fk_safecustody_user  FOREIGN KEY (user_id) REFERENCES bank_users(user_id);
+ 
+-- If your deposits table used cust_id, move it to user_id as well
+ALTER TABLE bank_deposits CHANGE cust_id user_id VARCHAR(100);
+ALTER TABLE bank_deposits ADD CONSTRAINT fk_deposits_user FOREIGN KEY (user_id) REFERENCES bank_users(user_id);
+
+
+use banking_products;
+select * from deposits;
+select * from salary_accounts;
+select * from current_accounts;
+select * from digital_fixed_deposits;
+select * from recurring_deposits;
+select * from transactions;
+select * from fixed_deposits;
+
+show tables
+select * from deposits
+
+RENAME TABLE bank_deposits TO deposits;
+
+-- Add missing columns safely (won’t error if they already exist)
+ALTER TABLE deposits
+  ADD COLUMN  txn_id VARCHAR(32) NULL,
+  ADD COLUMN  status ENUM('success','failed','pending') DEFAULT 'success',
+  ADD COLUMN  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+-- Add helpful indexes
+ALTER TABLE deposits
+  ADD KEY  ix_dep_user (user_id),
+  ADD KEY  ix_dep_account (account_number);
+
+
+
+-- Digital Fixed Deposits
+CREATE TABLE IF NOT EXISTS digital_fixed_deposits (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id VARCHAR(100) NOT NULL,
+  first_name VARCHAR(100), middle_name VARCHAR(100), last_name VARCHAR(100),
+  email VARCHAR(100), mobile VARCHAR(15), aadhar VARCHAR(12),
+  account_number VARCHAR(20) NOT NULL UNIQUE,
+  principal_amount DECIMAL(15,2) NOT NULL,
+  interest_rate DECIMAL(5,2) NOT NULL,
+  compounding ENUM('MONTHLY','QUARTERLY','HALF_YEARLY','YEARLY') DEFAULT 'QUARTERLY',
+  tenure_months INT NOT NULL,
+  date_of_opening DATE NOT NULL DEFAULT (CURRENT_DATE),
+  date_of_delete DATE DEFAULT NULL,
+  date_of_action DATE DEFAULT NULL,
+  status_flag CHAR(1) DEFAULT 'A',
+  maturity_date DATE GENERATED ALWAYS AS (DATE_ADD(date_of_opening, INTERVAL tenure_months MONTH)) STORED,
+  maturity_amount DECIMAL(15,2) NULL,
+  KEY ix_dfd_user (user_id),
+  CONSTRAINT fk_dfd_user FOREIGN KEY (user_id) REFERENCES bank_users(user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Fixed Deposits
+CREATE TABLE IF NOT EXISTS fixed_deposits (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id VARCHAR(100) NOT NULL,
+  first_name VARCHAR(100), middle_name VARCHAR(100), last_name VARCHAR(100),
+  email VARCHAR(100), mobile VARCHAR(15), aadhar VARCHAR(12),
+  account_number VARCHAR(20) NOT NULL UNIQUE,
+  principal_amount DECIMAL(15,2) NOT NULL,
+  interest_rate DECIMAL(5,2) NOT NULL,
+  compounding ENUM('MONTHLY','QUARTERLY','HALF_YEARLY','YEARLY') DEFAULT 'QUARTERLY',
+  tenure_months INT NOT NULL,
+  date_of_opening DATE NOT NULL DEFAULT (CURRENT_DATE),
+  date_of_delete DATE DEFAULT NULL,
+  date_of_action DATE DEFAULT NULL,
+  status_flag CHAR(1) DEFAULT 'A',
+  maturity_date DATE GENERATED ALWAYS AS (DATE_ADD(date_of_opening, INTERVAL tenure_months MONTH)) STORED,
+  maturity_amount DECIMAL(15,2) NULL,
+  KEY ix_fd_user (user_id),
+  CONSTRAINT fk_fd_user FOREIGN KEY (user_id) REFERENCES bank_users(user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Recurring Deposits
+CREATE TABLE IF NOT EXISTS recurring_deposits (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id VARCHAR(100) NOT NULL,
+  first_name VARCHAR(100), middle_name VARCHAR(100), last_name VARCHAR(100),
+  email VARCHAR(100), mobile VARCHAR(15), aadhar VARCHAR(12),
+  account_number VARCHAR(20) NOT NULL UNIQUE,
+  monthly_installment DECIMAL(15,2) NOT NULL,
+  interest_rate DECIMAL(5,2) NOT NULL,
+  compounding ENUM('MONTHLY','QUARTERLY','HALF_YEARLY','YEARLY') DEFAULT 'MONTHLY',
+  tenure_months INT NOT NULL,
+  date_of_opening DATE NOT NULL DEFAULT (CURRENT_DATE),
+  date_of_delete DATE DEFAULT NULL,
+  date_of_action DATE DEFAULT NULL,
+  status_flag CHAR(1) DEFAULT 'A',
+  maturity_date DATE GENERATED ALWAYS AS (DATE_ADD(date_of_opening, INTERVAL tenure_months MONTH)) STORED,
+  maturity_amount DECIMAL(15,2) NULL,
+  KEY ix_rd_user (user_id),
+  CONSTRAINT fk_rd_user FOREIGN KEY (user_id) REFERENCES bank_users(user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+drop table deposits;
+
+CREATE TABLE IF NOT EXISTS deposits (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id VARCHAR(100) NOT NULL,
+  account_number VARCHAR(20) NOT NULL,
+  amount DECIMAL(15,2) NOT NULL,
+  note VARCHAR(255) NULL,
+  txn_id VARCHAR(32) NULL,
+  status ENUM('success','failed','pending') DEFAULT 'success',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY ix_dep_user (user_id),
+  KEY ix_dep_account (account_number),
+  CONSTRAINT fk_deposits_user FOREIGN KEY (user_id) REFERENCES bank_users(user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+
+CREATE TABLE IF NOT EXISTS accounts_registry (
+  account_number VARCHAR(20) PRIMARY KEY
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Backfill existing accounts (run once)
+INSERT IGNORE INTO accounts_registry (account_number)
+SELECT account_number FROM saving_accounts
+UNION ALL SELECT account_number FROM current_accounts
+UNION ALL SELECT account_number FROM salary_accounts
+UNION ALL SELECT account_number FROM pmjdy_accounts
+UNION ALL SELECT account_number FROM pension_accounts
+UNION ALL SELECT account_number FROM safecustody_accounts;
+
+DELIMITER $$
+
+-- INSERT triggers (repeat for each table)
+CREATE TRIGGER trg_saving_accounts_ai AFTER INSERT ON saving_accounts
+FOR EACH ROW BEGIN
+  INSERT IGNORE INTO accounts_registry(account_number) VALUES (NEW.account_number);
+END$$
+
+CREATE TRIGGER trg_current_accounts_ai AFTER INSERT ON current_accounts
+FOR EACH ROW BEGIN
+  INSERT IGNORE INTO accounts_registry(account_number) VALUES (NEW.account_number);
+END$$
+
+CREATE TRIGGER trg_salary_accounts_ai AFTER INSERT ON salary_accounts
+FOR EACH ROW BEGIN
+  INSERT IGNORE INTO accounts_registry(account_number) VALUES (NEW.account_number);
+END$$
+
+CREATE TRIGGER trg_pmjdy_accounts_ai AFTER INSERT ON pmjdy_accounts
+FOR EACH ROW BEGIN
+  INSERT IGNORE INTO accounts_registry(account_number) VALUES (NEW.account_number);
+END$$
+
+CREATE TRIGGER trg_pension_accounts_ai AFTER INSERT ON pension_accounts
+FOR EACH ROW BEGIN
+  INSERT IGNORE INTO accounts_registry(account_number) VALUES (NEW.account_number);
+END$$
+
+CREATE TRIGGER trg_safecustody_accounts_ai AFTER INSERT ON safecustody_accounts
+FOR EACH ROW BEGIN
+  INSERT IGNORE INTO accounts_registry(account_number) VALUES (NEW.account_number);
+END$$
+
+-- Optional: DELETE triggers (only if you actually delete accounts)
+CREATE TRIGGER trg_saving_accounts_ad AFTER DELETE ON saving_accounts
+FOR EACH ROW BEGIN
+  DELETE FROM accounts_registry WHERE account_number = OLD.account_number;
+END$$
+CREATE TRIGGER trg_current_accounts_ad AFTER DELETE ON current_accounts
+FOR EACH ROW BEGIN
+  DELETE FROM accounts_registry WHERE account_number = OLD.account_number;
+END$$
+CREATE TRIGGER trg_salary_accounts_ad AFTER DELETE ON salary_accounts
+FOR EACH ROW BEGIN
+  DELETE FROM accounts_registry WHERE account_number = OLD.account_number;
+END$$
+CREATE TRIGGER trg_pmjdy_accounts_ad AFTER DELETE ON pmjdy_accounts
+FOR EACH ROW BEGIN
+  DELETE FROM accounts_registry WHERE account_number = OLD.account_number;
+END$$
+CREATE TRIGGER trg_pension_accounts_ad AFTER DELETE ON pension_accounts
+FOR EACH ROW BEGIN
+  DELETE FROM accounts_registry WHERE account_number = OLD.account_number;
+END$$
+CREATE TRIGGER trg_safecustody_accounts_ad AFTER DELETE ON safecustody_accounts
+FOR EACH ROW BEGIN
+  DELETE FROM accounts_registry WHERE account_number = OLD.account_number;
+END$$
+
+DELIMITER ;
+
+ALTER TABLE transactions DROP FOREIGN KEY transactions_ibfk_1;
+ALTER TABLE transactions DROP FOREIGN KEY transactions_ibfk_2;
+
+ALTER TABLE transactions
+  MODIFY from_account VARCHAR(20) NULL,
+  MODIFY to_account   VARCHAR(20) NOT NULL;
+  
+  ALTER TABLE transactions
+  ADD CONSTRAINT fk_txn_to_registry
+    FOREIGN KEY (to_account)   REFERENCES accounts_registry(account_number)
+    ON UPDATE CASCADE ON DELETE RESTRICT,
+  ADD CONSTRAINT fk_txn_from_registry
+    FOREIGN KEY (from_account) REFERENCES accounts_registry(account_number)
+    ON UPDATE CASCADE ON DELETE SET NULL;
+    
+-- Digital Fixed Deposits
+ALTER TABLE digital_fixed_deposits
+  MODIFY status_flag VARCHAR(20) NULL DEFAULT NULL;
+
+-- Fixed Deposits
+ALTER TABLE fixed_deposits
+  MODIFY status_flag VARCHAR(20) NULL DEFAULT NULL;
+
+-- Recurring Deposits
+ALTER TABLE recurring_deposits
+  MODIFY status_flag VARCHAR(20) NULL DEFAULT NULL;
+
+drop table deposits;
+ 
+CREATE TABLE IF NOT EXISTS deposits (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id VARCHAR(100) NOT NULL,
+  account_number VARCHAR(20) NOT NULL,
+  amount DECIMAL(15,2) NOT NULL,
+  note VARCHAR(255) NULL,
+  txn_id VARCHAR(32) NULL,
+  status ENUM('success','failed','pending') DEFAULT 'success',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY ix_dep_user (user_id),
+  KEY ix_dep_account (account_number),
+  CONSTRAINT fk_deposits_user FOREIGN KEY (user_id) REFERENCES bank_users(user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Deposit Request
+
+CREATE TABLE request_deposits (
+
+  request_id        VARCHAR(7) PRIMARY KEY,   -- e.g. DEP1234
+
+  deposit_type      VARCHAR(40) NOT NULL,     -- 'Digital Fixed Deposit' | 'Fixed Deposit' | 'Recurring Deposit'
+
+  account_number    VARCHAR(32) NOT NULL,
+
+  first_name        VARCHAR(60) NOT NULL,
+
+  middle_name       VARCHAR(60) DEFAULT NULL,
+
+  last_name         VARCHAR(60) NOT NULL,
+
+  email             VARCHAR(120) NOT NULL,
+
+  mobile            VARCHAR(20) NOT NULL,
+
+  aadhar            VARCHAR(20) NOT NULL,
+
+  -- amounts (use whichever applies per type)
+
+  principal_amount      DECIMAL(14,2) DEFAULT NULL,
+
+  monthly_installment   DECIMAL(14,2) DEFAULT NULL,
+
+  interest_rate     DECIMAL(6,2) DEFAULT NULL,
+
+  compounding       VARCHAR(16)  DEFAULT NULL,
+
+  tenure_months     INT          DEFAULT NULL,
+
+  maturity_amount   DECIMAL(14,2) DEFAULT NULL,
+
+  request_type      VARCHAR(64)  NOT NULL DEFAULT 'Open New Deposit',
+
+  created_at        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  status_flag       CHAR(1)      DEFAULT NULL,  -- NULL=Pending, 'A'=Approved, 'R'=Rejected
+
+  date_of_action    DATETIME     DEFAULT NULL
+
+);
+select * from digital_fixed_deposits
+ 
+
+ -- CARD APPLICATIONS (supports User & Card_Agent submissions)
+
+use banking_products;
+use banking_products;
+select * from card_applications;
+select * from bank_users;
+
+select * from accounts_registry;
+
+ALTER TABLE card_applications
+ADD column status_flag CHAR(1)  DEFAULT NULL;
+
+-- Card Request Table
+show tables
+CREATE TABLE card_requests (
+
+    request_id VARCHAR(10) PRIMARY KEY,
+
+    customer_name VARCHAR(200),
+
+    customer_email VARCHAR(100),
+
+    customer_mobile VARCHAR(15),
+
+    customer_aadhaar VARCHAR(12),
+
+    customer_pan VARCHAR(20),
+
+    card_type VARCHAR(50),
+
+    card_subtype VARCHAR(50),
+
+    requested_for_account_number VARCHAR(30),
+
+    employment_type VARCHAR(50),
+
+    monthly_income INT,
+
+    cibil_score INT,
+
+    submitted_by_role VARCHAR(50),
+
+    submitted_by_user_id VARCHAR(20),
+
+    submitted_by_agent_id VARCHAR(20),
+
+    card_number VARCHAR(30),
+
+    cvv VARCHAR(4),
+
+    issue_limit DECIMAL(15,2),
+
+    limit_utilized DECIMAL(15,2),
+
+    application_ref VARCHAR(30),
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    status_flag CHAR(1) DEFAULT NULL,
+
+    date_of_action DATETIME DEFAULT NULL
+
+);
+ 
+ 
+
+drop table card_applications
+
+CREATE TABLE IF NOT EXISTS card_applications (
+  id                  INT AUTO_INCREMENT PRIMARY KEY,
+  application_ref     VARCHAR(32) UNIQUE NULL,
+
+  -- Customer (the person the card is for)
+  customer_user_id    VARCHAR(100) NULL,               -- FK to bank_users.user_id (can be NULL if agent enters for non-registered customer)
+  customer_name       VARCHAR(150) NOT NULL,
+  customer_email      VARCHAR(120) NOT NULL,
+  customer_mobile     VARCHAR(15)  NOT NULL,
+  customer_aadhaar    CHAR(12)     NOT NULL,           -- 12 digits
+  customer_pan        VARCHAR(10)  NULL,               -- ABCDE1234F (optional)
+
+  -- Requested Card
+  card_type    ENUM('credit','debit','prepaid') NOT NULL,
+  card_subtype ENUM('visa','mastercard','rupay') NOT NULL,
+
+  -- Link to a specific account (mandatory for debit/prepaid; optional for credit)
+  requested_for_account_number VARCHAR(30) NULL,
+
+  -- Credit-only details (NULL for debit/prepaid)
+  employment_type ENUM('salaried','self_employed','student','retired','other') NULL,
+  monthly_income  DECIMAL(12,2) NULL,
+  cibil_score     INT NULL,
+
+  -- Who submitted this application
+  submitted_by_role     ENUM('User','Card_Agent') NOT NULL,
+  submitted_by_user_id  VARCHAR(100) NULL,            -- set when role='User'   (must look like DBxxxxxx)
+  submitted_by_agent_id VARCHAR(100) NULL,            -- set when role='Card_Agent' (must look like CAxxx)
+
+  -- Workflow
+  status ENUM('pending_manager') NOT NULL DEFAULT 'pending_manager',
+
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
+
+  -- Foreign Keys
+  CONSTRAINT fk_cardapps_customer_user
+    FOREIGN KEY (customer_user_id)      REFERENCES bank_users(user_id),
+  CONSTRAINT fk_cardapps_submit_user
+    FOREIGN KEY (submitted_by_user_id)  REFERENCES bank_users(user_id),
+  CONSTRAINT fk_cardapps_submit_agent
+    FOREIGN KEY (submitted_by_agent_id) REFERENCES bank_users(user_id),
+  CONSTRAINT fk_cardapps_req_acct
+    FOREIGN KEY (requested_for_account_number) REFERENCES accounts_registry(account_number),
+
+  -- Basic data validation
+  CONSTRAINT chk_aadhaar_digits
+    CHECK (customer_aadhaar REGEXP '^[0-9]{12}$'),
+  CONSTRAINT chk_pan_format
+    CHECK (customer_pan IS NULL OR UPPER(customer_pan) REGEXP '^[A-Z]{5}[0-9]{4}[A-Z]$'),
+
+  -- Exactly one submitter path, with ID format tied to role
+  CONSTRAINT chk_submitter_match_role
+    CHECK (
+      (submitted_by_role='User'
+        AND submitted_by_user_id  IS NOT NULL
+        AND submitted_by_agent_id IS NULL
+        AND submitted_by_user_id  REGEXP '^DB[0-9]{6}$')
+      OR
+      (submitted_by_role='Card_Agent'
+        AND submitted_by_agent_id IS NOT NULL
+        AND submitted_by_user_id  IS NULL
+        AND submitted_by_agent_id REGEXP '^CA[0-9]{3}$')
+    ),
+
+  -- If a User submits, we expect a concrete customer_user_id
+  CONSTRAINT chk_user_submission_has_customer
+    CHECK (submitted_by_role <> 'User' OR customer_user_id IS NOT NULL),
+
+  -- Debit/Prepaid must be tied to an account; Credit may omit it
+  CONSTRAINT chk_account_required_by_type
+    CHECK (
+      (card_type='credit'  AND (requested_for_account_number IS NULL OR requested_for_account_number IS NOT NULL))
+      OR
+      (card_type IN ('debit','prepaid') AND requested_for_account_number IS NOT NULL)
+    ),
+
+  -- Credit-only rules
+  CONSTRAINT chk_credit_fields
+    CHECK (
+      (card_type <> 'credit' AND cibil_score IS NULL AND monthly_income IS NULL AND employment_type IS NULL)
+      OR
+      (card_type =  'credit' AND cibil_score BETWEEN 300 AND 900 AND monthly_income IS NOT NULL AND monthly_income >= 0)
+    )
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Helpful indexes
+CREATE INDEX idx_cardapps_status    ON card_applications(status, created_at);
+CREATE INDEX idx_cardapps_customer  ON card_applications(customer_user_id);
+CREATE INDEX idx_cardapps_req_acct  ON card_applications(requested_for_account_number);
+CREATE INDEX idx_submitter_user     ON card_applications(submitted_by_user_id);
+CREATE INDEX idx_submitter_agent    ON card_applications(submitted_by_agent_id);
+
+-- Optional: auto-generate a friendly application reference like APP20250827-000123
+DELIMITER $$
+CREATE TRIGGER trg_cardapps_set_ref
+AFTER INSERT ON card_applications
+FOR EACH ROW
+BEGIN
+  IF NEW.application_ref IS NULL OR NEW.application_ref = '' THEN
+    UPDATE card_applications
+       SET application_ref = CONCAT('APP', DATE_FORMAT(NEW.created_at,'%Y%m%d'), '-', LPAD(NEW.id, 6, '0'))
+     WHERE id = NEW.id;
+  END IF;
+END $$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS trg_cardapps_set_ref;
+
+
+
+
+
+-- Add the columns my upsert uses
+ALTER TABLE accounts_registry
+  ADD COLUMN account_type   VARCHAR(20)   NULL AFTER account_number,
+  ADD COLUMN table_name     VARCHAR(64)   NULL AFTER account_type,
+  ADD COLUMN owner_user_id  VARCHAR(100)  NULL AFTER table_name,
+  ADD COLUMN created_at     TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER owner_user_id;
+
+show tables;
+
+ALTER TABLE accounts_registry
+  ADD COLUMN  account_type   VARCHAR(20)   NULL AFTER account_number,
+  ADD COLUMN  table_name     VARCHAR(64)   NULL AFTER account_type,
+  ADD COLUMN  owner_user_id  VARCHAR(100)  NULL AFTER table_name,
+  ADD COLUMN  created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER owner_user_id;
+  
+INSERT INTO accounts_registry (account_number, account_type, table_name, owner_user_id)
+SELECT account_number, account_type, table_name, owner_user_id
+FROM (
+  SELECT account_number, account_type, 'saving_accounts'      AS table_name, user_id AS owner_user_id FROM saving_accounts
+  UNION ALL
+  SELECT account_number, account_type, 'current_accounts',     user_id FROM current_accounts
+  UNION ALL
+  SELECT account_number, account_type, 'salary_accounts',      user_id FROM salary_accounts
+  UNION ALL
+  SELECT account_number, account_type, 'pmjdy_accounts',       user_id FROM pmjdy_accounts
+  UNION ALL
+  SELECT account_number, account_type, 'pension_accounts',     user_id FROM pension_accounts
+  UNION ALL
+  SELECT account_number, account_type, 'safecustody_accounts', user_id FROM safecustody_accounts
+) AS src
+ON DUPLICATE KEY UPDATE
+  account_type  = src.account_type,
+  table_name    = src.table_name,
+  owner_user_id = src.owner_user_id;
+
+SELECT COUNT(*) FROM accounts_registry;
+SELECT account_number, account_type, table_name, owner_user_id
+FROM accounts_registry
+ORDER BY created_at DESC
+LIMIT 10;
+
+
+ALTER TABLE card_applications DROP CHECK chk_pan_format;
+
+
+ALTER TABLE card_applications
+  ADD COLUMN  card_number     VARCHAR(24) NULL,
+  ADD COLUMN  cvv             CHAR(3)     NULL,
+  ADD COLUMN  issue_limit     DECIMAL(12,2) NOT NULL DEFAULT 0,
+  ADD COLUMN  limit_utilized  DECIMAL(12,2) NOT NULL DEFAULT 0;
+  
+ALTER TABLE card_applications
+  ADD COLUMN manager_approval_date DATETIME NULL AFTER updated_at,
+  ADD COLUMN issued_date           DATETIME NULL AFTER manager_approval_date;
+
+select * from card_applications
+
+
+CREATE TABLE IF NOT EXISTS `investment_applications` (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+ 
+  -- Human-readable unique application number (e.g., INV250912-AB12)
+  application_number VARCHAR(24) NOT NULL UNIQUE,
+ 
+  -- Who this investment belongs to (customer)
+  user_id VARCHAR(100) NOT NULL,                 -- FK -> bank_users.user_id
+ 
+  -- Form fields
+  full_name VARCHAR(150) NOT NULL,
+  pan VARCHAR(20) NOT NULL,
+  initial_deposit DECIMAL(12,2) NOT NULL,
+  investment_type VARCHAR(60) NOT NULL,          -- e.g., 'PPF','FRSB','NPS'
+  investment_tenure_years INT NOT NULL,
+ 
+  -- Submission meta
+  application_date DATE NOT NULL,
+  submitted_by_role ENUM('User','Investment_Agent') NOT NULL DEFAULT 'User',
+  submitted_by_user_id VARCHAR(100) NULL,        -- who clicked Submit (agent or user)
+ 
+  -- Workflow
+  status ENUM('pending_manager','approved','declined','active','closed')
+         NOT NULL DEFAULT 'pending_manager',
+ 
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
+ 
+  INDEX idx_inv_user (user_id),
+  INDEX idx_inv_status (status, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+Alter table investment_applications
+add column request_id VARCHAR(10);
+select * from investment_applications
+
+
+CREATE TABLE IF NOT EXISTS `home_loan_applications` (
+
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  user_id VARCHAR(100) NOT NULL,             -- bank_users.user_id (e.g., DB745774)
+ 
+  -- Applicant
+
+  applicant_name VARCHAR(150) NOT NULL,
+
+  dob DATE NOT NULL,
+
+  age INT NULL,
+
+  gender ENUM('Male','Female','Other') NOT NULL,
+
+  address TEXT NOT NULL,
+
+  pin VARCHAR(10) NOT NULL,
+
+  telephone VARCHAR(20) NULL,
+
+  mobile VARCHAR(20) NOT NULL,
+
+  nationality VARCHAR(60) NOT NULL,
+
+  marital_status ENUM('Single','Married','Divorced','Widowed') NOT NULL,
+
+  pan VARCHAR(20) NOT NULL,
+ 
+  -- Employment
+
+  employment_type VARCHAR(40) NOT NULL,
+
+  company_name VARCHAR(150) NOT NULL,
+
+  designation VARCHAR(100) NOT NULL,
+
+  gross_annual_income DECIMAL(12,2) NOT NULL,
+
+  total_experience_years INT NOT NULL,
+
+  current_company_experience_years INT NULL,
+ 
+  -- Property
+
+  property_address TEXT NOT NULL,
+
+  property_type VARCHAR(50) NOT NULL,
+
+  property_age_years INT NULL,
+
+  built_up_area_sqft INT NOT NULL,
+
+  property_value DECIMAL(14,2) NOT NULL,
+ 
+  -- Loan
+
+  loan_amount DECIMAL(14,2) NOT NULL,
+
+  loan_tenure_years INT NOT NULL,
+
+  builder_name VARCHAR(150) NULL,
+
+  purpose VARCHAR(50) NOT NULL,
+
+  interest_type ENUM('Floating','Fixed') NOT NULL,
+ 
+  -- Financials
+
+  existing_home_loan DECIMAL(14,2) NULL,
+
+  other_loans DECIMAL(14,2) NULL,
+
+  credit_card_limits DECIMAL(14,2) NULL,
+
+  savings_investments DECIMAL(14,2) NULL,
+
+  other_assets DECIMAL(14,2) NULL,
+ 
+  -- Bank account
+
+  bank_name VARCHAR(120) NOT NULL,
+
+  bank_account_number VARCHAR(30) NOT NULL,
+
+  bank_account_type ENUM('Savings','Current') NOT NULL,
+
+  bank_years_with_bank INT NOT NULL,
+ 
+  -- Co-applicant
+
+  coapplicant_name VARCHAR(150) NULL,
+
+  coapplicant_relationship VARCHAR(50) NULL,
+
+  coapplicant_annual_income DECIMAL(12,2) NULL,
+ 
+  -- Documents / flags
+
+  has_id_proof TINYINT(1) NOT NULL DEFAULT 0,
+
+  has_address_proof TINYINT(1) NOT NULL DEFAULT 0,
+
+  has_income_proof TINYINT(1) NOT NULL DEFAULT 0,
+
+  has_property_docs TINYINT(1) NOT NULL DEFAULT 0,
+
+  declaration_agreed TINYINT(1) NOT NULL DEFAULT 0,
+ 
+  -- Uploads
+
+  applicant_signature_path VARCHAR(255) NULL,
+
+  coapplicant_signature_path VARCHAR(255) NULL,
+ 
+  -- Submission
+
+  application_date DATE NOT NULL,
+
+  place VARCHAR(100) NOT NULL,
+ 
+  status ENUM('pending_manager','approved','declined','issued') NOT NULL DEFAULT 'pending_manager',
+ 
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
+ 
+  INDEX idx_hla_user (user_id),
+
+  INDEX idx_hla_status (status, created_at)
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `personal_loan_applications` (
+
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  user_id VARCHAR(100) NOT NULL,
+ 
+  -- Applicant
+
+  applicant_name VARCHAR(150) NOT NULL,
+
+  dob DATE NOT NULL,
+
+  age INT NULL,
+
+  gender ENUM('Male','Female','Other') NOT NULL,
+
+  address TEXT NOT NULL,
+
+  pin VARCHAR(10) NOT NULL,
+
+  telephone VARCHAR(20) NULL,
+
+  mobile VARCHAR(20) NOT NULL,
+
+  nationality VARCHAR(60) NOT NULL,
+
+  marital_status ENUM('Single','Married','Divorced','Widowed') NOT NULL,
+
+  pan VARCHAR(20) NOT NULL,
+ 
+  -- Employment
+
+  employment_type VARCHAR(40) NOT NULL,
+
+  company_name VARCHAR(150) NOT NULL,
+
+  designation VARCHAR(100) NOT NULL,
+
+  gross_annual_income DECIMAL(12,2) NOT NULL,
+
+  total_experience_years INT NOT NULL,
+
+  current_company_experience_years INT NULL,
+ 
+  -- Property (kept same as form even if not used much for personal loans)
+
+  property_address TEXT NOT NULL,
+
+  property_type VARCHAR(50) NOT NULL,
+
+  property_age_years INT NULL,
+
+  built_up_area_sqft INT NOT NULL,
+
+  property_value DECIMAL(14,2) NOT NULL,
+ 
+  -- Loan
+
+  loan_amount DECIMAL(14,2) NOT NULL,
+
+  loan_tenure_years INT NOT NULL,
+
+  builder_name VARCHAR(150) NULL,
+
+  purpose VARCHAR(50) NOT NULL,
+
+  interest_type ENUM('Floating','Fixed') NOT NULL,
+ 
+  -- Financials
+
+  existing_home_loan DECIMAL(14,2) NULL,
+
+  other_loans DECIMAL(14,2) NULL,
+
+  credit_card_limits DECIMAL(14,2) NULL,
+
+  savings_investments DECIMAL(14,2) NULL,
+
+  other_assets DECIMAL(14,2) NULL,
+ 
+  -- Bank account
+
+  bank_name VARCHAR(120) NOT NULL,
+
+  bank_account_number VARCHAR(30) NOT NULL,
+
+  bank_account_type ENUM('Savings','Current') NOT NULL,
+
+  bank_years_with_bank INT NOT NULL,
+ 
+  -- Co-applicant
+
+  coapplicant_name VARCHAR(150) NULL,
+
+  coapplicant_relationship VARCHAR(50) NULL,
+
+  coapplicant_annual_income DECIMAL(12,2) NULL,
+ 
+  -- Documents / flags
+
+  has_id_proof TINYINT(1) NOT NULL DEFAULT 0,
+
+  has_address_proof TINYINT(1) NOT NULL DEFAULT 0,
+
+  has_income_proof TINYINT(1) NOT NULL DEFAULT 0,
+
+  has_property_docs TINYINT(1) NOT NULL DEFAULT 0,
+
+  declaration_agreed TINYINT(1) NOT NULL DEFAULT 0,
+ 
+  -- Uploads
+
+  applicant_signature_path VARCHAR(255) NULL,
+
+  coapplicant_signature_path VARCHAR(255) NULL,
+ 
+  -- Submission
+
+  application_date DATE NOT NULL,
+
+  place VARCHAR(100) NOT NULL,
+ 
+  status ENUM('pending_manager','approved','declined','issued') NOT NULL DEFAULT 'pending_manager',
+ 
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
+ 
+  INDEX idx_pla_user (user_id),
+
+  INDEX idx_pla_status (status, created_at)
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+ 
+ CREATE TABLE IF NOT EXISTS `business_loan_applications` (
+
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  user_id VARCHAR(100) NOT NULL,
+ 
+  -- Applicant
+
+  applicant_name VARCHAR(150) NOT NULL,
+
+  dob DATE NOT NULL,
+
+  age INT NULL,
+
+  gender ENUM('Male','Female','Other') NOT NULL,
+
+  address TEXT NOT NULL,
+
+  pin VARCHAR(10) NOT NULL,
+
+  telephone VARCHAR(20) NULL,
+
+  mobile VARCHAR(20) NOT NULL,
+
+  nationality VARCHAR(60) NOT NULL,
+
+  marital_status ENUM('Single','Married','Divorced','Widowed') NOT NULL,
+
+  pan VARCHAR(20) NOT NULL,
+ 
+  -- Employment / Business
+
+  employment_type VARCHAR(40) NOT NULL,
+
+  company_name VARCHAR(150) NOT NULL,
+
+  designation VARCHAR(100) NOT NULL,
+
+  gross_annual_income DECIMAL(12,2) NOT NULL,
+
+  total_experience_years INT NOT NULL,
+
+  current_company_experience_years INT NULL,
+ 
+  -- Property
+
+  property_address TEXT NOT NULL,
+
+  property_type VARCHAR(50) NOT NULL,
+
+  property_age_years INT NULL,
+
+  built_up_area_sqft INT NOT NULL,
+
+  property_value DECIMAL(14,2) NOT NULL,
+ 
+  -- Loan
+
+  loan_amount DECIMAL(14,2) NOT NULL,
+
+  loan_tenure_years INT NOT NULL,
+
+  builder_name VARCHAR(150) NULL,
+
+  purpose VARCHAR(50) NOT NULL,
+
+  interest_type ENUM('Floating','Fixed') NOT NULL,
+ 
+  -- Financials
+
+  existing_home_loan DECIMAL(14,2) NULL,
+
+  other_loans DECIMAL(14,2) NULL,
+
+  credit_card_limits DECIMAL(14,2) NULL,
+
+  savings_investments DECIMAL(14,2) NULL,
+
+  other_assets DECIMAL(14,2) NULL,
+ 
+  -- Bank account
+
+  bank_name VARCHAR(120) NOT NULL,
+
+  bank_account_number VARCHAR(30) NOT NULL,
+
+  bank_account_type ENUM('Savings','Current') NOT NULL,
+
+  bank_years_with_bank INT NOT NULL,
+ 
+  -- Co-applicant
+
+  coapplicant_name VARCHAR(150) NULL,
+
+  coapplicant_relationship VARCHAR(50) NULL,
+
+  coapplicant_annual_income DECIMAL(12,2) NULL,
+ 
+  -- Documents / flags
+
+  has_id_proof TINYINT(1) NOT NULL DEFAULT 0,
+
+  has_address_proof TINYINT(1) NOT NULL DEFAULT 0,
+
+  has_income_proof TINYINT(1) NOT NULL DEFAULT 0,
+
+  has_property_docs TINYINT(1) NOT NULL DEFAULT 0,
+
+  declaration_agreed TINYINT(1) NOT NULL DEFAULT 0,
+ 
+  -- Uploads
+
+  applicant_signature_path VARCHAR(255) NULL,
+
+  coapplicant_signature_path VARCHAR(255) NULL,
+ 
+  -- Submission
+
+  application_date DATE NOT NULL,
+
+  place VARCHAR(100) NOT NULL,
+ 
+  status ENUM('pending_manager','approved','declined','issued') NOT NULL DEFAULT 'pending_manager',
+ 
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
+ 
+  INDEX idx_bla_user (user_id),
+
+  INDEX idx_bla_status (status, created_at)
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+ 
+ 
+INSERT INTO bank_users
+
+  (user_id,  name,            pan,          aadhaar,        dob,
+
+   mobile,     email,                 gender, address,      city,
+
+   state,        country, department, onboarding_date, status,
+
+   role,        password,   deleted_date)
+
+VALUES
+
+  ('LA028', 'Akash patil', 'DLLPP7561C', '775433456777', '2002-08-11',
+
+   '9034567833', 'LA028@digibank.com', 'male', 'sambhaji nagar', 'mumbai',
+
+   'maharashtra', 'India',  'Loans',   '2025-09-09',      'active',
+
+   'Loan_Agent', 'agent12345', NULL);
+ 
+ 
+CREATE TABLE IF NOT EXISTS loan_interest_rate_matrix (
+
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  loan_category ENUM('home','personal','business') NOT NULL,
+
+  interest_type ENUM('Floating','Fixed') NOT NULL,
+
+  min_amount DECIMAL(14,2) NOT NULL,
+
+  max_amount DECIMAL(14,2) NOT NULL,
+
+  min_tenure_years INT NOT NULL,
+
+  max_tenure_years INT NOT NULL,
+
+  rate_percent DECIMAL(5,2) NOT NULL,
+
+  effective_from DATE NOT NULL,
+
+  effective_to DATE NULL,
+
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+ 
+  INDEX idx_rate_look (loan_category, interest_type, min_amount, max_amount, min_tenure_years, max_tenure_years, is_active)
+
+);
+ 
+ALTER TABLE home_loan_applications
+
+  ADD COLUMN interest_rate DECIMAL(5,2) NULL AFTER interest_type,
+
+  ADD COLUMN emi_amount    DECIMAL(14,2) NULL AFTER interest_rate;
+ 
+-- Do the same for your personal & business loan tables if you have them:
+
+ALTER TABLE personal_loan_applications
+
+  ADD COLUMN interest_rate DECIMAL(5,2) NULL,
+
+  ADD COLUMN emi_amount    DECIMAL(14,2) NULL;
+ 
+ALTER TABLE business_loan_applications
+
+  ADD COLUMN interest_rate DECIMAL(5,2) NULL,
+
+  ADD COLUMN emi_amount    DECIMAL(14,2) NULL;
+ 
+ 
+ALTER TABLE home_loan_applications
+
+  ADD COLUMN submitted_by_role ENUM('User','Loan_Agent') NOT NULL DEFAULT 'User',
+
+  ADD COLUMN submitted_by_user_id VARCHAR(100) NULL,
+
+  ADD INDEX idx_hla_submitter (submitted_by_role, submitted_by_user_id);
+ 
+ALTER TABLE personal_loan_applications
+
+  ADD COLUMN submitted_by_role ENUM('User','Loan_Agent') NOT NULL DEFAULT 'User',
+
+  ADD COLUMN submitted_by_user_id VARCHAR(100) NULL,
+
+  ADD INDEX idx_pla_submitter (submitted_by_role, submitted_by_user_id);
+ 
+ALTER TABLE business_loan_applications
+
+  ADD COLUMN submitted_by_role ENUM('User','Loan_Agent') NOT NULL DEFAULT 'User',
+
+  ADD COLUMN submitted_by_user_id VARCHAR(100) NULL,
+
+  ADD INDEX idx_bla_submitter (submitted_by_role, submitted_by_user_id);
+
+alter table personal_loan_applications
+
+    drop column submitted_by_user_id;
+
+alter table home_loan_applications
+
+    drop column submitted_by_user_id;
+
+alter table business_loan_applications
+
+    drop column submitted_by_user_id;
+ 
+ 
+ CREATE TABLE loan_requests (
+
+  request_id VARCHAR(10) PRIMARY KEY,   -- e.g. CR001
+
+  loan_type ENUM('home','personal','business') NOT NULL,
+ 
+  applicant_name VARCHAR(150) NOT NULL,
+
+  dob DATE NOT NULL,
+
+  age INT NULL,
+
+  gender ENUM('Male','Female','Other') NOT NULL,
+
+  address TEXT NOT NULL,
+
+  pin VARCHAR(10) NOT NULL,
+
+  telephone VARCHAR(20) NULL,
+
+  mobile VARCHAR(20) NOT NULL,
+
+  nationality VARCHAR(60) NOT NULL,
+
+  marital_status ENUM('Single','Married','Divorced','Widowed') NOT NULL,
+
+  pan VARCHAR(20) NOT NULL,
+ 
+  employment_type VARCHAR(40) NOT NULL,
+
+  company_name VARCHAR(150) NOT NULL,
+
+  designation VARCHAR(100) NOT NULL,
+
+  gross_annual_income DECIMAL(12,2) NOT NULL,
+
+  total_experience_years INT NOT NULL,
+
+  current_company_experience_years INT NULL,
+ 
+  property_address TEXT,
+
+  property_type VARCHAR(50),
+
+  property_age_years INT,
+
+  built_up_area_sqft INT,
+
+  property_value DECIMAL(14,2),
+
+  builder_name VARCHAR(150),
+ 
+  loan_amount DECIMAL(14,2) NOT NULL,
+
+  loan_tenure_years INT NOT NULL,
+
+  purpose VARCHAR(50) NOT NULL,
+
+  interest_type ENUM('Floating','Fixed') NOT NULL,
+
+  interest_rate DECIMAL(5,2),
+
+  emi_amount DECIMAL(14,2),
+ 
+  existing_home_loan DECIMAL(14,2),
+
+  other_loans DECIMAL(14,2),
+
+  credit_card_limits DECIMAL(14,2),
+
+  savings_investments DECIMAL(14,2),
+
+  other_assets DECIMAL(14,2),
+ 
+  bank_name VARCHAR(120) NOT NULL,
+
+  bank_account_number VARCHAR(30) NOT NULL,
+
+  bank_account_type ENUM('Savings','Current') NOT NULL,
+
+  bank_years_with_bank INT NOT NULL,
+ 
+  coapplicant_name VARCHAR(150),
+
+  coapplicant_relationship VARCHAR(50),
+
+  coapplicant_annual_income DECIMAL(12,2),
+ 
+  has_id_proof TINYINT(1) DEFAULT 0,
+
+  has_address_proof TINYINT(1) DEFAULT 0,
+
+  has_income_proof TINYINT(1) DEFAULT 0,
+
+  has_property_docs TINYINT(1) DEFAULT 0,
+
+  declaration_agreed TINYINT(1) DEFAULT 0,
+ 
+  applicant_signature_path VARCHAR(255),
+
+  coapplicant_signature_path VARCHAR(255),
+ 
+  application_date DATE NOT NULL,
+
+  place VARCHAR(100) NOT NULL,
+ 
+  status ENUM('pending_manager','approved','declined','issued') NOT NULL DEFAULT 'pending_manager',
+ 
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+ 
+ select * from home_loan_applications
+  select * from personal_loan_applications
+   select * from business_loan_applications
+  select * from loan_requests
+ 
+ select * from bank_users;
+truncate table home_loan_applications
+
+Alter table loan_requests
+
+Add column status ENUM('pending_manager','approved','rejected','issued') NOT NULL DEFAULT 'pending_manager';
+
+Alter table home_loan_applications
+
+Add column status ENUM('pending_manager','approved','rejected','issued') NOT NULL DEFAULT 'pending_manager';
+
+Alter table personal_loan_applications
+
+Add column status ENUM('pending_manager','approved','rejected','issued') NOT NULL DEFAULT 'pending_manager';
+
+Alter table business_loan_applications
+
+Add column status ENUM('pending_manager','approved','rejected','issued') NOT NULL DEFAULT 'pending_manager';
+ 
+ select * from card_applications;
+ ALTER TABLE card_applications
+  MODIFY COLUMN card_type ENUM('credit','debit','prepaid','forex') NOT NULL;
+ALTER TABLE card_applications
+  ADD CONSTRAINT chk_account_required_by_type
+  CHECK (
+    card_type = 'credit'
+    OR (card_type IN ('debit','prepaid','forex') AND requested_for_account_number IS NOT NULL)
+  );
+  
+  ALTER TABLE card_applications
+  DROP CHECK chk_account_required_by_type;
+ Alter table home_loan_applications
+drop column status;
+Alter table personal_loan_applications
+add column request_id VARCHAR(10);
+Alter table business_loan_applications
+add column request_id VARCHAR(10);
+Alter table loan_requests
+add column request_id VARCHAR(10);
+ 
+
+
+
+
+
+
+ use banking_products
+show tables
+select * from users
+select * from deposits
+select * from bank_users
+ALTER TABLE users ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'user';
+UPDATE users SET role = 'tl' WHERE email = 'tl@digibank.com';
+UPDATE users SET role = 'manager' WHERE email = 'mn@digibank.com';
+
+INSERT INTO bank_users (user_id, name, email, password, role, department)
+VALUES ('U001', 'Team Lead', 'tl@digibank.com', 'digibank', 'tl', 'Bank Staff');
+
+INSERT INTO bank_users (user_id, name, email, password, role, department)
+VALUES ('U002', 'Manager', 'mn@digibank.com', 'digibank', 'manager', 'Bank Staff');
+
+
+ALTER TABLE bank_users
+MODIFY COLUMN name VARCHAR(100) DEFAULT NULL,
+MODIFY COLUMN pan VARCHAR(10) DEFAULT NULL,
+MODIFY COLUMN aadhar VARCHAR(12) DEFAULT NULL,
+MODIFY COLUMN dob DATE DEFAULT NULL,
+MODIFY COLUMN mobile_no VARCHAR(15) DEFAULT NULL,
+MODIFY COLUMN email VARCHAR(100) DEFAULT NULL,
+MODIFY COLUMN gender VARCHAR(10) DEFAULT NULL,
+MODIFY COLUMN address VARCHAR(255) DEFAULT NULL,
+MODIFY COLUMN city VARCHAR(100) DEFAULT NULL,
+MODIFY COLUMN state VARCHAR(100) DEFAULT NULL,
+MODIFY COLUMN country VARCHAR(100) DEFAULT NULL,
+MODIFY COLUMN department VARCHAR(100) NOT NULL DEFAULT 'Bank Customer',
+MODIFY COLUMN onboarding_date DATE DEFAULT NULL,
+MODIFY COLUMN status VARCHAR(20) DEFAULT NULL,
+MODIFY COLUMN role VARCHAR(50) NOT NULL DEFAULT 'User',
+MODIFY COLUMN password VARCHAR(255) DEFAULT NULL,
+MODIFY COLUMN deleted_at DATE DEFAULT NULL;
+
+
+
+CREATE TABLE users (
+    cust_id VARCHAR(20) PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    pan VARCHAR(10) NOT NULL,
+    mobile_no VARCHAR(100) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE bank_accounts (
+    
+    cust_id varchar(100),
+    first_name VARCHAR(100),
+    middle_name VARCHAR(100),
+    last_name VARCHAR(100),
+    email VARCHAR(100),
+    mobile VARCHAR(15),
+    aadhar VARCHAR(12),
+    account_type VARCHAR(20),
+    account_number BIGINT UNIQUE,
+    FOREIGN KEY (cust_id) REFERENCES users(cust_id)
+);
+
+saving = DIGIS45675577
+salary= DIGISAL78900
+current = DIGIC09878
+Pens= DIGIP90988
+use banking_products
+select * from bank_accounts;
+select * from bank_deposits;
+select * from bank_ccards;
+select * from accounts
+select * from agents;
+select * from accounts;
+truncate table  bank_accounts
+
+show tables
+CREATE TABLE bank_deposits (
+    
+    cust_id varchar(100),
+    first_name VARCHAR(100),
+    middle_name VARCHAR(100),
+    last_name VARCHAR(100),
+    email VARCHAR(100),
+    mobile VARCHAR(15),
+    aadhar VARCHAR(12),
+    account_type VARCHAR(20),
+    account_number BIGINT UNIQUE,
+    FOREIGN KEY (cust_id) REFERENCES users(cust_id)
+);
+select *  from bank_ccards;
+CREATE TABLE bank_ccards (
+   
+    cust_id varchar(100),
+    first_name VARCHAR(50),
+    middle_name VARCHAR(50),
+    last_name VARCHAR(50),
+    email VARCHAR(100),
+    mobile VARCHAR(15),
+    Addhar VARCHAR(20),
+    card_type VARCHAR(20),
+    card_subtype VARCHAR(20),
+    card_number VARCHAR(30) UNIQUE,
+    FOREIGN KEY (cust_id) REFERENCES users(cust_id)
+    
+    
+);
+
+ALTER TABLE agents
+RENAME COLUMN agent_id TO user_id;
+
+CREATE TABLE agents (
+
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    agent_id VARCHAR(6) UNIQUE,
+
+    first_name VARCHAR(50),
+
+    last_name VARCHAR(50),
+
+    dob DATE,
+
+    gender ENUM('male','female'),
+
+    pan VARCHAR(10),
+
+    aadhaar VARCHAR(12),
+
+    date_of_joining DATE,
+
+    country VARCHAR(50),
+
+    state VARCHAR(50),
+
+    city VARCHAR(50),
+
+    department VARCHAR(50),
+
+    photo_path VARCHAR(255),
+
+    password_hash VARCHAR(255),
+
+    status ENUM('active', 'deleted') DEFAULT 'active',
+
+    onboarding_date DATETIME,
+
+    deleted_date DATETIME
+
+);
+ ALTER TABLE agents
+ADD COLUMN mobile VARCHAR(20) AFTER aadhaar;
+select*from bank_users;
+select*from agents;
+select * from accounts;
+ALTER TABLE bank_deposits
+  MODIFY COLUMN account_number VARCHAR(20) NOT NULL;
+ALTER TABLE agents
+ADD COLUMN role VARCHAR(50);
+ALTER TABLE agents
+ADD COLUMN email VARCHAR(255);
+
+ALTER TABLE agents
+DROP COLUMN last_name;
+select * from bank_users
+ALTER TABLE bank_users
+RENAME COLUMN deleted_at TO deleted_date;
+select * from agents
+select * from agents
+
+DELETE FROM bank_users
+WHERE user_id = 'CA021';
+
+select * from bank_users
+
+CREATE TABLE IF NOT EXISTS transactions (
+
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+  from_account VARCHAR(20) NULL,
+
+  to_account   VARCHAR(20) NULL,
+
+  amount       DECIMAL(14,2) NOT NULL,
+
+  note         VARCHAR(255),
+
+  created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  status       ENUM('success','failed') NOT NULL DEFAULT 'success',
+
+  FOREIGN KEY (from_account) REFERENCES bank_accounts(account_number),
+
+  FOREIGN KEY (to_account)   REFERENCES bank_accounts(account_number),
+
+  INDEX idx_created_at (created_at),
+
+  INDEX idx_from (from_account),
+
+  INDEX idx_to (to_account)
+
+);
+ALTER TABLE transactions 
+ADD COLUMN transaction_id VARCHAR(30) UNIQUE AFTER id;
+
+update saving_accounts SET balance = 50000.00 WHERE account_number = 'DIGIS5426763718';
+select * from card_applications
+ALTER TABLE transactions DROP FOREIGN KEY transactions_ibfk_1
+ALTER TABLE transactions DROP FOREIGN KEY transactions_ibfk_2;
+ALTER TABLE card_applications DROP CHECK chk_aadhaar_digits;
+
+select * from bank_users;
+
+UPDATE bank_users
+SET gender = 'male',
+    dob = 17/09/1999,
+    city = 'Wardha',
+    state = 'Maharashtra',
+    country = 'India',
+    aadhaar = '123456789012'
+    
+WHERE user_id = 'DB654550';
+
+select * from bank_users
+
+ALTER TABLE bank_users
+ALTER COLUMN status SET DEFAULT 'Active';
+ 
