@@ -1,4 +1,4 @@
-
+ 
  
 <!DOCTYPE html>
 <html lang="en">
@@ -13,18 +13,19 @@
  
   <style>
     body { background:#f8f9fa; font-family: Arial, sans-serif; }
-    h1 { color:#0B4D83; margin-bottom:16px; font-weight:700; }
+    h1 { color:#fff; margin-bottom:16px; font-weight:700; }
+   
     label { font-weight:600; }
-    .section-title { background:#0B4D83; color:#fff; padding:10px 15px; margin:24px 0 16px; border-radius:6px; font-size:1.1rem; }
+    .section-title { background:#0B4D83; color:#786d6d; padding:10px 15px; margin:24px 0 16px; border-radius:6px; font-size:1.1rem; }
     .required::after { content:" *"; color:#dc3545; }
     .btn-custom { background:#0B4D83; color:#fff; border:none; }
     .btn-custom:hover { background:#7a0f39; color:#fff; }
     .navbar { position: sticky; top: 0; z-index: 1000; }
     nav.breadcrumb-container { padding:10px 20px; background:#fff; }
   </style>
-  <style>
+<style>
     :root {
-      --primary-color: #ebf0f4;
+      --primary-color: #0B4D83;
       --gray-color: #f1f1f1;
       --dark-gray: #444;
     }
@@ -126,36 +127,129 @@
       padding: 10px 0;
       border-bottom: 1px solid #ddd;
     }
+ 
     .hover-shadow:hover {
-    box-shadow: 0 0 15px rgba(151, 20, 77, 0.3);
-    transform: scale(1.01);
-    transition: 0.2s ease-in-out;
-  }
-  .border-custom-left {
-  border-left: 6px solid #eceff2;
-  }
-  .card.custom-bordered {
-      border: 1px solid #d9dfe3;
+      box-shadow: 0 0 15px rgba(151, 20, 77, 0.3);
+      transform: scale(1.01);
+      transition: 0.2s ease-in-out;
+    }
+ 
+    .border-custom-left {
+      border-left: 6px solid #0B4D83;
+    }
+ 
+    .card.custom-bordered {
+      border: 1px solid #0B4D83;
       border-radius: 8px;
-  }
-  .border-custom-left {
-     border: 1px solid #d9dfe3;
-    border-radius: 5px;
-  }
-  footer {
-  background-color: #d9dfe3;
-  color: white;
-  padding: 1rem 0;
-  font-size: 0.9rem;
-  text-align: center;
-  line-height: 1.4;
-}
+    }
+ 
+    .border-custom-left {
+      border: 1px solid #0B4D83;
+      border-radius: 5px;
+    }
+ 
+    footer {
+      background-color: #0B4D83;
+      color: white;
+      padding: 1rem 0;
+      font-size: 0.9rem;
+      text-align: center;
+      line-height: 1.4;
+    }
+    .breadcrumb a { color:#0B4D83; text-decoration:none; }
+    .breadcrumb .active { color:#0B4D83; font-weight:bold; }
 </style>
+ 
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap');
+ 
+  .digi-bank-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+  }
+ 
+  .digi-bank-logo:hover {
+    transform: scale(1.05);
+  }
+ 
+  .logo-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 6px 18px rgba(102, 126, 234, 0.3), 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+ 
+  .logo-icon::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+  }
+ 
+  .logo-icon::after {
+    content: 'D';
+    position: absolute;
+    color: transparent;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    background-clip: text;
+    -webkit-background-clip: text;
+    font-weight: 800;
+    font-size: 20px;
+    z-index: 2;
+  }
+ 
+  .logo-text {
+    color: #fff;
+  }
+ 
+  .main-text {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    line-height: 1;
+  }
+ 
+  .digi {
+    background: linear-gradient(135deg, #87CEEB 0%, #98D8E8 25%, #FFF8DC 50%, #87CEFA 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  }
+ 
+  .bank {
+    color: #ffffff;
+    margin-left: 3px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+ 
+  .tagline {
+    font-size: 9px;
+    font-weight: 600;
+    color: #e8f4f8;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+</style>
+ 
  
 </head>
 <body>
  
-<!-- Sidebar Offcanvas -->
+  <!-- Sidebar Offcanvas -->
   <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
     <div class="offcanvas-header">
       <h5 class="offcanvas-title" id="sidebarMenuLabel">Welcome, {{ user.name }} ! ({{user.role}})</h5>
@@ -220,6 +314,22 @@
       aria-controls="sidebarMenu" aria-label="Toggle sidebar">
       <i class="bi bi-list"></i>
     </button>
+    <!-- 🔽 Custom DigiBank Logo -->
+    <a class="navbar-brand digi-bank-logo" href="{{ url_for('home') }}">
+      <div class="logo-icon"></div>
+      <div class="logo-text">
+        <div class="main-text">
+          <span class="digi">DiGi</span><span class="bank">Bank</span>
+        </div>
+        <div class="tagline">Smart Banking</div>
+      </div>
+    </a>
+ 
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+            aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
  
     <!-- title wrapper with flex-grow to take center space -->
     <!-- <h5 class="m-0 text-center flex-grow-1">DigiBank User Dashboard</h5> -->
@@ -254,15 +364,15 @@
               <button class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button"
                 data-bs-toggle="dropdown" aria-expanded="false">Deposits</button>
               <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Digital Fixed
+                <li><a class="dropdown-item"  href="{{ url_for('open_deposits') }}">Digital Fixed
                     Deposits</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Fixed
+                <li><a class="dropdown-item"  href="{{ url_for('open_deposits') }}">Fixed
                     Deposits</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Recurring
                     Deposits</a></li>
               </ul>
             </li>
-            <!-- Deposits Dropdown -->
+            <!-- Loans Dropdown -->
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="loanDropdown" role="button" data-bs-toggle="dropdown"
                 aria-expanded="false">Loans</a>
@@ -312,13 +422,12 @@
   </div>
  
  
- 
    
 <!-- Breadcrumb -->
-<nav class="breadcrumb-container">
+<nav aria-label="breadcrumb" style="background-color:#f8f9fa; padding:8px 15px; border-radius:4px; margin:10px 20px;">
   <ol class="breadcrumb mb-0">
-    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#0B4D83;">Dashboard</a></li>
-    <li class="breadcrumb-item active">Home Loan</li>
+    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#0B4D83;">Home</a></li>
+    <li class="breadcrumb-item active" aria-current="page" style="color:#0B4D83; font-weight:bold;">Home Apply</li>
   </ol>
 </nav>
  
@@ -354,7 +463,10 @@
   <!-- NOTE: Correct route + multipart -->
   <form action="{{ url_for('homeloan') }}" method="POST" enctype="multipart/form-data">
     <!-- A) Applicant -->
-    <div class="section-title">A) PARTICULARS OF THE APPLICANT</div>
+    <div class="section-title" style="background:#0B4D83; color:white; padding:10px 15px; margin:24px 0 16px; border-radius:6px; font-size:1.1rem;">
+  A) PARTICULARS OF THE APPLICANT
+</div>
+ 
  
     <div class="mb-3">
       <label for="applicantName" class="form-label required">Full Name</label>
@@ -418,7 +530,10 @@
     </div>
  
     <!-- Employment -->
-    <div class="section-title">Employment Details</div>
+    <div class="section-title" style="background:#0B4D83; color:white; padding:10px 15px; margin:24px 0 16px; border-radius:6px; font-size:1.1rem;">
+  B) Employment Details
+</div>
+ 
     <div class="mb-3">
       <label for="employmentType" class="form-label required">Employment Type</label>
       <select class="form-select" id="employmentType" name="employmentType" required>
@@ -454,7 +569,9 @@
     </div>
  
     <!-- Property -->
-    <div class="section-title">B) PROPERTY DETAILS</div>
+<div class="section-title" style="background:#0B4D83; color:white; padding:10px 15px; margin:24px 0 16px; border-radius:6px; font-size:1.1rem;">
+  C) Property details
+</div>
     <div class="mb-3">
       <label for="propertyAddress" class="form-label required">Property Address</label>
       <textarea class="form-control" id="propertyAddress" name="propertyAddress" rows="2" required></textarea>
@@ -494,7 +611,9 @@
     </div>
  
     <!-- Loan Details -->
-    <div class="section-title">C) LOAN DETAILS</div>
+<div class="section-title" style="background:#0B4D83; color:white; padding:10px 15px; margin:24px 0 16px; border-radius:6px; font-size:1.1rem;">
+  D) Loan Details
+</div>
     <div class="row mb-3">
       <div class="col-md-6">
         <label for="purpose" class="form-label required">Purpose of Loan</label>
@@ -532,7 +651,9 @@
     <input type="hidden" name="emi_amount" id="emi_amount">
  
     <!-- Financial -->
-    <div class="section-title">D) FINANCIAL DETAILS</div>
+<div class="section-title" style="background:#0B4D83; color:white; padding:10px 15px; margin:24px 0 16px; border-radius:6px; font-size:1.1rem;">
+  E) Financial Details
+</div>
     <div class="row mb-3">
       <div class="col-md-4">
         <label for="existingLoan" class="form-label">Existing Home Loan (₹)</label>
@@ -560,7 +681,9 @@
     </div>
  
     <!-- Bank Account -->
-    <div class="section-title">E) BANK ACCOUNT DETAILS</div>
+<div class="section-title" style="background:#0B4D83; color:white; padding:10px 15px; margin:24px 0 16px; border-radius:6px; font-size:1.1rem;">
+  F) Bank Account Details
+</div>
     <div class="row mb-3">
       <div class="col-md-6">
         <label for="bankName" class="form-label required">Bank Name</label>
@@ -587,7 +710,9 @@
     </div>
  
     <!-- Co-Applicant -->
-    <div class="section-title">F) CO-APPLICANT DETAILS (If any)</div>
+<div class="section-title" style="background:#0B4D83; color:white; padding:10px 15px; margin:24px 0 16px; border-radius:6px; font-size:1.1rem;">
+  G) Co-Applicant Details (If Any)
+</div>
     <div class="mb-3">
       <label for="coApplicantName" class="form-label">Full Name</label>
       <input type="text" class="form-control" id="coApplicantName" name="coApplicantName" />
@@ -604,7 +729,9 @@
     </div>
  
     <!-- Documents -->
-    <div class="section-title">G) DOCUMENTS TO BE ATTACHED</div>
+<div class="section-title" style="background:#0B4D83; color:white; padding:10px 15px; margin:24px 0 16px; border-radius:6px; font-size:1.1rem;">
+  H) Documents to be Attached
+</div>
     <div class="mb-3 form-check">
       <input type="checkbox" class="form-check-input" id="idProof" name="idProof" required />
       <label class="form-check-label required" for="idProof">Identity Proof (PAN/Aadhaar/Passport)</label>
@@ -623,7 +750,9 @@
     </div>
  
     <!-- Declaration -->
-    <div class="section-title">H) DECLARATION</div>
+<div class="section-title" style="background:#0B4D83; color:white; padding:10px 15px; margin:24px 0 16px; border-radius:6px; font-size:1.1rem;">
+  I) Declaration
+</div>
     <div class="mb-3 form-check">
       <input type="checkbox" class="form-check-input" id="declaration" name="declaration" required />
       <label class="form-check-label required" for="declaration">
@@ -732,6 +861,8 @@
 </script>
 </body>
 </html>
+ 
+ 
  
  
  

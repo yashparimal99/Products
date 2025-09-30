@@ -205,13 +205,91 @@
 }
 
   </style>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap');
+ 
+.digi-bank-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  transition: transform 0.3s ease;
+}
+.digi-bank-logo:hover {
+  transform: scale(1.05);
+}
+.logo-icon {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 6px 18px rgba(102, 126, 234, 0.3), 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+.logo-icon::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+}
+.logo-icon::after {
+  content: 'D';
+  position: absolute;
+  color: transparent;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  background-clip: text;
+  -webkit-background-clip: text;
+  font-weight: 800;
+  font-size: 20px;
+  z-index: 2;
+}
+.logo-text {
+  color: #fff;
+}
+.main-text {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+.digi {
+  background: linear-gradient(135deg, #87CEEB 0%, #98D8E8 25%, #FFF8DC 50%, #87CEFA 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+.bank {
+  color: #ffffff;
+  margin-left: 3px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+.tagline {
+  font-size: 9px;
+  font-weight: 600;
+  color: #e8f4f8;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+  </style>
 </head>
 <body>
  
 <!-- Sidebar Offcanvas -->
+  <!-- Sidebar Offcanvas -->
   <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
     <div class="offcanvas-header">
       <h5 class="offcanvas-title" id="sidebarMenuLabel">DigiBank</h5>
+      <
       <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
@@ -249,22 +327,37 @@
       </ul>
     </div>
   </div>
- 
+
   <!-- Top Bar -->
   <div class="top-bar">
     <button class="btn btn-outline-light btn-sm" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
       aria-controls="sidebarMenu" aria-label="Toggle sidebar">
       <i class="bi bi-list"></i>
     </button>
- 
+
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#0B4D83; width:100%;">
       <div class="container-fluid">
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <!-- 🔽 Custom DigiBank Logo -->
+    <a class="navbar-brand digi-bank-logo" href="{{ url_for('home') }}">
+      <div class="logo-icon"></div>
+      <div class="logo-text">
+        <div class="main-text">
+          <span class="digi">DiGi</span><span class="bank">Bank</span>
+        </div>
+        <div class="tagline">Smart Banking</div>
+      </div>
+    </a>
  
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+            aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}">Home</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">My Activities</a></li>
- 
+
             <!-- Open Account -->
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown"
@@ -278,7 +371,7 @@
                 <li><a class="dropdown-item" href="{{ url_for('open_account') }}">PMJDY Account</a></li>
               </ul>
             </li>
- 
+
             <!-- Deposits -->
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
@@ -289,7 +382,7 @@
                 <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Recurring Deposits</a></li>
               </ul>
             </li>
- 
+
             <!-- Loans -->
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="loansDropdown" role="button" data-bs-toggle="dropdown"
@@ -300,7 +393,7 @@
                 <li><a class="dropdown-item" href="{{ url_for('Business_loan') }}">Business Loan</a></li>
               </ul>
             </li>
- 
+
             <!-- Cards -->
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="cardsDropdown" role="button" data-bs-toggle="dropdown"
@@ -311,8 +404,9 @@
                 <li><a class="dropdown-item" href="{{ url_for('open_cards', preset='prepaid') }}">Prepaid Cards</a></li>
               </ul>
             </li>
- 
-            
+
+
+
             <!-- Investments -->
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="investDropdown" role="button" data-bs-toggle="dropdown"
@@ -324,7 +418,7 @@
               </ul>
             </li>
           </ul>
- 
+
           <div class="d-flex align-items-center">
             <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name if user else '' }}!</h5>
             <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">Logout</a>
@@ -333,7 +427,7 @@
       </div>
     </nav>
   </div>
- 
+
 <nav aria-label="breadcrumb" class="bg-light px-3 py-2 mt-3">
     <ol class="breadcrumb mb-0">
       <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color: #0B4D83;">Dashboard</a></li>

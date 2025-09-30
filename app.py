@@ -1010,26 +1010,22 @@ def deposit():
         flash("Please login first", "danger")
         return redirect(url_for("login"))
  
-    my_accounts = get_accounts_for_email(email)
+    my_accounts = get_accounts_for_email(email)  # list of dicts with account_number, account_type, etc.
  
     if request.method == "POST":
-        from_account  = request.form.get("from_account")      # dropdown in your paybill form
-        to_account    = request.form.get("to_account")
-        re_to_account = request.form.get("re_to_account")
-        amount_str    = request.form.get("amount")
-        remark        = (request.form.get("remark") or "").strip()
+        # Single destination account (belongs to the logged-in user)
+        to_account  = request.form.get("account_number")
+        amount_str  = request.form.get("amount")
+        remark      = (request.form.get("remark") or "").strip()
  
-        # If user didn't type to_account fields, use the selected dropdown
-        if (not to_account) and from_account:
-            to_account = from_account
-        if (not re_to_account) and from_account:
-            re_to_account = from_account
- 
-        if not to_account or not re_to_account or not amount_str:
-            flash("Please fill all required fields.", "danger")
+        if not to_account or not amount_str:
+            flash("Please select an account and enter an amount.", "danger")
             return redirect(url_for("deposit"))
-        if to_account != re_to_account:
-            flash("Account numbers do not match!", "danger")
+ 
+        # Ensure the account truly belongs to the current user (prevents tampering)
+        my_acc_numbers = {str(acc.get("account_number")) for acc in my_accounts or []}
+        if to_account not in my_acc_numbers:
+            flash("Invalid account selection.", "danger")
             return redirect(url_for("deposit"))
  
         try:
@@ -1042,7 +1038,7 @@ def deposit():
  
         cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         txn_id = None
-        FROM_SENTINEL = 'CASH'  # avoids NOT NULL errors on transactions.from_account
+        FROM_SENTINEL = 'CASH'  # record as cash deposit
  
         try:
             # get user_id for ledger
@@ -1108,7 +1104,7 @@ def deposit():
         return redirect(url_for("Txnhistory"))
  
     return render_template("deposit.html", accounts=my_accounts)
-  
+   
  
 
 DEPOSIT_TABLES = {
@@ -3170,16 +3166,7 @@ def banktransfer():
 
 #Dashboard - user->loan
 
-# @app.route('/userdashloan')
-# def userdashloan():
-#     user_id = session.get('user_id')
-#     # session['cust_id'] = user['cust_id']
-#     # print("Logged in cust_id:", cust_id)   # debug
-#     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-#     cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
-#     user = cur.fetchone()
-#     cur.close()
-#     return render_template('userloand.html',user=user)
+
 
 @app.route('/userdashloan')
 def userdashloan():
@@ -4542,6 +4529,15 @@ def userpfform():
  
     # Back to the same form
     return redirect(url_for('userpfform'))
+
+@app.route('/investperformance')
+def investperformance():
+    user_id = session.get('user_id')
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT email FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    return render_template('investperformance.html',user=user)
  
  
 # ---------- USER: Apply for Investment ----------

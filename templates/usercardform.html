@@ -16,6 +16,82 @@
     .btn-digibank:hover { background:#7a0f3e; }
     .form-control, .form-select { border:0.5px solid #0B4D83; }
   </style>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap');
+ 
+.digi-bank-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  transition: transform 0.3s ease;
+}
+.digi-bank-logo:hover {
+  transform: scale(1.05);
+}
+.logo-icon {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 6px 18px rgba(102, 126, 234, 0.3), 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+.logo-icon::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+}
+.logo-icon::after {
+  content: 'D';
+  position: absolute;
+  color: transparent;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  background-clip: text;
+  -webkit-background-clip: text;
+  font-weight: 800;
+  font-size: 20px;
+  z-index: 2;
+}
+.logo-text {
+  color: #fff;
+}
+.main-text {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+.digi {
+  background: linear-gradient(135deg, #87CEEB 0%, #98D8E8 25%, #FFF8DC 50%, #87CEFA 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+.bank {
+  color: #ffffff;
+  margin-left: 3px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+.tagline {
+  font-size: 9px;
+  font-weight: 600;
+  color: #e8f4f8;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+  </style>
 </head>
 <body>
  
@@ -50,6 +126,22 @@
 <div class="top-bar d-flex align-items-center">
   <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
     aria-controls="sidebarMenu" aria-label="Toggle sidebar"><i class="bi bi-list"></i></button>
+  <!-- 🔽 Custom DigiBank Logo -->
+    <a class="navbar-brand digi-bank-logo" href="{{ url_for('home') }}">
+      <div class="logo-icon"></div>
+      <div class="logo-text">
+        <div class="main-text">
+          <span class="digi">DiGi</span><span class="bank">Bank</span>
+        </div>
+        <div class="tagline">Smart Banking</div>
+      </div>
+    </a>
+ 
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+            aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
  
   <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#0B4D83; width:100%;">
     <div class="container-fluid">
