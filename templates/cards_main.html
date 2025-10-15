@@ -380,8 +380,8 @@
   <!-- Breadcrumb -->
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
-      <li class="breadcrumb-item"><a href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
+      
+      <li class="breadcrumb-item"><a href="{{ url_for('exploreproduct') }}">Home</a></li>
       <li class="breadcrumb-item active" aria-current="page">Cards</li>
     </ol>
   </nav>
@@ -433,6 +433,7 @@
             <p class="card-text">Credit cards can be a great choice for managing your finances smartly, offering
               benefits for mindful spending and timely repayment.</p>
             <a href="{{ url_for('creditcard') }}" class="btn btn-outline-danger">Explore More</a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline-danger ms-3">Apply Now</a>
           </div>
         </div>
       </div>
@@ -445,6 +446,7 @@
             <p class="card-text">As society moves away from cash, debit cards become essential, eliminating the need to
               carry cash while offering security and convenience.</p>
             <a href="{{ url_for('Debitcard') }}" class="btn btn-outline-danger">Explore More</a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline-danger ms-3">Apply Now</a>
           </div>
         </div>
       </div>
@@ -453,10 +455,11 @@
         <div class="custom-card p-3 h-100">
           <img src="{{ url_for('static', filename='Cards/19058333_6089340.jpg') }}" alt="Prepaid Card">
           <div class="card-body">
-            <h5 class="card-title">Pre-paid Cards</h5>
-            <p class="card-text">Explore a convenient way of gifting, rewarding, and motivating with our range of
-              pre-paid cards.</p>
+            <h5 class="card-title">Pre-Paid Cards</h5>
+            <p class="card-text">Explore a convenient way of gifting, rewarding, purchasing  and motivating with our range of
+              pre-paid cards.experince wide class of prepaid cards</p>
             <a href="{{ url_for('prepaid') }}" class="btn btn-outline-danger">Explore More</a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline-danger ms-3">Apply Now</a>
           </div>
         </div>
       </div>

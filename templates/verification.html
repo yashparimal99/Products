@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loan Verification Dashboard</title>
+ 
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+ 
+<style>
+  body {
+    background-color: #f4f7fa;
+    font-family: 'Inter', sans-serif;
+  }
+ 
+  .top-bar {
+    background: linear-gradient(135deg, #0B4D83 0%, #007bff 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+ 
+  .logo-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+ 
+  .logo-icon::after {
+    content: 'D';
+    position: absolute;
+    color: transparent;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    font-weight: 800;
+    font-size: 20px;
+  }
+ 
+  .logo-text .main-text {
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1;
+  }
+ 
+  .digi { background: linear-gradient(135deg, #87CEEB, #FFF8DC, #87CEFA); -webkit-background-clip: text; color: transparent; }
+  .bank { color: #fff; }
+  .tagline { font-size: 9px; font-weight: 600; color: #e8f4f8; text-transform: uppercase; letter-spacing: 2px; }
+ 
+  .container { margin-top: 30px; margin-bottom: 50px; }
+  .dashboard-card { background: white; border-radius: 15px; box-shadow: 0 6px 20px rgba(0,0,0,0.08); padding: 25px; }
+ 
+  th { background-color: #0B4D83; color: white; text-align: center; font-weight: 600; }
+  td { text-align: center; vertical-align: middle; }
+  tbody tr:hover { background-color: #f1f6fb; }
+ 
+  .btn-view { background-color: #007bff; color: white; border-radius: 20px; padding: 4px 10px; }
+  .btn-view:hover { background-color: #0056b3; }
+  .badge { padding: 6px 10px; font-size: 0.8rem; }
+ 
+  .search-bar { margin-bottom: 20px; text-align: end; }
+  .search-input { border-radius: 20px; padding: 8px 15px; border: 1px solid #ccc; }
+</style>
+</head>
+<body>
+ 
+<!-- Navbar -->
+<div class="top-bar d-flex align-items-center px-3 py-2">
+  <a class="navbar-brand d-flex align-items-center text-white text-decoration-none" href="{{ url_for('home') }}">
+    <div class="logo-icon me-2"></div>
+    <div class="logo-text">
+      <div class="main-text"><span class="digi">DiGi</span><span class="bank">Bank</span></div>
+      <div class="tagline">Smart Banking</div>
+    </div>
+  </a>
+  <h5 class="flex-grow-1 text-center m-0">Underwriting Agent Dashboard</h5>
+  <div class="d-flex align-items-center">
+    <h5 class="m-0 me-2 fs-6">Welcome</h5>
+    <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">Logout</a>
+  </div>
+</div>
+ 
+<!-- Main Content -->
+<div class="container">
+  <div class="dashboard-card">
+    <h3 class="mb-4 text-center text-primary fw-bold">Loan Verification Dashboard</h3>
+ 
+    <!-- Search -->
+    <div class="search-bar">
+      <form method="get" action="{{ url_for('loan_verification') }}" class="d-inline">
+        <input type="text" name="q" value="{{ search_query }}" class="search-input" placeholder="Search by Applicant or ID...">
+        <button type="submit" class="btn btn-primary btn-sm ms-2">Search</button>
+      </form>
+    </div>
+ 
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+ 
+    <!-- PENDING REQUESTS TABLE -->
+    <h5 class="mt-4 text-primary fw-bold">Pending Loan Requests</h5>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Request ID</th>
+            <th>Loan Type</th>
+            <th>Applicant</th>
+            <th>Loan Amount</th>
+            <th>Interest Rate</th>
+            <th>Tenure</th>
+            <th>Status</th>
+            <th>Actions</th>
+            <th>View</th>
+            <th>Documents</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for loan in pending_loans %}
+          <tr>
+            <td>{{ loan.request_id }}</td>
+            <td>{{ loan.loan_type.title() }}</td>
+            <td>{{ loan.applicant_name }}</td>
+            <td>{{ loan.loan_amount|currency }}</td>
+            <td>{{ loan.interest_rate }}%</td>
+            <td>{{ loan.loan_tenure_years }} yrs</td>
+            <td><span class="badge bg-warning text-dark">Pending</span></td>
+            <td>
+              <form action="{{ url_for('update_loan_status', request_id=loan.request_id) }}" method="POST" class="d-inline">
+                <button name="action" value="approve" class="btn btn-success btn-sm mb-1">Approve</button>
+              </form>
+              <form action="{{ url_for('update_loan_status', request_id=loan.request_id) }}" method="POST" class="d-inline">
+                <button name="action" value="reject" class="btn btn-danger btn-sm mb-1">Reject</button>
+              </form>
+            </td>
+            <td><button class="btn btn-view btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal{{ loan.request_id }}">View</button></td>
+            <td>
+              {% if loan.documents_zip %}
+                <a href="{{ url_for('download_docs', request_id=loan.request_id) }}" class="btn btn-outline-secondary btn-sm">Download</a>
+              {% else %}
+                <span class="text-muted">No Docs</span>
+              {% endif %}
+            </td>
+          </tr>
+ 
+          <!-- Loan Modal -->
+          <div class="modal fade" id="viewModal{{ loan.request_id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+              <div class="modal-content">
+                <div class="modal-header bg-light">
+                  <h5 class="modal-title text-primary">Loan Details — {{ loan.loan_type.title() }}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                  <h6 class="text-primary mb-2">Applicant Info</h6>
+                  <ul>
+                    <li><b>Name:</b> {{ loan.applicant_name }}</li>
+                    <li><b>Purpose:</b> {{ loan.purpose }}</li>
+                    <li><b>Loan Amount:</b> {{ loan.loan_amount|currency }}</li>
+                    <li><b>Interest:</b> {{ loan.interest_rate }}%</li>
+                    <li><b>Tenure:</b> {{ loan.loan_tenure_years }} years</li>
+                    <li><b>EMI:</b> {{ loan.emi_amount|currency }}</li>
+                  </ul>
+ 
+                  {% if loan.company_name %}
+                  <hr><h6 class="text-primary mb-2">Employment Details</h6>
+                  <ul>
+                    <li><b>Company:</b> {{ loan.company_name }}</li>
+                    <li><b>Designation:</b> {{ loan.designation }}</li>
+                    <li><b>Annual Income:</b> {{ loan.gross_annual_income|currency }}</li>
+                    <li><b>Total Experience:</b> {{ loan.total_experience_years }} years</li>
+                  </ul>
+                  {% endif %}
+ 
+                  {% if loan.loan_type == 'home' %}
+                  <hr><h6 class="text-primary mb-2">Property Details</h6>
+                  <ul>
+                    <li><b>Address:</b> {{ loan.property_address }}</li>
+                    <li><b>Type:</b> {{ loan.property_type }}</li>
+                    <li><b>Value:</b> {{ loan.property_value|currency }}</li>
+                  </ul>
+                  {% endif %}
+ 
+                  {% if loan.coapplicant_name %}
+                  <hr><h6 class="text-primary mb-2">Co-Applicant</h6>
+                  <ul>
+                    <li><b>Name:</b> {{ loan.coapplicant_name }}</li>
+                    <li><b>Relation:</b> {{ loan.coapplicant_relationship }}</li>
+                    <li><b>Income:</b> {{ loan.coapplicant_annual_income|currency }}</li>
+                  </ul>
+                  {% endif %}
+ 
+                  {% if loan.bank_name %}
+                  <hr><h6 class="text-primary mb-2">Bank Info</h6>
+                  <ul>
+                    <li><b>Bank:</b> {{ loan.bank_name }}</li>
+                    <li><b>Account No:</b> {{ loan.bank_account_number }}</li>
+                    <li><b>Type:</b> {{ loan.bank_account_type }}</li>
+                    <li><b>Years with Bank:</b> {{ loan.bank_years_with_bank }}</li>
+                  </ul>
+                  {% endif %}
+                </div>
+                <div class="modal-footer">
+                  <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% else %}
+            <tr><td colspan="10" class="text-center text-muted">No pending loans found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+ 
+    <!-- APPROVED / REJECTED TABLE -->
+    <h5 class="mt-5 text-success fw-bold">Approved / Rejected Loan Requests</h5>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Request ID</th>
+            <th>Loan Type</th>
+            <th>Applicant</th>
+            <th>Loan Amount</th>
+            <th>Interest Rate</th>
+            <th>Tenure</th>
+            <th>Status</th>
+            <th>View</th>
+            <th>Documents</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for loan in verified_loans %}
+          <tr>
+            <td>{{ loan.request_id }}</td>
+            <td>{{ loan.loan_type.title() }}</td>
+            <td>{{ loan.applicant_name }}</td>
+            <td>{{ loan.loan_amount|currency }}</td>
+            <td>{{ loan.interest_rate }}%</td>
+            <td>{{ loan.loan_tenure_years }} yrs</td>
+            <td>
+              {% if loan.status == 'approved' %}
+                <span class="badge bg-success">Approved</span>
+              {% elif loan.status == 'approved_docs' %}
+                <span class="badge" style="background-color:#17a2b8; color:#fff;">Approved (Docs)</span>
+              {% elif loan.status == 'rejected' %}
+                <span class="badge bg-danger">Rejected</span>
+              {% else %}
+                <span class="badge bg-secondary">Unknown</span>
+              {% endif %}
+            </td>
+ 
+            <td><button class="btn btn-view btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal{{ loan.request_id }}">View</button></td>
+            <td>
+              {% if loan.documents_zip %}
+                <a href="{{ url_for('download_docs', request_id=loan.request_id) }}" class="btn btn-outline-secondary btn-sm">Download</a>
+              {% else %}
+                <span class="text-muted">No Docs</span>
+              {% endif %}
+            </td>
+          </tr>
+ 
+          <!-- Modal (same structure reused) -->
+          <div class="modal fade" id="viewModal{{ loan.request_id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+              <div class="modal-content">
+                <div class="modal-header bg-light">
+                  <h5 class="modal-title text-primary">Loan Details — {{ loan.loan_type.title() }}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                  <h6 class="text-primary mb-2">Applicant Info</h6>
+                  <ul>
+                    <li><b>Name:</b> {{ loan.applicant_name }}</li>
+                    <li><b>Purpose:</b> {{ loan.purpose }}</li>
+                    <li><b>Loan Amount:</b> {{ loan.loan_amount|currency }}</li>
+                    <li><b>Interest:</b> {{ loan.interest_rate }}%</li>
+                    <li><b>Tenure:</b> {{ loan.loan_tenure_years }} years</li>
+                    <li><b>EMI:</b> {{ loan.emi_amount|currency }}</li>
+                  </ul>
+ 
+                  {% if loan.company_name %}
+                  <hr><h6 class="text-primary mb-2">Employment Details</h6>
+                  <ul>
+                    <li><b>Company:</b> {{ loan.company_name }}</li>
+                    <li><b>Designation:</b> {{ loan.designation }}</li>
+                    <li><b>Annual Income:</b> {{ loan.gross_annual_income|currency }}</li>
+                    <li><b>Total Experience:</b> {{ loan.total_experience_years }} years</li>
+                  </ul>
+                  {% endif %}
+ 
+                  {% if loan.loan_type == 'home' %}
+                  <hr><h6 class="text-primary mb-2">Property Details</h6>
+                  <ul>
+                    <li><b>Address:</b> {{ loan.property_address }}</li>
+                    <li><b>Type:</b> {{ loan.property_type }}</li>
+                    <li><b>Value:</b> {{ loan.property_value|currency }}</li>
+                  </ul>
+                  {% endif %}
+ 
+                  {% if loan.coapplicant_name %}
+                  <hr><h6 class="text-primary mb-2">Co-Applicant</h6>
+                  <ul>
+                    <li><b>Name:</b> {{ loan.coapplicant_name }}</li>
+                    <li><b>Relation:</b> {{ loan.coapplicant_relationship }}</li>
+                    <li><b>Income:</b> {{ loan.coapplicant_annual_income|currency }}</li>
+                  </ul>
+                  {% endif %}
+ 
+                  {% if loan.bank_name %}
+                  <hr><h6 class="text-primary mb-2">Bank Info</h6>
+                  <ul>
+                    <li><b>Bank:</b> {{ loan.bank_name }}</li>
+                    <li><b>Account No:</b> {{ loan.bank_account_number }}</li>
+                    <li><b>Type:</b> {{ loan.bank_account_type }}</li>
+                    <li><b>Years with Bank:</b> {{ loan.bank_years_with_bank }}</li>
+                  </ul>
+                  {% endif %}
+                </div>
+                <div class="modal-footer">
+                  <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% else %}
+            <tr><td colspan="9" class="text-center text-muted">No approved or rejected loans found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+ 
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+ 
+ 

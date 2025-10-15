@@ -10,376 +10,47 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
  
   <style>
-    body {
-      background-color: #f8f9fa;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    .navbar {
-      background-color: #0B4D83;
-    }
-    .navbar-brand {
-      font-weight: bold;
-      color: white !important;
-    }
-    .btn-action {
-      margin: 0 3px;
-    }
-    .badge-pending {
-      background-color: #ffc107;
-      color: #000;
-    }
-    .badge-approved {
-      background-color: #28a745;
-    }
-    .badge-rejected {
-      background-color: #dc3545;
-    }
-    .card {
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    footer {
-      background-color: #0B4D83;
-      color: white;
-      text-align: center;
-      padding: 15px;
-      margin-top: 40px;
-    }
-    .table-responsive {
-      border-radius: 12px;
-      background: white;
-      padding: 15px;
-      margin-bottom: 30px;
-    }
+    body{background:#f8f9fa;font-family:Segoe UI,Tahoma,Verdana,sans-serif}
+    .navbar{background:#0B4D83}.navbar-brand{font-weight:700;color:#fff!important}
+    .table-responsive{border-radius:12px;background:#fff;padding:15px;margin-bottom:30px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+    .badge-pending{background:#ffc107;color:#000}.badge-approved{background:#28a745}.badge-rejected{background:#dc3545}
+    .btn-action{border-radius:8px;padding:4px 10px;font-size:.85rem;margin:0 3px}
+    footer{background:#0B4D83;color:#fff;text-align:center;padding:15px;margin-top:40px}
   </style>
-  <style>
-   
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap');
- 
-    .digi-bank-logo {
- 
-      display: flex;
- 
-      align-items: center;
- 
-      gap: 12px;
- 
-      text-decoration: none;
- 
-      transition: transform 0.3s ease;
- 
-    }
- 
-    .digi-bank-logo:hover {
- 
-      transform: scale(1.05);
- 
-    }
- 
-    .logo-icon {
- 
-      width: 50px;
- 
-      height: 50px;
- 
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 100%);
- 
-      border-radius: 12px;
- 
-      display: flex;
- 
-      align-items: center;
- 
-      justify-content: center;
- 
-      position: relative;
- 
-      box-shadow: 0 6px 18px rgba(102, 126, 234, 0.3), 0 2px 6px rgba(0, 0, 0, 0.1);
- 
-    }
- 
-    .logo-icon::before {
- 
-      content: '';
- 
-      position: absolute;
- 
-      top: 8px;
- 
-      left: 8px;
- 
-      right: 8px;
- 
-      bottom: 8px;
- 
-      background: rgba(255, 255, 255, 0.95);
- 
-      border-radius: 8px;
- 
-    }
- 
-    .logo-icon::after {
- 
-      content: 'D';
- 
-      position: absolute;
- 
-      color: transparent;
- 
-      background: linear-gradient(135deg, #667eea, #764ba2);
- 
-      background-clip: text;
- 
-      -webkit-background-clip: text;
- 
-      font-weight: 800;
- 
-      font-size: 20px;
- 
-      z-index: 2;
- 
-    }
- 
-    .logo-text {
- 
-      color: #fff;
- 
-    }
- 
-    .main-text {
- 
-      font-size: 20px;
- 
-      font-weight: 800;
- 
-      letter-spacing: -0.5px;
- 
-      line-height: 1;
- 
-    }
- 
-    .digi {
- 
-      background: linear-gradient(135deg, #87CEEB 0%, #98D8E8 25%, #FFF8DC 50%, #87CEFA 100%);
- 
-      background-clip: text;
- 
-      -webkit-background-clip: text;
- 
-      color: transparent;
- 
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
- 
-    }
- 
-    .bank {
- 
-      color: #ffffff;
- 
-      margin-left: 3px;
- 
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
- 
-    }
- 
-    .tagline {
- 
-      font-size: 9px;
- 
-      font-weight: 600;
- 
-      color: #e8f4f8;
- 
-      letter-spacing: 2px;
- 
-      text-transform: uppercase;
- 
-      margin-top: 2px;
- 
-    }
-    </style>
-    <style>
- /* ============================= */
-/* DigiBank Table & Badge Styling */
-/* ============================= */
-
-/* Table Container */
-.table-responsive {
-    border-radius: 12px;
-    background: #fff;
-    padding: 15px;
-    margin-bottom: 30px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-
-/* Table Styling */
-.table-custom thead {
-    background-color: #0B4D83;  /* DigiBank Blue */
-    color: white;
-    font-size: 15px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.table-custom th,
-.table-custom td {
-    padding: 14px 16px;
-    vertical-align: middle;
-    border-top: none;
-}
-
-/* Alternating row colors */
-.table-custom tbody tr:nth-child(odd) {
-    background-color: #f9fbfd;
-}
-
-.table-custom tbody tr:hover {
-    background-color: #eaf3fc;
-    transition: background 0.3s ease;
-}
-
-/* Rounded table */
-.table-custom {
-    border-radius: 12px;
-    overflow: hidden;
-    border: 1px solid #dee2e6;
-}
-
-/* Status Badges */
-.badge {
-    font-size: 0.8rem;
-    font-weight: 600;
-    padding: 6px 10px;
-    border-radius: 8px;
-}
-
-.badge-pending {
-    background-color: #ffc107;
-    color: #000;
-}
-
-.badge-approved {
-    background-color: #28a745;
-    color: #fff;
-}
-
-.badge-rejected {
-    background-color: #dc3545;
-    color: #fff;
-}
-
-/* Table Action Buttons */
-.btn-action {
-    border-radius: 8px;
-    padding: 4px 10px;
-    font-size: 0.8rem;
-    margin: 0 3px;
-}
-
-/* Optional: Responsive Font */
-@media (max-width: 768px) {
-    .table-custom th,
-    .table-custom td {
-        font-size: 0.85rem;
-        padding: 10px 12px;
-    }
-
-    .btn-action {
-        font-size: 0.75rem;
-        padding: 3px 8px;
-    }
-}
-</style>
 </head>
 <body>
  
-<!-- Top Bar -->
-<!-- Sidebar Offcanvas -->
-  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
-    <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="sidebarMenuLabel">Manager</h5>
-      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body">
-      <ul class="nav flex-column">
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark active" href="{{ url_for('dashboard') }}">
-            <i class="bi bi-speedometer2 me-2"></i> Dashboard
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="{{ url_for('managerapprovals') }}">
-            <i class="bi bi-people-fill me-2"></i> Manage Approvals
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="{{ url_for('manstaff') }}">
-            <i class="bi bi-file-earmark-check me-2"></i>  Staff Management
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="{{ url_for('transactions_review') }}">
-            <i class="bi bi-list-check me-2"></i> Transaction Review
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="{{ url_for('manreport') }}">
-            <i class="bi bi-graph-up me-2"></i> Reports & Analytics
-          </a>
-        </li>
-     
-      </ul>
-    </div>
+<!-- Top bar (trimmed) -->
+<nav class="navbar navbar-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{{ url_for('dashboard') }}">DigiBank — Manage Cards</a>
+    <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">Logout</a>
   </div>
+</nav>
  
-  <!-- Top Bar -->
-  <!-- ✅ Top Bar -->
-<div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#0B4D83; color:white;">
- 
-  <!-- Sidebar Toggle -->
-  <button class="btn btn-outline-light btn-sm me-3"
-          data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
-          aria-controls="sidebarMenu" aria-label="Toggle sidebar">
-    <i class="bi bi-list fs-5"></i>
-  </button>
- 
-  <!-- DigiBank Logo -->
-  <a class="navbar-brand digi-bank-logo d-flex align-items-center me-3" href="{{ url_for('home') }}">
-    <div class="logo-icon"></div>
-    <div class="logo-text ms-2">
-      <div class="main-text">
-        <span class="digi">DiGi</span><span class="bank">Bank</span>
-      </div>
-      <div class="tagline">Smart Banking</div>
-    </div>
-  </a>
- 
-  <!-- Title -->
-  <h5 class="flex-grow-1 text-center m-0">Manage Approvals</h5>
- 
-  <!-- Right Side: User + Logout -->
-  <div class="d-flex align-items-center">
-    <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }}</h5>
-    <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
-      Logout
-    </a>
-  </div>
+<!-- Flash (Flask) -->
+<div class="container mt-3">
+  {% with msgs = get_flashed_messages(with_categories=true) %}
+    {% if msgs %}
+      {% for cat, msg in msgs %}
+        <div class="alert alert-{{ 'success' if cat=='success' else ('warning' if cat=='warning' else ('info' if cat=='info' else 'danger')) }} alert-dismissible fade show">
+          {{ msg }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+  <!-- JS toast area (for AJAX actions) -->
+  <div id="js-flash" class="d-none"></div>
 </div>
  
-<nav aria-label="breadcrumb" style="background-color:#f8f9fa; padding:8px 15px; border-radius:4px; margin:10px 20px;">
-    <ol class="breadcrumb mt-0">
-      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#0B4D83;">Home</a></li>
-      <li class="breadcrumb-item active" aria-current="page" style="color:#0B4D83; font-weight:bold;"> Manage Cards
-      </li>
-    </ol>
-  </nav>
 <div class="container my-4">
  
-  <!-- Pending Requests -->
+  <!-- Pending -->
   <div class="card p-4 mb-4">
-    <h4 class="mb-4">Pending Card Requests</h4>
+    <h4 class="mb-3">Pending Card Requests</h4>
     <div class="table-responsive">
-      <table class="table table-hover align-middle table-custom">
+      <table class="table table-hover align-middle">
         <thead class="table-light">
           <tr>
             <th>Request ID</th>
@@ -391,39 +62,39 @@
             <th>Action</th>
           </tr>
         </thead>
-        <tbody>
-          {% for r in requests if not r.status_flag %}
-          <tr>
-            <td>{{ r.request_id }}</td>
-            <td>{{ r.customer_name }}</td>
-            <td>{{ r.card_type }}</td>
-            <td>{{ r.application_ref or '—' }}</td>
-            <td>{{ r.created_at.strftime('%Y-%m-%d %H:%M') if r.created_at else '—' }}</td>
-            <td><span class="badge badge-pending">Pending</span></td>
-            <td>
-              <form action="{{ url_for('card_request', request_id=r.request_id, action='approve') }}" method="post" style="display:inline;">
-                <button class="btn btn-sm btn-success btn-action">
-                  <i class="bi bi-check-circle"></i> Approve
-                </button>
-              </form>
-              <form action="{{ url_for('card_request', request_id=r.request_id, action='reject') }}" method="post" style="display:inline;">
-                <button class="btn btn-sm btn-danger btn-action">
-                  <i class="bi bi-x-circle"></i> Reject
-                </button>
-              </form>
+        <tbody id="pending-body">
+        {% for r in requests if not r.status_flag %}
+          <tr data-request-id="{{ r.request_id }}">
+            <td class="td-request-id">{{ r.request_id }}</td>
+            <td class="td-customer">{{ r.customer_name }}</td>
+            <td class="td-cardtype">{{ r.card_type }}{% if r.card_subtype %} ({{ r.card_subtype|upper }}){% endif %}</td>
+            <td class="td-appref">{{ r.application_ref or '—' }}</td>
+            <td class="td-created">
+              {% if r.created_at %}
+                {% if r.created_at.strftime %}{{ r.created_at.strftime('%Y-%m-%d %H:%M') }}{% else %}{{ r.created_at }}{% endif %}
+              {% else %}—{% endif %}
+            </td>
+            <td class="td-status"><span class="badge badge-pending">Pending</span></td>
+            <td class="td-actions">
+              <button class="btn btn-success btn-action" onclick="decideRequest(this,'approve')">
+                <i class="bi bi-check-circle"></i> Approve
+              </button>
+              <button class="btn btn-danger btn-action" onclick="decideRequest(this,'reject')">
+                <i class="bi bi-x-circle"></i> Reject
+              </button>
             </td>
           </tr>
-          {% else %}
-          <tr><td colspan="7" class="text-center py-4 text-muted">No pending requests.</td></tr>
-          {% endfor %}
+        {% else %}
+          <tr><td colspan="7" class="text-center text-muted py-4">No pending requests.</td></tr>
+        {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
  
-  <!-- Processed Requests -->
+  <!-- Processed -->
   <div class="card p-4">
-    <h4 class="mb-4">Processed Card Requests</h4>
+    <h4 class="mb-3">Processed Card Requests</h4>
     <div class="table-responsive">
       <table class="table table-hover align-middle">
         <thead class="table-light">
@@ -432,31 +103,39 @@
             <th>Customer</th>
             <th>Submitted By</th>
             <th>Application Ref</th>
-            <th>Date</th>
+            <th>Created</th>
             <th>Status</th>
             <th>Date of Action</th>
           </tr>
         </thead>
-        <tbody>
-          {% for r in requests if r.status_flag in ['A','R'] %}
-          <tr>
-            <td>{{ r.request_id }}</td>
-            <td>{{ r.customer_name }}</td>
-            <td>{{ r.submitted_by_role }}</td>
-            <td>{{ r.application_ref or '—' }}</td>
-            <td>{{ r.created_at.strftime('%Y-%m-%d %H:%M') if r.created_at else '—' }}</td>
-            <td>
+        <tbody id="processed-body">
+        {% for r in requests if r.status_flag in ['A','R'] %}
+          <tr data-request-id="{{ r.request_id }}">
+            <td class="td-request-id">{{ r.request_id }}</td>
+            <td class="td-customer">{{ r.customer_name }}</td>
+            <td class="td-submittedby">{{ r.submitted_by_role or '—' }}</td>
+            <td class="td-appref">{{ r.application_ref or '—' }}</td>
+            <td class="td-created">
+              {% if r.created_at %}
+                {% if r.created_at.strftime %}{{ r.created_at.strftime('%Y-%m-%d %H:%M') }}{% else %}{{ r.created_at }}{% endif %}
+              {% else %}—{% endif %}
+            </td>
+            <td class="td-status">
               {% if r.status_flag == 'A' %}
                 <span class="badge badge-approved">Approved</span>
               {% elif r.status_flag == 'R' %}
                 <span class="badge badge-rejected">Rejected</span>
               {% endif %}
             </td>
-            <td>{{ r.date_of_action.strftime('%Y-%m-%d %H:%M') if r.date_of_action else '—' }}</td>
+            <td class="td-actiondate">
+              {% if r.date_of_action %}
+                {% if r.date_of_action.strftime %}{{ r.date_of_action.strftime('%Y-%m-%d %H:%M') }}{% else %}{{ r.date_of_action }}{% endif %}
+              {% else %}—{% endif %}
+            </td>
           </tr>
-          {% else %}
-          <tr><td colspan="7" class="text-center py-4 text-muted">No processed requests yet.</td></tr>
-          {% endfor %}
+        {% else %}
+          <tr><td colspan="7" class="text-center text-muted py-4">No processed requests yet.</td></tr>
+        {% endfor %}
         </tbody>
       </table>
     </div>
@@ -466,12 +145,102 @@
  
 <footer>© 2025 DigiBank. All rights reserved.</footer>
  
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Show a tiny alert without reloading
+  function showJsFlash(message, type='success') {
+    const box = document.getElementById('js-flash');
+    box.className = '';
+    box.classList.add('container','mt-3');
+    box.innerHTML = `
+      <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>`;
+  }
  
+  // Approve / Reject via AJAX and move row between tables
+  async function decideRequest(btn, action){
+    const tr = btn.closest('tr');
+    const reqId = tr?.dataset?.requestId;
+    if(!reqId) return;
+ 
+    // optimistic disable buttons
+    tr.querySelectorAll('button').forEach(b => b.disabled = true);
+ 
+    try {
+      const resp = await fetch(`/card_request/${encodeURIComponent(reqId)}/${action}`, {
+        method: 'POST',
+        headers: {'X-Requested-With': 'XMLHttpRequest'}
+      });
+ 
+      if(!resp.ok){
+        throw new Error('Server responded with ' + resp.status);
+      }
+ 
+      // Build a processed-row using existing cells
+      const processedBody = document.getElementById('processed-body');
+ 
+      // If processed table has the "no processed requests" row, remove it
+      const emptyRow = processedBody.querySelector('tr td[colspan]');
+      if(emptyRow) emptyRow.closest('tr').remove();
+ 
+      // Clone current row and adapt it
+      const clone = tr.cloneNode(true);
+ 
+      // Status badge
+      const statusTd = clone.querySelector('.td-status');
+      const nowStr = new Date().toLocaleString();
+ 
+      if(action === 'approve'){
+        statusTd.innerHTML = '<span class="badge badge-approved">Approved</span>';
+      } else {
+        statusTd.innerHTML = '<span class="badge badge-rejected">Rejected</span>';
+      }
+ 
+      // Replace actions cell with action date
+      const actionsCell = clone.querySelector('.td-actions');
+      if(actionsCell){
+        actionsCell.classList.remove('td-actions');
+        actionsCell.classList.add('td-actiondate');
+        actionsCell.textContent = nowStr;
+      } else {
+        // If there wasn't an actions cell (unlikely in pending), append date cell
+        const td = document.createElement('td');
+        td.className = 'td-actiondate';
+        td.textContent = nowStr;
+        clone.appendChild(td);
+      }
+ 
+      // Add "Submitted By" column if missing (insert after Customer)
+      const submittedByCell = document.createElement('td');
+      submittedByCell.className = 'td-submittedby';
+      submittedByCell.textContent = '{{ (requests[0].submitted_by_role if requests|length) or "—" }}';
+      clone.insertBefore(submittedByCell, clone.children[2]); // after customer
+ 
+      // Remove buttons in the clone (safety)
+      clone.querySelectorAll('button').forEach(b => b.remove());
+ 
+      // Append to processed table
+      processedBody.prepend(clone);
+ 
+      // Remove from pending table (or replace with empty message if it was the last)
+      const pendingBody = document.getElementById('pending-body');
+      tr.remove();
+      if(!pendingBody.querySelector('tr')){
+        pendingBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">No pending requests.</td></tr>';
+      }
+ 
+      showJsFlash(`Request ${reqId} ${action === 'approve' ? 'approved' : 'rejected'} successfully.`, 'success');
+ 
+    } catch (err){
+      // Re-enable buttons on error
+      tr.querySelectorAll('button').forEach(b => b.disabled = false);
+      showJsFlash('Action failed: ' + err.message, 'danger');
+    }
+  }
+</script>
 </body>
 </html>
- 
- 
  
  

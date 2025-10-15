@@ -383,7 +383,7 @@
   <!-- Breadcrumb -->
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('exploreproduct') }}">Home</a></li>
       <li class="breadcrumb-item active" aria-current="page">Accounts</li>
     </ol>
   </nav>
@@ -429,6 +429,7 @@
             <h5 class="card-title">Saving Account</h5>
             <p class="card-text">Save funds for fixed tenure and enjoy fixed rate of return.</p>
             <a href="{{ url_for('saving') }}" class="btn btn-custom">Explore more</a>
+            <a href="{{ url_for('login') }}" class="btn btn-custom ms-3">Apply Now</a>
           </div>
         </div>
       </div>
@@ -438,8 +439,9 @@
           <img src="{{ url_for('static', filename='Account/SAL.webp') }}" alt="Salary Account">
           <div class="p-3">
             <h5 class="card-title">Salary Account</h5>
-            <p class="card-text">Save and grow your wealth with fixed deposits.</p>
-            <a href="{{ url_for('salary') }}" class="btn btn-custom">Explore more</a>
+            <p class="card-text">Save and grow your wealth with our salary accounts.</p>
+            <a href="{{ url_for('salary') }}" class="btn btn-custom">Explore More</a>
+            <a href="{{ url_for('login') }}" class="btn btn-custom ms-3">Apply Now</a>
           </div>
         </div>
       </div>
@@ -467,6 +469,7 @@
             <h5 class="card-title">Safe Custody</h5>
             <p class="card-text">Keep your valuables secure with our trusted custody services.</p>
             <a href="{{ url_for('safec') }}" class="btn btn-custom">Explore more</a>
+            <a href="{{ url_for('login') }}" class="btn btn-custom ms-3">Apply Now</a>
           </div>
         </div>
       </div>
@@ -478,6 +481,7 @@
             <h5 class="card-title">Pension Account</h5>
             <p class="card-text">Plan for your retirement with reliable pension solutions.</p>
             <a href="{{ url_for('pension') }}" class="btn btn-custom">Explore more</a>
+            <a href="{{ url_for('login') }}" class="btn btn-custom ms-3">Apply Now</a>
           </div>
         </div>
       </div>
@@ -489,6 +493,7 @@
             <h5 class="card-title">PMJDY Account</h5>
             <p class="card-text">Enjoy financial inclusion benefits with PMJDY account services.</p>
             <a href="{{ url_for('pmjdy') }}" class="btn btn-custom">Explore more</a>
+            <a href="{{ url_for('login') }}" class="btn btn-custom ms-3">Apply Now</a>
           </div>
         </div>
       </div>

@@ -111,7 +111,7 @@
   text-transform: uppercase;
   margin-top: 2px;
 }
-
+ 
   </style>
 </head>
 <body>
@@ -147,7 +147,7 @@
   </a>
 </div>
 </div>
-
+ 
 <!-- Breadcrumb -->
   <nav aria-label="breadcrumb" class="bg-light px-3 py-2">
     <ol class="breadcrumb mb-0">
@@ -427,24 +427,50 @@
       </div>
  
       <!-- Docs & Declaration -->
-      <div class="section-title"><span class="dot"></span> Documents & Declaration</div>
-      <div class="row g-3">
-        <div class="col-md-3 form-check">
-          <input type="checkbox" class="form-check-input" id="idProof" name="idProof" required aria-required="true">
-          <label for="idProof" class="form-check-label">Identity Proof</label>
+      <!-- H) Documents to be Attached (UPDATED with upload inputs) -->
+      <div class="section-title" style="background:#0B4D83; color:white; padding:10px 15px; margin:24px 0 16px; border-radius:6px; font-size:1.1rem;">
+        H) Documents to be Attached
+      </div>
+ 
+      <!-- Identity Proof -->
+      <div class="mb-3">
+        <div class="form-check mb-2">
+          <input type="checkbox" class="form-check-input" id="idProof" name="idProof">
+          <label class="form-check-label" for="idProof"><strong>Identity Proof</strong> (PAN/Aadhaar/Passport)</label>
         </div>
-        <div class="col-md-3 form-check">
-          <input type="checkbox" class="form-check-input" id="addressProof" name="addressProof" required aria-required="true">
-          <label for="addressProof" class="form-check-label">Address Proof</label>
+        <input type="file" class="form-control" id="idProofFile" name="idProofFile" accept=".pdf,.jpg,.jpeg,.png,.webp" disabled>
+        <small class="text-muted">Accepted: PDF, JPG, PNG, WEBP — max 10MB</small>
+      </div>
+ 
+      <!-- Address Proof -->
+      <div class="mb-3">
+        <div class="form-check mb-2">
+          <input type="checkbox" class="form-check-input" id="addressProof" name="addressProof">
+          <label class="form-check-label" for="addressProof"><strong>Address Proof</strong></label>
         </div>
-        <div class="col-md-3 form-check">
-          <input type="checkbox" class="form-check-input" id="incomeProof" name="incomeProof" required aria-required="true">
-          <label for="incomeProof" class="form-check-label">Income Proof</label>
+        <input type="file" class="form-control" id="addressProofFile" name="addressProofFile" accept=".pdf,.jpg,.jpeg,.png,.webp" disabled>
+        <small class="text-muted">Accepted: PDF, JPG, PNG, WEBP — max 10MB</small>
+      </div>
+ 
+      <!-- Income Proof -->
+      <div class="mb-3">
+        <div class="form-check mb-2">
+          <input type="checkbox" class="form-check-input" id="incomeProof" name="incomeProof">
+          <label class="form-check-label" for="incomeProof"><strong>Income Proof</strong> (Salary slips / ITR)</label>
         </div>
-        <div class="col-md-3 form-check">
+        <input type="file" class="form-control" id="incomeProofFile" name="incomeProofFile" accept=".pdf,.jpg,.jpeg,.png,.webp" disabled>
+        <small class="text-muted">Accepted: PDF, JPG, PNG, WEBP — max 10MB</small>
+      </div>
+ 
+      <!-- Property Documents -->
+      <div class="mb-3">
+        <div class="form-check mb-2">
           <input type="checkbox" class="form-check-input" id="propertyDocs" name="propertyDocs">
-          <label for="propertyDocs" class="form-check-label">Property Docs (Home)</label>
+          <label class="form-check-label" for="propertyDocs"><strong>Property Documents</strong></label>
         </div>
+        <input type="file" class="form-control" id="propertyDocsFile" name="propertyDocsFile" accept=".pdf,.jpg,.jpeg,.png,.webp" disabled>
+        <small class="text-muted">Accepted: PDF, JPG, PNG, WEBP — max 10MB</small>
+      </div>
         <div class="col-md-12 form-check">
           <input type="checkbox" class="form-check-input" id="declaration" name="declaration" required aria-required="true">
           <label for="declaration" class="form-check-label">I declare the information is true and correct.</label>
@@ -551,10 +577,39 @@
   }
   [loanAmount, loanTenure, interestType].forEach(el => el && el.addEventListener('input', quote));
  
+  // Toggle file inputs on checkbox change; require file when checked
+    (function () {
+      const pairs = [
+        { box: 'idProof', file: 'idProofFile' },
+        { box: 'addressProof', file: 'addressProofFile' },
+        { box: 'incomeProof', file: 'incomeProofFile' },
+        { box: 'propertyDocs', file: 'propertyDocsFile' },
+      ];
+ 
+      function bindToggle(boxId, fileId) {
+        const box = document.getElementById(boxId);
+        const file = document.getElementById(fileId);
+        if (!box || !file) return;
+ 
+        function apply() {
+          const on = box.checked;
+          file.disabled = !on;
+          file.required = on;      // required only when the user has checked the box
+          if (!on) file.value = '';// clear if unchecked
+        }
+ 
+        box.addEventListener('change', apply);
+        apply(); // initialize on load
+      }
+ 
+      pairs.forEach(p => bindToggle(p.box, p.file));
+    })();
+ 
   // init
   updateKindUI();
 </script>
 </body>
 </html>
+ 
  
  

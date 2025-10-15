@@ -1,24 +1,17 @@
 <!doctype html>
 <html lang="en">
- 
 <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
- 
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
- 
     <title>diGi Bank Products</title>
 </head>
- 
  
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0B4D83 !important;">
   <div class="container-fluid">
-    <!-- 🔽 Custom DigiBank Logo -->
-    <a class="navbar-brand digi-bank-logo" href="{{ url_for('home') }}">
+    <a class="navbar-brand digi-bank-logo" href="#">
       <div class="logo-icon"></div>
       <div class="logo-text">
         <div class="main-text">
@@ -37,13 +30,100 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item"><a class="nav-link active" href="{{ url_for('home') }}">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('exploreproduct') }}">Explore Products</a></li>
+ 
+        <li class="nav-item dropdown position-static">
+          <a class="nav-link active dropdown-toggle" href="{{ url_for('exploreproduct') }}">
+            Explore Products
+          </a>
+         
+          <div class="dropdown-menu mega-menu" aria-labelledby="exploreDropdown">
+            <div class="container">
+              <div class="row g-4">
+                <!-- Column 1 -->
+                <div class="col-md-3">
+                  <div class="mega-section">
+                    <h6 class="mega-title">Accounts</h6>
+                    <ul class="mega-list">
+                      <li><a href="{{ url_for('Accounts') }}">Saving Account</a></li>
+                      <li><a href="{{ url_for('Accounts') }}">Salary Account</a></li>
+                      <li><a href="{{ url_for('Accounts') }}">Current Account</a></li>
+                      <li><a href="{{ url_for('Accounts') }}">Safe Custody</a></li>
+                      <li><a href="{{ url_for('Accounts') }}">Pension Account</a></li>
+                      <li><a href="{{ url_for('Accounts') }}">PMJDY Account</a></li>
+                    </ul>
+                  </div>
+                </div>
+ 
+                <!-- Column 2 -->
+                <div class="col-md-3">
+                  <div class="mega-section">
+                    <h6 class="mega-title">Loans</h6>
+                    <ul class="mega-list">
+                      <li><a href="{{ url_for('loans') }}">Home Loan</a></li>
+                      <li><a href="{{ url_for('loans') }}">Personal Loan</a></li>
+                      <li><a href="{{ url_for('loans') }}">Business Loan</a></li>
+                    </ul>
+                  </div>
+ 
+                  <div class="mega-section mt-4">
+                    <h6 class="mega-title">Deposits</h6>
+                    <ul class="mega-list">
+                      <li><a href="{{ url_for('deposits') }}">Digital Fix Deposits</a></li>
+                      <li><a href="{{ url_for('deposits') }}">Fix Deposits</a></li>
+                      <li><a href="{{ url_for('deposits') }}">Recuring Deposits</a></li>
+                    </ul>
+                  </div>
+                </div>
+ 
+                <!-- Column 3 -->
+                <div class="col-md-3">
+                  <div class="mega-section">
+                    <h6 class="mega-title">Cards</h6>
+                    <ul class="mega-list">
+                      <li><a href="{{ url_for('cards') }}">Credit card</a></li>
+                      <li><a href="{{ url_for('cards') }}">Debit card</a></li>
+                      <li><a href="{{ url_for('cards') }}">Pre-Paid card</a></li>
+                    </ul>
+                  </div>
+ 
+                  <div class="mega-section mt-4">
+                    <h6 class="mega-title">Forex</h6>
+                    <ul class="mega-list">
+                      <li><a href="{{ url_for('forex') }}">Travel Forex Card</a></li>
+                      <li><a href="{{ url_for('forex') }}">Send Money Abroad</a></li>
+                      <li><a href="{{ url_for('forex') }}">Send Money to India</a></li>
+                      <li><a href="{{ url_for('forex') }}">Foreign Currency Exchange</a></li>
+                    </ul>
+                  </div>
+                </div>
+ 
+                <!-- Column 4 -->
+                <div class="col-md-3">
+                  <div class="mega-section">
+                    <h6 class="mega-title">Investments</h6>
+                    <ul class="mega-list">
+                      <li><a href="{{ url_for('invest') }}">Public Provident Fund</a></li>
+                      <li><a href="{{ url_for('invest') }}">Floating Rate Saving Bonds</a></li>
+                      <li><a href="{{ url_for('invest') }}">National Pension System</a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+ 
         <li class="nav-item"><a class="nav-link" href="#">Grab Deals</a></li>
         <li class="nav-item"><a class="nav-link" href="#">Make Payments</a></li>
         <li class="nav-item"><a class="nav-link" href="#">Bank Smart</a></li>
       </ul>
- 
+   
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+              <!-- ✅ Added Search Bar Here -->
+      <form class="d-flex me-3" role="search">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-light" type="submit">Search</button>
+      </form>
         <li class="nav-item">
           <a class="btn btn-outline-light me-2 navbar-btn" href="{{ url_for('login') }}">Login</a>
         </li>
@@ -55,24 +135,10 @@
   </div>
 </nav>
  
- 
- 
-    <style>
-        .breadcrumb .breadcrumb-item a {
-            color: #0B4D83;
-            text-decoration: none;
-        }
- 
-        .breadcrumb .breadcrumb-item a:hover {
-            text-decoration: underline;
-        }
- 
-        .breadcrumb .breadcrumb-item {
-            color: #0B4D83;
-        }
-       
+<style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap');
  
+/* Logo Styling */
 .digi-bank-logo {
   display: flex;
   align-items: center;
@@ -145,9 +211,91 @@
   margin-top: 2px;
 }
  
-    </style>
-    <div class="card mt-4 border-0"></div>
-    
+/* Mega Menu Styling */
+.dropdown.position-static .dropdown-menu {
+  left: 0 !important;
+  right: 0 !important;
+  width: 100%;
+}
+ 
+.mega-menu {
+  background: white;
+  border: none;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  padding: 30px 20px;
+  margin-top: 0;
+  border-radius: 0;
+}
+ 
+.mega-section {
+  padding: 0;
+}
+ 
+.mega-title {
+  color: #0B4D83;
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #0B4D83;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+ 
+.mega-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+ 
+.mega-list li {
+  margin-bottom: 8px;
+}
+ 
+.mega-list a {
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+  display: block;
+  padding: 6px 10px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+ 
+.mega-list a:hover {
+  background-color: #e8f4f9;
+  color: #0B4D83;
+  padding-left: 15px;
+}
+.dropdown:hover .mega-menu {
+  display: block;
+}
+</style>
+ 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // Open mega menu on hover
+  const dropdown = document.querySelector('.dropdown');
+  const menu = document.querySelector('.mega-menu');
+ 
+  dropdown.addEventListener('mouseenter', () => {
+    menu.classList.add('show');
+  });
+  dropdown.addEventListener('mouseleave', () => {
+    menu.classList.remove('show');
+  });
+ 
+  // // Redirect all links in mega menu to explore.html
+  // const links = document.querySelectorAll('.mega-list a');
+  // links.forEach(link => {
+  //   link.addEventListener('click', (e) => {
+  //     e.preventDefault(); // prevent default Bootstrap dropdown behavior
+  //     window.location.href = 'explore.html';
+  //   });
+//   });
+// });
+</script>
+ 
 <!-- ✅ Rotating Ad Banners with Navigation Arrows -->
 <div id="adBannerCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="600">
   <div class="carousel-inner">
@@ -211,7 +359,7 @@
        
             /* rounded */
             transition: background-color 0.3s, color 0.3s;}
-            /* }}
+            /* }
  
         .custom-card:hover {
             background-color: #97144D;
@@ -285,6 +433,5 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
     -->
 </body>
- 
 </html>
  

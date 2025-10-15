@@ -124,7 +124,7 @@
   text-transform: uppercase;
   margin-top: 2px;
 }
-
+ 
   </style>
 </head>
 <body>
@@ -317,12 +317,12 @@
  
   </div>
  
- <nav aria-label="breadcrumb" class="mb-3 mt-3">
-    <ol class="breadcrumb mb-0">
-      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#0B4D83;">Home</a></li>
-      <li class="breadcrumb-item active" aria-current="page" style="color:#0B4D83; font-weight:bold;">Quick Transfer</li>
-    </ol>
-  </nav>
+  <nav aria-label="breadcrumb" style="background-color:#f8f9fa; padding:8px 15px; border-radius:4px; margin:10px 20px;">
+  <ol class="breadcrumb mb-0">
+    <li class="breadcrumb-item"><a href="{{ url_for('paybill') }}" style="color:#0B4D83;">Home</a></li>
+    <li class="breadcrumb-item active" aria-current="page" style="color:#0B4D83; font-weight:bold;">Quick Transfer</li>
+  </ol>
+</nav>
  
  
  
@@ -362,7 +362,9 @@
         <div class="row mb-3">
           <label class="col-sm-2 col-form-label">Amount (₹)</label>
           <div class="col-sm-4">
-            <input type="number" name="amount" step="0.01" min="0.01" class="form-control" required />
+            <!-- ✅ Added max="50000" to enforce the UI cap -->
+            <input type="number" name="amount" step="0.01" min="0.01" max="50000" class="form-control" required />
+            <small class="text-muted">Quick Transfer limit: ₹50,000 per transaction.</small>
           </div>
           <label class="col-sm-2 col-form-label">Remark</label>
           <div class="col-sm-4">
@@ -387,12 +389,39 @@
     if (toAcc !== toAccConf) {
       e.preventDefault();
       alert('The destination account numbers do not match.');
+      return;
+    }
+ 
+    // ✅ Enforce ₹50,000 client-side cap as well
+    const amtInput = document.querySelector('input[name="amount"]');
+    const amt = parseFloat(amtInput.value || '0');
+    if (isNaN(amt) || amt <= 0) {
+      e.preventDefault();
+      alert('Amount must be a positive number.');
+      return;
+    }
+    if (amt > 50000) {
+      e.preventDefault();
+      alert('Quick Transfer limit is ₹50,000 per transaction.');
+      return;
     }
   });
+ 
+ 
 </script>
+ 
+{% with msgs = get_flashed_messages(with_categories=true) %}
+  {% if msgs %}
+    {% for category, message in msgs %}
+      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+ 
 </body>
 </html>
- 
- 
  
  

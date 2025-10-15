@@ -281,6 +281,47 @@
 }
 
   </style>
+  <style>
+.table-custom {
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.table-custom thead {
+  background-color: #0B4D83;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.table-custom tbody tr:hover {
+  background-color: #eef6ff;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}
+
+.table-custom td, .table-custom th {
+  padding: 14px 18px;
+}
+
+.badge-approved {
+  background-color: #198754;
+  color: #fff;
+}
+
+.badge-rejected {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.badge-pending {
+  background-color: #ffc107;
+  color: #000;
+}
+</style>
+
 </head>
 <body>
  
@@ -289,7 +330,7 @@
   <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
     <div class="offcanvas-header">
       <h5 class="offcanvas-title" id="sidebarMenuLabel">DigiBank</h5>
-      <
+      
       <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
@@ -473,45 +514,61 @@
   <!-- Investments table -->
   <div class="card mt-3">
     <!-- <div class="card-header fw-semibold">My Investments</div> -->
-    <div class="table-responsive">
-      <table class="table table-hover align-middle table-custom">
-       <thead style="background-color:#0B4D83; color:white; font-size:20px;">
-          <tr>
-            <th>Application Number</th>
-            <th>Type</th>
-            <th>Tenure</th>
-            <th class="text-end">Amount (₹)</th>
-            <th>Status</th>
-            <th>Submitted By</th>
-            <th>Applied On</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% if investments and investments|length > 0 %}
-            {% for inv in investments %}
-            <tr>
-              <td style="font-size: 20px;"  class="fw-semibold">{{ inv.application_number}}</td>
-              <td style="font-size: 20px;">{{ inv.investment_type }}</td>
-              <td style="font-size: 20px;">{{ inv.investment_tenure_years or '—' }}</td>
-              <td style="font-size: 20px;" class="text-end">₹ {{ '{:,.2f}'.format(inv.initial_deposit or 0) }}</td>
-              <td>
-                <span class="badge
-                  {% if inv.status == 'approved' %} bg-success
-                  {% elif inv.status in ['rejected','declined'] %} bg-danger
-                  {% elif inv.status in ['pending','pending_manager'] %} bg-warning text-dark
-                  {% else %} bg-secondary {% endif %}">
-                  {{ inv.status|replace('_',' ')|title }}
-                </span>
-              </td>
-              <td style="font-size: 20px;">{{ inv.submitted_by_role or 'User' }}</td>
-              <td style="font-size: 20px;" class="text-nowrap">{% if inv.created_at %}{{ inv.created_at }}{% else %}—{% endif %}</td>
-            </tr>
-            {% endfor %}
-          {% else %}
-            <tr><td colspan="7" class="text-center py-4 text-muted">No investment applications found.</td></tr>
-          {% endif %}
-        </tbody>
-      </table>
+    <div class="table-responsive mt-3">
+  <table class="table table-hover table-borderless align-middle table-custom shadow-sm">
+    <thead class="custom-thead text-uppercase">
+      <tr>
+        <th scope="col">Application No.</th>
+        <th scope="col">Investment Type</th>
+        <th scope="col" class="text-center">Tenure (Years)</th>
+        <th scope="col" class="text-end">Amount (₹)</th>
+        <th scope="col" class="text-center">Status</th>
+        <th scope="col" class="text-center">Submitted By</th>
+        <th scope="col" class="text-center">Applied On</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if investments and investments|length > 0 %}
+        {% for inv in investments %}
+        <tr class="align-middle">
+          <td class="fw-semibold text-primary" style="font-size: 17px;">
+            {{ inv.application_number }}
+          </td>
+          <td style="font-size: 16px;">{{ inv.investment_type }}</td>
+          <td style="font-size: 16px;" class="text-center">
+            {{ inv.investment_tenure_years or '—' }}
+          </td>
+          <td style="font-size: 16px;" class="text-end">
+            ₹ {{ '{:,.2f}'.format(inv.initial_deposit or 0) }}
+          </td>
+          <td class="text-center">
+            <span class="badge px-3 py-2 
+              {% if inv.status == 'approved' %}badge-approved
+              {% elif inv.status in ['rejected','declined'] %}badge-rejected
+              {% elif inv.status in ['pending','pending_manager'] %}badge-pending
+              {% else %}bg-secondary{% endif %}">
+              {{ inv.status|replace('_',' ')|title }}
+            </span>
+          </td>
+          <td style="font-size: 16px;" class="text-center">
+            {{ inv.submitted_by_role or 'User' }}
+          </td>
+          <td style="font-size: 16px;" class="text-center text-nowrap">
+            {% if inv.created_at %}{{ inv.created_at }}{% else %}—{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="7" class="text-center py-4 text-muted">
+            No investment applications found.
+          </td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
     </div>
   </div>
  

@@ -38,17 +38,17 @@
     padding: 5px 10px;
     border-radius: 8px;
 }
-
+ 
 .badge-pending {
     background-color: #ffc107;
     color: #000;
 }
-
+ 
 .badge-approved {
     background-color: #28a745;
     color: #fff;
 }
-
+ 
 .badge-rejected {
     background-color: #dc3545;
     color: #fff;
@@ -205,7 +205,7 @@
         /* ============================= */
 /* DigiBank Table & Badge Styling */
 /* ============================= */
-
+ 
 /* Table Container */
 .table-responsive {
     border-radius: 12px;
@@ -214,7 +214,7 @@
     margin-bottom: 30px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
-
+ 
 /* Table Styling */
 .table-custom thead {
     background-color: #0B4D83;  /* DigiBank Blue */
@@ -223,31 +223,31 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
-
+ 
 .table-custom th,
 .table-custom td {
     padding: 14px 16px;
     vertical-align: middle;
     border-top: none;
 }
-
+ 
 /* Alternating row colors */
 .table-custom tbody tr:nth-child(odd) {
     background-color: #f9fbfd;
 }
-
+ 
 .table-custom tbody tr:hover {
     background-color: #eaf3fc;
     transition: background 0.3s ease;
 }
-
+ 
 /* Rounded table */
 .table-custom {
     border-radius: 12px;
     overflow: hidden;
     border: 1px solid #dee2e6;
 }
-
+ 
 /* Status Badges */
 .badge {
     font-size: 0.8rem;
@@ -255,22 +255,22 @@
     padding: 6px 10px;
     border-radius: 8px;
 }
-
+ 
 .badge-pending {
     background-color: #ffc107;
     color: #000;
 }
-
+ 
 .badge-approved {
     background-color: #28a745;
     color: #fff;
 }
-
+ 
 .badge-rejected {
     background-color: #dc3545;
     color: #fff;
 }
-
+ 
 /* Table Action Buttons */
 .btn-action {
     border-radius: 8px;
@@ -278,7 +278,7 @@
     font-size: 0.8rem;
     margin: 0 3px;
 }
-
+ 
 /* Optional: Responsive Font */
 @media (max-width: 768px) {
     .table-custom th,
@@ -286,13 +286,13 @@
         font-size: 0.85rem;
         padding: 10px 12px;
     }
-
+ 
     .btn-action {
         font-size: 0.75rem;
         padding: 3px 8px;
     }
 }
-
+ 
     </style>
  
 <body>
@@ -413,69 +413,67 @@
  
                 <!-- Loan Applications Table -->
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle table-custom">
-                        <thead>
-                            <tr>
-                                <th>Loan ID</th>
-                                <th>Customer</th>
-                                <th>Loan Type</th>
-                                <th>Amount</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="loanTableBody">
-                            {% for loan in loans %}
-                            <tr id="loanRow-{{ loan.request_id }}"
-                                data-applicant="{{ loan.applicant_name }}"
-                                data-type="{{ loan.loan_type|capitalize }} Loan"
-                                data-amount="{{ loan.loan_amount }}"
-                                data-date="{{ loan.application_date }}"
-                                data-status="{{ loan.status }}"
-                                data-purpose="{{ loan.purpose }}"
-                                data-emi="{{ loan.emi_amount }}">
-                                <td>{{ loan.request_id }}</td>
-                                <td>{{ loan.applicant_name }}</td>
-                                <td>{{ loan.loan_type|capitalize }} Loan</td>
-                                <td>{{ loan.loan_amount }}</td>
-                                <td>{{ loan.application_date }}</td>
-                                <td>
-    <span class="badge
-        {% if loan.status|lower == 'pending_manager' %}badge-pending
-        {% elif loan.status|lower == 'approved' %}badge-approved
-        {% elif loan.status|lower == 'rejected' %}badge-rejected
-        {% else %}badge-secondary
-        {% endif %}">
-        {% if loan.status|lower == 'pending_manager' %}Pending
-        {% else %}{{ loan.status }}
-        {% endif %}
-    </span>
-</td>
-
-                                <td>
-                                    <button class="btn btn-sm btn-primary me-1" onclick="viewLoanDetails('{{ loan.request_id }}')">
-                                        <i class="bi bi-eye"></i> View
-                                    </button>
-                                    {% if loan.status == 'pending_manager' %}
-                                    <form method="POST" action="{{ url_for('approve_loan', request_id=loan.request_id) }}" style="display:inline;">
-                                        <button type="submit" class="btn btn-sm btn-success me-1">
-                                            <i class="bi bi-check-circle"></i> Approve
-                                        </button>
-                                    </form>
-                                    <form method="POST" action="{{ url_for('reject_loan', request_id=loan.request_id) }}" style="display:inline;">
-                                        <button type="submit" class="btn btn-sm btn-danger">
-                                            <i class="bi bi-x-circle"></i> Reject
-                                        </button>
-                                    </form>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% else %}
-                            <tr><td colspan="7" class="text-center">No loan applications found.</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Loan ID</th>
+                        <th>Customer</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for loan in loan_applications %}
+                      <tr id="loanRow-{{ loan.request_id }}"
+                          data-applicant="{{ loan.applicant_name }}"
+                          data-type="{{ loan.loan_type|capitalize }} Loan"
+                          data-amount="{{ loan.loan_amount }}"
+                          data-date="{{ loan.created_at.strftime('%Y-%m-%d') if loan.created_at else '' }}"
+                          data-status="{{ loan.status|capitalize }}"
+                          data-purpose="{{ loan.purpose or 'N/A' }}"
+                          data-emi="{{ loan.emi_amount or 'Not calculated' }}">
+                         
+                        <td>{{ loan.request_id }}</td>
+                        <td>{{ loan.applicant_name }}</td>
+                        <td>{{ loan.loan_type|capitalize }} Loan</td>
+                        <td>{{ loan.loan_amount }}</td>
+                        <td>
+                          <span class="badge
+                              {% if loan.status == 'pending' %}bg-warning text-dark
+                              {% elif loan.status == 'approved_docs' %}bg-info text-dark
+                              {% elif loan.status == 'approved' %}bg-success
+                              {% elif loan.status == 'rejected' %}bg-danger
+                              {% endif %}">
+                              {{ loan.status|capitalize }}
+                          </span>
+                        </td>
+                        <td>
+                          <button class="btn btn-sm btn-primary me-1"
+                                  onclick="viewLoanDetails('{{ loan.request_id }}')">
+                              <i class="bi bi-eye"></i> View
+                          </button>
+ 
+                          {% if loan.status == 'approved_docs' %}
+                          <form method="POST" action="{{ url_for('approve_loan', request_id=loan.request_id) }}" style="display:inline;">
+                              <button type="submit" class="btn btn-sm btn-success me-1">
+                                  <i class="bi bi-check-circle"></i> Approve
+                              </button>
+                          </form>
+                          <form method="POST" action="{{ url_for('reject_loan', request_id=loan.request_id) }}" style="display:inline;">
+                              <button type="submit" class="btn btn-sm btn-danger">
+                                  <i class="bi bi-x-circle"></i> Reject
+                              </button>
+                          </form>
+                          {% endif %}
+                        </td>
+                      </tr>
+                      {% else %}
+                      <tr><td colspan="6" class="text-center">No loan applications found.</td></tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
                 </div>
             </div>
         </div>
@@ -489,37 +487,55 @@
                 <p>View and manage currently active loans.</p>
                 <div class="table-responsive">
                     <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Loan ID</th>
-                                <th>Customer</th>
-                                <th>Type</th>
-                                <th>Amount</th>
-                                <th>Disbursed</th>
-                                <th>EMI</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="activeLoansTableBody">
-                            {% for loan in loans if loan.status == 'Approved' %}
-                            <tr>
-                                <td>{{ loan.request_id }}</td>
-                                <td>{{ loan.applicant_name }}</td>
-                                <td>{{ loan.loan_type|capitalize }} Loan</td>
-                                <td>{{ loan.loan_amount }}</td>
-                                <td>{{ loan.updated_at.strftime('%Y-%m-%d') if loan.updated_at else '' }}</td>
-                                <td>{{ loan.emi_amount }}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-primary" onclick="viewLoanDetails('{{ loan.request_id }}')">
-                                        <i class="bi bi-eye"></i> Details
-                                    </button>
-                                </td>
-                            </tr>
-                            {% else %}
-                            <tr><td colspan="7" class="text-center">No active loans yet.</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                      <thead>
+                          <tr>
+                              <th>Loan ID</th>
+                              <th>Customer</th>
+                              <th>Type</th>
+                              <th>Amount</th>
+                              <th>Disbursed</th>
+                              <th>EMI</th>
+                              <th>Status</th>
+                              <th>Actions</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                      {% for loan in active_loans %}
+                      <tr id="loanRow-{{ loan.request_id }}"
+                          data-applicant="{{ loan.applicant_name }}"
+                          data-type="{{ loan.loan_type|capitalize }} Loan"
+                          data-amount="{{ loan.loan_amount }}"
+                          data-date="{{ loan.updated_at.strftime('%Y-%m-%d') if loan.updated_at else '' }}"
+                          data-status="Approved"
+                          data-purpose="{{ loan.purpose or 'N/A' }}"
+                          data-emi="{{ loan.emi_amount }}">
+                          <td>{{ loan.request_id }}</td>
+                          <td>{{ loan.applicant_name }}</td>
+                          <td>{{ loan.loan_type|capitalize }} Loan</td>
+                          <td>{{ loan.loan_amount }}</td>
+                          <td>{{ loan.updated_at.strftime('%Y-%m-%d') if loan.updated_at else '' }}</td>
+                          <td>{{ loan.emi_amount }}</td>
+                          <td>
+                              {% if loan.status|lower == 'approved' %}
+                                  <span class="badge bg-success">Approved</span>
+                              {% elif loan.status|lower == 'rejected' %}
+                                  <span class="badge bg-danger">Rejected</span>
+                              {% else %}
+                                  <span class="badge bg-secondary">{{ loan.status|capitalize }}</span>
+                              {% endif %}
+                          </td>
+ 
+                          <td>
+                              <button class="btn btn-sm btn-primary me-1" onclick="viewLoanDetails('{{ loan.request_id }}')">
+                                  <i class="bi bi-eye"></i> View
+                              </button>
+                          </td>
+                      </tr>
+                      {% else %}
+                      <tr><td colspan="8" class="text-center">No active loans yet.</td></tr>
+                      {% endfor %}
+                  </tbody>
+                  </table>
                 </div>
             </div>
         </div>
@@ -527,15 +543,15 @@
  
     <!-- Loan Details Modal -->
     <div class="modal fade" id="loanDetailsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="loanModalTitle">Loan Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="loanModalBody"></div>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loanModalTitle">Loan Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <div class="modal-body" id="loanModalBody"></div>
         </div>
+    </div>
     </div>
  
     <!-- Bootstrap JS -->
@@ -544,26 +560,30 @@
     <script>
       function viewLoanDetails(requestId) {
         const row = document.getElementById(`loanRow-${requestId}`);
-        if (!row) return;
+        if (!row) {
+          alert("Loan details not found!");
+          return;
+        }
  
-        const applicant = row.getAttribute("data-applicant");
-        const type = row.getAttribute("data-type");
-        const amount = row.getAttribute("data-amount");
-        const date = row.getAttribute("data-date");
-        const status = row.getAttribute("data-status");
-        const purpose = row.getAttribute("data-purpose");
-        const emi = row.getAttribute("data-emi");
+        const applicant = row.getAttribute("data-applicant") || "N/A";
+        const type = row.getAttribute("data-type") || "N/A";
+        const amount = row.getAttribute("data-amount") || "N/A";
+        const date = row.getAttribute("data-date") || "N/A";
+        const status = row.getAttribute("data-status") || "N/A";
+        const purpose = row.getAttribute("data-purpose") || "N/A";
+        const emi = row.getAttribute("data-emi") || "N/A";
  
         document.getElementById("loanModalTitle").textContent = `Loan Request - ${requestId}`;
         document.getElementById("loanModalBody").innerHTML = `
           <p><strong>Applicant:</strong> ${applicant}</p>
           <p><strong>Loan Type:</strong> ${type}</p>
-          <p><strong>Amount:</strong> ${amount}</p>
-          <p><strong>Application Date:</strong> ${date}</p>
+          <p><strong>Amount:</strong> ₹ ${amount}</p>
+          <p><strong>Date:</strong> ${date}</p>
           <p><strong>Status:</strong> ${status}</p>
           <p><strong>Purpose:</strong> ${purpose}</p>
           <p><strong>EMI:</strong> ${emi}</p>
         `;
+ 
         const modal = new bootstrap.Modal(document.getElementById('loanDetailsModal'));
         modal.show();
       }
@@ -586,6 +606,7 @@
     </script>
 </body>
 </html>
+ 
  
  
  

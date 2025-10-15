@@ -334,7 +334,7 @@
   text-transform: uppercase;
   margin-top: 2px;
 }
-
+ 
   </style>
 </head>
  
@@ -529,7 +529,20 @@
  
  
  
- 
+ <!-- Flash alerts (Bootstrap 5) -->
+<div class="container mt-2">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ 'warning' if category=='warning' else category }} alert-dismissible fade show" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-1"></i>
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+</div>
  
  
   <!-- Dashboard Content -->
@@ -540,7 +553,7 @@
         <div class="container my-5">
     <!-- <h3 class="text-danger mb-4">Account Opening Form</h3> -->
     <h3 style="color: #0B4D83;" class="mb-4">Account Opening Form</h3>
-    <form action="#" method="post">
+    <form action="{{ url_for('open_account') }}" method="post">
       <div class="row mb-3">
         <label for="fName" class="col-sm-2 col-form-label">First Name</label>
         <div class="col-sm-4">
@@ -579,7 +592,7 @@
         <div class="col-sm-10">
           <select id="accountType" name="accountType" class="form-select" required>
             <option value="" selected disabled>Select account type</option>
-            <option value="saving">Savings Account</option>
+            <option value="savings">Savings Account</option>
             <option value="salary">Salary Account</option>
             <option value="current">Current Account</option>
             <option value="safec">Safe Custody</option>
@@ -600,6 +613,9 @@
     <!-- </div>
   </div> -->
  
+ 
+ 
+ 
   <!-- Footer -->
   <footer class="bg-custom text-white text-center py-3 mt-auto" style="background-color: #0B4D83;">
     © 2025 DigiBank. All rights reserved.
@@ -607,6 +623,14 @@
  
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+ 
+  <script>
+  setTimeout(() => {
+    document.querySelectorAll('.alert').forEach(a => {
+      if (a.classList.contains('show')) new bootstrap.Alert(a).close();
+    });
+  }, 5000);
+</script>
  
   <!-- <script>
     function logout() {
@@ -617,5 +641,6 @@
 </body>
  
 </html>
+ 
  
  
