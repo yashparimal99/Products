@@ -952,64 +952,6 @@ def generate_transaction_id():
     return prefix + suffix
  
  
-@app.route('/accountbal')
-def accountbal():
-    email = session.get('user_email')
-    if not email:
-        flash('Please login first', 'danger')
-        return redirect(url_for('login'))
- 
-    # Fetch logged-in user (for user_id + header)
-    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute("SELECT user_id, name, role FROM bank_users WHERE email=%s", (email,))
-    user = cur.fetchone()
-    if not user:
-        cur.close()
-        flash('User not found.', 'danger')
-        return redirect(url_for('login'))
- 
-    user_id = user['user_id']
- 
-    # Only include accounts that are approved (status_flag = 'A')
-    account_tables = [
-        ("saving_accounts",      "savings"),
-        ("current_accounts",     "current"),
-        ("salary_accounts",      "salary"),
-        ("pmjdy_accounts",       "pmjdy"),
-        ("pension_accounts",     "pension"),
-        ("safecustody_accounts", "safecustody"),
-    ]
- 
-    accounts = []
-    for table_name, acct_type in account_tables:
-        # No ORDER BY here to avoid 'Unknown column id' errors on tables without an 'id' column
-        cur.execute(f"""
-            SELECT account_number, balance, status_flag
-            FROM {table_name}
-            WHERE user_id = %s
-              AND status_flag = 'A'
-        """, (user_id,))
-        rows = cur.fetchall() or []
-        for r in rows:
-            accounts.append({
-                'account_number': r.get('account_number'),
-                'balance': r.get('balance') or Decimal('0.00'),
-                'account_type': acct_type,
-            })
- 
-    cur.close()
- 
-    # Optional: stable sort in Python (by account_number)
-    accounts.sort(key=lambda a: (a['account_type'], str(a['account_number'])))
- 
-    total_balance = sum(Decimal(str(a['balance'])) for a in accounts) if accounts else Decimal('0.00')
- 
-    return render_template(
-        'balance.html',
-        accounts=accounts,
-        total_balance=total_balance,
-        user=user
-    )
  
 @app.route('/Txnhistory')
 def Txnhistory():
@@ -1043,192 +985,6 @@ def Txnhistory():
 
  
  
-@app.route('/quicktransfer', methods=['GET', 'POST'])
-def quicktransfer():
-    email = session.get('user_email')
-    if not email:
-        flash('Please login first', 'danger')
-        return redirect(url_for('login'))
- 
-    if request.method == 'GET':
-        my_accounts = get_accounts_for_email(email)
-        # pass user for header
-        cur2 = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cur2.execute("SELECT * FROM bank_users WHERE email=%s", (email,))
-        user = cur2.fetchone()
-        cur2.close()
-        return render_template('quicktransfer.html', my_accounts=my_accounts, user=user)
- 
-    # POST: perform transfer
-    from_account = request.form.get('from_account')
-    to_account   = request.form.get('to_account')
-    amount_str   = request.form.get('amount')
-    note         = (request.form.get('note') or '').strip()[:255]
- 
-    if not from_account or not to_account or not amount_str:
-        flash('Please provide source, destination, and amount.', 'danger')
-        return redirect(url_for('quicktransfer'))
- 
-    if from_account == to_account:
-        flash('Source and destination accounts cannot be the same.', 'danger')
-        return redirect(url_for('quicktransfer'))
- 
-    try:
-        amount = Decimal(amount_str)
-        if amount <= 0:
-            raise InvalidOperation()
-    except (InvalidOperation, TypeError):
-        flash('Amount must be a positive number.', 'danger')
-        return redirect(url_for('quicktransfer'))
- 
-    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    txn_id = None
-    try:
-        mysql.connection.begin()
- 
-        # who am I
-        cur.execute("SELECT user_id FROM bank_users WHERE email=%s", (email,))
-        me = cur.fetchone()
-        if not me:
-            raise ValueError("User not found.")
-        my_user_id = me['user_id']
- 
-        # Lock rows in their specific tables
-        src = find_account_by_number(from_account, for_update=True)
-        dst = find_account_by_number(to_account, for_update=True)
- 
-        if not src:
-            raise ValueError("Source account not found.")
-        if not dst:
-            raise ValueError("Destination account not found.")
- 
-        # Ensure source belongs to logged-in user
-        if src['user_id'] != my_user_id:
-            raise ValueError("You can only transfer from your own account.")
- 
-        # Balance check
-        if Decimal(str(src['balance'])) < amount:
-            raise ValueError("Insufficient balance.")
- 
-        new_src_bal = Decimal(str(src['balance'])) - amount
-        new_dst_bal = Decimal(str(dst['balance'])) + amount
- 
-        update_account_balance(src['table_name'], from_account, new_src_bal)
-        update_account_balance(dst['table_name'], to_account,   new_dst_bal)
- 
-        txn_id = generate_transaction_id()
-        cur.execute("""
-            INSERT INTO transactions (transaction_id, from_account, to_account, amount, note, status)
-            VALUES (%s, %s, %s, %s, %s, 'success')
-        """, (txn_id, from_account, to_account, str(amount), note))
- 
-        mysql.connection.commit()
-        flash(f'Transfer successful: ₹{amount} to {to_account} | Transaction ID: {txn_id}', 'success')
-        return redirect(url_for('Txnhistory'))
- 
-    except Exception as e:
-        mysql.connection.rollback()
-        # log failure (best effort)
-        try:
-            if not txn_id:
-                txn_id = generate_transaction_id()
-            cur.execute("""
-                INSERT INTO transactions (transaction_id, from_account, to_account, amount, note, status)
-                VALUES (%s, %s, %s, %s, %s, 'failed')
-            """, (txn_id, from_account, to_account, str(amount_str or '0'), f'FAILED: {note}' if note else 'FAILED'))
-            mysql.connection.commit()
-        except Exception:
-            mysql.connection.rollback()
-        flash(f"Transfer failed: {str(e)}", 'danger')
-        return redirect(url_for('quicktransfer'))
-    finally:
-        cur.close()
- 
- 
-    # POST: perform transfer
-    from_account = request.form.get('from_account')
-    to_account   = request.form.get('to_account')
-    amount_str   = request.form.get('amount')
-    note         = (request.form.get('note') or '').strip()[:255]
- 
-    if not from_account or not to_account or not amount_str:
-        flash('Please provide source, destination, and amount.', 'danger')
-        return redirect(url_for('quicktransfer'))
- 
-    if from_account == to_account:
-        flash('Source and destination accounts cannot be the same.', 'danger')
-        return redirect(url_for('quicktransfer'))
- 
-    try:
-        amount = Decimal(amount_str)
-        if amount <= 0:
-            raise InvalidOperation()
-    except (InvalidOperation, TypeError):
-        flash('Amount must be a positive number.', 'danger')
-        return redirect(url_for('quicktransfer'))
- 
-    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    txn_id = None
-    try:
-        mysql.connection.begin()
- 
-        # who am I
-        cur.execute("SELECT user_id FROM bank_users WHERE email=%s", (email,))
-        me = cur.fetchone()
-        if not me:
-            raise ValueError("User not found.")
-        my_user_id = me['user_id']
- 
-        # Lock rows in their specific tables
-        src = find_account_by_number(from_account, for_update=True)
-        dst = find_account_by_number(to_account, for_update=True)
- 
-        if not src:
-            raise ValueError("Source account not found.")
-        if not dst:
-            raise ValueError("Destination account not found.")
- 
-        # Ensure source belongs to logged-in user
-        if src['user_id'] != my_user_id:
-            raise ValueError("You can only transfer from your own account.")
- 
-        # Balance check
-        if Decimal(str(src['balance'])) < amount:
-            raise ValueError("Insufficient balance.")
- 
-        new_src_bal = Decimal(str(src['balance'])) - amount
-        new_dst_bal = Decimal(str(dst['balance'])) + amount
- 
-        update_account_balance(src['table_name'], from_account, new_src_bal)
-        update_account_balance(dst['table_name'], to_account,   new_dst_bal)
- 
-        txn_id = generate_transaction_id()
-        cur.execute("""
-            INSERT INTO transactions (transaction_id, from_account, to_account, amount, note, status)
-            VALUES (%s, %s, %s, %s, %s, 'success')
-        """, (txn_id, from_account, to_account, str(amount), note))
- 
-        mysql.connection.commit()
-        flash(f'Transfer successful: ₹{amount} to {to_account} | Transaction ID: {txn_id}', 'success')
-        return redirect(url_for('Txnhistory'))
- 
-    except Exception as e:
-        mysql.connection.rollback()
-        # log failure (best effort)
-        try:
-            if not txn_id:
-                txn_id = generate_transaction_id()
-            cur.execute("""
-                INSERT INTO transactions (transaction_id, from_account, to_account, amount, note, status)
-                VALUES (%s, %s, %s, %s, %s, 'failed')
-            """, (txn_id, from_account, to_account, str(amount_str or '0'), f'FAILED: {note}' if note else 'FAILED'))
-            mysql.connection.commit()
-        except Exception:
-            mysql.connection.rollback()
-        flash(f"Transfer failed: {str(e)}", 'danger')
-        return redirect(url_for('quicktransfer'))
-    finally:
-        cur.close()
 
 # === SIMPLE DEPOSIT (credits account + logs to transactions; mirrors to `deposits` ledger) ===
 from decimal import Decimal, InvalidOperation
@@ -1398,7 +1154,6 @@ def generate_deposit_request_id():
     cur.close()
     return rid
  
- 
 @app.route('/open_deposits', methods=['GET', 'POST'])
 def open_deposits():
     email = session.get('user_email')
@@ -1540,6 +1295,7 @@ def open_deposits():
  
     cur.close()
     return render_template('depositform.html', user=user)
+ 
   
 
 
@@ -2612,9 +2368,548 @@ def agent_suggestions():
 
  
 
+ 
+##################### Tushar )Branch Performance) ################
+ 
 @app.route('/branchperformance')
 def branchperformance():
     return render_template('branch-performance.html')
+ 
+ 
+ 
+# -------- Branch Performance API (drop-in) --------
+from datetime import date, timedelta
+from flask import jsonify, request
+from MySQLdb.cursors import DictCursor
+ 
+# ---- Helpers ----
+CASA_TABLES = [
+    ("saving_accounts",     "Saving"),
+    ("current_accounts",    "Current"),
+    ("salary_accounts",     "Salary"),
+    ("pmjdy_accounts",      "PMJDY"),
+    ("pension_accounts",    "Pension"),
+    ("safecustody_accounts","Safe Custody"),
+]
+ 
+DEPOSIT_TABLES1 = [
+    ("fixed_deposits",         "principal_amount", "fd"),
+    ("digital_fixed_deposits", "principal_amount", "digital_fd"),
+    ("recurring_deposits",     "monthly_installment", "rd"),
+]
+ 
+LOAN_TABLES = [
+    ("home_loan_applications",     "home"),
+    ("personal_loan_applications", "personal"),
+    ("business_loan_applications", "business"),
+]
+ 
+CARD_TABLES = [
+    ("card_requests",  "credit"),
+    ("card_requests",   "debit"),
+    ("card_requests", "prepaid"),
+    ("card_requests",   "forex"),
+]
+ 
+INVEST_TABLES = [
+    ("ppf_accounts", "amount_invested", "ppf"),
+    ("saving_bonds", "amount_invested", "bonds"),
+    ("nps_accounts", "amount_invested", "nps"),
+]
+ 
+def _period_bounds(period: str):
+    """Return (start_date, end_date_exclusive) using server local date."""
+    today = date.today()
+    if period == 'day':
+        start = today
+    elif period == 'week':
+        start = today - timedelta(days=today.weekday())  # Monday
+    elif period == 'month':
+        start = today.replace(day=1)
+    elif period == 'quarter':
+        q = (today.month - 1) // 3  # 0..3
+        start_month = q * 3 + 1
+        start = date(today.year, start_month, 1)
+    elif period == 'year':
+        start = date(today.year, 1, 1)
+    else:
+        start = today.replace(day=1)
+    end = today + timedelta(days=1)
+    return (start, end)
+ 
+def _table_exists(cur, tbl):
+    try:
+        cur.execute(
+            "SELECT 1 FROM INFORMATION_SCHEMA.TABLES "
+            "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME=%s", (tbl,)
+        )
+        return cur.fetchone() is not None
+    except Exception:
+        return False
+ 
+def _safe_scalar(cur, sql, params=()):
+    try:
+        cur.execute(sql, params)
+        row = cur.fetchone()
+        if not row:
+            return 0
+        if isinstance(row, dict):
+            return list(row.values())[0]
+        return row[0]
+    except Exception:
+        return 0
+ 
+def _city_clause(city, alias="bu"):
+    return (" AND {alias}.city=%s ".format(alias=alias), [city]) if city else ("", [])
+ 
+def _sum_casa_balances(cur, city=None):
+    total = 0.0
+    for tbl, _ in CASA_TABLES:
+        if not _table_exists(cur, tbl):
+            continue
+        sql = (
+            f"SELECT COALESCE(SUM(a.balance),0) "
+            f"FROM {tbl} a JOIN bank_users bu ON bu.user_id=a.user_id "
+            f"WHERE COALESCE(a.status_flag,'A')='A'"
+        )
+        clause, params = _city_clause(city, "bu")
+        total += float(_safe_scalar(cur, sql + clause, params) or 0)
+    return total
+ 
+def _count_active_accounts(cur, city=None):
+    tot = 0
+    for tbl, _ in CASA_TABLES:
+        if not _table_exists(cur, tbl):
+            continue
+        sql = (
+            f"SELECT COUNT(*) "
+            f"FROM {tbl} a JOIN bank_users bu ON bu.user_id=a.user_id "
+            f"WHERE COALESCE(a.status_flag,'A')='A'"
+        )
+        clause, params = _city_clause(city, "bu")
+        tot += int(_safe_scalar(cur, sql + clause, params) or 0)
+    return tot
+ 
+def _avg_casa_balance(cur, city=None):
+    s, c = 0.0, 0
+    for tbl, _ in CASA_TABLES:
+        if not _table_exists(cur, tbl):
+            continue
+        sql = (
+            f"SELECT COALESCE(SUM(a.balance),0), COUNT(*) "
+            f"FROM {tbl} a JOIN bank_users bu ON bu.user_id=a.user_id "
+            f"WHERE COALESCE(a.status_flag,'A')='A'"
+        )
+        clause, params = _city_clause(city, "bu")
+        try:
+            cur.execute(sql + clause, params)
+            row = cur.fetchone() or {}
+            s += float((row.get('COALESCE(SUM(a.balance),0)') or row.get('0') or 0))
+            c += int((row.get('COUNT(*)') or row.get('1') or 0))
+        except Exception:
+            pass
+    return (s / c) if c else 0.0
+ 
+def _sum_deposit_products(cur, city=None):
+    tot = 0.0
+    for tbl, col, _key in DEPOSIT_TABLES1:
+        if not _table_exists(cur, tbl):
+            continue
+        sql = (
+            f"SELECT COALESCE(SUM(d.{col}),0) "
+            f"FROM {tbl} d JOIN bank_users bu ON bu.user_id=d.user_id "
+            f"WHERE COALESCE(d.status_flag,'A')='A'"
+        )
+        clause, params = _city_clause(city, "bu")
+        tot += float(_safe_scalar(cur, sql + clause, params) or 0)
+    return tot
+ 
+def _count_new_customers(cur, start_date, end_date, city=None):
+    sql = "SELECT COUNT(*) FROM bank_users bu WHERE bu.onboarding_date >= %s AND bu.onboarding_date < %s"
+    params = [start_date, end_date]
+    clause, extra = _city_clause(city, "bu")
+    return int(_safe_scalar(cur, sql + clause, params + extra) or 0)
+ 
+def _count_total_customers(cur, city=None):
+    sql = "SELECT COUNT(*) FROM bank_users bu WHERE 1=1"
+    clause, params = _city_clause(city, "bu")
+    return int(_safe_scalar(cur, sql + clause, params) or 0)
+ 
+def _count_transactions(cur, start_date, end_date, city=None):
+    # tolerant if transactions table doesn’t exist
+    if not _table_exists(cur, "transactions"):
+        return 0
+    try:
+        sql = """
+            SELECT COUNT(*) FROM transactions t
+            JOIN (
+                SELECT a.account_number, bu.city
+                FROM saving_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
+                UNION ALL
+                SELECT a.account_number, bu.city FROM current_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
+                UNION ALL
+                SELECT a.account_number, bu.city FROM salary_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
+                UNION ALL
+                SELECT a.account_number, bu.city FROM pmjdy_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
+                UNION ALL
+                SELECT a.account_number, bu.city FROM pension_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
+                UNION ALL
+                SELECT a.account_number, bu.city FROM safecustody_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
+            ) acc ON acc.account_number=t.from_account
+            WHERE t.created_at >= %s AND t.created_at < %s
+        """
+        params = [start_date, end_date]
+        if city:
+            sql += " AND acc.city=%s"
+            params.append(city)
+        return int(_safe_scalar(cur, sql, params) or 0)
+    except Exception:
+        return 0
+ 
+def _loans_amount(cur, city=None):
+    total = 0.0
+    for tbl, _key in LOAN_TABLES:
+        if not _table_exists(cur, tbl):
+            continue
+        sql = (
+            f"SELECT COALESCE(SUM(l.loan_amount),0) "
+            f"FROM {tbl} l JOIN bank_users bu ON bu.user_id=l.user_id "
+            f"WHERE COALESCE(l.status,'approved') IN ('approved','issued','disbursed')"
+        )
+        clause, params = _city_clause(city, "bu")
+        total += float(_safe_scalar(cur, sql + clause, params) or 0)
+    return total
+ 
+# ---- Routes expected by your HTML ----
+ 
+@app.get("/api/perf/cities")
+def api_perf_cities():
+    cur = mysql.connection.cursor(DictCursor)
+    cur.execute("SELECT DISTINCT city FROM bank_users WHERE city IS NOT NULL AND city<>'' ORDER BY city")
+    rows = cur.fetchall()
+    cur.close()
+    return jsonify([r['city'] for r in rows])
+ 
+@app.get("/api/perf/kpis")
+def api_perf_kpis():
+    period = (request.args.get('period') or 'month').lower()
+    city = (request.args.get('city') or '').strip() or None
+    start, end = _period_bounds(period)
+ 
+    cur = mysql.connection.cursor(DictCursor)
+ 
+    new_accounts = _count_new_customers(cur, start, end, city)
+    casa_sum = _sum_casa_balances(cur, city)
+    dep_sum = _sum_deposit_products(cur, city)
+    total_deposits = casa_sum + dep_sum
+    loans_amt = _loans_amount(cur, city)
+    transactions = _count_transactions(cur, start, end, city)
+    active_accts = _count_active_accounts(cur, city)
+    avg_balance = _avg_casa_balance(cur, city)
+    total_customers= _count_total_customers(cur, city)
+ 
+    # previous same-length period
+    prev_len = (end - start)
+    prev_start = start - prev_len
+    prev_end = end - prev_len
+    prev_new = _count_new_customers(cur, prev_start, prev_end, city)
+    prev_casa = _sum_casa_balances(cur, city)
+    prev_dep = _sum_deposit_products(cur, city)
+    prev_txn = _count_transactions(cur, prev_start, prev_end, city)
+ 
+    def pct(curv, prevv):
+        if prevv == 0:
+            return 0
+        return round(((curv - prevv)/prevv)*100.0, 1)
+ 
+    # old % fields (kept)
+    delta_new = pct(new_accounts, prev_new)
+    delta_deposits = pct(total_deposits, (prev_casa + prev_dep))
+    delta_transactions = pct(transactions, prev_txn)
+ 
+    # NEW absolute-change fields (what we’ll show)
+    delta_new_count = int(new_accounts - prev_new)
+    delta_deposits_abs = float(total_deposits - (prev_casa + prev_dep))
+    delta_transactions_count = int(transactions - prev_txn)
+ 
+    # crude employee proxy
+    employees = max(1, total_customers // 200)
+    txn_per_employee = round(transactions / employees, 2)
+ 
+    cur.close()
+    return jsonify({
+        "new_accounts": new_accounts,
+        "total_deposits": round(total_deposits, 2),
+        "loans_amount": round(loans_amt, 2),
+        "transactions": transactions,
+        "active_accounts": active_accts,
+        "avg_balance": round(avg_balance, 2),
+        "txn_per_employee": txn_per_employee,
+        "total_customers": total_customers,
+ 
+        # kept (%), in case other parts still reference them
+        "delta_new_accounts": delta_new,
+        "delta_deposits": delta_deposits,
+        "delta_transactions": delta_transactions,
+ 
+        # NEW (absolute change)
+        "delta_new_count": delta_new_count,                     # e.g., +37 customers
+        "delta_deposits_abs": round(delta_deposits_abs, 2),    # e.g., +₹1,25,000.00
+        "delta_transactions_count": delta_transactions_count    # e.g., +412 txns
+    })
+ 
+@app.get("/api/perf/trend")
+def api_perf_trend():
+    """Return last 6 months monthly aggregates for charts used in the page."""
+    city = (request.args.get('city') or '').strip() or None
+    # build 6 month windows (end is first day of next month)
+    today = date.today().replace(day=1)
+    months = []
+    for i in range(6, 0, -1):
+        start = (today - timedelta(days=1)).replace(day=1)  # ensure month math OK
+        # roll back i-1 times
+    # Simpler: generate from current month going back 5:
+    months = []
+    y, m = today.year, today.month
+    for _ in range(5, -1, -1):
+        mm = m - _
+        yy = y
+        while mm <= 0:
+            mm += 12
+            yy -= 1
+        start = date(yy, mm, 1)
+        # end = first day of next month
+        nm, ny = (mm+1, yy)
+        if nm == 13:
+            nm, ny = 1, yy+1
+        end = date(ny, nm, 1)
+        months.append((start, end))
+ 
+    cur = mysql.connection.cursor(DictCursor)
+    out = []
+    for start, end in months:
+        deposits = _sum_casa_balances(cur, city) + _sum_deposit_products(cur, city)
+        loans    = _loans_amount(cur, city)
+        new_acc  = _count_new_customers(cur, start, end, city)
+        txns     = _count_transactions(cur, start, end, city)
+        out.append({
+            "m": start.strftime("%Y-%m-01"),
+            "deposits": round(deposits, 2),
+            "loans": round(loans, 2),
+            "new_accounts": new_acc,
+            "txns": txns
+        })
+    cur.close()
+    return jsonify(out)
+ 
+@app.get("/api/perf/employee_efficiency")
+def api_perf_employee_efficiency():
+    """Return per-city efficiency for the bar+line combo."""
+    city_filter = (request.args.get('city') or '').strip()
+    cur = mysql.connection.cursor(DictCursor)
+    cur.execute("SELECT DISTINCT city FROM bank_users WHERE city IS NOT NULL AND city<>'' ORDER BY city")
+    cities = [r['city'] for r in cur.fetchall()]
+    rows = []
+    for c in cities:
+        if city_filter and c != city_filter:
+            continue
+        # recompute per-city KPIs for the current month (enough for chart)
+        start, end = _period_bounds('month')
+        txns = _count_transactions(cur, start, end, c)
+        customers = _count_total_customers(cur, c)
+        employees = max(1, customers // 200)
+        txn_per_emp = round(txns / employees, 2) if employees else 0
+        # proxy cost-per-txn: smaller branches cost higher → simple formula
+        base_cost = 50.0  # nominal
+        cost_per_txn = round((base_cost * max(1, 300 - txn_per_emp)) / 300.0, 2)
+        rows.append({
+            "city": c,
+            "txn_per_employee": txn_per_emp,
+            "cost_per_txn": cost_per_txn
+        })
+    cur.close()
+    return jsonify(rows)
+ 
+@app.get("/api/perf/customer_retention")
+def api_perf_customer_retention():
+    """Simple proxy retention & NPS (if you don’t store them)."""
+    city = (request.args.get('city') or '').strip() or None
+    cur = mysql.connection.cursor(DictCursor)
+    # proxy: higher active accounts per total customers ⇒ better retention
+    total_customers = _count_total_customers(cur, city)
+    active_accounts = _count_active_accounts(cur, city)
+    retention_rate = 0 if total_customers == 0 else min(100, round((active_accounts / max(1,total_customers)) * 100))
+    # proxy NPS derived from retention and txn density
+    start, end = _period_bounds('month')
+    txns = _count_transactions(cur, start, end, city)
+    nps = max(0, min(100, int(0.6 * retention_rate + 0.4 * min(100, txns // 10))))
+    cur.close()
+    return jsonify({"retention_rate": retention_rate, "nps": nps})
+ 
+@app.get("/api/perf/pies")
+def api_perf_pies():
+    """
+    Return 5 pies as COUNTS:
+    - accounts: number of active CASA accounts per type
+    - loans: number of approved/issued/disbursed loan records per type
+    - deposits: number of active deposit records per type (FD/Digital FD/RD)
+    - cards: number of active/issued cards per type
+    - investments: number of investment records per type
+    """
+    
+
+
+    city = (request.args.get('city') or '').strip() or None
+    cur = mysql.connection.cursor(DictCursor)
+ 
+    # --- Accounts (counts of active accounts) ---
+    accounts = {"saving": 0, "current": 0, "salary": 0, "pmjdy": 0, "pension": 0, "safecustody": 0}
+    for tbl, _label in CASA_TABLES:
+        if not _table_exists(cur, tbl):
+            continue
+        sql = (
+            f"SELECT COUNT(*) "
+            f"FROM {tbl} a JOIN bank_users bu ON bu.user_id=a.user_id "
+            f"WHERE COALESCE(a.status_flag,'A')='A'"
+        )
+        clause, params = _city_clause(city, "bu")
+        cnt = int(_safe_scalar(cur, sql + clause, params) or 0)
+ 
+        key = "safecustody" if tbl == "safecustody_accounts" else tbl.split("_")[0]
+        if tbl.startswith("saving_") or tbl.startswith("saving"):
+            key = "saving"
+        if tbl.startswith("current"):
+            key = "current"
+        if tbl.startswith("salary"):
+            key = "salary"
+        if tbl.startswith("pmjdy"):
+            key = "pmjdy"
+        if tbl.startswith("pension"):
+            key = "pension"
+        if tbl.startswith("safecustody"):
+            key = "safecustody"
+ 
+        accounts[key] += cnt
+ 
+    # --- Loans (counts of approved/issued/disbursed) ---
+    loans = {"home": 0, "personal": 0, "business": 0}
+    for tbl, key in LOAN_TABLES:
+        if not _table_exists(cur, tbl):
+            continue
+        sql = (
+            f"SELECT COUNT(*) "
+            f"FROM {tbl} l JOIN bank_users bu ON bu.user_id=l.user_id "
+            f"WHERE COALESCE(l.status,'approved') IN ('approved','issued','disbursed')"
+        )
+        clause, params = _city_clause(city, "bu")
+        loans[key] = int(_safe_scalar(cur, sql + clause, params) or 0)
+ 
+    # --- Deposits (counts of active deposit records) ---
+    deposits = {"fd": 0, "digital_fd": 0, "rd": 0}
+    for tbl, _col, key in DEPOSIT_TABLES1:
+        if not _table_exists(cur, tbl):
+            continue
+        sql = (
+            f"SELECT COUNT(*) "
+            f"FROM {tbl} d JOIN bank_users bu ON bu.user_id=d.user_id "
+            f"WHERE COALESCE(d.status_flag,'A')='A'"
+        )
+        clause, params = _city_clause(city, "bu")
+        deposits[key] = int(_safe_scalar(cur, sql + clause, params) or 0)
+ 
+    # --- Cards (counts) ---
+    cards = {"credit": 0, "debit": 0, "prepaid": 0, "forex": 0}
+    if _table_exists(cur, "card_requests"):
+        for key in cards.keys():
+            sql = (
+                "SELECT COUNT(*) "
+                "FROM card_requests c "
+                "LEFT JOIN bank_users bu ON bu.user_id=c.submitted_by_user_id "
+                "WHERE LOWER(TRIM(c.card_type)) = LOWER(%s) "
+                "AND COALESCE(c.status_flag,'A')='A'"
+            )
+            clause, params = _city_clause(city, "bu")
+            params = [key] + params  # first param is card_type
+            cards[key] = int(_safe_scalar(cur, sql + clause, params) or 0)
+
+    # --- Investments (counts) ---
+    investments = {"PPF": 0, "FRSB": 0, "NPS": 0}
+    if _table_exists(cur, "investment_applications"):
+        for key in investments.keys():
+            sql = (
+                "SELECT COUNT(*) "
+                "FROM investment_applications i "
+                "JOIN bank_users bu ON bu.user_id = i.user_id "
+                "WHERE LOWER(TRIM(i.investment_type)) = LOWER(%s) "
+                "AND LOWER(TRIM(i.status)) IN ('approved','active')"
+            )
+            clause, params = _city_clause(city, "bu")
+            params = [key] + params
+            investments[key] = int(_safe_scalar(cur, sql + clause, params) or 0)
+    cur.close()
+    return jsonify({
+        "accounts": accounts,
+        "loans": loans,
+        "deposits": deposits,
+        "cards": cards,
+        "investments": investments
+    })
+ 
+@app.get("/api/perf/branch_detail")
+def api_perf_branch_detail():
+    """Modal details for a given city (last 30 days + summary)."""
+    city = (request.args.get('city') or '').strip()
+    if not city:
+        return jsonify({"error":"City is required"}), 400
+ 
+    cur = mysql.connection.cursor(DictCursor)
+    # 30-day window
+    end = date.today() + timedelta(days=1)
+    start = end - timedelta(days=30)
+ 
+    kpis = {
+        "new_accounts": _count_new_customers(cur, start, end, city),
+        "casa_balance": round(_sum_casa_balances(cur, city), 2),
+        "loans_amount": round(_loans_amount(cur, city), 2),
+        "transactions": _count_transactions(cur, start, end, city)
+    }
+ 
+    # Top customers by txn count/amount (tolerant if transactions table absent)
+    top_customers = []
+    if _table_exists(cur, "transactions"):
+        try:
+            # Try mapping account_number → user via CASA union
+            cur.execute("""
+                WITH acc_map AS (
+                    SELECT a.account_number, bu.user_id, bu.name, bu.email FROM saving_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
+                    UNION ALL SELECT a.account_number, bu.user_id, bu.name, bu.email FROM current_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
+                    UNION ALL SELECT a.account_number, bu.user_id, bu.name, bu.email FROM salary_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
+                    UNION ALL SELECT a.account_number, bu.user_id, bu.name, bu.email FROM pmjdy_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
+                    UNION ALL SELECT a.account_number, bu.user_id, bu.name, bu.email FROM pension_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
+                    UNION ALL SELECT a.account_number, bu.user_id, bu.name, bu.email FROM safecustody_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
+                )
+                SELECT am.name, am.email, COUNT(*) AS txn_count, COALESCE(SUM(t.amount),0) AS amount
+                FROM transactions t
+                JOIN acc_map am ON am.account_number = t.from_account
+                JOIN bank_users bu ON bu.email = am.email
+                WHERE t.created_at >= %s AND t.created_at < %s AND bu.city=%s
+                GROUP BY am.name, am.email
+                ORDER BY amount DESC
+                LIMIT 10
+            """, (start, end, city))
+            top_customers = [{
+                "name": r.get("name"), "email": r.get("email"),
+                "txn_count": int(r.get("txn_count") or 0),
+                "amount": float(r.get("amount") or 0)
+            } for r in (cur.fetchall() or [])]
+        except Exception:
+            top_customers = []
+ 
+    cur.close()
+    return jsonify({"kpis": kpis, "top_customers": top_customers})
+# -------- End Branch Performance API --------
+ 
+ 
 
 
 # TL Dashboard Routes
@@ -6024,8 +6319,490 @@ def download_docs(request_id):
         return redirect(url_for('loan_verification'))
  
     return send_file(doc['documents_zip'], as_attachment=True)
+  
  
-#Session time out implementation
+ 
+ 
+ 
+ 
+ 
+######################################
+ 
+# =========================
+# Imports (deduplicated)
+# =========================
+import re
+import time
+import random
+import string
+from decimal import Decimal, InvalidOperation
+from functools import wraps
+from datetime import datetime, timedelta
+ 
+import MySQLdb
+from MySQLdb.cursors import DictCursor
+ 
+from flask import (
+    request, session, redirect, url_for, render_template, flash
+)
+ 
+from flask_bcrypt import Bcrypt
+from werkzeug.security import check_password_hash as wz_check  # only for legacy pbkdf2 hashes
+ 
+# Initialize bcrypt exactly once
+bcrypt = Bcrypt(app)
+ 
+ 
+# =========================
+# Shared account helpers
+# =========================
+ACCOUNT_TABLES2 = [
+    ("saving_accounts",      "savings"),
+    ("current_accounts",     "current"),
+    ("salary_accounts",      "salary"),
+    ("pmjdy_accounts",       "pmjdy"),
+    ("pension_accounts",     "pension"),
+    ("safecustody_accounts", "safecustody"),
+]
+ 
+def generate_transaction_id(prefix="TXN"):
+    """Generate a unique-ish transaction id."""
+    now = datetime.utcnow().strftime("%Y%m%d%H%M%S%f")[:-3]  # up to ms
+    rand = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    return f"{prefix}{now}{rand}"
+ 
+def list_viewaccounts_for_user(user_id, cur=None):
+    """
+    Return a list of APPROVED accounts for a user across all tables.
+    Each item: {account_number, balance, account_type}
+    """
+    close_after = False
+    if cur is None:
+        cur = mysql.connection.cursor(DictCursor)
+        close_after = True
+ 
+    try:
+        accounts = []
+        for table_name, acct_type in ACCOUNT_TABLES2:
+            cur.execute(f"""
+                SELECT account_number, balance
+                FROM {table_name}
+                WHERE user_id = %s AND status_flag = 'A'
+            """, (user_id,))
+            for r in (cur.fetchall() or []):
+                accounts.append({
+                    "account_number": r.get("account_number"),
+                    "balance": r.get("balance") or Decimal("0.00"),
+                    "account_type": acct_type,
+                })
+        accounts.sort(key=lambda a: (a["account_type"], str(a["account_number"])))
+        return accounts
+    finally:
+        if close_after:
+            cur.close()
+ 
+def find_account_by_number(account_number, for_update=False):
+    """
+    Look up an account by its account_number across all account tables.
+    If for_update=True, lock the matching row (SELECT ... FOR UPDATE).
+    Returns dict: {table_name, account_type, account_number, user_id, balance, status_flag}
+    """
+    acct = "" if account_number is None else str(account_number).strip()
+    if not acct:
+        return None
+ 
+    cur = mysql.connection.cursor(DictCursor)
+    try:
+        for table_name, acct_type in ACCOUNT_TABLES2:
+            sql = f"""
+                SELECT account_number, user_id, balance, status_flag
+                FROM {table_name}
+                WHERE account_number = %s
+            """
+            if for_update:
+                sql += " FOR UPDATE"
+ 
+            cur.execute(sql, (acct,))
+            row = cur.fetchone()
+            if row:
+                bal = row.get("balance") if row.get("balance") is not None else Decimal("0.00")
+                return {
+                    "table_name": table_name,
+                    "account_type": acct_type,
+                    "account_number": row.get("account_number"),
+                    "user_id": row.get("user_id"),
+                    "balance": Decimal(str(bal)),
+                    "status_flag": row.get("status_flag"),
+                }
+        return None
+    finally:
+        cur.close()
+ 
+def update_account_balance(table_name, account_number, new_balance):
+    """Update balance for an existing account in a given table."""
+    cur = mysql.connection.cursor(DictCursor)
+    try:
+        cur.execute(
+            f"UPDATE {table_name} SET balance=%s WHERE account_number=%s",
+            (str(Decimal(str(new_balance))), str(account_number))
+        )
+        if cur.rowcount != 1:
+            raise ValueError("Failed to update account balance.")
+    finally:
+        cur.close()
+ 
+ 
+# =========================
+# PIN: Set / Verify / Gate
+# =========================
+ 
+# How long a verified PIN can be considered "fresh" if you want to use TTL logic
+PIN_SESSION_TTL_MINUTES = 10
+ 
+@app.route('/set_pin', methods=['GET', 'POST'])
+def set_pin():
+    email = session.get('user_email')
+    if not email:
+        flash('Please login first', 'danger')
+        return redirect(url_for('login'))
+ 
+    # allow optional return target
+    next_url = request.args.get('next') or request.form.get('next') or url_for('paybill')
+ 
+    if request.method == 'GET':
+        cur = mysql.connection.cursor(DictCursor)
+        cur.execute("SELECT name, role FROM bank_users WHERE email=%s", (email,))
+        user = cur.fetchone() or {}
+        cur.close()
+        return render_template('set_pin.html', user=user)
+ 
+    # POST
+    current_pin = (request.form.get('current_pin') or '').strip()
+    new_pin     = (request.form.get('new_pin') or '').strip()
+    confirm_pin = (request.form.get('confirm_pin') or '').strip()
+ 
+    # 1) Validate new pin
+    if not re.fullmatch(r'\d{4}', new_pin):
+        flash('Enter a valid 4-digit numeric PIN.', 'danger')
+        return redirect(url_for('set_pin', next=next_url))
+ 
+    if new_pin != confirm_pin:
+        flash('New PIN and Confirm PIN must match.', 'danger')
+        return redirect(url_for('set_pin', next=next_url))
+ 
+    # 2) Fetch existing hash (if any)
+    cur = mysql.connection.cursor(DictCursor)
+    cur.execute("SELECT txn_pin_hash FROM bank_users WHERE email=%s", (email,))
+    row = cur.fetchone()
+    cur.close()
+ 
+    old_hash = ((row or {}).get('txn_pin_hash') or '').strip()
+ 
+    # Treat as "has existing pin" ONLY if hash looks like a real hash
+    has_existing = old_hash.startswith('pbkdf2:') or old_hash.startswith('$2')
+ 
+    # 3) Only require current PIN if an existing, valid hash is present
+    if has_existing:
+        if not re.fullmatch(r'\d{4}', current_pin):
+            flash('Enter your current 4-digit PIN to change it.', 'warning')
+            return redirect(url_for('set_pin', next=next_url))
+ 
+        try:
+            if old_hash.startswith('pbkdf2:'):
+                ok = wz_check(old_hash, current_pin)
+            else:  # bcrypt ($2…)
+                ok = bcrypt.check_password_hash(old_hash, current_pin)
+        except ValueError:
+            ok = False
+ 
+        if not ok:
+            flash('Current PIN is incorrect.', 'danger')
+            return redirect(url_for('set_pin', next=next_url))
+ 
+    # 4) Save new bcrypt hash
+    new_hash = bcrypt.generate_password_hash(new_pin).decode('utf-8')
+    cur = mysql.connection.cursor(DictCursor)
+    cur.execute("UPDATE bank_users SET txn_pin_hash=%s WHERE email=%s", (new_hash, email))
+    mysql.connection.commit()
+    cur.close()
+ 
+    flash('Your transaction PIN has been saved.', 'success')
+    return redirect(next_url)
+ 
+ 
+ 
+@app.route('/enter_pin', methods=['GET'])
+def enter_pin():
+    """
+    Lightweight PIN prompt page. We always show the nudge to set a PIN.
+    Use ?next=accountbal (endpoint key) or ?next=/absolute/path
+    """
+    email = session.get('user_email')
+    if not email:
+        flash('Please login first', 'danger')
+        return redirect(url_for('login'))
+ 
+    next_url = request.args.get('next', '')  # can be 'accountbal' or a path
+    return render_template('enter_pin.html', next=next_url)
+ 
+ 
+@app.route('/verify_pin', methods=['POST'])
+def verify_pin():
+    """
+    Checks the user's 4-digit PIN and then redirects to ?next.
+    If next='accountbal', we mark a one-time token so /accountbal allows entry.
+    """
+    email = session.get('user_email')
+    if not email:
+        flash('Please login first', 'danger')
+        return redirect(url_for('login'))
+ 
+    pin      = (request.form.get('pin') or '').strip()
+    next_url = request.form.get('next') or ''
+ 
+    if not re.fullmatch(r'\d{4}', pin):
+        flash('Enter a valid 4-digit PIN.', 'danger')
+        return redirect(url_for('enter_pin', next=next_url))
+ 
+    # Pull saved hash
+    cur = mysql.connection.cursor(DictCursor)
+    cur.execute("SELECT txn_pin_hash FROM bank_users WHERE email=%s", (email,))
+    row = cur.fetchone()
+    cur.close()
+ 
+    hashval = (row or {}).get('txn_pin_hash') or ''
+    hashval = hashval.strip()
+ 
+    if not hashval:
+        flash('No PIN set. Please set your PIN first.', 'warning')
+        return redirect(url_for('set_pin', next=next_url))
+ 
+    # Verify (support legacy pbkdf2 or bcrypt)
+    try:
+        if hashval.startswith('pbkdf2:'):
+            ok = wz_check(hashval, pin)
+        elif hashval.startswith('$2'):  # bcrypt
+            ok = bcrypt.check_password_hash(hashval, pin)
+        else:
+            flash('Your saved PIN is invalid. Please set a new PIN.', 'warning')
+            return redirect(url_for('set_pin', next=next_url))
+    except ValueError:
+        flash('Your saved PIN is corrupted. Please set a new PIN.', 'warning')
+        return redirect(url_for('set_pin', next=next_url))
+ 
+    if not ok:
+        flash('Incorrect PIN.', 'danger')
+        return redirect(url_for('enter_pin', next=next_url))
+ 
+    # Success: mark session freshness and (optionally) one-time pass for accountbal
+    session['pin_verified_at'] = time.time()
+    if next_url == 'accountbal':
+        session['pin_ok_once'] = 'accountbal'  # one-time gate
+    else:
+        # You can also store a TTL if you want to reuse within a time window
+        session['pin_ok_until'] = (datetime.utcnow() + timedelta(minutes=PIN_SESSION_TTL_MINUTES)).isoformat()
+ 
+    flash('PIN verified.', 'success')
+ 
+    # Where to go next:
+    if next_url == 'accountbal':
+        return redirect(url_for('accountbal'))
+    elif next_url.startswith('/'):
+        return redirect(next_url)
+    else:
+        return redirect(url_for('dashboard'))
+ 
+ 
+# =========================
+# Balance (PIN every time)
+# =========================
+@app.route('/accountbal')
+def accountbal():
+    email = session.get('user_email')
+    if not email:
+        flash('Please login first', 'danger')
+        return redirect(url_for('login'))
+ 
+    # Require a fresh PIN verification EVERY time:
+    if session.pop('pin_ok_once', None) != 'accountbal':
+        return redirect(url_for('enter_pin', next='accountbal'))
+ 
+    # Fetch user
+    cur = mysql.connection.cursor(DictCursor)
+    cur.execute("SELECT user_id, name, role FROM bank_users WHERE email=%s", (email,))
+    user = cur.fetchone()
+    if not user:
+        cur.close()
+        flash('User not found.', 'danger')
+        return redirect(url_for('login'))
+ 
+    user_id = user['user_id']
+ 
+    # Collect approved accounts across tables
+    accounts = []
+    for table_name, acct_type in ACCOUNT_TABLES2:
+        cur.execute(f"""
+            SELECT account_number, balance
+            FROM {table_name}
+            WHERE user_id = %s AND status_flag = 'A'
+        """, (user_id,))
+        for r in (cur.fetchall() or []):
+            accounts.append({
+                'account_number': r.get('account_number'),
+                'balance': r.get('balance') or Decimal('0.00'),
+                'account_type': acct_type,
+            })
+ 
+    cur.close()
+    accounts.sort(key=lambda a: (a['account_type'], str(a['account_number'])))
+    total_balance = sum(Decimal(str(a['balance'])) for a in accounts) if accounts else Decimal('0.00')
+ 
+    return render_template('balance.html', accounts=accounts, total_balance=total_balance, user=user)
+ 
+ 
+# =========================
+# Quick Transfer (PIN inline)
+# =========================
+@app.route('/quicktransfer', methods=['GET', 'POST'])
+def quicktransfer():
+    email = session.get('user_email')
+    if not email:
+        flash('Please login first', 'danger')
+        return redirect(url_for('login'))
+ 
+    cur = mysql.connection.cursor(DictCursor)
+    cur.execute("SELECT user_id, name, role, txn_pin_hash FROM bank_users WHERE email=%s", (email,))
+    user = cur.fetchone()
+    if not user:
+        cur.close()
+        flash('User not found.', 'danger')
+        return redirect(url_for('login'))
+ 
+    user_id = user['user_id']
+ 
+    if request.method == 'GET':
+        # Show only APPROVED accounts (same as View Accounts)
+        accounts = list_viewaccounts_for_user(user_id, cur)
+        cur.close()
+        return render_template('quicktransfer.html', accounts=accounts, user=user)
+ 
+    # POST: inline PIN validation + transfer
+    from_account = (request.form.get('from_account') or '').strip()
+    to_account   = (request.form.get('to_account') or '').strip()
+    amount_str   = (request.form.get('amount') or '').strip()
+    note         = (request.form.get('note') or '').strip()[:255]
+    pin          = (request.form.get('pin') or '').strip()
+ 
+    if not from_account or not to_account or not amount_str or not pin:
+        cur.close()
+        flash('Please fill all required fields (including PIN).', 'danger')
+        return redirect(url_for('quicktransfer'))
+ 
+    if from_account == to_account:
+        cur.close()
+        flash('Source and destination accounts cannot be the same.', 'danger')
+        return redirect(url_for('quicktransfer'))
+ 
+    try:
+        amount = Decimal(amount_str)
+        if amount <= 0:
+            raise InvalidOperation()
+    except (InvalidOperation, TypeError):
+        cur.close()
+        flash('Amount must be a positive number.', 'danger')
+        return redirect(url_for('quicktransfer'))
+ 
+    if amount > Decimal('50000'):
+        cur.close()
+        flash('Quick Transfer limit is ₹50,000 per transaction.', 'danger')
+        return redirect(url_for('quicktransfer'))
+ 
+    txn_pin_hash = user.get('txn_pin_hash')
+    if not txn_pin_hash:
+        cur.close()
+        flash('You must set your 4-digit Transaction PIN first.', 'warning')
+        return redirect(url_for('set_pin'))
+ 
+    # Verify entered PIN vs stored hash
+    ok = False
+    try:
+        if txn_pin_hash.startswith('pbkdf2:'):
+            ok = wz_check(txn_pin_hash, pin)
+        elif txn_pin_hash.startswith('$2'):
+            ok = bcrypt.check_password_hash(txn_pin_hash, pin)
+    except ValueError:
+        ok = False
+ 
+    if not (len(pin) == 4 and pin.isdigit() and ok):
+        cur.close()
+        flash('Incorrect PIN.', 'danger')
+        return redirect(url_for('quicktransfer'))
+ 
+    txn_id = None
+    try:
+        mysql.connection.begin()
+ 
+        # Lock both accounts
+        src = find_account_by_number(from_account, for_update=True)
+        dst = find_account_by_number(to_account,   for_update=True)
+ 
+        if not src:
+            raise ValueError("Source account not found.")
+        if not dst:
+            raise ValueError("Destination account not found.")
+ 
+        # Ensure source belongs to the logged-in user
+        if str(src.get('user_id')) != str(user_id):
+            raise ValueError("You can only transfer from your own account.")
+ 
+        # We trust the dropdown already showed only approved accounts.
+        # Still, do a quick balance check and perform transfer.
+        src_bal = Decimal(str(src.get('balance') or '0'))
+        dst_bal = Decimal(str(dst.get('balance') or '0'))
+        if src_bal < amount:
+            raise ValueError("Insufficient balance.")
+ 
+        new_src_bal = src_bal - amount
+        new_dst_bal = dst_bal + amount
+ 
+        update_account_balance(src['table_name'], from_account, new_src_bal)
+        update_account_balance(dst['table_name'], to_account,   new_dst_bal)
+ 
+        txn_id = generate_transaction_id()
+        cur.execute("""
+            INSERT INTO transactions
+                (transaction_id, from_account, to_account, amount, note, status, created_at)
+            VALUES (%s, %s, %s, %s, %s, 'success', %s)
+        """, (txn_id, from_account, to_account, str(amount), note, datetime.now()))
+ 
+        mysql.connection.commit()
+        flash(f'Transfer successful: ₹{amount} to {to_account} | Transaction ID: {txn_id}', 'success')
+        return redirect(url_for('Txnhistory'))
+ 
+    except Exception as e:
+        mysql.connection.rollback()
+        try:
+            if not txn_id:
+                txn_id = generate_transaction_id()
+            cur.execute("""
+                INSERT INTO transactions
+                    (transaction_id, from_account, to_account, amount, note, status, created_at)
+                VALUES (%s, %s, %s, %s, %s, 'failed', %s)
+            """, (txn_id, from_account, to_account, str(amount_str or '0'),
+                  f'FAILED: {note}' if note else 'FAILED', datetime.now()))
+            mysql.connection.commit()
+        except Exception:
+            mysql.connection.rollback()
+ 
+        flash(f"Transfer failed: {str(e)}", 'danger')
+        return redirect(url_for('quicktransfer'))
+    finally:
+        cur.close()
+ 
+ 
+
+
+
  
 
    

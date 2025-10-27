@@ -8,264 +8,44 @@
   <!-- Bootstrap CSS & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+ 
   <style>
-    body {
-      background-color: #f8f9fa;
-      font-family: 'Segoe UI', sans-serif;
-      padding: 20px;
-    }
- 
-    .card-custom {
-      border: 1px solid #0B4D83;
-      border-radius: 12px;
-      padding: 20px;
-      position: relative;
-      height: 150px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-      background-color: #fff;
-    }
-    .card-custom h6 {
-      font-weight: 700;
-      color: #0B4D83;
-    }
-    .card-custom p {
-      font-size: 0.9rem;
-      color: #555;
-    }
-    .card-custom i.arrow {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      font-size: 1.2rem;
-      color: #0B4D83;
-    }
-    .card-custom i.icon {
-      position: absolute;
-      bottom: 15px;
-      right: 15px;
-      font-size: 1.5rem;
-      color: #0B4D83;
-    }
- 
-    .banner-box {
-      display: flex;
-      align-items: center;
-      background-color: #fff;
-      border: 1px solid #0B4D83;
-      border-radius: 12px;
-      padding: 20px;
-      margin: 20px 0;
-      position: relative;
-    }
-    .banner-box i {
-      font-size: 2rem;
-      color: #0B4D83;
-      margin-right: 15px;
-    }
-    .banner-box .arrow-btn {
-      position: absolute;
-      right: 20px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 1.5rem;
-      color: #0B4D83;
-      cursor: pointer;
-    }
- 
-    .label-box {
-      background-color: #fff;
-      border: 1px solid #ccc;
-      padding: 15px;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      color: #444;
-    }
-  </style>
-  <style>
-  .btn-custom {
-    background-color: #0B4D83;
-    color: #fff;
-    border: none;
-  }
-  .btn-custom:hover {
-    background-color: #7b103e; /* slightly darker on hover */
-    color: #fff;
-  }
-  body {
-      background-color: #f8f9fa;
-      font-family: 'Segoe UI', sans-serif;
-      padding: 20px 0 0 0;
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
+    body { background-color:#f8f9fa; font-family:'Segoe UI',sans-serif; padding:20px 0 0 0; margin:0; min-height:100vh; display:flex; flex-direction:column; height:100vh; }
  
     /* Sidebar Offcanvas */
-    #sidebarMenu.offcanvas-start {
-      width: 250px;
-    }
- 
-    #sidebarMenu .offcanvas-body {
-      padding: 0.5rem 1rem;
-    }
- 
-    #sidebarMenu .nav-link {
-      font-size: 0.9rem;
-      padding: 8px 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #333;
-      transition: color 0.3s;
-    }
- 
-    #sidebarMenu .nav-link i {
-      font-size: 1.1rem;
-    }
- 
-    #sidebarMenu .nav-link.active {
-      font-weight: 700;
-      color: #0B4D83 !important;
-      background-color: #f0d7e0;
-      border-radius: 4px;
-    }
- 
-    #sidebarMenu .nav-link:hover {
-      color: #7a0f3e;
-      background-color: #f9e5ef;
-      border-radius: 4px;
-    }
- 
-    .top-bar button.btn-outline-light {
-      border: 1.5px solid white;
-      color: white;
-      background: transparent;
-      padding: 4px 10px;
-      font-size: 1.3rem;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.2s, color 0.2s;
-    }
- 
-    .top-bar button.btn-outline-light:hover {
-      background-color: white;
-      color: #0B4D83;
-    }
- 
+    #sidebarMenu.offcanvas-start { width:250px; }
+    #sidebarMenu .offcanvas-body { padding:.5rem 1rem; }
+    #sidebarMenu .nav-link { font-size:.9rem; padding:8px 12px; display:flex; align-items:center; gap:8px; color:#333; transition:color .3s, background .3s; border-radius:6px; }
+    #sidebarMenu .nav-link i { font-size:1.1rem; }
+    #sidebarMenu .nav-link.active { font-weight:700; color:#0B4D83 !important; background:#eef6ff; }
+    #sidebarMenu .nav-link:hover { color:#0B4D83; background:#f3f8ff; }
  
     /* Top Bar */
-    .top-bar {
-      background-color: #0B4D83;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 20px;
-      user-select: none;
-      position: sticky;
-      top: 0;
-      z-index: 1030;
-    }
+    .top-bar { background:#0B4D83; color:#fff; display:flex; align-items:center; justify-content:space-between; padding:10px 20px; user-select:none; position:sticky; top:0; z-index:1030; }
+    .top-bar h5 { margin:0; font-weight:700; flex-grow:1; text-align:center; color:#fff; }
+    .top-bar button.btn-outline-light { border:1.5px solid #fff; color:#fff; background:transparent; padding:4px 10px; font-size:1.3rem; border-radius:6px; transition:all .2s; }
+    .top-bar button.btn-outline-light:hover { background:#fff; color:#0B4D83; }
+    .logout-btn { background:transparent; border:1.5px solid #fff; color:#fff; padding:6px 14px; border-radius:6px; font-weight:600; transition:all .2s; }
+    .logout-btn:hover { background:#fff; color:#0B4D83; }
  
-    .top-bar h5 {
-      margin: 0;
-      font-weight: 700;
-      flex-grow: 1;
-      text-align: center;
-      color: white;
-    }
+    /* Logo */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap');
+    .digi-bank-logo { display:flex; align-items:center; gap:12px; text-decoration:none; transition:transform .2s ease; }
+    .digi-bank-logo:hover { transform:translateY(-1px); }
+    .logo-icon { width:50px; height:50px; background:linear-gradient(135deg,#667eea 0%,#764ba2 25%,#f093fb 50%,#4facfe 100%); border-radius:12px; position:relative; box-shadow:0 6px 18px rgba(102,126,234,.3),0 2px 6px rgba(0,0,0,.08); }
+    .logo-icon::before { content:''; position:absolute; inset:8px; background:rgba(255,255,255,.95); border-radius:8px; }
+    .logo-icon::after { content:'D'; position:absolute; color:transparent; background:linear-gradient(135deg,#667eea,#764ba2); -webkit-background-clip:text; background-clip:text; font-weight:800; font-size:20px; z-index:2; left:50%; top:50%; transform:translate(-50%,-50%); }
+    .logo-text { color:#fff; }
+    .main-text { font-size:20px; font-weight:800; letter-spacing:-.5px; line-height:1; }
+    .digi { background:linear-gradient(135deg,#87CEEB 0%,#98D8E8 25%,#FFF8DC 50%,#87CEFA 100%); -webkit-background-clip:text; background-clip:text; color:transparent; text-shadow:0 0 10px rgba(255,255,255,.3); }
+    .bank { color:#ffffff; margin-left:3px; text-shadow:0 1px 2px rgba(0,0,0,.3); }
+    .tagline { font-size:9px; font-weight:600; color:#e8f4f8; letter-spacing:2px; text-transform:uppercase; margin-top:2px; }
  
-    .logout-btn {
-      background: transparent;
-      border: 1.5px solid white;
-      color: white;
-      padding: 5px 15px;
-      border-radius: 4px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.2s, color 0.2s;
-      flex-shrink: 0;
-    }
+    /* Section headings */
+    .section-title { color:#0B4D83; font-weight:800; letter-spacing:.2px; }
+    .section-sub { color:#4b5b6a; font-size:.95rem; }
  
-    .logout-btn:hover {
-      background-color: white;
-      color: #0B4D83;
-    }
- 
-    /* Search Bar Row with Sidebar Toggle & Chatbot */
-    .search-chatbar {
-      max-width: 900px;
-      margin: 15px auto 40px auto;
-      padding: 0 15px;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
- 
-    /* Sidebar toggle button */
-    .search-chatbar .btn-toggle-sidebar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 5px;
-      border: 1.5px solid #ccc;
-      color: #444;
-      background: white;
-      transition: border-color 0.3s, color 0.3s;
-      cursor: pointer;
-      flex-shrink: 0;
-      min-width: 42px;
-      padding: 6px 8px;
-      font-size: 1.3rem;
-    }
- 
-    .search-chatbar .btn-toggle-sidebar:hover {
-      border-color: #0B4D83;
-      color: #0B4D83;
-    }
- 
-    /* Search input centered and wide */
-    .search-chatbar input[type="text"] {
-      flex-grow: 1;
-      padding: 10px 14px;
-      border-radius: 5px;
-      border: 1.5px solid #ccc;
-      font-size: 1rem;
-      outline-offset: 0;
-      transition: border-color 0.3s;
-      width: 9000px;
-      margin: 0 auto;
-      display: block;
-    }
- 
-    .search-chatbar input[type="text"]:focus {
-      border-color: #0B4D83;
-      box-shadow: 0 0 5px rgba(151, 20, 77, 0.5);
-    }
- 
-    /* Chatbot button right aligned */
-    .search-chatbar .chatbot-btn {
-      background-color: #0B4D83;
-      border: none;
-      color: white;
-      padding: 10px 14px;
-      border-radius: 5px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background-color 0.3s ease;
-      font-size: 1.3rem;
-      flex-shrink: 0;
-    }
- 
-    .search-chatbar .chatbot-btn:hover {
-      background-color: #7a0f3e;
-    }
- 
-    /* Dashboard Cards */
+    /* ✅ Dashboard card styles (copied from User Dashboard for perfect match) */
     .dashboard-card {
       transition: 0.3s;
       height: 280px;
@@ -278,30 +58,25 @@
       border-radius: 8px;
       box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
     }
- 
     .dashboard-card:hover {
       transform: translateY(-5px);
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
     }
- 
     .dashboard-icon {
       font-size: 32px;
       color: #0B4D83;
       margin-bottom: 15px;
     }
- 
     .dashboard-card h5 {
       font-weight: 600;
       margin-bottom: 10px;
     }
- 
     .dashboard-card p {
       flex-grow: 1;
       font-size: 14px;
       color: #555;
       margin-bottom: 15px;
     }
- 
     .btn-digibank {
       background-color: #0B4D83;
       color: #fff;
@@ -311,399 +86,276 @@
       border-radius: 25px;
       transition: background-color 0.3s ease;
     }
- 
     .btn-digibank:hover {
       background-color: #7a0f3e;
       color: white;
     }
  
-    /* Footer */
-    footer.bg-custom {
-      background-color: #0B4D83;
+    /* Banners / Helper boxes (kept) */
+    .banner-box {
+      display:flex; align-items:center; gap:14px;
+      background:#fff; border:1px solid #e6eef7; border-radius:14px; padding:16px 18px;
+      box-shadow:0 6px 20px rgba(11,77,131,0.08);
+      transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;
     }
-  </style>
-  <style>
-  body {
-      background-color: #f8f9fa;
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-    }
-    .btn-submit {
-      background-color: #0B4D83;
-      color: #fff;
-      font-weight: 600;
-      border: none;
-      padding: 10px 0;
-      border-radius: 4px;
-    }
-    .btn-submit:hover {
-      background-color: #7a0f3e;
-    }
+    .banner-box:hover { transform:translateY(-2px); box-shadow:0 12px 28px rgba(11,77,131,0.12); border-color:#d5e6fb; }
+    .banner-icon { width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#e7f1ff 0%, #f5f9ff 100%); border:1px solid #d9e7fb; }
+    .banner-icon i { font-size:22px; color:#0B4D83; }
+    .banner-title { margin:0; font-weight:800; color:#0B4D83; }
+    .banner-text { margin:2px 0 0; color:#536273; font-size:.95rem; }
+    .arrow-btn { color:#0B4D83; font-size:1.4rem; margin-left:auto; }
  
-</style>
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap');
+    .label-box { background:#fff; border:1px solid #e6eef7; border-radius:14px; padding:16px 18px; color:#4b5b6a; box-shadow:0 6px 20px rgba(11,77,131,0.08); }
  
-.digi-bank-logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  text-decoration: none;
-  transition: transform 0.3s ease;
-}
-.digi-bank-logo:hover {
-  transform: scale(1.05);
-}
-.logo-icon {
-  width: 50px;
-  height: 50px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 100%);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  box-shadow: 0 6px 18px rgba(102, 126, 234, 0.3), 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-.logo-icon::before {
-  content: '';
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  right: 8px;
-  bottom: 8px;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 8px;
-}
-.logo-icon::after {
-  content: 'D';
-  position: absolute;
-  color: transparent;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  background-clip: text;
-  -webkit-background-clip: text;
-  font-weight: 800;
-  font-size: 20px;
-  z-index: 2;
-}
-.logo-text {
-  color: #fff;
-}
-.main-text {
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  line-height: 1;
-}
-.digi {
-  background: linear-gradient(135deg, #87CEEB 0%, #98D8E8 25%, #FFF8DC 50%, #87CEFA 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-}
-.bank {
-  color: #ffffff;
-  margin-left: 3px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-.tagline {
-  font-size: 9px;
-  font-weight: 600;
-  color: #e8f4f8;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-top: 2px;
-}
-
+    footer.bg-custom { background-color:#0B4D83; }
   </style>
 </head>
 <body>
  
-<!-- Sidebar -->
-<div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+  <!-- Sidebar -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
     <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="sidebarMenuLabel">Welcome,{{ user.name }} ! ({{user.role}}) </h5>
+      <h5 class="offcanvas-title" id="sidebarMenuLabel">Welcome, {{ user.name }} ! ({{ user.role }})</h5>
       <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
       <ul class="nav flex-column">
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark active" href="{{ url_for('dashboard') }}">
-            <i class="bi bi-speedometer2 me-2"></i> Home
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="{{ url_for('viewaccounts') }}">
-            <i class="bi bi-person-lines-fill me-2"></i> View Accounts
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="{{ url_for('userdashloan') }}">
-            <i class="bi bi-cash-coin me-2"></i> Loans
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="{{ url_for('Txnhistory') }}">
-            <i class="bi bi-clock-history me-2"></i> Transaction History
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="{{ url_for('accountbal') }}">
-            <i class="bi bi-wallet2 me-2"></i> Check Balance
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="{{ url_for('profile') }}">
-            <i class="bi bi-gift-fill me-2"></i> Profile
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="{{ url_for('paybill') }}">
-            <i class="bi bi-credit-card me-2"></i> Pay Bill
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="#">
-            <i class="bi bi-person-rolodex me-2"></i> Get Contact
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="#">
-            <i class="bi bi-shield-lock-fill me-2"></i> Privacy & Security
-          </a>
-        </li>
- 
+        <li class="nav-item mb-2"><a class="nav-link text-dark active" href="{{ url_for('dashboard') }}"><i class="bi bi-speedometer2 me-2"></i> Home</a></li>
+        <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('viewaccounts') }}"><i class="bi bi-person-lines-fill me-2"></i> View Accounts</a></li>
+        <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('userdashloan') }}"><i class="bi bi-cash-coin me-2"></i> Loans</a></li>
+        <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('Txnhistory') }}"><i class="bi bi-clock-history me-2"></i> Transaction History</a></li>
+        <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('accountbal') }}"><i class="bi bi-wallet2 me-2"></i> Check Balance</a></li>
+        <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('profile') }}"><i class="bi bi-gift-fill me-2"></i> Profile</a></li>
+        <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('paybill') }}"><i class="bi bi-credit-card me-2"></i> Pay Bill</a></li>
+        <li class="nav-item mb-2"><a class="nav-link text-dark" href="#"><i class="bi bi-person-rolodex me-2"></i> Get Contact</a></li>
+        <li class="nav-item mb-2"><a class="nav-link text-dark" href="#"><i class="bi bi-shield-lock-fill me-2"></i> Privacy & Security</a></li>
       </ul>
     </div>
   </div>
  
-  <!-- ---------------------------- -->
+  <!-- Top Bar -->
   <div class="top-bar d-flex align-items-center">
-    <!-- left toggle -->
-    <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
-      aria-controls="sidebarMenu" aria-label="Toggle sidebar">
+    <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-label="Toggle sidebar">
       <i class="bi bi-list"></i>
     </button>
-    <!-- 🔽 Custom DigiBank Logo -->
+ 
     <a class="navbar-brand digi-bank-logo" href="{{ url_for('home') }}">
       <div class="logo-icon"></div>
       <div class="logo-text">
-        <div class="main-text">
-          <span class="digi">DiGi</span><span class="bank">Bank</span>
-        </div>
+        <div class="main-text"><span class="digi">DiGi</span><span class="bank">Bank</span></div>
         <div class="tagline">Smart Banking</div>
       </div>
     </a>
  
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-            aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
- 
-    <!-- title wrapper with flex-grow to take center space -->
-    <!-- <h5 class="m-0 text-center flex-grow-1">DigiBank User Dashboard</h5> -->
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0B4D83 !important; width: 100%;">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#0B4D83 !important; width:100%;">
       <div class="container-fluid">
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <!-- <li class="nav-item"><a class="nav-link active" href="{{ url_for('home') }}">Home</a></li> -->
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">My Activities</a>
-            </li>
-            <!-- Open Account Dropdown -->
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">My Activities</a></li>
+ 
+            <!-- Open Account -->
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Open Account</a>
+              <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Open Account</a>
               <ul class="dropdown-menu" aria-labelledby="accountDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Savings
-                    Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Salary Account</a>
-                </li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Current
-                    Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Safe Custody
-                    Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Pension
-                    Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">PMJDY Account</a>
-                </li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Savings Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Salary Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Current Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Safe Custody Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Pension Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">PMJDY Account</a></li>
               </ul>
             </li>
-            <!-- Deposits Dropdown -->
+ 
+            <!-- Deposits -->
             <li class="nav-item dropdown">
-              <button class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button"
-                data-bs-toggle="dropdown" aria-expanded="false">Deposits</button>
+              <button class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Deposits</button>
               <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Digital Fixed
-                    Deposits</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Fixed
-                    Deposits</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Recurring
-                    Deposits</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Digital Fixed Deposits</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Fixed Deposits</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Recurring Deposits</a></li>
               </ul>
             </li>
-            <!-- Deposits Dropdown -->
+ 
+            <!-- Loans -->
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="loanDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Loans</a>
+              <a class="nav-link dropdown-toggle" href="#" id="loanDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Loans</a>
               <ul class="dropdown-menu" aria-labelledby="loanDropdown">
                 <li><a class="dropdown-item" href="{{ url_for('userdashloan') }}">Home Loan</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('userdashloan') }}">Personal Loan</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('userdashloan') }}">Busniness Loan</a></li>
- 
- 
               </ul>
             </li>
-            <!-- Deposits Dropdown -->
+ 
+            <!-- Cards -->
             <li class="nav-item dropdown">
-              <button class="nav-link dropdown-toggle" id="cardDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false" type="button">Cards</button>
+              <button class="nav-link dropdown-toggle" id="cardDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" type="button">Cards</button>
               <ul class="dropdown-menu" aria-labelledby="cardDropdown">
                 <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Credit Cards</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Debit Cards</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Prepaid Cards</a></li>
               </ul>
             </li>
-            <!-- Deposits Dropdown -->
+ 
+            <!-- Investments -->
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="forexDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Forex</a>
-              <ul class="dropdown-menu" aria-labelledby="forexDropdown">
-                <li><a class="dropdown-item" href="#">Travel Forex Cards</a></li>
-                <li><a class="dropdown-item" href="#">Send Money Abroad</a></li>
-                <li><a class="dropdown-item" href="#">Send Money India</a></li>
-                <li><a class="dropdown-item" href="#">Foregin Currency Exchange</a></li>
-              </ul>
-            </li>
-            <!-- Deposits Dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="investDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Investments</a>
-              <ul class="dropdown-menu" aria-labelledby="investDropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="investDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Investments</a>
+              <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="#">Public Provident Fund</a></li>
                 <li><a class="dropdown-item" href="#">Floating Rate Saving Bonds</a></li>
                 <li><a class="dropdown-item" href="#">National Pension System</a></li>
               </ul>
             </li>
           </ul>
-          <div class="d-flex align-items-center">
-            <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name }} ! ({{user.role}}) </h5>
-            <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">
-              Logout
-            </a>
-          </div>
  
+          <div class="d-flex align-items-center">
+            <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name }} ! ({{ user.role }})</h5>
+            <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">Logout</a>
+          </div>
         </div>
       </div>
     </nav>
-    <!-- End of custom navbar -->
- 
   </div>
  
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="bg-light px-3 py-2 mt-3">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#0B4D83;">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page" style="color:#0B4D83; font-weight:bold;">Pay Bills and Utilities</li>
+    </ol>
+  </nav>
  
- 
+  <!-- Flash messages -->
+  <div class="container mt-3">
+    {% with msgs = get_flashed_messages(with_categories=true) %}
+      {% if msgs %}
+        {% for cat, msg in msgs %}
+          <div class="alert alert-{{ 'success' if cat=='success' else ('warning' if cat=='warning' else ('info' if cat=='info' else 'danger')) }} alert-dismissible fade show" role="alert">
+            {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
   </div>
- 
-  <nav aria-label="breadcrumb" style="background-color:#f8f9fa; padding:8px 15px; border-radius:4px; margin:10px 20px;">
-  <ol class="breadcrumb mb-0">
-    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#0B4D83;">Home</a></li>
-    <li class="breadcrumb-item active" aria-current="page" style="color:#0B4D83; font-weight:bold;">Pay Bills and Utilities</li>
-  </ol>
-</nav>
  
   <div class="container">
  
-    <!-- First Row: Transfers -->
-    <div class="row g-3 mb-4 mt-3">
-      <div class="col-md-4">
-        <div class="card-custom">
-          <h6>Quick Transfer</h6>
-          <p>Up to ₹50,000</p>
-          <!-- <button class="btn btn-primary btn-sm btn-custom">Transfer Now</button> -->
-          <a href="{{ url_for('quicktransfer') }}" class="btn btn-primary btn-sm btn-custom">Transfer Now</a>
-          <i class="bi bi-arrow-right-circle-fill arrow"></i>
+    <!-- Transfers -->
+    <div class="d-flex align-items-center justify-content-between mt-3 mb-2">
+      <div>
+        <h4 class="section-title mb-0">Transfers</h4>
+        <div class="section-sub">Move funds quickly and securely</div>
+      </div>
+    </div>
+ 
+    <div class="row g-4 justify-content-center">
+      <!-- Quick Transfer -->
+      <div class="col-md-4 col-sm-6">
+        <div class="card dashboard-card p-4 text-center">
+          <i class="bi bi-lightning-charge-fill dashboard-icon mb-2"></i>
+          <h5>Quick Transfer</h5>
+          <p>Transfer up to ₹50,000 instantly to any account.</p>
+          <a href="{{ url_for('quicktransfer') }}" class="btn btn-digibank">Transfer Now</a>
         </div>
       </div>
-     
-      <div class="col-md-4">
-        <div class="card-custom">
-          <h6>Bank Transfer</h6>
-          <p>To own/other account</p>
-          <a href="{{ url_for('banktransfer') }}" class="btn btn-primary btn-sm btn-custom">Transfer Now</a>
-         
-          <i class="bi bi-arrow-right-circle-fill arrow"></i>
+ 
+      <!-- Bank Transfer -->
+      <div class="col-md-4 col-sm-6">
+        <div class="card dashboard-card p-4 text-center">
+          <i class="bi bi-bank2 dashboard-icon mb-2"></i>
+          <h5>Bank Transfer</h5>
+          <p>Send money to your own or other bank accounts.</p>
+          <a href="{{ url_for('banktransfer') }}" class="btn btn-digibank">Transfer Now</a>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card-custom">
-          <h6>International Fund Transfer</h6>
-          <p>Transfer fund outside india</p>
-          <button class="btn btn-primary btn-sm btn-custom">Transfer Now</button>
-          <i class="bi bi-arrow-right-circle-fill arrow"></i>
+ 
+      <!-- Set / Change PIN -->
+      <div class="col-md-4 col-sm-6">
+        <div class="card dashboard-card p-4 text-center">
+          <i class="bi bi-shield-lock-fill dashboard-icon mb-2"></i>
+          <h5>Set / Change Transaction PIN</h5>
+          <p>Secure your Quick Transfers and Balance view with a 4-digit PIN.</p>
+          <a href="{{ url_for('set_pin') }}" class="btn btn-digibank">Set PIN</a>
         </div>
       </div>
     </div>
  
-    <!-- Second Row: Bill Payments -->
-    <div class="row g-3 mb-4">
-      <div class="col-md-4">
-        <div class="card-custom">
-          <h6>Bill Payments</h6>
-          <p>Make Bill Payments</p>
-          <button class="btn btn-primary btn-sm btn-custom">Transfer Now</button>
-          <i class="bi bi-receipt icon"></i>
-          <i class="bi bi-arrow-right-circle-fill arrow"></i>
+    <!-- Bills & Payments -->
+    <div class="d-flex align-items-center justify-content-between mt-4 mb-2">
+      <div>
+        <h4 class="section-title mb-0">Bills & Payments</h4>
+        <div class="section-sub">Pay utilities and cards with ease</div>
+      </div>
+    </div>
+ 
+    <div class="row g-4 justify-content-center">
+      <!-- Bill Payments -->
+      <div class="col-md-4 col-sm-6">
+        <div class="card dashboard-card p-4 text-center">
+          <i class="bi bi-receipt dashboard-icon mb-2"></i>
+          <h5>Bill Payments</h5>
+          <p>Pay electricity, broadband, water, and more.</p>
+          <a href="#" class="btn btn-digibank">Pay Now</a>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card-custom">
-          <h6>Credit Card Bills</h6>
-          <p>Any card Payments</p>
-          <button class="btn btn-primary btn-sm btn-custom">Transfer Now</button>
-          <i class="bi bi-credit-card icon"></i>
-          <i class="bi bi-arrow-right-circle-fill arrow"></i>
+ 
+      <!-- Credit Card Bills -->
+      <div class="col-md-4 col-sm-6">
+        <div class="card dashboard-card p-4 text-center">
+          <i class="bi bi-credit-card-2-front-fill dashboard-icon mb-2"></i>
+          <h5>Credit Card Bills</h5>
+          <p>Pay any bank’s credit card easily.</p>
+          <a href="#" class="btn btn-digibank">Pay Now</a>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card-custom">
-          <h6>Deposit</h6>
-          <p>Deposit your money easily</p>
-          <a href="{{ url_for('deposit') }}" class="btn btn-primary btn-sm btn-custom">Deposit Now</a>
-          <i class="bi bi-arrow-right-circle-fill arrow"></i>
+ 
+      <!-- Deposit -->
+      <div class="col-md-4 col-sm-6">
+        <div class="card dashboard-card p-4 text-center">
+          <i class="bi bi-piggy-bank-fill dashboard-icon mb-2"></i>
+          <h5>Deposit</h5>
+          <p>Open fixed and recurring deposits in a few clicks.</p>
+          <a href="{{ url_for('deposit') }}" class="btn btn-digibank">Deposit Now</a>
         </div>
       </div>
     </div>
  
     <!-- Donation Banner -->
-    <div class="banner-box">
-      <i class="bi bi-heart-fill"></i>
+    <div class="banner-box mt-4">
+      <div class="banner-icon"><i class="bi bi-heart-fill"></i></div>
       <div>
-        <h5>Donations</h5>
-        <p>Donate and create impact that lasts a lifetime</p>
+        <h6 class="banner-title">Donations</h6>
+        <p class="banner-text mb-0">Donate and create impact that lasts a lifetime.</p>
       </div>
+      <i class="bi bi-arrow-right-circle-fill arrow-btn"></i>
     </div>
  
     <!-- Manage Transaction Limit Banner -->
-    <div class="banner-box">
+    <div class="banner-box mt-3">
+      <div class="banner-icon"><i class="bi bi-sliders2"></i></div>
       <div>
-        <h5>Manage Transaction Limit</h5>
-        <p>Set secure limits for efficient transactions</p>
+        <h6 class="banner-title">Manage Transaction Limit</h6>
+        <p class="banner-text mb-0">Set secure limits for efficient transactions.</p>
       </div>
       <i class="bi bi-arrow-right-circle-fill arrow-btn"></i>
     </div>
  
     <!-- Label Box -->
-    <div class="label-box">
+    <div class="label-box mt-3">
       For a hassle-free transactions experience, please make sure your total limit per day for third-party transfer transactions is sufficiently set for all your transactions planned through the day. You can reach TPT limit anytime from above Manage Transaction Limit.
     </div>
  
   </div>
  
+  <!-- Footer -->
+  <footer class="text-white text-center py-3 mt-5 bg-custom">
+    © 2025 DigiBank. All rights reserved.
+  </footer>
+ 
+  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
- 
- 
  
  

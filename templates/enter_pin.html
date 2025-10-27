@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Enter PIN - DigiBank</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+ 
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+ 
+  <style>
+    body { background:#f8f9fa; font-family:'Segoe UI', sans-serif; margin:0; min-height:100vh; display:flex; flex-direction:column; }
+    .top-bar { background:#0B4D83; color:#fff; display:flex; align-items:center; justify-content:space-between; padding:10px 20px; position:sticky; top:0; z-index:1030; }
+    .logout-btn { background:transparent; border:1.5px solid #fff; color:#fff; padding:5px 15px; border-radius:4px; font-weight:600; }
+    .logout-btn:hover { background:#fff; color:#0B4D83; }
+    .container-narrow { max-width: 560px; }
+    .card { border:none; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+    .card-header { background:#0B4D83; color:#fff; border-radius:12px 12px 0 0 !important; }
+    .btn-primary { background:#0B4D83; border-color:#0B4D83; }
+    .btn-primary:hover { background:#7a0f3e; border-color:#7a0f3e; }
+    .pin-input { letter-spacing:.4em; text-align:center; font-size:1.1rem; }
+    footer.bg-custom { background-color:#0B4D83; }
+  </style>
+</head>
+<body>
+ 
+  <!-- Simple top bar -->
+  <div class="top-bar d-flex align-items-center">
+    <div class="fw-bold">DigiBank</div>
+    <div class="text-center flex-grow-1">Security Check</div>
+    <div></div>
+  </div>
+ 
+  <!-- Flash messages + always-on info box -->
+  <div class="container container-narrow mt-3">
+    {% with msgs = get_flashed_messages(with_categories=true) %}
+      {% if msgs %}
+        {% for cat, msg in msgs %}
+          <div class="alert alert-{{ 'success' if cat=='success' else ('warning' if cat=='warning' else ('info' if cat=='info' else 'danger')) }} alert-dismissible fade show" role="alert">
+            {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+ 
+    <!-- Always show this info box -->
+    <div class="alert alert-info d-flex align-items-start" role="alert">
+      <div class="me-2">
+        <i class="bi bi-shield-lock-fill"></i>
+      </div>
+      <div class="flex-grow-1">
+       
+          <strong>Security check:</strong> Please enter your 4-digit transaction PIN to continue.
+         
+          Not having PIN?
+       
+        <div class="mt-2">
+          <a class="btn btn-sm btn-primary" href="{{ url_for('set_pin', next=next) }}">
+            Set PIN now
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- PIN Form -->
+  <div class="container container-narrow my-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="m-0"><i class="bi bi-shield-lock"></i> Enter Transaction PIN</h5>
+      </div>
+      <form method="post" action="{{ url_for('verify_pin') }}" class="card-body" id="enterPinForm" novalidate>
+        <input type="hidden" name="next" value="{{ next }}">
+ 
+        <div class="mb-3">
+          <label class="form-label" for="pin">PIN</label>
+          <input
+            id="pin"
+            name="pin"
+            type="password"
+            inputmode="numeric"
+            pattern="[0-9]{4}"
+            maxlength="4"
+            autocomplete="one-time-code"
+            class="form-control pin-input"
+            required
+            placeholder="••••"
+            aria-describedby="pinHelp">
+          <div id="pinHelp" class="form-text">Enter your 4-digit transaction PIN.</div>
+          <div class="invalid-feedback">Enter a 4-digit numeric PIN.</div>
+        </div>
+ 
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="showPinCheck">
+          <label class="form-check-label" for="showPinCheck">Show PIN</label>
+        </div>
+ 
+        <div class="d-flex gap-2">
+          <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary">Verify</button>
+        </div>
+      </form>
+    </div>
+  </div>
+ 
+  <footer class="bg-custom text-white text-center py-3 mt-auto">
+    © 2025 DigiBank. All rights reserved.
+  </footer>
+ 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function(){
+      const pin = document.getElementById('pin');
+      const form = document.getElementById('enterPinForm');
+      const showPin = document.getElementById('showPinCheck');
+ 
+      // Focus on load
+      pin.focus();
+ 
+      // Keep only digits, max 4
+      function sanitize(v){ return (v || '').replace(/\D/g,'').slice(0,4); }
+ 
+      pin.addEventListener('input', ()=>{
+        pin.value = sanitize(pin.value);
+        pin.classList.remove('is-invalid');
+      });
+ 
+      // Handle paste nicely
+      pin.addEventListener('paste', (e)=>{
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData).getData('text');
+        pin.value = sanitize(text);
+      });
+ 
+      showPin.addEventListener('change', ()=>{
+        pin.type = showPin.checked ? 'text' : 'password';
+      });
+ 
+      form.addEventListener('submit', (e)=>{
+        if(!/^\d{4}$/.test(pin.value)){
+          pin.classList.add('is-invalid');
+          e.preventDefault(); e.stopPropagation();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
+ 
+ 
