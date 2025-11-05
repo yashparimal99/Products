@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+  <meta charset="UTF-8" />
+  <title>Loan Autopay - DigiBank</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', sans-serif;
+    }
+ 
+    .btn-submit {
+      background-color: #0B4D83;
+      color: #fff;
+      font-weight: 600;
+      border: none;
+      padding: 8px 0;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+ 
+    .btn-submit:hover {
+      background-color: #7a0f3e;
+    }
+ 
+    .btn-verify {
+      background-color: #0B4D83;
+      color: white;
+      font-weight: 500;
+      font-size: 0.9rem;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 16px;
+      margin-top: 8px;
+      transition: background-color 0.3s ease;
+    }
+ 
+    .btn-verify:hover {
+      background-color: #7a0f3e;
+    }
+ 
+    .verified {
+      display: block;
+      margin-top: 5px;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+ 
+    .form-section {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+      padding: 25px;
+      margin-top: 30px;
+      max-width: 650px;
+    }
+ 
+    label {
+      font-weight: 500;
+      margin-bottom: 5px;
+      color: #0B4D83;
+    }
+ 
+    h3 {
+      color: #0B4D83;
+      font-weight: 700;
+    }
+  </style>
+</head>
+ 
+<body>
+  <div class="container d-flex justify-content-center">
+    <div class="form-section w-100">
+      <h3 class="text-center mb-4">Loan Autopay - Payment Gateway</h3>
+ 
+      <form action="{{ url_for('loan_autopay') }}" method="POST" id="autopayForm">
+ 
+        <!-- Name -->
+        <div class="mb-4">
+          <label class="form-label">Full Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="fullName" name="full_name" placeholder="Enter your full name" required>
+        </div>
+ 
+        <!-- Loan Account Number -->
+        <div class="mb-4">
+          <label class="form-label">Loan Account Number <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="loanNumber" name="loan_number"
+            placeholder="Enter loan account number" required>
+          <button type="button" class="btn-verify" id="verifyLoanBtn">Verify Account</button>
+          <span id="loanStatus" class="verified"></span>
+        </div>
+ 
+        <!-- Loan Type -->
+        <div class="mb-4">
+          <label class="form-label">Loan Type <span class="text-danger">*</span></label>
+          <select class="form-select" id="loanType" name="loan_type" required>
+            <option value="">-- Select Loan Type --</option>
+            <option value="home">Home Loan</option>
+            <option value="personal">Personal Loan</option>
+            <option value="car">Car Loan</option>
+            <option value="education">Education Loan</option>
+            <option value="business">Business Loan</option>
+          </select>
+        </div>
+ 
+        <!-- Mobile Number -->
+        <div class="mb-4">
+          <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
+          <input type="tel" class="form-control" id="mobileNumber" name="mobile_number"
+            placeholder="Enter 10-digit mobile number" maxlength="10" pattern="[0-9]{10}" required>
+        </div>
+ 
+        <!-- Email ID -->
+        <div class="mb-4">
+          <label class="form-label">Email ID <span class="text-danger">*</span></label>
+          <input type="email" class="form-control" id="emailId" name="email_id" placeholder="Enter your email address"
+            required>
+        </div>
+ 
+        <!-- Loan Amount -->
+        <div class="mb-4">
+          <label class="form-label">Loan Amount (₹) <span class="text-danger">*</span></label>
+          <input type="number" class="form-control" id="loanAmount" name="loan_amount" placeholder="Enter total loan amount"
+            required min="1000">
+        </div>
+ 
+        <!-- Installment Amount -->
+        <div class="mb-4">
+          <label class="form-label">Installment Amount (₹) <span class="text-danger">*</span></label>
+          <input type="number" class="form-control" id="installmentAmount" name="installment_amount"
+            placeholder="Enter installment amount" required min="100">
+        </div>
+ 
+        <!-- Payment Option -->
+        <div class="mb-4">
+          <label class="form-label">Select Payment Option <span class="text-danger">*</span></label>
+          <select class="form-select" id="paymentMode" name="payment_mode" required>
+            <option value="">-- Choose Payment Option --</option>
+            <option value="upi">UPI</option>
+            <option value="debit_card">Debit Card</option>
+            <option value="bank_account">Bank Account</option>
+          </select>
+        </div>
+ 
+        <!-- AutoPay Checkbox -->
+        <div class="form-check mb-4">
+          <input class="form-check-input" type="checkbox" id="autopayEnable" name="autopay_enable">
+          <label class="form-check-label" for="autopayEnable">
+            Enable AutoPay for future installments
+          </label>
+        </div>
+ 
+        <!-- Submit -->
+        <div class="text-center mt-4">
+          <button type="submit" class="btn btn-submit w-50" id="payNowBtn">Pay Now</button>
+        </div>
+      </form>
+    </div>
+  </div>
+ 
+  <!-- Payment Success Modal -->
+  <div class="modal fade" id="paymentSuccessModal" tabindex="-1" aria-labelledby="paymentSuccessLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color:#0B4D83; color:white;">
+          <h5 class="modal-title" id="paymentSuccessLabel">Payment Successful</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+            aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <h5 class="text-success fw-bold mb-3">✅ Your loan installment payment has been processed successfully!</h5>
+          <p>Transaction ID: <span id="txnId">TXN123456</span></p>
+          <p>Amount: ₹<span id="txnAmount"></span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- JS Logic -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Loan verification
+    document.getElementById('verifyLoanBtn').addEventListener('click', async () => {
+      const loanNumber = document.getElementById('loanNumber').value.trim();
+      const loanStatus = document.getElementById('loanStatus');
+ 
+      if (!loanNumber) {
+        alert("Please enter your loan account number.");
+        return;
+      }
+ 
+      // Simulated backend verification
+      const response = await fetch('/verify_loan', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ loan_number: loanNumber })
+      });
+ 
+      const data = await response.json();
+      if (data.verified) {
+        loanStatus.textContent = "✔ Loan Account Verified";
+        loanStatus.style.color = "green";
+        alert("Loan account verified successfully!");
+      } else {
+        loanStatus.textContent = "❌ Loan Account Not Found";
+        loanStatus.style.color = "red";
+        alert("Loan account not found in our records.");
+      }
+    });
+ 
+    // Payment simulation
+    document.getElementById('autopayForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const amount = document.getElementById('installmentAmount').value;
+      if (!amount || amount <= 0) {
+        alert("Please enter a valid installment amount.");
+        return;
+      }
+ 
+      // Simulate payment success
+      document.getElementById('txnAmount').textContent = amount;
+      const modal = new bootstrap.Modal(document.getElementById('paymentSuccessModal'));
+      modal.show();
+    });
+  </script>
+</body>
+ 
+</html>
+ 
+ 

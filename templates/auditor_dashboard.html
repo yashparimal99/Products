@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Manager Dashboard - DigiBank</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+ 
+  <!-- Bootstrap CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+ 
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px 0 0 0;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    /* Sidebar Offcanvas */
+    #sidebarMenu.offcanvas-start {
+      width: 250px;
+    }
+    #sidebarMenu .offcanvas-body {
+      padding: 0.5rem 1rem;
+    }
+    #sidebarMenu .nav-link {
+      font-size: 0.9rem;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #333;
+      transition: color 0.3s;
+    }
+    #sidebarMenu .nav-link i {
+      font-size: 1.1rem;
+    }
+    #sidebarMenu .nav-link.active {
+      font-weight: 700;
+      color: #0B4D83 !important;
+      background-color: #f0d7e0;
+      border-radius: 4px;
+    }
+    #sidebarMenu .nav-link:hover {
+      color: #7a0f3e;
+      background-color: #f9e5ef;
+      border-radius: 4px;
+    }
+
+    .top-bar button.btn-outline-light {
+      border: 1.5px solid white;
+      color: white;
+      background: transparent;
+      padding: 4px 10px;
+      font-size: 1.3rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+    }
+    .top-bar button.btn-outline-light:hover {
+      background-color: white;
+      color: #0B4D83;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      background-color: #0B4D83;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      user-select: none;
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+    }
+    .top-bar h5 {
+      margin: 0;
+      font-weight: 700;
+      flex-grow: 1;
+      text-align: center;
+      color: white;
+    }
+    .logout-btn {
+      background: transparent;
+      border: 1.5px solid white;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+      flex-shrink: 0;
+    }
+    .logout-btn:hover {
+      background-color: white;
+      color: #0B4D83;
+    }
+
+    /* Search Bar Row with Sidebar Toggle & Chatbot */
+    .search-chatbar {
+      max-width: 900px;
+      margin: 15px auto 40px auto;
+      padding: 0 15px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    /* Sidebar toggle button */
+    .search-chatbar .btn-toggle-sidebar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 5px;
+      border: 1.5px solid #ccc;
+      color: #444;
+      background: white;
+      transition: border-color 0.3s, color 0.3s;
+      cursor: pointer;
+      flex-shrink: 0;
+      min-width: 42px;
+      padding: 6px 8px;
+      font-size: 1.3rem;
+    }
+    .search-chatbar .btn-toggle-sidebar:hover {
+      border-color: #0B4D83;
+      color: #0B4D83;
+    }
+    /* Search input centered and wide */
+    .search-chatbar input[type="text"] {
+      flex-grow: 1;
+      padding: 10px 14px;
+      border-radius: 5px;
+      border: 1.5px solid #ccc;
+      font-size: 1rem;
+      outline-offset: 0;
+      transition: border-color 0.3s;
+      width: 9000px;
+      margin: 0 auto;
+      display: block;
+    }
+    .search-chatbar input[type="text"]:focus {
+      border-color: #0B4D83;
+      box-shadow: 0 0 5px rgba(151, 20, 77, 0.5);
+    }
+    /* Chatbot button right aligned */
+    .search-chatbar .chatbot-btn {
+      background-color: #0B4D83;
+      border: none;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .search-chatbar .chatbot-btn:hover {
+      background-color: #7a0f3e;
+    }
+
+    /* Dashboard Cards */
+    .dashboard-card {
+      transition: 0.3s;
+      height: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 20px 30px 20px;
+      text-align: center;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+    }
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+    }
+    .dashboard-icon {
+      font-size: 32px;
+      color: #0B4D83;
+      margin-bottom: 15px;
+    }
+    .dashboard-card h5 {
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .dashboard-card p {
+      flex-grow: 1;
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 15px;
+    }
+    .btn-manager {
+      background-color: #0B4D83;
+      color: #fff;
+      border: none;
+      padding: 8px 18px;
+      font-size: 0.9rem;
+      border-radius: 25px;
+      transition: background-color 0.3s ease;
+    }
+    .btn-manager:hover {
+      background-color: #7a0f3e;
+      color: white;
+    }
+
+    /* Footer */
+    footer.bg-custom {
+      background-color: #0B4D83;
+    }
+  </style>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap');
+
+    .digi-bank-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      transition: transform 0.3s ease;
+    }
+    .digi-bank-logo:hover { transform: scale(1.05); }
+
+    .logo-icon {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 6px 18px rgba(102, 126, 234, 0.3), 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    .logo-icon::before {
+      content: '';
+      position: absolute;
+      top: 8px; left: 8px; right: 8px; bottom: 8px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 8px;
+    }
+    .logo-icon::after {
+      content: 'D';
+      position: absolute;
+      color: transparent;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      background-clip: text;
+      -webkit-background-clip: text;
+      font-weight: 800;
+      font-size: 20px;
+      z-index: 2;
+    }
+    .logo-text { color: #fff; }
+    .main-text {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+    .digi {
+      background: linear-gradient(135deg, #87CEEB 0%, #98D8E8 25%, #FFF8DC 50%, #87CEFA 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
+    .bank {
+      color: #ffffff;
+      margin-left: 3px;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+    .tagline {
+      font-size: 9px;
+      font-weight: 600;
+      color: #e8f4f8;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Sidebar Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="sidebarMenuLabel">Manager</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark active" href="{{ url_for('dashboard') }}">
+            <i class="bi bi-speedometer2"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('transactions_review') }}">
+            <i class="bi bi-person-lines-fill"></i> Profile
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('manreport') }}">
+            <i class="bi bi-bar-chart-line-fill"></i> Audit Logs
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+<!-- ✅ Top Bar -->
+<div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#0B4D83; color:white;">
+  <button class="btn btn-outline-light btn-sm me-3"
+          data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
+          aria-controls="sidebarMenu" aria-label="Toggle sidebar">
+    <i class="bi bi-list fs-5"></i>
+  </button>
+
+  <!-- DigiBank Logo -->
+  <a class="navbar-brand digi-bank-logo d-flex align-items-center me-3" href="{{ url_for('home') }}">
+    <div class="logo-icon"></div>
+    <div class="logo-text ms-2">
+      <div class="main-text">
+        <span class="digi">DiGi</span><span class="bank">Bank</span>
+      </div>
+      <div class="tagline">Smart Banking</div>
+    </div>
+  </a>
+
+  <!-- Title -->
+  <h5 class="flex-grow-1 text-center m-0">Welcome To Auditor's Dashboard</h5>
+
+  <!-- Right Side: User + Logout -->
+  <div class="d-flex align-items-center">
+    <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }}</h5>
+    <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
+      Logout
+    </a>
+  </div>
+</div>
+
+<!-- Search Bar with Live Suggestions -->
+<div class="search-chatbar position-relative">
+  <form id="searchForm" class="d-flex w-100 align-items-center"
+        action="{{ url_for('searchprofile') }}" method="get" autocomplete="off">
+    <input id="searchInput" type="text" name="query"
+           class="form-control me-2"
+           placeholder="Search by Name or User ID" required>
+    <input type="hidden" name="search_by" id="searchBy" value="name">
+    <button class="btn btn-manager" type="submit">
+      <i class="bi bi-search"></i>
+    </button>
+  </form>
+
+  <ul id="suggestions"
+      class="list-group position-absolute w-100"
+      style="top:100%; left:0; margin-top:4px; z-index:1000;"></ul>
+</div>
+
+<script>
+const input = document.getElementById('searchInput');
+const list  = document.getElementById('suggestions');
+const searchBy = document.getElementById('searchBy');
+
+input.addEventListener('input', async () => {
+  const q = input.value.trim();
+  list.innerHTML = '';
+  if (q.length < 2) return;
+  const res = await fetch(`/api/user_suggestions?q=${encodeURIComponent(q)}`);
+  const data = await res.json();
+
+  data.forEach(user => {
+    const li = document.createElement('li');
+    li.className = 'list-group-item list-group-item-action';
+    li.innerHTML = `<strong>${user.name}</strong><br>
+                    <small class="text-muted">ID: ${user.user_id}</small>`;
+    li.addEventListener('click', () => {
+      input.value = user.user_id;
+      searchBy.value = 'user_id';
+      list.innerHTML = '';
+    });
+    list.appendChild(li);
+  });
+});
+
+document.addEventListener('click', e => {
+  if (!list.contains(e.target) && e.target !== input) list.innerHTML = '';
+});
+</script>
+
+<!-- Dashboard Content -->
+<div class="container my-4 flex-grow-1">
+  <h3 class="mb-4 text-center">Auditor Tools</h3>
+  <div class="row g-4 justify-content-center">
+    <div class="col-md-4 col-sm-6">
+      <div class="card dashboard-card p-4 text-center">
+        <i class="bi bi-people-fill dashboard-icon mb-2"></i>
+        <h5>Profile</h5>
+        <p>View profiles.</p>
+        <a href="{{ url_for('manprofile') }}" class="btn btn-manager">Manage Accounts</a>
+      </div>
+    </div>
+
+    <div class="col-md-4 col-sm-6">
+      <div class="card dashboard-card p-4 text-center">
+        <i class="bi bi-bar-chart-line-fill dashboard-icon mb-2"></i>
+        <h5>Audit Logs</h5>
+        <p>View User Actions</p>
+        <a href="{{ url_for('managerapprovals') }}" class="btn btn-manager">View Logs</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="bg-custom text-white text-center py-3 mt-auto">
+  © 2025 DigiBank. Manager Dashboard. All rights reserved.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

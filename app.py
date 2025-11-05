@@ -588,8 +588,6 @@ def savingform():
 @app.route('/profile')
 def profile():
     user_id = session.get('user_id')
-    # session['cust_id'] = user['cust_id']
-    # print("Logged in cust_id:", cust_id)   # debug
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
     user = cur.fetchone()
@@ -1321,7 +1319,10 @@ def dashboard():
         'Card_Agent': 'cardagent_dashboard.html',
         'Loan_Agent': 'loanagent_dashboard.html',
         'Investment_Agent': 'investagent_dashboard.html',
-        'Underwriting_Agent': 'underwriting.html'
+        'Underwriting_Agent': 'underwriting.html',
+        'Admin': 'admindashboard.html',
+        'Officer': 'officer_dashboard.html',
+        'Auditor': 'auditor_dashboard.html',
     }
  
     if role == "manager":
@@ -1799,10 +1800,7 @@ def viewcards():
     cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
     user = cur.fetchone()
     cur.close()
-    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
-    user = cur.fetchone()
-    cur.close()
+    
  
  
     email = session.get('user_email')
@@ -1864,81 +1862,188 @@ def card_request(request_id, action):
   
 
 @app.route('/view_cards')
+
 def view_cards():
+
     email = session.get('user_email')
+
     if not email:
+
         flash('Please login first', 'danger')
+
         return redirect(url_for('login'))
  
-    # get user for header + user_id for filtering
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
     cur.execute("SELECT * FROM bank_users WHERE email=%s", (email,))
+
     user = cur.fetchone()
+
     if not user:
+
         cur.close()
+
         flash('User not found.', 'danger')
+
         return redirect(url_for('login'))
  
     user_id = user['user_id']
  
-    # Fetch this user's card applications
+    # Show cards where:
+
+    # - application shows approved/issued (status or status_flag), OR
+
+    # - related request in card_requests is approved (status_flag='A')
+
     cur.execute("""
-        SELECT application_ref, card_type, card_subtype, status_flag,
-               card_number, cvv, issue_limit, limit_utilized,
-               requested_for_account_number, created_at, updated_at
-        FROM card_applications
-        WHERE (customer_user_id=%s OR submitted_by_user_id=%s)
-        AND status_flag = 'A'
-        ORDER BY created_at DESC, id DESC
+
+        SELECT
+
+            ca.id,
+
+            ca.application_ref,
+
+            ca.card_type,
+
+            ca.card_subtype,
+
+            ca.status_flag AS app_status_flag,
+
+            ca.status      AS app_status,
+
+            cr.status_flag AS req_status_flag,
+
+            ca.card_number,
+
+            ca.cvv,
+
+            ca.issue_limit,
+
+            ca.limit_utilized,
+
+            ca.requested_for_account_number,
+
+            ca.created_at,
+
+            ca.updated_at
+
+        FROM card_applications ca
+
+        LEFT JOIN card_requests cr
+
+               ON cr.application_ref = ca.application_ref
+
+        WHERE (ca.customer_user_id=%s OR ca.submitted_by_user_id=%s)
+
+          AND (
+
+                ca.status_flag IN ('A','approved','issued')
+
+             OR ca.status      IN ('A','approved','issued')
+
+             OR cr.status_flag = 'A'
+
+          )
+
+        ORDER BY COALESCE(ca.updated_at, ca.created_at) DESC, ca.id DESC
+
     """, (user_id, user_id))
+
     rows = cur.fetchall()
+
     cur.close()
  
-    # Mapping for UI
-    type_label = {
-        'credit': 'Credit Card',
-        'debit': 'Debit Card',
-        'prepaid': 'Prepaid Card'
-    }
-    status_label = {
-        None: 'Pending',   # NULL in DB
-        '': 'Pending',     # empty string safeguard
-        'A': 'Approved',
-        'R': 'Rejected',
-        'issued': 'Issued'
-    }
+    type_label = {'credit': 'Credit Card', 'debit': 'Debit Card', 'prepaid': 'Prepaid Card'}
+ 
+    def normalize_status(app_flag, app_status, req_flag):
+
+        # Priority: explicit issued/approved on application, else approved by request, else pending
+
+        s_app_flag  = (app_flag  or '').strip().lower()
+
+        s_app_stat  = (app_status or '').strip().lower()
+
+        s_req_flag  = (req_flag  or '').strip().lower()
+ 
+        # If application says issued -> Issued
+
+        if s_app_stat in ('issued',) or s_app_flag in ('issued',):
+
+            return 'Issued'
+
+        # If application says approved -> Approved
+
+        if s_app_stat in ('a','approved') or s_app_flag in ('a','approved'):
+
+            return 'Approved'
+
+        # If request approved -> Approved
+
+        if s_req_flag == 'a':
+
+            return 'Approved'
+
+        # Fallbacks
+
+        if s_app_stat in ('r','rejected','declined'):
+
+            return 'Declined'
+
+        return 'Pending'
  
     def fmt_card_no(n):
+
         if not n:
+
             return '—'
-        s = ''.join(ch for ch in n if ch.isdigit())
-        if not s:
-            return n
-        return ' '.join(s[i:i+4] for i in range(0, len(s), 4))
+
+        digits = ''.join(ch for ch in str(n) if ch.isdigit())
+
+        if not digits:
+
+            return str(n)
+
+        return ' '.join(digits[i:i+4] for i in range(0, len(digits), 4))
  
     cards = []
-    for r in rows:
-        flag = r.get('status_flag')
-        label = status_label.get(flag, 'Pending')  # fallback to Pending
+
+    for r in rows or []:
+
+        status_label = normalize_status(r.get('app_status_flag'), r.get('app_status'), r.get('req_status_flag'))
+
         cards.append({
+
             'application_ref': r.get('application_ref') or '—',
+
             'card_type': r.get('card_type') or '',
+
             'card_type_label': type_label.get((r.get('card_type') or '').lower(), r.get('card_type') or ''),
+
             'card_subtype': (r.get('card_subtype') or '').upper(),
-            'status': flag,
-            'status_label': label,
+
+            'status_label': status_label,
+
             'card_number': r.get('card_number'),
+
             'card_number_fmt': fmt_card_no(r.get('card_number')),
+
             'cvv': r.get('cvv') or '—',
+
             'issue_limit': r.get('issue_limit') if r.get('issue_limit') is not None else 0,
+
             'limit_utilized': r.get('limit_utilized') if r.get('limit_utilized') is not None else 0,
+
             'requested_for_account_number': r.get('requested_for_account_number') or '—',
+
             'created_at': r.get('created_at'),
+
             'updated_at': r.get('updated_at'),
+
         })
  
     return render_template('viewcards.html', user=user, cards=cards)
 
+ 
  
 # ============ Manager list screen (with optional search) ============
 @app.route('/manager/cash-deposits', methods=['GET'])
@@ -2156,9 +2261,184 @@ def manager_cash_deposits_decide(req_id, action):
 def transactions_review():
     return render_template('transactions-review.html')
 
+
+from flask import jsonify, request, render_template, make_response
+from MySQLdb.cursors import DictCursor
+ 
+# If not already defined in your file:
+# CASA_TABLES = [("saving_accounts","Saving"), ("current_accounts","Current"), ("salary_accounts","Salary"), ("pmjdy_accounts","PMJDY"), ("pension_accounts","Pension"), ("safecustody_accounts","Safe Custody")]
+# DEPOSIT_TABLES = [("fixed_deposits","principal_amount","FD"), ("digital_fixed_deposits","principal_amount","Digital FD"), ("recurring_deposits","monthly_installment","RD")]
+# LOAN_TABLES = [("home_loan_applications","Home"), ("personal_loan_applications","Personal"), ("business_loan_applications","Business")]
+# CARD_TABLES = [("credit_cards","Credit"), ("debit_cards","Debit"), ("prepaid_cards","Prepaid"), ("forex_cards","Forex")]
+# INVEST_TABLES = [("ppf_accounts","amount_invested","PPF"), ("saving_bonds","amount_invested","Bonds"), ("nps_accounts","amount_invested","NPS")]
+ 
+def _has_column(cur, table, column):
+    try:
+        cur.execute("""
+            SELECT 1
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_SCHEMA = DATABASE()
+              AND TABLE_NAME=%s
+              AND COLUMN_NAME=%s
+            LIMIT 1
+        """, (table, column))
+        return cur.fetchone() is not None
+    except Exception:
+        return False
+ 
+def _safe_scalar(cur, sql, params=()):
+    try:
+        cur.execute(sql, params)
+        row = cur.fetchone()
+        if not row:
+            return 0
+        if isinstance(row, dict):
+            return list(row.values())[0]
+        return row[0]
+    except Exception:
+        return 0
+ 
+def _count_split_with_city(cur, table, alias, where_approved, where_pending, city):
+    """
+    Count approved/pending in `table`.
+    If table has user_id, LEFT JOIN bank_users to filter by city (if provided).
+    Returns (approved_count, pending_count, used_city_filter: bool)
+    """
+    base_join = ""
+    params_app, params_pen = [], []
+    city_used = False
+ 
+    if _has_column(cur, table, 'user_id'):
+        base_join = f" LEFT JOIN bank_users bu ON bu.user_id={alias}.user_id "
+        if city:
+            where_approved += " AND bu.city=%s "
+            where_pending += " AND bu.city=%s "
+            params_app.append(city)
+            params_pen.append(city)
+            city_used = True
+ 
+    sql_app = f"SELECT COUNT(*) FROM {table} {alias}{base_join} WHERE 1=1 {where_approved}"
+    sql_pen = f"SELECT COUNT(*) FROM {table} {alias}{base_join} WHERE 1=1 {where_pending}"
+ 
+    approved = int(_safe_scalar(cur, sql_app, params_app) or 0)
+    pending = int(_safe_scalar(cur, sql_pen, params_pen) or 0)
+ 
+    return approved, pending, city_used
+ 
+def _norm_status_ok(alias):
+    """Approve when status_flag='A' OR status in active/issued/approved (trim/lower)."""
+    return (
+        f" AND ("
+        f"   COALESCE({alias}.status_flag,'')='A' "
+        f"   OR LOWER(TRIM(COALESCE({alias}.status,''))) IN ('active','issued','approved','disbursed')"
+        f" )"
+    )
+ 
+def _norm_status_pending(alias):
+    """Pending when status NOT approved and in typical pending set or NULL."""
+    return (
+        f" AND ("
+        f"   (LOWER(TRIM(COALESCE({alias}.status,''))) IN ('pending','applied','under_review','processing','submitted')"
+        f"     OR {alias}.status IS NULL) "
+        f"   AND COALESCE({alias}.status_flag,'') <> 'A'"
+        f" )"
+    )
+ 
+
 @app.route('/manreport')
 def manreport():
     return render_template('manreports.html')
+ 
+@app.get('/api/report/approval_breakdown')
+def api_report_approval_breakdown():
+    """
+    Returns Approved vs Pending counts for:
+    - Accounts (CASA types): status_flag 'A' => approved; otherwise pending
+    - Deposits: status_flag 'A' => approved; otherwise pending
+    - Loans: status in ('approved','issued','approved_docs') => approved; pending = status='pending'
+    - Cards: status_flag 'A' or status in ('active','issued','approved') => approved; pending = status='pending_manager'
+    - Investments: status in ('approved','active','closed') => approved; pending = 'pending_manager'
+    City filter applied if table has user_id; otherwise counts are global.
+    """
+    city = (request.args.get('city') or '').strip() or None
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    # ---- Accounts (CASA)
+    acc_labels, acc_approved, acc_pending = [], [], []
+    cur.execute("SELECT DISTINCT account_type FROM accounts_requests")
+    account_types = [row['account_type'] for row in cur.fetchall()]
+
+    for acc_type in account_types:
+        acc_labels.append(acc_type)
+        where_app = f" AND COALESCE(r.status_flag,'')='A' AND r.account_type='{acc_type}' "
+        where_pen = f" AND COALESCE(r.status_flag,'')<>'A' AND r.account_type='{acc_type}' "
+        a, p, _ = _count_split_with_city(cur, "accounts_requests", "r", where_app, where_pen, city)
+        acc_approved.append(a)
+        acc_pending.append(p)
+
+    # ---- Deposits
+    # dep_labels, dep_approved, dep_pending = [], [], []
+    # for tbl, _col, lbl in DEPOSIT_TABLES:
+    #     if not _table_exists(cur, tbl):
+    #         continue
+    #     dep_labels.append(lbl)
+    #     if _has_column(cur, tbl, 'status_flag'):
+    #         where_app = " AND COALESCE(d.status_flag,'')='A' "
+    #         where_pen = " AND COALESCE(d.status_flag,'') <> 'A' "
+    #     else:
+    #         where_app = ""
+    #         where_pen = " AND 1=0 "
+    #     a, p, _ = _count_split_with_city(cur, tbl, "d", where_app, where_pen, city)
+    #     dep_approved.append(a)
+    #     dep_pending.append(p)
+
+    # ---- Loans
+    loan_labels, loan_approved, loan_pending = [], [], []
+    if _table_exists(cur, "loan_requests"):
+        loan_labels.append("Loan Requests")
+        where_app = " AND COALESCE(l.status,'') IN ('approved','issued','approved_docs') "
+        where_pen = " AND COALESCE(l.status,'')='pending' "
+        a, p, _ = _count_split_with_city(cur, "loan_requests", "l", where_app, where_pen, city)
+        loan_approved.append(a)
+        loan_pending.append(p)
+
+    # ---- Cards
+    card_labels, card_approved, card_pending = [], [], []
+    if _table_exists(cur, "card_applications"):
+        card_labels.append("Card Applications")
+        where_app = " AND (COALESCE(c.status_flag,'')='A' OR COALESCE(c.status,'') IN ('active','issued','approved')) "
+        where_pen = " AND (COALESCE(c.status_flag,'')<>'A' AND COALESCE(c.status,'')='pending_manager') "
+        a, p, _ = _count_split_with_city(cur, "card_applications", "c", where_app, where_pen, city)
+        card_approved.append(a)
+        card_pending.append(p)
+
+    # ---- Investments
+    inv_labels, inv_approved, inv_pending = [], [], []
+    if _table_exists(cur, "investment_applications"):
+        inv_labels.append("Investment Applications")
+        where_app = " AND COALESCE(i.status,'') IN ('approved','active','closed') "
+        where_pen = " AND COALESCE(i.status,'')='pending_manager' "
+        a, p, _ = _count_split_with_city(cur, "investment_applications", "i", where_app, where_pen, city)
+        inv_approved.append(a)
+        inv_pending.append(p)
+
+    cur.close()
+
+    # ---- Final Payload
+    payload = {
+        "accounts":    {"labels": acc_labels, "approved": acc_approved, "pending": acc_pending},
+        # "deposits":    {"labels": dep_labels, "approved": dep_approved, "pending": dep_pending},
+        "loans":       {"labels": loan_labels, "approved": loan_approved, "pending": loan_pending},
+        "cards":       {"labels": card_labels, "approved": card_approved, "pending": card_pending},
+        "investments": {"labels": inv_labels, "approved": inv_approved, "pending": inv_pending}
+    }
+
+    resp = make_response(jsonify(payload))
+    resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    resp.headers["Pragma"] = "no-cache"
+    return resp
+# -------- End Report & Analytics --------
+ 
 
 @app.route('/manstaff')
 def manstaff():
@@ -2373,7 +2653,14 @@ def agent_suggestions():
  
 @app.route('/branchperformance')
 def branchperformance():
-    return render_template('branch-performance.html')
+    user_id = session.get('user_id')
+    # session['cust_id'] = user['cust_id']
+    # print("Logged in cust_id:", cust_id)   # debug
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    return render_template('branch-performance.html',user=user)
  
  
  
@@ -2463,7 +2750,7 @@ def _city_clause(city, alias="bu"):
     return (" AND {alias}.city=%s ".format(alias=alias), [city]) if city else ("", [])
  
 def _sum_casa_balances(cur, city=None):
-    total = 0.0
+    total = 0.0 
     for tbl, _ in CASA_TABLES:
         if not _table_exists(cur, tbl):
             continue
@@ -3298,6 +3585,13 @@ def tlloan():
 # Invest Page
 @app.route('/tlinvest')
 def tlinvest():
+    user_id = session.get('user_id')
+    # session['cust_id'] = user['cust_id']
+    # print("Logged in cust_id:", cust_id)   # debug
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("""
         SELECT user_id, name, department, onboarding_date 
@@ -3305,7 +3599,7 @@ def tlinvest():
         WHERE status='active' AND department='Investment'
     """)
     agents = cur.fetchall()
-    return render_template("tlinvest.html", agents=agents)
+    return render_template("tlinvest.html", agents=agents,user=user)
 
 # Forex Page
 @app.route('/tlforex')
@@ -6201,6 +6495,13 @@ def underagentupdate_profile():
 
 @app.route('/loan_verification', methods=['GET'])
 def loan_verification():
+    user_id = session.get('user_id')
+    # session['cust_id'] = user['cust_id']
+    # print("Logged in cust_id:", cust_id)   # debug
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
     """
     Display pending and verified (approved/rejected) loan requests.
     Supports dynamic search by request ID or applicant name.
@@ -6248,7 +6549,8 @@ def loan_verification():
         "verification.html",
         pending_loans=pending_loans,
         verified_loans=verified_loans,
-        search_query=search_query
+        search_query=search_query,
+        user=user
     )
  
 
@@ -6799,12 +7101,396 @@ def quicktransfer():
     finally:
         cur.close()
  
+# Admin Dashboard
+
+@app.route('/adminprofile')
+def adminprofile():
+    user_id = session.get('user_id')
+    
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    return render_template('adminprofile.html',user=user)
+
+@app.route('/adminupdate_profile', methods=['GET', 'POST'])
+def adminupdate_profile():
+    email = session.get('user_email')
+    if not email:
+        flash('Please login first', 'danger')
+        return redirect(url_for('login'))
  
-
-
-
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
  
+    # GET → load edit form
+    if request.method == 'GET':
+        cur.execute("""
+            SELECT user_id, name, email, mobile,
+                   COALESCE(address,'') AS address,
+                   COALESCE(city,'')    AS city,
+                   COALESCE(state,'')   AS state,
+                   COALESCE(country,'') AS country
+            FROM bank_users
+            WHERE email=%s
+        """, (email,))
+        user = cur.fetchone()
+        cur.close()
+        return render_template('adminupdateprofile.html', user=user)
+ 
+    # POST → save changes
+    cur.execute("""
+        SELECT mobile, address, city, state, country, password
+        FROM bank_users
+        WHERE email=%s
+    """, (email,))
+    current = cur.fetchone()
+ 
+    mobile   = (request.form.get('mobile')   or '').strip()
+    address  = (request.form.get('address')  or '').strip()
+    city     = (request.form.get('city')     or '').strip()
+    state    = (request.form.get('state')    or '').strip()
+    country  = (request.form.get('country')  or '').strip()
+ 
+    curr_pw  = (request.form.get('current_password') or '').strip()
+    new_pw   = (request.form.get('new_password')     or '').strip()
+    conf_pw  = (request.form.get('confirm_password') or '').strip()
+ 
+    updates = {}
+ 
+    # Only update changed & non-empty values
+    if mobile and mobile != (current['mobile'] or ''):
+        if not (len(mobile) == 10 and mobile.isdigit()):
+            flash('Mobile must be exactly 10 digits.', 'danger')
+            cur.close()
+            return redirect(url_for('adminupdate_profile'))
+        updates['mobile'] = mobile
+    if address and address != (current['address'] or ''):
+        updates['address'] = address
+    if city and city != (current['city'] or ''):
+        updates['city'] = city
+    if state and state != (current['state'] or ''):
+        updates['state'] = state
+    if country and country != (current['country'] or ''):
+        updates['country'] = country
+ 
+    # Optional password change
+    if curr_pw or new_pw or conf_pw:
+        if not current or current['password'] != curr_pw:
+            flash('Current password is incorrect.', 'danger')
+            cur.close()
+            return redirect(url_for('adminupdate_profile'))
+        if not new_pw or new_pw != conf_pw or len(new_pw) < 8:
+            flash('New password mismatch or too short (min 8).', 'danger')
+            cur.close()
+            return redirect(url_for('adminupdate_profile'))
+        updates['password'] = new_pw
+ 
+    # Helper: human list join
+    def human_join(items):
+        if not items:
+            return ''
+        if len(items) == 1:
+            return items[0]
+        return ', '.join(items[:-1]) + ' and ' + items[-1]
+ 
+    labels = {
+        'mobile': 'mobile number',
+        'address': 'address',
+        'city': 'city',
+        'state': 'state',
+        'country': 'country',
+        'password': 'password'
+    }
+ 
+    try:
+        if updates:
+            set_clause = ", ".join([f"{k}=%s" for k in updates.keys()])
+            params = list(updates.values()) + [email]
+            cur.execute(f"UPDATE bank_users SET {set_clause} WHERE email=%s", params)
+            mysql.connection.commit()
+ 
+            changed = [labels[k] for k in updates.keys()]
+            msg = f"Updated {human_join(changed)}."
+            # Make password updates feel more “done”
+            if 'password' in updates and len(updates) == 1:
+                msg = "Password changed successfully."
+            flash(msg, 'success')
+        else:
+            flash('No changes to update.', 'info')
+ 
+    except Exception as e:
+        mysql.connection.rollback()
+        flash(f"Couldn't save your changes. Error: {e}", 'danger')
+    finally:
+        cur.close()
+ 
+    return redirect(url_for('adminprofile'))
 
+
+@app.route('/adminstaff')
+def adminstaff():
+    user_id = session.get('user_id')
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    return render_template('adminstaffmanage.html',user=user)
+
+@app.route('/customer_search', methods=['GET', 'POST'])
+
+def customer_search():
+    customers = []
+    searched = False
+
+    if request.method == 'POST':
+        user_id = request.form.get('user_id', '').strip()
+        name = request.form.get('name', '').strip()
+        mobile = request.form.get('mobile', '').strip()
+        email = request.form.get('email', '').strip()
+
+        # Check if any search parameter provided
+        searched = any([user_id, name, mobile, email])
+
+        if searched:
+            cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+            # Base query
+            query = "SELECT * FROM bank_users WHERE 1=1 and role='User'"
+            params = []
+
+            # Apply filters dynamically
+            if user_id:
+                query += " AND user_id LIKE %s"
+                params.append(f"%{user_id}%")
+            if name:
+                query += " AND name LIKE %s"
+                params.append(f"%{name}%")
+            if mobile:
+                query += " AND mobile LIKE %s"
+                params.append(f"%{mobile}%")
+            if email:
+                query += " AND email LIKE %s"
+                params.append(f"%{email}%")
+
+            # Execute query and fetch results
+            cur.execute(query, params)
+            customers = cur.fetchall()
+            cur.close()
+    user_id = session.get('user_id')
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+
+    return render_template('admincust.html', customers=customers, searched=searched,user=user)
+
+
+@app.route('/updateekyc')
+def updateekyc():
+    user_id = session.get('user_id')
+    
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    return render_template('ekyc_update.html',user=user)
+
+
+####---- Team Performance----###
+ 
+ # ==================== BEGIN: Team Performance (robust city filter) ====================
+from flask import render_template, request, jsonify, session, redirect, url_for, flash
+from MySQLdb.cursors import DictCursor
+ 
+# ---------- Helpers ----------
+def _get_logged_in_user(mysql):
+    email = session.get('user_email')
+    if not email:
+        return None
+    cur = mysql.connection.cursor(DictCursor)
+    try:
+        cur.execute("SELECT * FROM bank_users WHERE email=%s", (email,))
+        return cur.fetchone()
+    finally:
+        cur.close()
+ 
+def _get_all_cities(mysql):
+    cur = mysql.connection.cursor(DictCursor)
+    try:
+        cur.execute("""
+            SELECT DISTINCT TRIM(city) AS city
+            FROM bank_users
+            WHERE city IS NOT NULL AND TRIM(city) <> ''
+            ORDER BY city
+        """)
+        rows = cur.fetchall()
+        return [r['city'] for r in rows if r.get('city')]
+    finally:
+        cur.close()
+ 
+# ---------- Page Route ----------
+@app.route('/team_performance')
+def team_performance():
+    """
+    Fully dynamic page. 'Bank Users' are bank_users with role='user'.
+    """
+    user = _get_logged_in_user(mysql)
+    if not user:
+        flash('Please login first', 'danger')
+        return redirect(url_for('login'))
+ 
+    sel_city = request.args.get('city', 'All')
+ 
+    # Cities dropdown
+    try:
+        db_cities = _get_all_cities(mysql)
+    except Exception as e:
+        print("City fetch error:", e)
+        db_cities = []
+    cities = ['All'] + db_cities if db_cities else ['All']
+ 
+    # --- local counters (TRIM() on both sides) ---
+    def _count_role(role, city):
+        c = mysql.connection.cursor(DictCursor)
+        try:
+            c.execute("""
+                SELECT COUNT(*) AS c
+                FROM bank_users
+                WHERE role=%s
+                  AND (TRIM(%s)='All' OR TRIM(city)=TRIM(%s))
+            """, (role, city, city))
+            return c.fetchone()['c']
+        finally:
+            c.close()
+ 
+    managers      = _count_role('manager', sel_city)
+    underwriters  = _count_role('underwriter', sel_city)
+    auditors      = _count_role('auditor', sel_city)
+    agents        = _count_role('agent', sel_city)
+    customers     = _count_role('user', sel_city)   # <= role='user'
+ 
+    # Composition for stacked chart/table (staff roles only)
+    comp = []
+    cur = mysql.connection.cursor(DictCursor)
+    try:
+        if sel_city == 'All':
+            cur.execute("""
+                SELECT TRIM(city) AS city,
+                       SUM(role='manager')     AS managers,
+                       SUM(role='underwriter') AS underwriters,
+                       SUM(role='auditor')     AS auditors,
+                       SUM(role='agent')       AS agents
+                FROM bank_users
+                WHERE city IS NOT NULL AND TRIM(city) <> ''
+                GROUP BY TRIM(city)
+                ORDER BY (managers+underwriters+auditors+agents) DESC
+                LIMIT 12
+            """)
+            comp = cur.fetchall()
+        else:
+            cur.execute("""
+                SELECT TRIM(%s) AS city,
+                       SUM(role='manager')     AS managers,
+                       SUM(role='underwriter') AS underwriters,
+                       SUM(role='auditor')     AS auditors,
+                       SUM(role='agent')       AS agents
+                FROM bank_users
+                WHERE TRIM(city)=TRIM(%s)
+            """, (sel_city, sel_city))
+            row = cur.fetchone() or {}
+            comp = [{
+                'city': sel_city,
+                'managers': row.get('managers', 0) if row else 0,
+                'underwriters': row.get('underwriters', 0) if row else 0,
+                'auditors': row.get('auditors', 0) if row else 0,
+                'agents': row.get('agents', 0) if row else 0
+            }]
+    finally:
+        cur.close()
+ 
+    return render_template(
+        'team_performance.html',
+        user=user,
+        cities=cities,
+        sel_city=sel_city,
+        managers=managers,
+        underwriters=underwriters,
+        auditors=auditors,
+        agents=agents,
+        customers=customers,
+        comp=comp
+    )
+ 
+# ---------- Unified API (KPIs + composition) ----------
+@app.route('/api/team_performance_data')
+def api_team_performance_data():
+    sel_city = request.args.get('city', 'All')
+ 
+    def _count_role(role, city):
+        cur = mysql.connection.cursor(DictCursor)
+        try:
+            cur.execute("""
+                SELECT COUNT(*) AS c
+                FROM bank_users
+                WHERE role=%s
+                  AND (TRIM(%s)='All' OR TRIM(city)=TRIM(%s))
+            """, (role, city, city))
+            return cur.fetchone()['c']
+        finally:
+            cur.close()
+ 
+    data = {
+        'city': sel_city,
+        'kpi': {
+            'managers':     _count_role('manager', sel_city),
+            'underwriters': _count_role('underwriter', sel_city),
+            'auditors':     _count_role('auditor', sel_city),
+            'agents':       _count_role('agent', sel_city),
+            'customers':    _count_role('user', sel_city),  # <= role='user'
+        }
+    }
+ 
+    cur = mysql.connection.cursor(DictCursor)
+    try:
+        if sel_city == 'All':
+            cur.execute("""
+                SELECT TRIM(city) AS city,
+                       SUM(role='manager')     AS managers,
+                       SUM(role='underwriter') AS underwriters,
+                       SUM(role='auditor')     AS auditors,
+                       SUM(role='agent')       AS agents
+                FROM bank_users
+                WHERE city IS NOT NULL AND TRIM(city) <> ''
+                GROUP BY TRIM(city)
+                ORDER BY (managers+underwriters+auditors+agents) DESC
+                LIMIT 12
+            """)
+            comp = cur.fetchall()
+        else:
+            cur.execute("""
+                SELECT TRIM(%s) AS city,
+                       SUM(role='manager')     AS managers,
+                       SUM(role='underwriter') AS underwriters,
+                       SUM(role='auditor')     AS auditors,
+                       SUM(role='agent')       AS agents
+                FROM bank_users
+                WHERE TRIM(city)=TRIM(%s)
+            """, (sel_city, sel_city))
+            row = cur.fetchone() or {}
+            comp = [{
+                'city': sel_city,
+                'managers': row.get('managers', 0) if row else 0,
+                'underwriters': row.get('underwriters', 0) if row else 0,
+                'auditors': row.get('auditors', 0) if row else 0,
+                'agents': row.get('agents', 0) if row else 0
+            }]
+    finally:
+        cur.close()
+ 
+    data['composition'] = comp
+    return jsonify({'ok': True, 'data': data})
+# ===================== END: Team Performance (robust city filter) ====================
+ 
    
 if __name__ == '__main__':
     app.run(debug=True)

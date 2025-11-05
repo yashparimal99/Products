@@ -17,7 +17,7 @@
       box-shadow:0 4px 10px rgba(0,0,0,0.1);
     }
     .btn-custom {
-      background:#97144D;
+      background:#0B4D83;
       color:#fff;
       padding:6px 16px;       /* Compact padding */
       font-size:0.9rem;       /* Smaller font */
@@ -25,8 +25,8 @@
     }
     .btn-custom:hover {
       background:#fff;
-      color:#97144D;
-      border:1px solid #97144D;
+      color:#0B4D83;
+      border:1px solid #0B4D83;
     }
     .btn-secondary {
       padding:6px 16px;
@@ -75,7 +75,7 @@
  
     #sidebarMenu .nav-link.active {
       font-weight: 700;
-      color: #97144D !important;
+      color: #0B4D83 !important;
       background-color: #f0d7e0;
       border-radius: 4px;
     }
@@ -99,12 +99,12 @@
  
     .top-bar button.btn-outline-light:hover {
       background-color: white;
-      color: #97144D;
+      color: #0B4D83;
     }
  
     /* Top Bar */
     .top-bar {
-      background-color: #97144D;
+      background-color: #0B4D83;
       color: white;
       display: flex;
       align-items: center;
@@ -138,7 +138,7 @@
  
     .logout-btn:hover {
       background-color: white;
-      color: #97144D;
+      color: #0B4D83;
     }
  
     /* Search Bar Row with Sidebar Toggle & Chatbot */
@@ -169,8 +169,8 @@
     }
  
     .search-chatbar .btn-toggle-sidebar:hover {
-      border-color: #97144D;
-      color: #97144D;
+      border-color: #0B4D83;
+      color: #0B4D83;
     }
  
     /* Search input centered and wide */
@@ -188,13 +188,13 @@
     }
  
     .search-chatbar input[type="text"]:focus {
-      border-color: #97144D;
+      border-color: #0B4D83;
       box-shadow: 0 0 5px rgba(151, 20, 77, 0.5);
     }
  
     /* Chatbot button right aligned */
     .search-chatbar .chatbot-btn {
-      background-color: #97144D;
+      background-color: #0B4D83;
       border: none;
       color: white;
       padding: 10px 14px;
@@ -233,7 +233,7 @@
  
     .dashboard-icon {
       font-size: 32px;
-      color: #97144D;
+      color: #0B4D83;
       margin-bottom: 15px;
     }
  
@@ -250,7 +250,7 @@
     }
  
     .btn-digibank {
-      background-color: #97144D;
+      background-color: #0B4D83;
       color: #fff;
       border: none;
       padding: 8px 18px;
@@ -266,7 +266,7 @@
  
     /* Footer */
     footer.bg-custom {
-      background-color: #97144D;
+      background-color: #0B4D83;
     }
   </style>
 </head>
@@ -339,7 +339,7 @@
     </button>
  
     <!-- title wrapper with flex-grow to take center space -->
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #97144D !important; width: 100%;">
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0B4D83 !important; width: 100%;">
       <div class="container-fluid">
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -433,15 +433,15 @@
  
   <nav aria-label="breadcrumb" style="background-color:#f8f9fa; padding:8px 15px; border-radius:4px; margin:10px 20px;">
     <ol class="breadcrumb mb-0">
-      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#97144D;">Home</a></li>
-      <li class="breadcrumb-item"><a href="{{ url_for('userdashinvest') }}" style="color:#97144D;">Investment</a></li>
-      <li class="breadcrumb-item active" aria-current="page" style="color:#97144D; font-weight:bold;"> Investment form
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#0B4D83;">Home</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('userdashinvest') }}" style="color:#0B4D83;">Investment</a></li>
+      <li class="breadcrumb-item active" aria-current="page" style="color:#0B4D83; font-weight:bold;"> Investment form
       </li>
     </ol>
   </nav>
  
   <div class="form-container">
-    <h3 class="mb-4 text-center" style="color:#97144D;">Investment Application Form</h3>
+    <h3 class="mb-4 text-center" style="color:#0B4D83;">Investment Application Form</h3>
  
     <!-- Flash messages -->
     {% with msgs = get_flashed_messages(with_categories=true) %}
@@ -502,5 +502,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+ 
+ 
  
  

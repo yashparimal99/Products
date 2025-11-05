@@ -1,1043 +1,456 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Reports & Analytics - DigiBank</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <meta charset="UTF-8" />
+  <title>Report & Analytics — DigiBank</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+ 
+  <!-- Bootstrap + Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+ 
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+ 
   <style>
-    body {
-      background-color: #f8f9fa;
-      font-family: 'Segoe UI', sans-serif;
-      padding: 20px 0 0 0;
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
+    :root{
+      --brand:#97144D;      /* HDFC-ish maroon you use */
+      --brand-2:#0B4D83;    /* Deep blue you use */
+      --bg:#f4f6f9;
+      --card:#ffffff;
+      --ink:#212529;
+      --muted:#6c757d;
+      --ok:#22c55e;         /* Approved */
+      --pend:#f59e0b;       /* Pending  */
     }
-
-    #sidebarMenu.offcanvas-start { width: 250px; }
-    #sidebarMenu .offcanvas-body { padding: 0.5rem 1rem; }
-    #sidebarMenu .nav-link {
-      font-size: 0.9rem;
-      padding: 8px 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #333;
-      transition: color 0.3s;
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg:#0e1116;
+        --card:#151a21;
+        --ink:#f1f5f9;
+        --muted:#9aa4b2;
+      }
+      .form-select, .btn-outline-light { color:#e6eef7; }
     }
-    #sidebarMenu .nav-link i { font-size: 1.1rem; }
-    #sidebarMenu .nav-link.active {
-      font-weight: 700;
-      color: #97144D !important;
-      background-color: #f0d7e0;
-      border-radius: 4px;
+    html,body{ height:100%; }
+    body{
+      background: radial-gradient(1200px 600px at 10% -10%, rgba(151,20,77,0.08), transparent 60%),
+                  radial-gradient(900px 500px at 100% 0%, rgba(11,77,131,0.08), transparent 60%),
+                  var(--bg);
+      font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+      color:var(--ink);
+      display:flex; flex-direction:column;
+      min-height:100vh;
     }
-    #sidebarMenu .nav-link:hover {
-      color: #7a0f3e;
-      background-color: #f9e5ef;
-      border-radius: 4px;
+ 
+    /* Top bar */
+    .top-bar{
+      background:linear-gradient(90deg, var(--brand), var(--brand-2));
+      color:#fff; padding:.75rem 1rem; position:sticky; top:0; z-index:1030;
+      box-shadow:0 4px 20px rgba(0,0,0,.15);
     }
-
-    .top-bar button.btn-outline-light {
-      border: 1.5px solid white;
-      color: white;
-      background: transparent;
-      padding: 4px 10px;
-      font-size: 1.3rem;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.2s, color 0.2s;
+    .logout-btn{
+      background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.35);
+      color:#fff; padding:6px 14px; border-radius:100px; font-weight:600;
+      backdrop-filter: blur(6px);
     }
-    .top-bar button.btn-outline-light:hover {
-      background-color: white;
-      color: #97144D;
+    .logout-btn:hover{ background:#fff; color:var(--brand); }
+ 
+    /* Cards */
+    .glass-card{
+      background:linear-gradient(180deg, rgba(255,255,255,.65), rgba(255,255,255,.90)) ;
+      backdrop-filter: blur(6px);
+      border-radius:18px; border:1px solid rgba(0,0,0,.06);
+      box-shadow:0 10px 30px rgba(0,0,0,.08);
+      overflow:hidden;
     }
-
-    .top-bar {
-      background-color: #97144D;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 20px;
-      user-select: none;
-      position: sticky;
-      top: 0;
-      z-index: 1030;
+    @media (prefers-color-scheme: dark){
+      .glass-card{
+        background:linear-gradient(180deg, rgba(21,26,33,.7), rgba(21,26,33,.95));
+        border-color:rgba(255,255,255,.06);
+      }
     }
-    .top-bar h5 {
-      margin: 0;
-      font-weight: 700;
-      flex-grow: 1;
-      text-align: center;
-      color: white;
+    .card-head{
+      background:linear-gradient(90deg, rgba(151,20,77,.95), rgba(11,77,131,.95));
+      color:#fff; padding:.8rem 1rem;
+      display:flex; align-items:center; justify-content:space-between;
     }
-    .logout-btn {
-      background: transparent;
-      border: 1.5px solid white;
-      color: white;
-      padding: 5px 15px;
-      border-radius: 4px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.2s, color 0.2s;
-      flex-shrink: 0;
+    .badge-soft{
+      background: rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+      color:#fff; border-radius:999px; padding:.25rem .6rem; font-size:.78rem;
     }
-    .logout-btn:hover {
-      background-color: white;
-      color: #97144D;
+    .chart-wrap{ height:380px; padding:16px; background:transparent; }
+ 
+    /* Controls row */
+    .toolbar{
+      background:var(--card);
+      border:1px solid rgba(0,0,0,.06);
+      border-radius:14px;
+      box-shadow:0 8px 24px rgba(0,0,0,.06);
+      padding:12px; margin-top:14px;
     }
-
-    .search-chatbar {
-      max-width: 900px;
-      margin: 15px auto 40px auto;
-      padding: 0 15px;
-      display: flex;
-      align-items: center;
-      gap: 15px;
+ 
+    /* Skeleton loader */
+    .skeleton{
+      position:relative; overflow:hidden; border-radius:12px; height:360px; background:linear-gradient(90deg, rgba(0,0,0,.06), rgba(0,0,0,.03), rgba(0,0,0,.06));
     }
-    .search-chatbar input[type="text"] {
-      flex-grow: 1;
-      padding: 10px 14px;
-      border-radius: 5px;
-      border: 1.5px solid #ccc;
-      font-size: 1rem;
-      outline-offset: 0;
-      transition: border-color 0.3s;
-      width: 9000px; 
-      margin: 0 auto;
-      display: block;
+    .skeleton::after{
+      content:""; position:absolute; inset:0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+      transform: translateX(-100%);
+      animation: shimmer 1.4s infinite;
     }
-    .search-chatbar input[type="text"]:focus {
-      border-color: #97144D;
-      box-shadow: 0 0 5px rgba(151, 20, 77, 0.5);
-    }
-    .search-chatbar .chatbot-btn {
-      background-color: #97144D;
-      border: none;
-      color: white;
-      padding: 10px 14px;
-      border-radius: 5px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background-color 0.3s ease;
-      font-size: 1.3rem;
-      flex-shrink: 0;
-    }
-    .search-chatbar .chatbot-btn:hover {
-      background-color: #7a0f3e;
-    }
-
-    /* Reports Specific Styles */
-    .report-card {
-      transition: 0.3s;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
-      margin-bottom: 20px;
-    }
-    .report-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
-    }
-    .report-card-header {
-      background-color: #97144D;
-      color: white;
-      border-radius: 8px 8px 0 0 !important;
-      padding: 15px 20px;
-    }
-    .chart-container {
-      height: 250px;
-      position: relative;
-    }
-    .kpi-card {
-      border-radius: 8px;
-      padding: 15px;
-      background-color: white;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      margin-bottom: 15px;
-    }
-    .kpi-value {
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: #97144D;
-    }
-    .report-badge {
-      padding: 5px 10px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 500;
-    }
-
-    footer.bg-custom {
-      background-color: #97144D;
-      color: white;
-      text-align: center;
-      padding: 15px 0;
-      margin-top: auto;
-    }
-    
-    /* Time period selector */
-    .btn-period {
-      border: 1px solid #dee2e6;
-    }
-    .btn-period.active {
-      background-color: #97144D;
-      color: white;
-      border-color: #97144D;
-    }
-   .btn-primary {
-      border: 1px solid #dee2e6;
-    }
-    .btn-primary {
-      background-color: #97144D;
-      
-    } 
-    .btn-outline-primary {
-      border: 1px solid #dee2e6;
-    }
-    .btn-outline-primary {
-      background-color: #97144D;
-      color: white;
-      border-color: #97144D;
-    }
-    .btn-outline-primary active {
-      background-color: #97144D;
-      color: white;
-      border-color: #97144D;
-    }
-    /* Toast notification */
-    .toast-container {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 9999;
+    @keyframes shimmer{ 100%{ transform: translateX(100%);} }
+ 
+    /* Button pills */
+    .btn-pill{ border-radius:999px; }
+ 
+    footer{
+      background:linear-gradient(90deg, var(--brand), var(--brand-2)); color:#fff; margin-top:auto;
     }
   </style>
 </head>
 <body>
-  <!-- Toast notification container -->
-  <div class="toast-container"></div>
-
-  <!-- Sidebar Offcanvas -->
+ 
+  <!-- Top Bar -->
+  <div class="top-bar d-flex align-items-center">
+    <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
+      <i class="bi bi-list"></i>
+    </button>
+    <h5 class="me-auto mb-0"><i class="bi bi-graph-up-arrow me-2"></i> Report & Analytics</h5>
+    <a class="logout-btn ms-3" href="{{ url_for('logout') }}">Logout</a>
+  </div>
+ 
+  <!-- Sidebar -->
   <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
     <div class="offcanvas-header">
       <h5 class="offcanvas-title" id="sidebarMenuLabel">Manager</h5>
-      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      <button class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
     </div>
     <div class="offcanvas-body">
       <ul class="nav flex-column">
         <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="{{ url_for('dashboard') }}">
-            <i class="bi bi-speedometer2 me-2"></i> Dashboard
-          </a>
+          <a class="nav-link text-dark" href="{{ url_for('branchperformance') }}"><i class="bi bi-building me-2"></i> Branch Performance</a>
         </li>
         <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="{{ url_for('manage_accounts') }}">
-            <i class="bi bi-people-fill me-2"></i> Manage Accounts
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="{{ url_for('managerapprovals') }}">
-            <i class="bi bi-file-earmark-check me-2"></i> Manage Approvals
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="{{ url_for('transactions_review') }}">
-            <i class="bi bi-list-check me-2"></i> Transaction Review
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark active" href="{{ url_for('manreport') }}">
-            <i class="bi bi-graph-up me-2"></i> Reports & Analytics
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="{{ url_for('manstaff') }}">
-            <i class="bi bi-person-badge me-2"></i> Staff Management
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="{{ url_for('branchperformance') }}">
-            <i class="bi bi-building me-2"></i> Branch Performance
-          </a>
+          <a class="nav-link text-dark active" href="{{ url_for('manreport') }}"><i class="bi bi-graph-up-arrow me-2"></i> Report & Analytics</a>
         </li>
       </ul>
     </div>
   </div>
-
-  <!-- Top Bar -->
-  <div class="top-bar d-flex align-items-center">
-  <button class="btn btn-outline-light btn-sm me-3"
-          data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
-          aria-controls="sidebarMenu" aria-label="Toggle sidebar">
-    <i class="bi bi-list"></i>
-  </button>
-
-  <h5 class="me-auto mb-0">DigiBank Manager Dashboard</h5>
-
-  <div class="d-flex align-items-center">
-    <p class="navbar-text text-white mb-0">
-      Welcome, <strong>{{ user.name }}</strong>
-    </p>
+ 
+  <!-- Controls -->
+  <div class="container">
+    <div class="toolbar d-flex flex-wrap gap-2 align-items-center">
+      <div class="d-flex align-items-center gap-2">
+        <span class="text-muted small">City</span>
+        <select id="citySelect" class="form-select form-select-sm" style="min-width:220px">
+          <option value="">All Cities</option>
+        </select>
+      </div>
+ 
+      <div class="ms-auto d-flex gap-2">
+        <button id="refreshBtn" class="btn btn-primary btn-sm btn-pill">
+          <i class="bi bi-arrow-repeat me-1"></i> Refresh
+        </button>
+        <button id="exportAllPng" class="btn btn-outline-primary btn-sm btn-pill">
+          <i class="bi bi-image me-1"></i> Download Charts
+        </button>
+      </div>
+    </div>
   </div>
-
-  <!-- Ensuring contrast with .text-white -->
-  <a href="{{ url_for('logout') }}" class="logout-btn ms-3">
-    Logout
-  </a>
-</div>
-
-  <!-- Search Bar and Chatbot with Sidebar Toggle -->
-  <div class="search-chatbar">
-    <input type="text" placeholder="Search reports..." aria-label="Search" id="reportSearchInput" />
-    <button class="chatbot-btn" aria-label="Chatbot">
-      <i class="bi bi-chat-dots-fill"></i>
-    </button>
-  </div>
-
-  <!-- Main Content -->
-  <div class="container my-4 flex-grow-1">
-    <!-- Time Period Selector -->
-    <div class="card report-card mb-4">
-      <div class="card-body">
-        <div class="row align-items-center">
-          <div class="col-md-3">
-            <h6 class="mb-0">Report Period</h6>
-          </div>
-          <div class="col-md-6">
-            <div class="btn-group w-100" id="periodSelector">
-              <button class="btn btn-period active" data-period="today">Today</button>
-              <button class="btn btn-period" data-period="week">Week</button>
-              <button class="btn btn-period" data-period="month">Month</button>
-              <button class="btn btn-period" data-period="quarter">Quarter</button>
-              <button class="btn btn-period" data-period="year">Year</button>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <button class="btn btn-primary w-100" id="exportReportBtn">
-              <i class="bi bi-download me-1"></i> Export
-            </button>
+ 
+  <!-- Charts -->
+  <div class="container my-3">
+    <div class="row g-4">
+      <!-- Accounts -->
+      <div class="col-12 glass-card">
+        <div class="card-head">
+          <div><i class="bi bi-person-lines-fill me-2"></i> <strong>Accounts</strong> — Approved vs Pending</div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge-soft"><i class="bi bi-check2-circle me-1"></i> Approved</span>
+            <span class="badge-soft"><i class="bi bi-hourglass-split me-1"></i> Pending</span>
+            <button class="btn btn-light btn-sm btn-pill" data-dl="barAccounts"><i class="bi bi-download"></i></button>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Key Metrics -->
-    <div class="row mb-4">
-      <div class="col-md-3">
-        <div class="kpi-card">
-          <h6 class="text-muted">New Accounts</h6>
-          <div class="kpi-value">142</div>
-          <div class="text-success">+12% from last month</div>
+        <div class="chart-wrap">
+          <div class="skeleton" id="sk-acc"></div>
+          <canvas id="barAccounts" class="d-none"></canvas>
         </div>
       </div>
-      <div class="col-md-3">
-        <div class="kpi-card">
-          <h6 class="text-muted">Total Deposits</h6>
-          <div class="kpi-value">₹8.2M</div>
-          <div class="text-success">+5.4% from last month</div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="kpi-card">
-          <h6 class="text-muted">Loan Disbursed</h6>
-          <div class="kpi-value">₹3.5M</div>
-          <div class="text-danger">-2.1% from last month</div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="kpi-card">
-          <h6 class="text-muted">Transactions</h6>
-          <div class="kpi-value">1,245</div>
-          <div class="text-success">+8.7% from last month</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Main Charts -->
-    <div class="row mb-4">
-      <div class="col-md-8">
-        <div class="card report-card h-100">
-          <div class="report-card-header">
-            <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i> Branch Performance</h5>
-          </div>
-          <div class="card-body">
-            <div class="chart-container">
-              <canvas id="branchPerformanceChart"></canvas>
-            </div>
+ 
+      <!-- Deposits -->
+      <div class="col-12 glass-card">
+        <div class="card-head">
+          <div><i class="bi bi-piggy-bank me-2"></i> <strong>Deposits</strong> — Approved vs Pending</div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge-soft"><i class="bi bi-check2-circle me-1"></i> Approved</span>
+            <span class="badge-soft"><i class="bi bi-hourglass-split me-1"></i> Pending</span>
+            <button class="btn btn-light btn-sm btn-pill" data-dl="barDeposits"><i class="bi bi-download"></i></button>
           </div>
         </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card report-card h-100">
-          <div class="report-card-header">
-            <h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i> Account Distribution</h5>
-          </div>
-          <div class="card-body">
-            <div class="chart-container">
-              <canvas id="accountDistributionChart"></canvas>
-            </div>
-          </div>
+        <div class="chart-wrap">
+          <div class="skeleton" id="sk-dep"></div>
+          <canvas id="barDeposits" class="d-none"></canvas>
         </div>
       </div>
-    </div>
-
-    <!-- Secondary Charts -->
-    <div class="row mb-4">
-      <div class="col-md-6">
-        <div class="card report-card h-100">
-          <div class="report-card-header">
-            <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i> Transaction Volume</h5>
-          </div>
-          <div class="card-body">
-            <div class="chart-container">
-              <canvas id="transactionVolumeChart"></canvas>
-            </div>
+ 
+      <!-- Loans -->
+      <div class="col-12 glass-card">
+        <div class="card-head">
+          <div><i class="bi bi-house-door me-2"></i> <strong>Loans</strong> — Approved vs Pending</div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge-soft"><i class="bi bi-check2-circle me-1"></i> Approved</span>
+            <span class="badge-soft"><i class="bi bi-hourglass-split me-1"></i> Pending</span>
+            <button class="btn btn-light btn-sm btn-pill" data-dl="barLoans"><i class="bi bi-download"></i></button>
           </div>
         </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card report-card h-100">
-          <div class="report-card-header">
-            <h5 class="mb-0"><i class="bi bi-people me-2"></i> Customer Demographics</h5>
-          </div>
-          <div class="card-body">
-            <div class="chart-container">
-              <canvas id="customerDemographicsChart"></canvas>
-            </div>
-          </div>
+        <div class="chart-wrap">
+          <div class="skeleton" id="sk-loan"></div>
+          <canvas id="barLoans" class="d-none"></canvas>
         </div>
       </div>
-    </div>
-
-    <!-- Additional Charts -->
-    <div class="row mb-4">
-      <div class="col-md-6">
-        <div class="card report-card h-100">
-          <div class="report-card-header">
-            <h5 class="mb-0"><i class="bi bi-cash-coin me-2"></i> Revenue Sources</h5>
-          </div>
-          <div class="card-body">
-            <div class="chart-container">
-              <canvas id="revenueSourcesChart"></canvas>
-            </div>
+ 
+      <!-- Cards -->
+      <div class="col-12 glass-card">
+        <div class="card-head">
+          <div><i class="bi bi-credit-card-2-front me-2"></i> <strong>Cards</strong> — Approved vs Pending</div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge-soft"><i class="bi bi-check2-circle me-1"></i> Approved</span>
+            <span class="badge-soft"><i class="bi bi-hourglass-split me-1"></i> Pending</span>
+            <button class="btn btn-light btn-sm btn-pill" data-dl="barCards"><i class="bi bi-download"></i></button>
           </div>
         </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card report-card h-100">
-          <div class="report-card-header">
-            <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i> Customer Activity Timeline</h5>
-          </div>
-          <div class="card-body">
-            <div class="chart-container">
-              <canvas id="customerActivityChart"></canvas>
-            </div>
-          </div>
+        <div class="chart-wrap">
+          <div class="skeleton" id="sk-card"></div>
+          <canvas id="barCards" class="d-none"></canvas>
         </div>
       </div>
-    </div>
-
-    <!-- Report Generator -->
-    <div class="card report-card mb-4">
-      <div class="report-card-header">
-        <h5 class="mb-0"><i class="bi bi-file-earmark-text me-2"></i> Custom Report Generator</h5>
-      </div>
-      <div class="card-body">
-        <form id="reportGeneratorForm">
-          <div class="row g-3">
-            <div class="col-md-4">
-              <label class="form-label">Report Type</label>
-              <select class="form-select" id="reportType">
-                <option>Financial Summary</option>
-                <option>Customer Activity</option>
-                <option>Transaction Analysis</option>
-                <option>Risk Assessment</option>
-              </select>
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">Date Range</label>
-              <div class="input-group">
-                <input type="date" class="form-control" id="startDate">
-                <span class="input-group-text">to</span>
-                <input type="date" class="form-control" id="endDate">
-              </div>
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">Group By</label>
-              <select class="form-select" id="groupBy">
-                <option>Daily</option>
-                <option>Weekly</option>
-                <option>Monthly</option>
-                <option>Quarterly</option>
-              </select>
-            </div>
+ 
+      <!-- Investments -->
+      <div class="col-12 glass-card">
+        <div class="card-head">
+          <div><i class="bi bi-cash-coin me-2"></i> <strong>Investments</strong> — Approved vs Pending</div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge-soft"><i class="bi bi-check2-circle me-1"></i> Approved</span>
+            <span class="badge-soft"><i class="bi bi-hourglass-split me-1"></i> Pending</span>
+            <button class="btn btn-light btn-sm btn-pill" data-dl="barInvestments"><i class="bi bi-download"></i></button>
           </div>
-          <div class="row g-3 mt-2">
-            <div class="col-md-6">
-              <label class="form-label">Filters</label>
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="includeSavings" checked>
-                <label class="form-check-label" for="includeSavings">Include Savings Accounts</label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="includeCurrent" checked>
-                <label class="form-check-label" for="includeCurrent">Include Current Accounts</label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="includeLoans" checked>
-                <label class="form-check-label" for="includeLoans">Include Loan Accounts</label>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Output Format</label>
-              <div class="btn-group w-100" id="formatSelector">
-                <button type="button" class="btn btn-outline-primary" data-format="pdf">PDF</button>
-                <button type="button" class="btn btn-outline-primary active" data-format="excel">Excel</button>
-                <button type="button" class="btn btn-outline-primary" data-format="csv">CSV</button>
-              </div>
-            </div>
-          </div>
-          <div class="d-grid gap-2 mt-3">
-            <button type="button" class="btn btn-primary" id="generateReportBtn">Generate Report</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Saved Reports -->
-    <div class="card report-card">
-      <div class="report-card-header">
-        <h5 class="mb-0"><i class="bi bi-collection me-2"></i> Saved Reports</h5>
-      </div>
-      <div class="card-body">
-        <div class="table-responsive">
-          <table class="table table-hover" id="savedReportsTable">
-            <thead>
-              <tr>
-                <th>Report Name</th>
-                <th>Type</th>
-                <th>Last Generated</th>
-                <th>Schedule</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr data-report-id="1">
-                <td>Monthly Financial Summary</td>
-                <td>Financial</td>
-                <td>May 1, 2023</td>
-                <td>Monthly (1st)</td>
-                <td>
-                  <button class="btn btn-sm btn-outline-primary me-1 run-report-btn">Run</button>
-                  <button class="btn btn-sm btn-outline-secondary me-1 edit-report-btn">Edit</button>
-                  <button class="btn btn-sm btn-outline-danger delete-report-btn">Delete</button>
-                </td>
-              </tr>
-              <tr data-report-id="2">
-                <td>Weekly Transaction Report</td>
-                <td>Transaction</td>
-                <td>Today, 9:00 AM</td>
-                <td>Weekly (Monday)</td>
-                <td>
-                  <button class="btn btn-sm btn-outline-primary me-1 run-report-btn">Run</button>
-                  <button class="btn btn-sm btn-outline-secondary me-1 edit-report-btn">Edit</button>
-                  <button class="btn btn-sm btn-outline-danger delete-report-btn">Delete</button>
-                </td>
-              </tr>
-              <tr data-report-id="3">
-                <td>Customer Acquisition Q2</td>
-                <td>Customer</td>
-                <td>Apr 1, 2023</td>
-                <td>Quarterly</td>
-                <td>
-                  <button class="btn btn-sm btn-outline-primary me-1 run-report-btn">Run</button>
-                  <button class="btn btn-sm btn-outline-secondary me-1 edit-report-btn">Edit</button>
-                  <button class="btn btn-sm btn-outline-danger delete-report-btn">Delete</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        </div>
+        <div class="chart-wrap">
+          <div class="skeleton" id="sk-inv"></div>
+          <canvas id="barInvestments" class="d-none"></canvas>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- Footer -->
-  <footer class="bg-custom text-white text-center py-3 mt-auto">
-    © 2025 DigiBank. Manager Dashboard. All rights reserved.
+ 
+  <footer class="py-3 text-center">
+    © 2025 DigiBank. All rights reserved.
   </footer>
-
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+ 
+  <!-- Toast -->
+  <div class="toast-container position-fixed top-0 end-0 p-3"></div>
+ 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Chart instances
-    let charts = {};
-    
-    // Sample data for reports
-    const sampleReportData = {
-      'Monthly Financial Summary': [
-        ['Month', 'Revenue', 'Expenses', 'Profit'],
-        ['January', 150000, 120000, 30000],
-        ['February', 160000, 125000, 35000],
-        ['March', 170000, 130000, 40000],
-        ['April', 180000, 135000, 45000],
-        ['May', 190000, 140000, 50000]
-      ],
-      'Weekly Transaction Report': [
-        ['Week', 'Transactions', 'Amount', 'Avg. Transaction'],
-        ['Week 1', 1245, 8200000, 6586],
-        ['Week 2', 1320, 8700000, 6591],
-        ['Week 3', 1280, 8400000, 6563],
-        ['Week 4', 1400, 9200000, 6571]
-      ],
-      'Customer Acquisition Q2': [
-        ['Channel', 'New Customers', 'Cost per Acquisition', 'Conversion Rate'],
-        ['Online', 450, 1200, '3.2%'],
-        ['Branch', 320, 1800, '4.8%'],
-        ['Referral', 180, 800, '5.6%'],
-        ['Partnership', 210, 1500, '2.9%']
-      ]
+    const charts = {};
+    const loaders = {
+      acc: ['sk-acc','barAccounts'],
+      dep: ['sk-dep','barDeposits'],
+      loan:['sk-loan','barLoans'],
+      card:['sk-card','barCards'],
+      inv: ['sk-inv','barInvestments']
     };
-    
-    // Initialize charts
-    document.addEventListener('DOMContentLoaded', function() {
-      // Set default dates for report generator
-      const today = new Date();
-      const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-      
-      document.getElementById('startDate').valueAsDate = firstDayOfMonth;
-      document.getElementById('endDate').valueAsDate = today;
-      
-      // Initialize all charts
+ 
+    function showToast(msg, type='info'){
+      const box=document.querySelector('.toast-container');
+      const t=document.createElement('div');
+      t.className=`toast text-bg-${type==='success'?'success':type==='warning'?'warning':type==='danger'?'danger':'info'} border-0`;
+      t.setAttribute('role','alert'); t.setAttribute('aria-live','assertive'); t.setAttribute('aria-atomic','true');
+      t.innerHTML=`<div class="d-flex"><div class="toast-body">${msg}</div><button class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>`;
+      box.appendChild(t);
+      const bs=new bootstrap.Toast(t,{autohide:true,delay:2200}); bs.show();
+      t.addEventListener('hidden.bs.toast',()=>t.remove());
+    }
+ 
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadCities();
       initCharts();
-      
-      // Add event listeners
-      document.querySelectorAll('#periodSelector .btn-period').forEach(btn => {
-        btn.addEventListener('click', function() {
-          document.querySelectorAll('#periodSelector .btn-period').forEach(b => b.classList.remove('active'));
-          this.classList.add('active');
-          updateCharts(this.dataset.period);
-        });
-      });
-      
-      document.getElementById('generateReportBtn').addEventListener('click', function() {
-        generateReport();
-      });
-      
-      document.getElementById('exportReportBtn').addEventListener('click', function() {
-        exportCurrentReport();
-      });
-      
-      document.querySelectorAll('#formatSelector button').forEach(btn => {
-        btn.addEventListener('click', function() {
-          document.querySelectorAll('#formatSelector button').forEach(b => b.classList.remove('active'));
-          this.classList.add('active');
-        });
-      });
-      
-      // Add event listeners for saved reports actions
-      document.querySelectorAll('.run-report-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const reportId = this.closest('tr').dataset.reportId;
-          runSavedReport(reportId);
-        });
-      });
-      
-      document.querySelectorAll('.edit-report-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const reportId = this.closest('tr').dataset.reportId;
-          editSavedReport(reportId);
-        });
-      });
-      
-      document.querySelectorAll('.delete-report-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const reportId = this.closest('tr').dataset.reportId;
-          deleteSavedReport(reportId);
-        });
-      });
+      wireDownloads();
+      await refreshCharts();
+      document.getElementById('refreshBtn').addEventListener('click', refreshCharts);
+      document.getElementById('citySelect').addEventListener('change', refreshCharts);
+      document.getElementById('exportAllPng').addEventListener('click', downloadAllCharts);
     });
-    
-    // Initialize all charts
-    function initCharts() {
-      // Branch Performance Chart
-      const branchCtx = document.getElementById('branchPerformanceChart').getContext('2d');
-      charts.branchPerformance = new Chart(branchCtx, {
-        type: 'bar',
-        data: {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-          datasets: [{
-            label: 'Deposits',
-            data: [12000000, 11000000, 13000000, 12500000, 14000000, 15000000],
-            backgroundColor: 'rgba(151, 20, 77, 0.7)'
-          }, {
-            label: 'Withdrawals',
-            data: [8000000, 8500000, 9000000, 9500000, 10000000, 10500000],
-            backgroundColor: 'rgba(108, 117, 125, 0.7)'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: {
-                callback: function(value) {
-                  return '₹' + (value / 1000000) + 'M';
-                }
-              }
-            }
-          }
-        }
-      });
-
-      // Account Distribution Chart
-      const accountCtx = document.getElementById('accountDistributionChart').getContext('2d');
-      charts.accountDistribution = new Chart(accountCtx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Savings', 'Current', 'Fixed Deposit', 'Loan'],
-          datasets: [{
-            data: [45, 25, 20, 10],
-            backgroundColor: [
-              'rgba(151, 20, 77, 0.7)',
-              'rgba(33, 150, 243, 0.7)',
-              'rgba(255, 193, 7, 0.7)',
-              'rgba(25, 135, 84, 0.7)'
-            ]
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'bottom'
-            }
-          }
-        }
-      });
-
-      // Transaction Volume Chart
-      const transactionCtx = document.getElementById('transactionVolumeChart').getContext('2d');
-      charts.transactionVolume = new Chart(transactionCtx, {
-        type: 'line',
-        data: {
-          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-          datasets: [{
-            label: 'Transactions',
-            data: [1200, 1900, 1500, 2100, 1800, 900, 600],
-            borderColor: 'rgba(151, 20, 77, 1)',
-            backgroundColor: 'rgba(151, 20, 77, 0.1)',
-            tension: 0.3,
-            fill: true
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      });
-
-      // Customer Demographics Chart
-      const demographicsCtx = document.getElementById('customerDemographicsChart').getContext('2d');
-      charts.customerDemographics = new Chart(demographicsCtx, {
-        type: 'bar',
-        data: {
-          labels: ['18-25', '26-35', '36-45', '46-55', '56-65', '65+'],
-          datasets: [{
-            label: 'Number of Customers',
-            data: [120, 450, 380, 280, 180, 150],
-            backgroundColor: 'rgba(151, 20, 77, 0.7)'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      });
-
-      // Revenue Sources Chart
-      const revenueCtx = document.getElementById('revenueSourcesChart').getContext('2d');
-      charts.revenueSources = new Chart(revenueCtx, {
-        type: 'pie',
-        data: {
-          labels: ['Account Fees', 'Loan Interest', 'Transaction Fees', 'Investment Services'],
-          datasets: [{
-            data: [35, 40, 15, 10],
-            backgroundColor: [
-              'rgba(151, 20, 77, 0.7)',
-              'rgba(33, 150, 243, 0.7)',
-              'rgba(255, 193, 7, 0.7)',
-              'rgba(25, 135, 84, 0.7)'
-            ]
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'bottom'
-            }
-          }
-        }
-      });
-
-      // Customer Activity Chart
-      const activityCtx = document.getElementById('customerActivityChart').getContext('2d');
-      charts.customerActivity = new Chart(activityCtx, {
-        type: 'line',
-        data: {
-          labels: ['6 AM', '9 AM', '12 PM', '3 PM', '6 PM', '9 PM'],
-          datasets: [{
-            label: 'Mobile App',
-            data: [120, 450, 600, 550, 700, 400],
-            borderColor: 'rgba(151, 20, 77, 1)',
-            backgroundColor: 'rgba(151, 20, 77, 0.1)',
-            tension: 0.3,
-            fill: true
-          }, {
-            label: 'Online Banking',
-            data: [80, 350, 500, 450, 400, 200],
-            borderColor: 'rgba(33, 150, 243, 1)',
-            backgroundColor: 'rgba(33, 150, 243, 0.1)',
-            tension: 0.3,
-            fill: true
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      });
+ 
+    async function loadCities(){
+      try{
+        const res=await fetch('/api/perf/cities');
+        const cities=await res.json();
+        const sel=document.getElementById('citySelect');
+        (cities||[]).forEach(c=>{
+          const opt=document.createElement('option');
+          opt.value=c; opt.textContent=c; sel.appendChild(opt);
+        });
+      }catch(e){}
     }
-    
-    // Update charts based on selected period
-    function updateCharts(period) {
-      // In a real application, this would fetch new data based on the period
-      // For this example, we'll just simulate with different data
-      
-      const periods = {
-        today: ['6 AM', '9 AM', '12 PM', '3 PM', '6 PM', '9 PM'],
-        week: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        month: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-        quarter: ['Month 1', 'Month 2', 'Month 3'],
-        year: ['Q1', 'Q2', 'Q3', 'Q4']
+ 
+    function activeCity(){ return document.getElementById('citySelect')?.value || ''; }
+ 
+    function initCharts(){
+      // Rounded bar helper
+      const common = {
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{
+          legend:{ position:'bottom' },
+          tooltip:{ enabled:true }
+        },
+        scales:{
+          y:{ beginAtZero:true, ticks:{ precision:0 } },
+          x:{ ticks:{ autoSkip:false } }
+        }
       };
-      
-      const labels = periods[period] || periods.month;
-      
-      // Update transaction volume chart
-      charts.transactionVolume.data.labels = labels;
-      charts.transactionVolume.data.datasets[0].data = Array(labels.length).fill().map(() => Math.floor(Math.random() * 2000) + 500);
-      charts.transactionVolume.update();
-      
-      // Update branch performance chart
-      charts.branchPerformance.data.labels = labels;
-      charts.branchPerformance.data.datasets[0].data = Array(labels.length).fill().map(() => Math.floor(Math.random() * 10000000) + 5000000);
-      charts.branchPerformance.data.datasets[1].data = Array(labels.length).fill().map(() => Math.floor(Math.random() * 8000000) + 3000000);
-      charts.branchPerformance.update();
-      
-      showToast(`Charts updated for ${period} period`, 'success');
-    }
-    
-    // Generate custom report
-    function generateReport() {
-      const reportType = document.getElementById('reportType').value;
-      const startDate = document.getElementById('startDate').value;
-      const endDate = document.getElementById('endDate').value;
-      const groupBy = document.getElementById('groupBy').value;
-      
-      const format = document.querySelector('#formatSelector button.active').dataset.format;
-      
-      // Generate the report data
-      let reportData;
-      if (sampleReportData[reportType]) {
-        reportData = sampleReportData[reportType];
-      } else {
-        // Create generic report data
-        reportData = [
-          ['Period', 'Value 1', 'Value 2', 'Value 3'],
-          ['Q1', 1000, 2000, 1500],
-          ['Q2', 1200, 2200, 1700],
-          ['Q3', 1400, 2400, 1900],
-          ['Q4', 1600, 2600, 2100]
-        ];
-      }
-      
-      // Export based on format
-      if (format === 'excel') {
-        exportToExcel(reportData, `${reportType.replace(/\s+/g, '_')}_${startDate}_to_${endDate}`);
-      } else if (format === 'csv') {
-        exportToCSV(reportData, `${reportType.replace(/\s+/g, '_')}_${startDate}_to_${endDate}`);
-      } else {
-        // PDF would require additional libraries
-        showToast('PDF export would require additional setup', 'info');
-      }
-      
-      showToast(`Generated ${reportType} report from ${startDate} to ${endDate}`, 'success');
-    }
-    
-    // Export current report
-    function exportCurrentReport() {
-      const period = document.querySelector('#periodSelector button.active').dataset.period;
-      
-      // Create report data based on current view
-      const reportData = [
-        ['Metric', 'Value', 'Change'],
-        ['New Accounts', 142, '+12%'],
-        ['Total Deposits', '₹8.2M', '+5.4%'],
-        ['Loan Disbursed', '₹3.5M', '-2.1%'],
-        ['Transactions', 1245, '+8.7%']
-      ];
-      
-      exportToExcel(reportData, `DigiBank_${period}_Report_${formatDate(new Date())}`);
-      showToast(`Exported ${period} report`, 'success');
-    }
-    
-    // Run saved report
-    function runSavedReport(reportId) {
-      const reportRow = document.querySelector(`#savedReportsTable tr[data-report-id="${reportId}"]`);
-      const reportName = reportRow.cells[0].textContent;
-      
-      if (sampleReportData[reportName]) {
-        exportToExcel(sampleReportData[reportName], reportName.replace(/\s+/g, '_'));
-        showToast(`Running report: ${reportName}`, 'success');
-      } else {
-        showToast(`Report data not found for: ${reportName}`, 'warning');
-      }
-    }
-    
-    // Edit saved report
-    function editSavedReport(reportId) {
-      const reportRow = document.querySelector(`#savedReportsTable tr[data-report-id="${reportId}"]`);
-      const reportName = reportRow.cells[0].textContent;
-      
-      // In a real application, this would open a modal for editing
-      showToast(`Editing report: ${reportName}`, 'info');
-      
-      // Simulate opening an edit dialog
-      setTimeout(() => {
-        const newName = prompt('Enter new report name:', reportName);
-        if (newName && newName !== reportName) {
-          reportRow.cells[0].textContent = newName;
-          showToast(`Report renamed to: ${newName}`, 'success');
-        }
-      }, 500);
-    }
-    
-    // Delete saved report
-    function deleteSavedReport(reportId) {
-      const reportRow = document.querySelector(`#savedReportsTable tr[data-report-id="${reportId}"]`);
-      const reportName = reportRow.cells[0].textContent;
-      
-      if (confirm(`Are you sure you want to delete the report "${reportName}"?`)) {
-        reportRow.remove();
-        showToast(`Deleted report: ${reportName}`, 'success');
-      }
-    }
-    
-    // Export to Excel function
-    function exportToExcel(data, filename) {
-      const ws = XLSX.utils.aoa_to_sheet(data);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Report");
-      XLSX.writeFile(wb, `${filename}.xlsx`);
-    }
-    
-    // Export to CSV function
-    function exportToCSV(data, filename) {
-      const csvContent = data.map(row => 
-        row.map(cell => `"${cell}"`).join(',')
-      ).join('\n');
-      
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      const url = URL.createObjectURL(blob);
-      
-      link.setAttribute('href', url);
-      link.setAttribute('download', `${filename}.csv`);
-      link.style.visibility = 'hidden';
-      
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-    
-    // Format date for filename
-    function formatDate(date) {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      return `${year}${month}${day}`;
-    }
-    
-    // Show toast notification
-    function showToast(message, type = 'info') {
-      const toastContainer = document.querySelector('.toast-container');
-      const toastId = 'toast-' + Date.now();
-      
-      const toast = document.createElement('div');
-      toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'warning' ? 'warning' : type === 'error' ? 'danger' : 'info'} border-0`;
-      toast.setAttribute('role', 'alert');
-      toast.setAttribute('aria-live', 'assertive');
-      toast.setAttribute('aria-atomic', 'true');
-      toast.id = toastId;
-      
-      toast.innerHTML = `
-        <div class="d-flex">
-          <div class="toast-body">
-            ${message}
-          </div>
-          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-      `;
-      
-      toastContainer.appendChild(toast);
-      
-      const bsToast = new bootstrap.Toast(toast, {
-        autohide: true,
-        delay: 3000
+ 
+      const dataset = (label,isApproved) => ({
+        label,
+        data:[],
+        borderWidth:0,
+        borderRadius:8,
+        backgroundColor: isApproved
+            ? getApprovedGradient
+            : getPendingGradient,
+        hoverBackgroundColor: isApproved
+            ? 'rgba(34,197,94,.9)'
+            : 'rgba(245,158,11,.9)'
       });
-      
-      bsToast.show();
-      
-      // Remove toast from DOM after it's hidden
-      toast.addEventListener('hidden.bs.toast', function() {
-        toast.remove();
+ 
+      charts.acc = new Chart(document.getElementById('barAccounts'), {
+        type:'bar',
+        data:{ labels:[], datasets:[ dataset('Approved',true), dataset('Pending',false) ] },
+        options: common
+      });
+      charts.dep = new Chart(document.getElementById('barDeposits'), {
+        type:'bar',
+        data:{ labels:[], datasets:[ dataset('Approved',true), dataset('Pending',false) ] },
+        options: common
+      });
+      charts.loan = new Chart(document.getElementById('barLoans'), {
+        type:'bar',
+        data:{ labels:[], datasets:[ dataset('Approved',true), dataset('Pending',false) ] },
+        options: common
+      });
+      charts.card = new Chart(document.getElementById('barCards'), {
+        type:'bar',
+        data:{ labels:[], datasets:[ dataset('Approved',true), dataset('Pending',false) ] },
+        options: common
+      });
+      charts.inv = new Chart(document.getElementById('barInvestments'), {
+        type:'bar',
+        data:{ labels:[], datasets:[ dataset('Approved',true), dataset('Pending',false) ] },
+        options: common
       });
     }
-    
-    function logout() {
-      alert("Manager logout clicked! Implement logout logic here.");
+ 
+    // Nice gradients for bars
+    function getApprovedGradient(ctx){
+      const {ctx:cx, chartArea} = ctx.chart;
+      if(!chartArea) return 'rgba(34,197,94,.8)';
+      const g = cx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+      g.addColorStop(0, 'rgba(34,197,94,.35)');
+      g.addColorStop(.7, 'rgba(34,197,94,.85)');
+      return g;
+    }
+    function getPendingGradient(ctx){
+      const {ctx:cx, chartArea} = ctx.chart;
+      if(!chartArea) return 'rgba(245,158,11,.8)';
+      const g = cx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+      g.addColorStop(0, 'rgba(245,158,11,.35)');
+      g.addColorStop(.7, 'rgba(245,158,11,.85)');
+      return g;
+    }
+ 
+    function toggleSkeleton(show){
+      const set = (key, on) => {
+        const [sk,cnv] = loaders[key];
+        const s = document.getElementById(sk);
+        const c = document.getElementById(cnv);
+        if(on){ s.classList.remove('d-none'); c.classList.add('d-none'); }
+        else { s.classList.add('d-none'); c.classList.remove('d-none'); }
+      };
+      ['acc','dep','loan','card','inv'].forEach(k => set(k, show));
+    }
+ 
+    async function refreshCharts(){
+      try{
+        toggleSkeleton(true);
+        const city = activeCity();
+        const d = await (await fetch(`/api/report/approval_breakdown?city=${encodeURIComponent(city)}`)).json();
+ 
+        // Accounts
+        charts.acc.data.labels = d.accounts.labels || [];
+        charts.acc.data.datasets[0].data = d.accounts.approved || [];
+        charts.acc.data.datasets[1].data = d.accounts.pending || [];
+        charts.acc.update();
+ 
+        // Deposits
+        charts.dep.data.labels = d.deposits.labels || [];
+        charts.dep.data.datasets[0].data = d.deposits.approved || [];
+        charts.dep.data.datasets[1].data = d.deposits.pending || [];
+        charts.dep.update();
+ 
+        // Loans
+        charts.loan.data.labels = d.loans.labels || [];
+        charts.loan.data.datasets[0].data = d.loans.approved || [];
+        charts.loan.data.datasets[1].data = d.loans.pending || [];
+        charts.loan.update();
+ 
+        // Cards
+        charts.card.data.labels = d.cards.labels || [];
+        charts.card.data.datasets[0].data = d.cards.approved || [];
+        charts.card.data.datasets[1].data = d.cards.pending || [];
+        charts.card.update();
+ 
+        // Investments
+        charts.inv.data.labels = d.investments.labels || [];
+        charts.inv.data.datasets[0].data = d.investments.approved || [];
+        charts.inv.data.datasets[1].data = d.investments.pending || [];
+        charts.inv.update();
+ 
+        toggleSkeleton(false);
+        showToast(`Updated ${city?('· '+city):''}`,'success');
+      }catch(e){
+        console.error(e);
+        toggleSkeleton(false);
+        showToast('Failed to load Report & Analytics','danger');
+      }
+    }
+ 
+    function wireDownloads(){
+      document.querySelectorAll('[data-dl]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const id = btn.getAttribute('data-dl');
+          const canvas = document.getElementById(id);
+          const a = document.createElement('a');
+          a.href = canvas.toDataURL('image/png', 1.0);
+          a.download = `${id}_${new Date().toISOString().slice(0,10)}.png`;
+          a.click();
+        });
+      });
+    }
+ 
+    function downloadAllCharts(){
+      ['barAccounts','barDeposits','barLoans','barCards','barInvestments'].forEach(id=>{
+        const canvas=document.getElementById(id);
+        const a=document.createElement('a');
+        a.href=canvas.toDataURL('image/png',1.0);
+        a.download = `${id}_${new Date().toISOString().slice(0,10)}.png`;
+        a.click();
+      });
     }
   </script>
 </body>
 </html>
+ 
+ 

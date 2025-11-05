@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>DigiBank — Team Performance</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+ 
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet"/>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+ 
+  <style>
+    :root{
+      --brand:#0B4D83;
+      --brand-2:#7a0f3e;
+      --bg:#f8f9fa;
+      --card:#ffffff;
+      --muted:#6c757d;
+    }
+ 
+    html, body { height:100%; }
+    body {
+      background-color: var(--bg);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      margin: 0;
+      display:flex;
+      flex-direction:column;
+    }
+ 
+    /* Sidebar (optional, consistent with other pages) */
+    #sidebarMenu.offcanvas-start { width: 250px; }
+    #sidebarMenu .nav-link { display:flex; gap:8px; color:#333; padding:8px 12px; }
+    #sidebarMenu .nav-link.active { background:#f0d7e0; color:var(--brand)!important; border-radius:4px; }
+    #sidebarMenu .nav-link:hover { background:#f9e5ef; color:#7a0f3e; border-radius:4px; }
+ 
+    /* Top Bar */
+    .top-bar {
+      background-color: var(--brand);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+    }
+    .top-bar .btn-outline-light {
+      border:1.5px solid #fff; color:#fff; background:transparent; padding:4px 10px; font-size:1.1rem;
+    }
+    .top-bar .btn-outline-light:hover { background:#fff; color:var(--brand); }
+    .top-bar h5 { margin:0; font-weight:700; color:#fff; }
+ 
+    /* Page shell */
+    .page-wrap { width:100%; max-width:1200px; margin:14px auto 18px; padding-inline:12px; flex:1; display:flex; flex-direction:column; gap:14px; }
+ 
+    /* Toolbar (City Filter) */
+    .toolbar {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 10px 14px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.06);
+      display:flex; flex-wrap:wrap; align-items:center; gap:10px;
+    }
+ 
+    /* KPI grid */
+    .kpi {
+      background:#fff;
+      border-radius:12px;
+      padding:16px 14px;
+      box-shadow:0 2px 8px rgba(0,0,0,.08);
+      text-align:center;
+      height:100%;
+    }
+    .kpi .label { font-size:.9rem; color:var(--muted); margin-bottom:2px; }
+    .kpi .value { font-size:1.8rem; font-weight:800; color:var(--brand); }
+ 
+    /* Panels / charts */
+    .panel {
+      background:#fff;
+      border-radius:12px;
+      box-shadow:0 2px 10px rgba(0,0,0,.06);
+      display:flex;
+      flex-direction:column;
+      height:100%;
+      min-height: 360px;
+    }
+    .panel-header {
+      padding:12px 14px 8px;
+      border-bottom:1px solid #eef2f7;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .panel-header h6 { margin:0; font-weight:700; color:#111827; }
+    .panel-body {
+      padding:12px 14px 14px;
+      flex:1;
+      display:flex;
+      flex-direction:column;
+    }
+ 
+    .chart-holder {
+      position:relative;
+      width:100%;
+      height:100%;
+      min-height:260px;
+    }
+ 
+    .table-responsive { border-radius:10px; overflow:hidden; }
+    .table thead th { background:#f1f5f9; }
+ 
+    /* Logo styles like your other pages */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap');
+    .digi-bank-logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+    .logo-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 100%);
+      position: relative; box-shadow: 0 6px 18px rgba(102,126,234,.3), 0 2px 6px rgba(0,0,0,.1);
+    }
+    .logo-icon::before { content:''; position:absolute; inset:6px; border-radius:8px; background:rgba(255,255,255,.95); }
+    .logo-icon::after {
+      content:'D'; position:absolute; left:50%; top:50%; transform: translate(-50%,-50%);
+      font-weight:800; font-size:18px;
+      background:linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    .main-text { font-size:18px; font-weight:800; line-height:1; color:#fff; }
+    .digi { background:linear-gradient(135deg,#87CEEB 0%,#98D8E8 25%,#FFF8DC 50%,#87CEFA 100%); -webkit-background-clip:text; background-clip:text; color:transparent; text-shadow:0 0 10px rgba(255,255,255,.3); }
+    .bank { color:#fff; margin-left:3px; }
+    .tagline { font-size:9px; font-weight:600; color:#e8f4f8; letter-spacing:2px; text-transform:uppercase; margin-top:2px; }
+ 
+    footer.bg-custom { background-color: var(--brand); color:#fff; }
+  </style>
+</head>
+<body>
+ 
+  <!-- Sidebar (offcanvas, optional) -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="sidebarMenuLabel">Manager</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('dashboard') }}"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
+        <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('managerapprovals') }}"><i class="bi bi-people-fill me-2"></i> Manage Approvals</a></li>
+        <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('manstaff') }}"><i class="bi bi-file-earmark-check me-2"></i> Staff Management</a></li>
+        <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('transactions_review') }}"><i class="bi bi-list-check me-2"></i> Transaction Review</a></li>
+        <li class="nav-item mb-2"><a class="nav-link text-dark" href="{{ url_for('manreport') }}"><i class="bi bi-graph-up me-2"></i> Reports & Analytics</a></li>
+      </ul>
+    </div>
+  </div>
+ 
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <button class="btn btn-outline-light btn-sm me-2" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-label="Toggle sidebar">
+      <i class="bi bi-list fs-6"></i>
+    </button>
+ 
+    <a class="digi-bank-logo" href="{{ url_for('home') }}">
+      <div class="logo-icon"></div>
+      <div class="logo-text ms-2">
+        <div class="main-text">
+          <span class="digi">DiGi</span><span class="bank">Bank</span>
+        </div>
+        <div class="tagline">Smart Banking</div>
+      </div>
+    </a>
+ 
+    <h5 class="flex-grow-1 text-center m-0">Team Performance</h5>
+ 
+    <div class="d-flex align-items-center">
+      <span class="me-2 small">Welcome, <b>{{ user.name or user.email }}</b></span>
+      <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">Logout</a>
+    </div>
+  </div>
+ 
+  <!-- Page content -->
+  <div class="page-wrap">
+ 
+    <!-- City Filter -->
+    <div class="toolbar">
+      <i class="bi bi-geo-alt text-danger"></i>
+      <span class="me-1">Filter by City:</span>
+      <select id="citySelect" class="form-select form-select-sm" style="max-width:260px">
+        {% for c in cities %}
+          <option value="{{ c }}" {% if c==sel_city %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+      <span class="ms-1 small text-muted">Selected: <b id="chosenCity">{{ sel_city }}</b></span>
+    </div>
+ 
+    <!-- KPIs -->
+    <div class="row g-3">
+      <div class="col-6 col-md-2">
+        <div class="kpi h-100">
+          <div class="label">Managers</div>
+          <div id="kpiManagers" class="value">{{ managers }}</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-2">
+        <div class="kpi h-100">
+          <div class="label">Underwriting</div>
+          <div id="kpiUnderwriters" class="value">{{ underwriters }}</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-2">
+        <div class="kpi h-100">
+          <div class="label">Auditors</div>
+          <div id="kpiAuditors" class="value">{{ auditors }}</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-2">
+        <div class="kpi h-100">
+          <div class="label">Agents</div>
+          <div id="kpiAgents" class="value">{{ agents }}</div>
+        </div>
+      </div>
+      <div class="col-12 col-md-4">
+        <div class="kpi h-100">
+          <div class="label">Bank Users</div>
+          <div id="kpiCustomers" class="value">{{ customers }}</div>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- Charts: equal height, tight spacing -->
+    <div class="row g-3">
+      <div class="col-lg-5">
+        <div class="panel">
+          <div class="panel-header">
+            <h6 class="m-0">Role Mix</h6>
+            <span class="text-muted small">Managers vs Teams</span>
+          </div>
+          <div class="panel-body">
+            <div class="chart-holder">
+              <canvas id="roleMixChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+ 
+      <div class="col-lg-7">
+        <div class="panel">
+          <div class="panel-header">
+            <h6 class="m-0">Staff Composition — {{ 'Top Cities' if sel_city == 'All' else 'Selected City' }}</h6>
+            <span class="text-muted small">Stacked by Role</span>
+          </div>
+          <div class="panel-body">
+            <div class="chart-holder">
+              <canvas id="cityStackedChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- Top Cities / Selected City table -->
+    <div class="panel">
+      <div class="panel-header">
+        <h6 class="m-0">{{ 'Top Cities — Role Distribution' if sel_city == 'All' else 'Role Distribution — ' ~ sel_city }}</h6>
+        <span class="text-muted small">{{ 'Overall staff' if sel_city == 'All' else 'Selected city' }}</span>
+      </div>
+      <div class="panel-body">
+        <div class="table-responsive">
+          <table class="table table-sm align-middle mb-0">
+            <thead>
+              <tr>
+                <th>City</th>
+                <th class="text-end">Managers</th>
+                <th class="text-end">Underwriters</th>
+                <th class="text-end">Auditors</th>
+                <th class="text-end">Agents</th>
+                <th class="text-end">Total</th>
+              </tr>
+            </thead>
+            <tbody id="compBody">
+              {% for row in comp %}
+                {% set total = (row.managers or 0) + (row.underwriters or 0) + (row.auditors or 0) + (row.agents or 0) %}
+                <tr>
+                  <td>{{ row.city }}</td>
+                  <td class="text-end">{{ row.managers }}</td>
+                  <td class="text-end">{{ row.underwriters }}</td>
+                  <td class="text-end">{{ row.auditors }}</td>
+                  <td class="text-end">{{ row.agents }}</td>
+                  <td class="text-end fw-semibold">{{ total }}</td>
+                </tr>
+              {% endfor %}
+              {% if not comp or comp|length == 0 %}
+                <tr><td colspan="6" class="text-center text-muted">No data</td></tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+ 
+  </div>
+ 
+  <!-- Footer -->
+  <footer class="bg-custom text-white text-center py-3 mt-auto">
+    © 2025 DigiBank. Team Performance. All rights reserved.
+  </footer>
+ 
+  <!-- ===== Server data as JSON (lint-friendly) ===== -->
+  <script id="server-comp" type="application/json">{{ comp|tojson|safe }}</script>
+ 
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+ 
+  <script>
+    // Parse server JSON for initial stacked chart
+    const serverComp = JSON.parse(document.getElementById('server-comp').textContent || '[]');
+ 
+    // ====== Boot charts from initial server values (so first load is quick) ======
+    const initVals = {
+      managers: Number("{{ managers }}"),
+      underwriters: Number("{{ underwriters }}"),
+      auditors: Number("{{ auditors }}"),
+      agents: Number("{{ agents }}")
+    };
+ 
+    // Doughnut (Role Mix)
+    const roleMixCtx = document.getElementById('roleMixChart').getContext('2d');
+    let roleMixChart = new Chart(roleMixCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Managers','Underwriting','Auditors','Agents'],
+        datasets: [{ data: [initVals.managers, initVals.underwriters, initVals.auditors, initVals.agents] }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '60%',
+        plugins: { legend: { position: 'bottom' } }
+      }
+    });
+ 
+    // Stacked (from server render)
+    const cityStackedCtx = document.getElementById('cityStackedChart').getContext('2d');
+    function buildCityChart(comp) {
+      const labels = comp.map(r => r.city);
+      const dsManagers = comp.map(r => r.managers || 0);
+      const dsUnder    = comp.map(r => r.underwriters || 0);
+      const dsAudit    = comp.map(r => r.auditors || 0);
+      const dsAgents   = comp.map(r => r.agents || 0);
+ 
+      return new Chart(cityStackedCtx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            { label:'Managers',     data: dsManagers,  stack:'roles' },
+            { label:'Underwriting', data: dsUnder,     stack:'roles' },
+            { label:'Auditors',     data: dsAudit,     stack:'roles' },
+            { label:'Agents',       data: dsAgents,    stack:'roles' },
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom' } },
+          scales: {
+            x: { stacked: true, ticks: { maxRotation:0, autoSkip:true } },
+            y: { stacked: true, beginAtZero:true, ticks: { precision:0 } }
+          }
+        }
+      });
+    }
+    let cityStackedChart = buildCityChart(serverComp);
+ 
+    // ====== Full dynamic refresh on city change (KPIs + Role Mix + Stacked + Table) ======
+    const citySelect   = document.getElementById('citySelect');
+    const chosenCityEl = document.getElementById('chosenCity');
+    const kpiManagers     = document.getElementById('kpiManagers');
+    const kpiUnderwriters = document.getElementById('kpiUnderwriters');
+    const kpiAuditors     = document.getElementById('kpiAuditors');
+    const kpiAgents       = document.getElementById('kpiAgents');
+    const kpiCustomers    = document.getElementById('kpiCustomers');
+    const compBody        = document.getElementById('compBody');
+ 
+    async function loadData(city) {
+      // cache-bust with timestamp
+      const url = `/api/team_performance_data?city=${encodeURIComponent(city)}&_=${Date.now()}`;
+      console.log('[TeamPerf] fetching', url);
+ 
+      const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+      const json = await res.json();
+      console.log('[TeamPerf] payload', json);
+ 
+      if (!json.ok) throw new Error(json.error || 'Failed');
+ 
+      const d = json.data;
+ 
+      // --- KPIs ---
+      kpiManagers.textContent     = d.kpi.managers;
+      kpiUnderwriters.textContent = d.kpi.underwriters;
+      kpiAuditors.textContent     = d.kpi.auditors;
+      kpiAgents.textContent       = d.kpi.agents;
+      kpiCustomers.textContent    = d.kpi.customers;
+ 
+      // --- Doughnut update (Role Mix) ---
+      roleMixChart.data.datasets[0].data = [
+        d.kpi.managers, d.kpi.underwriters, d.kpi.auditors, d.kpi.agents
+      ];
+      roleMixChart.update();
+ 
+      // --- Stacked chart rebuild for neat scales ---
+      if (cityStackedChart) cityStackedChart.destroy();
+      cityStackedChart = buildCityChart(d.composition || []);
+ 
+      // --- Table refresh ---
+      const comp = d.composition || [];
+      compBody.innerHTML = '';
+      if (comp.length === 0) {
+        compBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">No data</td></tr>`;
+      } else {
+        comp.forEach(row => {
+          const total = (row.managers||0) + (row.underwriters||0) + (row.auditors||0) + (row.agents||0);
+          compBody.insertAdjacentHTML('beforeend', `
+            <tr>
+              <td>${row.city}</td>
+              <td class="text-end">${row.managers||0}</td>
+              <td class="text-end">${row.underwriters||0}</td>
+              <td class="text-end">${row.auditors||0}</td>
+              <td class="text-end">${row.agents||0}</td>
+              <td class="text-end fw-semibold">${total}</td>
+            </tr>
+          `);
+        });
+      }
+    }
+ 
+    // On select change -> refresh
+    citySelect.addEventListener('change', async () => {
+      const city = citySelect.value;
+      chosenCityEl.textContent = city;
+      try { await loadData(city); }
+      catch (e) {
+        console.error('[TeamPerf] refresh error', e);
+        alert('Could not refresh data for the selected city.');
+      }
+    });
+ 
+    // Optional: force API refresh on first load to ensure parity
+    // document.addEventListener('DOMContentLoaded', () => loadData("{{ sel_city }}"));
+  </script>
+</body>
+</html>
+ 
+ 
