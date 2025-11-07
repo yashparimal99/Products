@@ -402,28 +402,137 @@ def pfinvest():
 
 from MySQLdb.cursors import DictCursor
 
+
+from werkzeug.security import check_password_hash, generate_password_hash
+import hmac, binascii
+from MySQLdb.cursors import DictCursor
+from werkzeug.security import check_password_hash
+from flask import request, render_template, redirect, url_for, flash, session
+ 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-
-        cur = mysql.connection.cursor(DictCursor)  
-        cur.execute("SELECT * FROM bank_users WHERE email = %s AND password = %s", (email, password))
-        user = cur.fetchone()
+    if request.method == 'GET':
+        return render_template('login.html')
+ 
+    # ---- POST ----
+    email = (request.form.get('email') or '').strip().lower()
+    password = (request.form.get('password') or '').strip()
+ 
+    if not email or not password:
+        flash('Please enter email and password.', 'danger')
+        return render_template('login.html')
+ 
+    cur = mysql.connection.cursor(DictCursor)
+ 
+    # Normalize lookup (avoids hidden spaces / case issues)
+    cur.execute("SELECT user_id, email, role, status, deleted_date, password FROM bank_users WHERE LOWER(TRIM(email))=%s", (email,))
+    user = cur.fetchone()
+ 
+    if not user:
         cur.close()
+        flash('Invalid email or password', 'danger')
+        return render_template('login.html')
+ 
+    # Basic status checks
+    if user.get('deleted_date'):
+        cur.close()
+        flash('Account is deleted. Please contact support.', 'danger')
+        return render_template('login.html')
+ 
+    status = (user.get('status') or '').strip().lower()
+    if status in ('blocked', 'inactive'):
+        cur.close()
+        flash('Your account is not active. Please contact support.', 'danger')
+        return render_template('login.html')
+ 
+    # Password check (PBKDF2 as created by signup)
+    stored_hash = user.get('password') or ''
+    ok = False
+    try:
+        ok = check_password_hash(stored_hash, password)
+    except Exception:
+        ok = False
+ 
+    # Optional super-simple plaintext fallback (only if you had old test users)
+    if not ok and (not stored_hash.startswith(('pbkdf2:', 'scrypt:', 'argon2:', 'sha256$'))):
+        ok = (stored_hash == password)
+ 
+    if not ok:
+        cur.close()
+        flash('Invalid email or password', 'danger')
+        return render_template('login.html')
+ 
+    # Success
+    session['user_email'] = user['email']
+    session['user_role']  = user.get('role') or 'Customer'
+    session['user_id']    = user['user_id']
+ 
+    # Update last_login (best-effort)
+    try:
+        cur.execute("UPDATE bank_users SET last_login=NOW() WHERE user_id=%s", (user['user_id'],))
+        mysql.connection.commit()
+    except Exception:
+        pass
+ 
+    cur.close()
+    flash('Logged in successfully!', 'success')
+    return redirect(url_for('dashboard'))
 
-        if user:
-            session['user_email'] = user['email']
-            session['user_role'] = user['role'] 
-            session['user_id'] = user['user_id']  
-            flash('Logged in successfully!', 'success')
-            return redirect(url_for('dashboard'))
-        else:
-            flash('Invalid email or password', 'danger')
-
-    return render_template('login.html')
-
+from MySQLdb.cursors import DictCursor
+from werkzeug.security import generate_password_hash
+ 
+@app.route('/forgot', methods=['GET', 'POST'])
+def forgot_password_simple():
+    """
+    Very simple reset: user enters email + new password; we hash and update.
+    No email link or token in this minimal version.
+    """
+    if request.method == 'POST':
+        email = (request.form.get('email') or '').strip().lower()
+        new_pw = (request.form.get('password') or '').strip()
+        conf   = (request.form.get('confirm_password') or '').strip()
+ 
+        if not email:
+            flash('Please enter your registered email.', 'warning')
+            return render_template('forgot.html')
+        if len(new_pw) < 8:
+            flash('Password must be at least 8 characters.', 'warning')
+            return render_template('forgot.html')
+        if new_pw != conf:
+            flash('Passwords do not match.', 'warning')
+            return render_template('forgot.html')
+ 
+        cur = mysql.connection.cursor(DictCursor)
+        try:
+            # confirm the account exists
+            cur.execute("SELECT user_id FROM bank_users WHERE LOWER(TRIM(email))=%s", (email,))
+            row = cur.fetchone()
+            if not row:
+                flash('No account found with that email.', 'danger')
+                return render_template('forgot.html')
+ 
+            # store a secure hash (works with your login route)
+            hashed = generate_password_hash(new_pw)
+            cur.execute("UPDATE bank_users SET password=%s WHERE email=%s", (hashed, email))
+            mysql.connection.commit()
+ 
+            flash('Password updated successfully. Please log in.', 'success')
+            return redirect(url_for('login'))
+        except Exception as e:
+            mysql.connection.rollback()
+            flash('Server error. Please try again.', 'danger')
+            return render_template('forgot.html')
+        finally:
+            cur.close()
+ 
+    # GET
+    return render_template('forgot.html')
+ 
+  
+ 
+ 
+ 
+ 
 
 import random
 import string
@@ -536,51 +645,226 @@ def generate_card_number(card_subtype):
     return card_number
 
 
+# ---------- imports (near your other imports) ----------
+import re
+import random
+import string
+from datetime import datetime, date
+from flask import request, render_template, redirect, url_for, flash, session
+from MySQLdb.cursors import DictCursor
+from werkzeug.security import generate_password_hash
+ 
+# assuming you already have: from app import app, mysql
+ 
+# ---------- constants ----------
+ORG_DOMAIN = "digibank.com"
+ 
+EMAIL_RE = re.compile(r"^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$")
+PAN_RE   = re.compile(r"^[A-Z]{5}\d{4}[A-Z]$")
+AAD_RE   = re.compile(r"^\d{12}$")
+MOB_RE   = re.compile(r"^\d{10}$")
+ 
+ROLE_DEPT = {
+    "Customer": "Customer",
+    "Admin":    "Administration",
+    "Manager":  "Operations",
+    "Officer":  "Retail Banking",
+    "Auditor":  "Compliance",
+}
+STAFF_ROLES = {"Admin", "Manager", "Officer", "Auditor"}
+ 
+# Branch → IFSC (server source of truth)
+BRANCH_IFSC = {
+    "BR-HQ-000": "DIGI0000000",
+    "BR-MUM-001": "DIGI0001001",
+    "BR-DEL-002": "DIGI0002002",
+    "BR-PUN-003": "DIGI0003003",
+    "BR-HYD-004": "DIGI0004004",
+    "BR-BLR-005": "DIGI0005005",
+}
+ 
+# ---------- helpers ----------
+def _is_staff(role: str) -> bool:
+    return (role or "").strip() in STAFF_ROLES
+ 
+def _age_years(dob_str: str) -> int:
+    y, m, d = map(int, dob_str.split("-"))
+    dob = date(y, m, d)
+    today = date.today()
+    return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+ 
+def _unique_email(cur, email_in: str) -> str:
+    email_in = (email_in or "").strip().lower()
+    if not email_in:
+        return email_in
+    cur.execute("SELECT 1 FROM bank_users WHERE email=%s LIMIT 1", (email_in,))
+    if not cur.fetchone():
+        return email_in
+    local, _, domain = email_in.partition("@")
+    m = re.search(r"\+(\d{3})$", local)
+    start_n = int(m.group(1)) if m else 0
+    base_local = local[:-4] if m else local
+    n = start_n
+    while True:
+        n += 1
+        candidate = f"{base_local}+{n:03d}@{domain}"
+        cur.execute("SELECT 1 FROM bank_users WHERE email=%s LIMIT 1", (candidate,))
+        if not cur.fetchone():
+            return candidate
+ 
+def _seq_email_for_staff(cur, role: str, branch_code: str) -> str:
+    role_part = (role or "staff").strip().lower()
+    branch_part = (branch_code or "BR-HQ-000").strip()
+    prefix = f"{role_part}.{branch_part}."
+    cur.execute("SELECT email FROM bank_users WHERE email LIKE %s", (f"{prefix}%@{ORG_DOMAIN}",))
+    rows = cur.fetchall() or []
+    max_seq = 0
+    for r in rows:
+        em = (r.get("email") or "").lower()
+        m = re.match(rf"^{re.escape(prefix)}(\d{{3}})@{re.escape(ORG_DOMAIN)}$", em)
+        if m:
+            try:
+                max_seq = max(max_seq, int(m.group(1)))
+            except:  # noqa: E722
+                pass
+    next_seq = max_seq + 1
+    return f"{prefix}{next_seq:03d}@{ORG_DOMAIN}"
+ 
+def _gen_admin_email(cur, branch_code: str) -> str:
+    return _seq_email_for_staff(cur, "Admin", branch_code)
+ 
+def _gen_staff_email(cur, role: str, branch_code: str) -> str:
+    return _seq_email_for_staff(cur, role, branch_code)
+ 
+def generate_user_id(prefix="USR", length=8) -> str:
+    # e.g., USR-AB12CD34
+    part = ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
+    return f"{prefix}-{part}"
+ 
+# ---------- SIGNUP ----------
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
-    if request.method == 'POST':
-        name = request.form['name']
-        pan = request.form['pan']
-        email = request.form['email']
-        dob = request.form['dob']
-        aadhaar = request.form['aadhaar']
-        gender = request.form['gender']
-        mobile = request.form['mobile']
-        password = request.form['password']
-        city = request.form['city']
-        state = request.form['state']
-        country = request.form['country']
-        onboarding_date = datetime.now()
-
-        cur = mysql.connection.cursor()
-
-        # Check if email or mobile already exists
-        cur.execute("SELECT * FROM bank_users WHERE email = %s OR mobile = %s", (email, mobile))
-        if cur.fetchone():
-            flash('Email or mobile number already registered', 'danger')
+    if request.method == 'GET':
+        return render_template('signup.html')
+ 
+    role        = (request.form.get('role') or 'Customer').strip()
+    name        = (request.form.get('name') or '').strip()
+    email_in    = (request.form.get('email') or '').strip().lower()
+    dob         = (request.form.get('dob') or '').strip()
+    aadhaar     = (request.form.get('aadhaar') or '').strip()
+    pan         = (request.form.get('pan') or '').strip().upper()
+    mobile      = (request.form.get('mobile') or '').strip()
+    gender      = (request.form.get('gender') or '').strip()
+    city        = (request.form.get('city') or '').strip()
+    state       = (request.form.get('state') or '').strip()
+    country     = (request.form.get('country') or '').strip()
+    password_raw= request.form.get('password') or ''
+    confirm     = request.form.get('confirm_password') or ''
+    branch_code_in = (request.form.get('branch_code') or '').strip()
+    ifsc_in        = (request.form.get('ifsc_code') or '').strip()  # from hidden field, but we still resolve on server
+ 
+    department  = ROLE_DEPT.get(role, "Customer")
+ 
+    # basic required set
+    required_ok = all([role, name, dob, aadhaar, pan, mobile, gender, city, state, country, password_raw, confirm])
+    if not required_ok:
+        flash('Please fill all required fields.', 'danger')
+        return render_template('signup.html')
+ 
+    if password_raw != confirm:
+        flash('Passwords do not match.', 'danger')
+        return render_template('signup.html')
+ 
+    try:
+        if _age_years(dob) < 18:
+            flash('You must be at least 18 years old.', 'danger')
+            return render_template('signup.html')
+    except Exception:
+        flash('Invalid Date of Birth. Use YYYY-MM-DD.', 'danger')
+        return render_template('signup.html')
+ 
+    if not PAN_RE.match(pan):
+        flash('Invalid PAN (use ABCDE1234F).', 'danger')
+        return render_template('signup.html')
+    if not AAD_RE.match(aadhaar):
+        flash('Invalid Aadhaar (12 digits).', 'danger')
+        return render_template('signup.html')
+    if not MOB_RE.match(mobile):
+        flash('Invalid mobile (10 digits).', 'danger')
+        return render_template('signup.html')
+ 
+    # Branch/IFSC business rules
+    if role == 'Admin':
+        branch_code = 'BR-HQ-000'
+        ifsc_code = BRANCH_IFSC.get(branch_code)
+    else:
+        if not branch_code_in:
+            flash('Please select your Branch Code.', 'danger')
+            return render_template('signup.html')
+        branch_code = branch_code_in
+        # server-side IFSC resolution (ignore client’s hidden value for safety)
+        ifsc_code = BRANCH_IFSC.get(branch_code)
+        if not ifsc_code:
+            flash('Invalid Branch selected. IFSC not found.', 'danger')
+            return render_template('signup.html')
+ 
+    cur = mysql.connection.cursor(DictCursor)
+ 
+    # email handling
+    if _is_staff(role):
+        if role == 'Admin':
+            email = _gen_admin_email(cur, branch_code)
         else:
-            # Generate a unique cust_id
-            while True:
-                user_id = generate_user_id()
-                cur.execute("SELECT * FROM bank_users WHERE user_id = %s", (user_id,))
-                if not cur.fetchone():  # If not found, it's unique
-                    break
-
-            # Insert user with the generated cust_id
-            cur.execute(
-                "INSERT INTO bank_users (user_id, name,pan,dob, email, mobile, password,aadhaar,gender,city,state,country,onboarding_date) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s)",
-                (user_id, name,pan,dob, email, mobile, password,aadhaar,gender,city,state,country,onboarding_date)
-            )
-            mysql.connection.commit()
+            email = _gen_staff_email(cur, role, branch_code)
+    else:
+        if not EMAIL_RE.match(email_in):
             cur.close()
-            
-            flash('Welcome ! Please log in.', 'success')
-            return redirect(url_for('login'))
-
+            flash('Please enter a valid email address.', 'danger')
+            return render_template('signup.html')
+        email = _unique_email(cur, email_in)
+ 
+    # duplicates
+    cur.execute("SELECT 1 FROM bank_users WHERE email=%s OR mobile=%s LIMIT 1", (email, mobile))
+    if cur.fetchone():
         cur.close()
-
-    return render_template('signup.html')
-
+        flash('Email or mobile already registered.', 'danger')
+        return render_template('signup.html')
+ 
+    # user_id
+    while True:
+        user_id = generate_user_id()
+        cur.execute("SELECT 1 FROM bank_users WHERE user_id=%s", (user_id,))
+        if not cur.fetchone():
+            break
+ 
+    password_hash = generate_password_hash(password_raw)
+ 
+    # Insert (now with IFSC)
+    cur.execute("""
+      INSERT INTO bank_users
+        (user_id, name, pan, aadhaar, dob, mobile, email, gender,
+         address, city, state, country, department, onboarding_date,
+         status, role, password, txn_pin_hash, deleted_date, txn_pin_set_at,
+         branch_code, ifsc_code, email_verified, staff_confirmed)
+      VALUES
+        (%s,%s,%s,%s,%s,%s,%s,%s,
+         %s,%s,%s,%s,%s,%s,
+         %s,%s,%s,%s,%s,%s,
+         %s,%s,%s,%s)
+    """, (
+        user_id, name, pan, aadhaar, dob, mobile, email, gender,
+        None, city, state, country, department, datetime.now().date(),
+        'active', role, password_hash, None, None, None,
+        branch_code, ifsc_code, 1 if _is_staff(role) else 0, 1 if _is_staff(role) else 0
+    ))
+    mysql.connection.commit()
+    cur.close()
+ 
+    flash('Account created successfully. You can log in now.', 'success')
+    return redirect(url_for('login'))
+ 
+ 
+ 
 @app.route('/savingform')
 def savingform():
     return render_template('savingform.html')
@@ -1313,7 +1597,7 @@ def dashboard():
     cur.close()
  
     templates = {
-        'User': 'userdashboard.html',
+        'Customer': 'userdashboard.html',
         'tl': 'TLdashboard.html',
         'manager': 'managerdashboard.html',
         'Card_Agent': 'cardagent_dashboard.html',
@@ -7285,15 +7569,15 @@ def customer_search():
     return render_template('admincust.html', customers=customers, searched=searched,user=user)
 
 
-@app.route('/updateekyc')
-def updateekyc():
-    user_id = session.get('user_id')
+# @app.route('/updateekyc')
+# def updateekyc():
+#     user_id = session.get('user_id')
     
-    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
-    user = cur.fetchone()
-    cur.close()
-    return render_template('ekyc_update.html',user=user)
+#     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#     cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+#     user = cur.fetchone()
+#     cur.close()
+#     return render_template('ekyc_update.html',user=user)
 
 
 ####---- Team Performance----###
@@ -7490,7 +7774,365 @@ def api_team_performance_data():
     data['composition'] = comp
     return jsonify({'ok': True, 'data': data})
 # ===================== END: Team Performance (robust city filter) ====================
+
+
+#####===Audit Logs===###
  
+# --- AUDIT LOGS: imports (add if missing) ---
+import io, csv
+from datetime import datetime
+from urllib.parse import urlencode
+from MySQLdb.cursors import DictCursor
+from flask import request, render_template, send_file, flash, redirect, url_for
+ 
+# Make urlencode usable in Jinja
+app.jinja_env.globals['urlencode'] = urlencode
+ 
+# -------- small helpers --------
+def _parse_dt(dt_str: str):
+    """Accepts 'YYYY-MM-DDTHH:MM' or 'YYYY-MM-DD'. Returns datetime or None."""
+    if not dt_str:
+        return None
+    for fmt in ("%Y-%m-%dT%H:%M", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(dt_str, fmt)
+        except ValueError:
+            pass
+    return None
+ 
+def has_column(table_name: str, column_name: str) -> bool:
+    """True if table has the column (in current DB)."""
+    cur = mysql.connection.cursor()
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA=%s AND TABLE_NAME=%s AND COLUMN_NAME=%s
+    """, (app.config['MYSQL_DB'], table_name, column_name))
+    ok = cur.fetchone()[0] > 0
+    cur.close()
+    return ok
+ 
+def _safe_fetch(cur, sql, args, module_name):
+    """Run query; never crash page. Returns (rows, error_str|None)."""
+    try:
+        cur.execute(sql, tuple(args))
+        return cur.fetchall(), None
+    except Exception as e:
+        app.logger.error("Audit fetch failed for %s: %s", module_name, e, exc_info=True)
+        return [], f"{module_name}: {e.__class__.__name__}: {e}"
+ 
+# -------- unified fetcher across modules --------
+def _gather_audit_rows(filters):
+    """
+    Output rows with columns:
+      audit_type, ref_id, user_id, name, email, mobile, status, created_at, action_time, extra_ref
+    """
+    types   = filters.get("types") or ["account", "cards", "loans", "investment", "deposit"]
+    user_id = (filters.get("user_id") or "").strip()
+    name    = (filters.get("name") or "").strip()
+    email   = (filters.get("email") or "").strip()
+    mobile  = (filters.get("mobile") or "").strip()
+    dt_from = _parse_dt(filters.get("from_dt"))
+    dt_to   = _parse_dt(filters.get("to_dt"))
+ 
+    rows, errors = [], []
+    cur = mysql.connection.cursor(DictCursor)
+ 
+    # ---------- ACCOUNTS ----------
+    if "account" in types:
+        where, args = [], []
+        if name:    where.append("CONCAT_WS(' ', first_name, middle_name, last_name) LIKE %s"); args.append(f"%{name}%")
+        if email:   where.append("email LIKE %s"); args.append(f"%{email}%")
+        if mobile:  where.append("mobile LIKE %s"); args.append(f"%{mobile}%")
+        if dt_from: where.append("created_at >= %s"); args.append(dt_from)
+        if dt_to:   where.append("created_at <= %s"); args.append(dt_to)
+        clause = ("WHERE " + " AND ".join(where)) if where else ""
+        sql = f"""
+            SELECT
+              'account' AS audit_type,
+              request_id AS ref_id,
+              NULL AS user_id,
+              CONCAT_WS(' ', first_name, middle_name, last_name) AS name,
+              email, mobile,
+              status_flag AS status,
+              created_at,
+              date_of_action AS action_time,
+              account_number AS extra_ref
+            FROM accounts_requests
+            {clause}
+            ORDER BY created_at DESC
+            LIMIT 5000
+        """
+        data, err = _safe_fetch(cur, sql, args, "accounts_requests")
+        rows += data;  errors += [err] if err else []
+ 
+    # ---------- CARDS ----------
+    if "cards" in types:
+        where, args = [], []
+        if user_id: where.append("submitted_by_user_id LIKE %s"); args.append(f"%{user_id}%")
+        if name:    where.append("customer_name LIKE %s"); args.append(f"%{name}%")
+        if email:   where.append("customer_email LIKE %s"); args.append(f"%{email}%")
+        if mobile:  where.append("customer_mobile LIKE %s"); args.append(f"%{mobile}%")
+        if dt_from: where.append("created_at >= %s"); args.append(dt_from)
+        if dt_to:   where.append("created_at <= %s"); args.append(dt_to)
+        clause = ("WHERE " + " AND ".join(where)) if where else ""
+        sql = f"""
+            SELECT
+              'cards' AS audit_type,
+              request_id AS ref_id,
+              submitted_by_user_id AS user_id,
+              customer_name AS name,
+              customer_email AS email,
+              customer_mobile AS mobile,
+              status_flag AS status,
+              created_at,
+              date_of_action AS action_time,
+              card_number AS extra_ref
+            FROM card_requests
+            {clause}
+            ORDER BY created_at DESC
+            LIMIT 5000
+        """
+        data, err = _safe_fetch(cur, sql, args, "card_requests")
+        rows += data;  errors += [err] if err else []
+ 
+    # ---------- LOANS ----------
+    if "loans" in types:
+        where, args = [], []
+        if name:    where.append("applicant_name LIKE %s"); args.append(f"%{name}%")
+        if mobile:  where.append("mobile LIKE %s"); args.append(f"%{mobile}%")
+        if dt_from: where.append("created_at >= %s"); args.append(dt_from)
+        if dt_to:   where.append("created_at <= %s"); args.append(dt_to)
+        clause = ("WHERE " + " AND ".join(where)) if where else ""
+        sql = f"""
+            SELECT
+              'loans' AS audit_type,
+              request_id AS ref_id,
+              NULL AS user_id,
+              applicant_name AS name,
+              NULL AS email,
+              mobile,
+              status AS status,
+              created_at,
+              updated_at AS action_time,
+              bank_account_number AS extra_ref
+            FROM loan_requests
+            {clause}
+            ORDER BY created_at DESC
+            LIMIT 5000
+        """
+        data, err = _safe_fetch(cur, sql, args, "loan_requests")
+        rows += data;  errors += [err] if err else []
+ 
+    # ---------- INVESTMENT ----------
+    if "investment" in types:
+        where, args = [], []
+        inv_has_req_id = has_column('investment_applications', 'request_id')
+        ref_expr = "COALESCE(request_id, application_number)" if inv_has_req_id else "application_number"
+        if user_id: where.append("user_id LIKE %s"); args.append(f"%{user_id}%")
+        if name:    where.append("full_name LIKE %s"); args.append(f"%{name}%")
+        if dt_from: where.append("(created_at >= %s OR application_date >= %s)"); args += [dt_from, dt_from.date()]
+        if dt_to:   where.append("(created_at <= %s OR application_date <= %s)"); args += [dt_to, dt_to.date()]
+        clause = ("WHERE " + " AND ".join(where)) if where else ""
+        sql = f"""
+            SELECT
+              'investment' AS audit_type,
+              {ref_expr} AS ref_id,
+              user_id,
+              full_name AS name,
+              NULL AS email,
+              NULL AS mobile,
+              status,
+              created_at,
+              updated_at AS action_time,
+              application_number AS extra_ref
+            FROM investment_applications
+            {clause}
+            ORDER BY created_at DESC
+            LIMIT 5000
+        """
+        data, err = _safe_fetch(cur, sql, args, "investment_applications")
+        rows += data;  errors += [err] if err else []
+ 
+    # ---------- DEPOSIT ----------
+    if "deposit" in types:
+        where, args = [], []
+        if name:    where.append("CONCAT_WS(' ', first_name, middle_name, last_name) LIKE %s"); args.append(f"%{name}%")
+        if email:   where.append("email LIKE %s"); args.append(f"%{email}%")
+        if mobile:  where.append("mobile LIKE %s"); args.append(f"%{mobile}%")
+        if dt_from: where.append("created_at >= %s"); args.append(dt_from)
+        if dt_to:   where.append("created_at <= %s"); args.append(dt_to)
+        clause = ("WHERE " + " AND ".join(where)) if where else ""
+        sql = f"""
+            SELECT
+              'deposit' AS audit_type,
+              request_id AS ref_id,
+              NULL AS user_id,
+              CONCAT_WS(' ', first_name, middle_name, last_name) AS name,
+              email, mobile,
+              status_flag AS status,
+              created_at,
+              date_of_action AS action_time,
+              account_number AS extra_ref
+            FROM request_deposits
+            {clause}
+            ORDER BY created_at DESC
+            LIMIT 5000
+        """
+        data, err = _safe_fetch(cur, sql, args, "request_deposits")
+        rows += data;  errors += [err] if err else []
+ 
+    cur.close()
+ 
+    # normalize + global sort
+    for r in rows:
+        r.setdefault("email", None)
+        r.setdefault("mobile", None)
+        r.setdefault("user_id", None)
+        r.setdefault("status", None)
+        r.setdefault("extra_ref", None)
+    rows.sort(key=lambda x: (x.get("created_at") or datetime.min), reverse=True)
+    return rows
+ 
+# ------------- PAGES -------------
+ 
+@app.route("/audit_logs", methods=["GET"])
+def audit_logs():
+    # 1) read filters
+    types = request.args.getlist("audit_type")   # list from checkboxes
+    filters = {
+        "user_id": request.args.get("user_id", ""),
+        "name":    request.args.get("name", ""),
+        "email":   request.args.get("email", ""),
+        "mobile":  request.args.get("mobile", ""),
+        "from_dt": request.args.get("from_dt", ""),
+        "to_dt":   request.args.get("to_dt", ""),
+        "types":   types if types else None,
+    }
+ 
+    # 2) pagination
+    try:    page = max(int(request.args.get("page", 1)), 1)
+    except: page = 1
+    try:    per_page = min(max(int(request.args.get("per_page", 20)), 5), 100)
+    except: per_page = 20
+ 
+    # 3) fetch
+    rows = _gather_audit_rows(filters)
+    total = len(rows)
+    start = (page - 1) * per_page
+    end   = start + per_page
+    page_rows = rows[start:end]
+    total_pages = (total + per_page - 1) // per_page
+ 
+    # 4) build export querystring (preserve all current filters)
+    export_qs = request.args.to_dict(flat=False)
+    if types:
+        export_qs["audit_type"] = types
+    else:
+        export_qs.pop("audit_type", None)
+ 
+    return render_template(
+        "audit_logs_admin.html",
+        rows=page_rows,
+        total=total,
+        page=page,
+        per_page=per_page,
+        total_pages=total_pages,
+        filters=filters,
+        selected_types=types,      # pass list (not set)
+        searched=any([filters["user_id"], filters["name"], filters["email"], filters["mobile"],
+                      filters["from_dt"], filters["to_dt"], types]),
+        export_qs=export_qs
+    )
+ 
+@app.route("/audit_logs/export", methods=["GET"])
+def audit_logs_export():
+    types = request.args.getlist("audit_type")
+    filters = {
+        "user_id": request.args.get("user_id", ""),
+        "name":    request.args.get("name", ""),
+        "email":   request.args.get("email", ""),
+        "mobile":  request.args.get("mobile", ""),
+        "from_dt": request.args.get("from_dt", ""),
+        "to_dt":   request.args.get("to_dt", ""),
+        "types":   types if types else None,
+    }
+    rows = _gather_audit_rows(filters)
+ 
+    buf = io.StringIO()
+    w = csv.writer(buf)
+    w.writerow(["audit_type","ref_id","user_id","name","email","mobile","status","created_at","action_time","extra_ref"])
+    for r in rows:
+        created = r["created_at"].strftime("%Y-%m-%d %H:%M:%S") if r.get("created_at") else ""
+        action  = r["action_time"].strftime("%Y-%m-%d %H:%M:%S") if r.get("action_time") else ""
+        w.writerow([
+            r["audit_type"], r["ref_id"], r.get("user_id","") or "", r.get("name","") or "",
+            r.get("email","") or "", r.get("mobile","") or "", r.get("status","") or "",
+            created, action, r.get("extra_ref","") or ""
+        ])
+ 
+    mem = io.BytesIO(buf.getvalue().encode("utf-8-sig"))
+    mem.seek(0)
+    fname = f"audit_logs_{datetime.now():%Y%m%d_%H%M%S}.csv"
+    return send_file(mem, mimetype="text/csv", as_attachment=True, download_name=fname)
+ 
+ #EKUC Update
+
+import base64
+
+@app.route('/updateekyc', methods=['GET', 'POST'])
+def updateekyc():
+    user_id = session.get('user_id')
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+
+    if 'user_id' not in session:
+        flash("Please login first.", "warning")
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+
+    if request.method == 'POST':
+        passport_photo = request.files.get('passport_photo')
+        mobile_number = request.form.get('mobileNumber')
+        aadhar_number = request.form.get('aadharNumber')
+        pan_number = request.form.get('panNumber')
+
+        if not passport_photo:
+            flash("Please upload your passport photo.", "danger")
+            return redirect(url_for('updateekyc'))
+
+        # ✅ Read image as binary
+        photo_data = passport_photo.read()
+
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+        # Check if record exists
+        cur.execute("SELECT * FROM ekyc_details WHERE user_id=%s", (user_id,))
+        existing = cur.fetchone()
+
+        if existing:
+            cur.execute("""
+                UPDATE ekyc_details
+                SET aadhar_number=%s, pan_number=%s, mobile_number=%s, passport_photo=%s, status=%s, updated_at=NOW()
+                WHERE user_id=%s
+            """, (aadhar_number, pan_number, mobile_number, photo_data, 'verified', user_id))
+        else:
+            cur.execute("""
+                INSERT INTO ekyc_details (user_id, aadhar_number, pan_number, mobile_number, passport_photo, status, created_at)
+                VALUES (%s, %s, %s, %s, %s, %s, NOW())
+            """, (user_id, aadhar_number, pan_number, mobile_number, photo_data, 'verified'))
+
+        mysql.connection.commit()
+        cur.close()
+
+        flash("Your e-KYC details have been successfully updated and photo stored in database.", "success")
+        return redirect(url_for('profile'))
+
+    return render_template('ekyc_update.html',user=user)
+
    
 if __name__ == '__main__':
     app.run(debug=True)

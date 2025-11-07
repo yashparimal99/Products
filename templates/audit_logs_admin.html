@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DigiBank Admin - Audit Logs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+ 
+  <!-- Bootstrap & Icons & Fonts -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Inter:wght@600;700;800&display=swap%22 rel="stylesheet">
+ 
+  <style>
+    /* --- Page base + layout --- */
+    body {
+      background-color:#f8f9fa;
+      font-family:"Poppins", sans-serif;
+      padding: 20px 0 0 0;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+ 
+    /* Sidebar Offcanvas (kept so header toggle works) */
+    #sidebarMenu.offcanvas-start { width: 250px; }
+    #sidebarMenu .offcanvas-body { padding: 0.5rem 1rem; }
+    #sidebarMenu .nav-link { font-size: 0.9rem; padding: 8px 12px; display: flex; align-items: center; gap: 8px; color: #333; transition: color .3s; }
+    #sidebarMenu .nav-link i { font-size: 1.1rem; }
+    #sidebarMenu .nav-link.active { font-weight: 700; color:#0B4D83 !important; background:#f0d7e0; border-radius:4px; }
+    #sidebarMenu .nav-link:hover { color:#7a0f3e; background:#f9e5ef; border-radius:4px; }
+ 
+    /* --- Header --- */
+    .top-bar button.btn-outline-light {
+      border: 1.5px solid white; color: white; background: transparent;
+      padding: 4px 10px; font-size: 1.3rem; border-radius: 4px;
+      transition: background-color .2s, color .2s;
+    }
+    .top-bar button.btn-outline-light:hover { background-color: white; color: #0B4D83; }
+ 
+    .top-bar {
+      background-color:#0B4D83;
+      color:white;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:10px 20px;
+      user-select:none;
+      position:sticky;
+      top:0;
+      z-index:1030;
+    }
+    .top-bar h5 { margin:0; font-weight:700; flex-grow:1; text-align:center; color:white; }
+ 
+    .logout-btn {
+      background:transparent; border:1.5px solid white; color:white;
+      padding:5px 15px; border-radius:4px; font-weight:600;
+      transition: background-color .2s, color .2s;
+    }
+    .logout-btn:hover { background:white; color:#0B4D83; }
+ 
+    /* --- Footer --- */
+    footer.bg-custom { background-color:#0B4D83; }
+ 
+    /* --- DigiBank Logo styles --- */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap');
+    .digi-bank-logo { display:flex; align-items:center; gap:12px; text-decoration:none; transition: transform .3s ease; }
+    .digi-bank-logo:hover { transform: scale(1.05); }
+    .logo-icon { width:50px; height:50px;
+      background: linear-gradient(135deg,#667eea 0%,#764ba2 25%,#f093fb 50%,#4facfe 100%);
+      border-radius:12px; display:flex; align-items:center; justify-content:center; position:relative;
+      box-shadow: 0 6px 18px rgba(102,126,234,.3), 0 2px 6px rgba(0,0,0,.1);
+    }
+    .logo-icon::before { content:''; position:absolute; top:8px; left:8px; right:8px; bottom:8px; background:rgba(255,255,255,.95); border-radius:8px; }
+    .logo-icon::after {
+      content:'D'; position:absolute; color:transparent;
+      background: linear-gradient(135deg,#667eea,#764ba2);
+      -webkit-background-clip:text; background-clip:text; font-weight:800; font-size:20px; z-index:2;
+    }
+    .logo-text { color:#fff; }
+    .main-text { font-size:20px; font-weight:800; letter-spacing:-0.5px; line-height:1; }
+    .digi { background:linear-gradient(135deg,#87CEEB 0%,#98D8E8 25%,#FFF8DC 50%,#87CEFA 100%);
+            -webkit-background-clip:text; background-clip:text; color:transparent;
+            text-shadow:0 0 10px rgba(255,255,255,.3); }
+    .bank { color:#fff; margin-left:3px; text-shadow:0 1px 2px rgba(0,0,0,.3); }
+    .tagline { font-size:9px; font-weight:600; color:#e8f4f8; letter-spacing:2px; text-transform:uppercase; margin-top:2px; }
+ 
+    /* --- Page-specific styling --- */
+    .card { border:none; border-radius:12px; }
+    .form-control, .form-select { border-radius:10px; }
+    .btn-primary { background:#0B4D83; border:none; border-radius:8px; }
+    .btn-primary:hover { background:#0B4D83; }
+    .btn-secondary { border-radius:8px; }
+    table th { background:#e9f2ff; white-space:nowrap; }
+    table tbody tr:hover { background:#f1f8ff; }
+ 
+    .tag-pill { border:1px solid #e5e7eb; border-radius:8px; padding:6px 10px; background:#fff; }
+    .btn-manager { background-color:#0B4D83; color:#fff; border:none; padding:8px 18px; font-size:.9rem; border-radius:25px; transition: background-color .3s; }
+    .btn-manager:hover { background-color:#7a0f3e; color:#fff; }
+  </style>
+</head>
+<body>
+ 
+  <!-- Optional Sidebar -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="sidebarMenuLabel">Menu</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('transactions_review') }}"><i class="bi bi-person-lines-fill"></i> Profile</a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark active" href="{{ url_for('audit_logs') }}"><i class="bi bi-bar-chart-line-fill"></i> Audit Logs</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+ 
+  <!-- Header -->
+  <div class="top-bar d-flex align-items-center px-3 py-2">
+    <button class="btn btn-outline-light btn-sm me-3"
+            data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
+            aria-controls="sidebarMenu" aria-label="Toggle sidebar">
+      <i class="bi bi-list fs-5"></i>
+    </button>
+ 
+    <a class="navbar-brand digi-bank-logo d-flex align-items-center me-3" href="{{ url_for('home') }}">
+      <div class="logo-icon"></div>
+      <div class="logo-text ms-2">
+        <div class="main-text">
+          <span class="digi">DiGi</span><span class="bank">Bank</span>
+        </div>
+        <div class="tagline">Smart Banking</div>
+      </div>
+    </a>
+ 
+    <h5 class="flex-grow-1 text-center m-0">Audit Logs</h5>
+ 
+    <div class="d-flex align-items-center">
+      <h5 class="m-0 me-2 fs-6">
+        Welcome, {{ (user.email if user and user.email else session.get('user_email')) or 'User' }}
+      </h5>
+      <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">
+        Logout
+      </a>
+    </div>
+  </div>
+ 
+  <!-- Main -->
+  <div class="container mt-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <!-- Filters -->
+        <form class="mb-4" method="GET" action="{{ url_for('audit_logs') }}">
+          <!-- Row 1: user/name/email/mobile -->
+          <div class="row g-3">
+            <div class="col-md-3"><input type="text" name="user_id" class="form-control" placeholder="User ID" value="{{ filters.get('user_id','') }}"></div>
+            <div class="col-md-3"><input type="text" name="name" class="form-control" placeholder="Name" value="{{ filters.get('name','') }}"></div>
+            <div class="col-md-3"><input type="email" name="email" class="form-control" placeholder="Email" value="{{ filters.get('email','') }}"></div>
+            <div class="col-md-3"><input type="text" name="mobile" class="form-control" placeholder="Mobile" value="{{ filters.get('mobile','') }}"></div>
+          </div>
+ 
+          <!-- Row 2: audit type checkboxes -->
+          <div class="row g-3 mt-1">
+            <div class="col-12">
+              <div class="d-flex flex-wrap align-items-center gap-3">
+                <span class="fw-semibold">Filter Audit Type:</span>
+                {% set tsel = selected_types or [] %}
+                <label class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" name="audit_type" value="account"   {% if 'account' in tsel %}checked{% endif %}>
+                  <span class="form-check-label">Accounts</span>
+                </label>
+                <label class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" name="audit_type" value="cards"     {% if 'cards' in tsel %}checked{% endif %}>
+                  <span class="form-check-label">Cards</span>
+                </label>
+                <label class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" name="audit_type" value="loans"     {% if 'loans' in tsel %}checked{% endif %}>
+                  <span class="form-check-label">Loans</span>
+                </label>
+                <label class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" name="audit_type" value="investment"{% if 'investment' in tsel %}checked{% endif %}>
+                  <span class="form-check-label">Investment</span>
+                </label>
+                <label class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" name="audit_type" value="deposit"   {% if 'deposit' in tsel %}checked{% endif %}>
+                  <span class="form-check-label">Deposit</span>
+                </label>
+              </div>
+            </div>
+          </div>
+ 
+          <!-- Row 3: from/to datetime + per_page + buttons -->
+          <div class="row g-3 mt-1 align-items-end">
+            <div class="col-md-3">
+              <label class="form-label">From (Date & Time)</label>
+              <input type="datetime-local" name="from_dt" class="form-control" value="{{ filters.get('from_dt','') }}">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">To (Date & Time)</label>
+              <input type="datetime-local" name="to_dt" class="form-control" value="{{ filters.get('to_dt','') }}">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Per Page</label>
+              <select class="form-select" name="per_page">
+                {% for n in [10,20,50,100] %}
+                  <option value="{{ n }}" {{ 'selected' if per_page == n else '' }}>{{ n }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-4 text-end">
+              <button type="submit" class="btn btn-primary px-4 me-2">Search</button>
+              <a class="btn btn-secondary px-4" href="{{ url_for('audit_logs') }}">Clear</a>
+            </div>
+          </div>
+ 
+          <!-- Export (preserve filters) -->
+          <div class="mt-3 d-flex justify-content-end">
+            <a class="btn btn-success"
+               href="{{ url_for('audit_logs_export') }}?{{ urlencode(export_qs, doseq=True) }}">
+              Download CSV
+            </a>
+          </div>
+        </form>
+ 
+        <!-- Summary -->
+        {% if searched %}
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <div class="tag-pill">Total: <strong>{{ total }}</strong></div>
+            <div class="text-muted small">Page {{ page }} of {{ total_pages }}</div>
+          </div>
+        {% endif %}
+ 
+        <!-- Results -->
+        {% if rows %}
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+              <thead class="table-light text-center">
+                <tr>
+                  <th>Audit Type</th>
+                  <th>Ref ID</th>
+                  <th>User ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Mobile</th>
+                  <th>Status</th>
+                  <th>Created At</th>
+                  <th>Action Time</th>
+                  <!-- Renamed header only -->
+                  <th>Account Number</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for r in rows %}
+                  <tr>
+                    <td class="text-center"><span class="badge bg-primary">{{ r.audit_type|upper }}</span></td>
+                    <td>{{ r.ref_id or '-' }}</td>
+                    <td>{{ r.user_id or '-' }}</td>
+                    <td>{{ r.name or '-' }}</td>
+                    <td>{{ r.email or '-' }}</td>
+                    <td>{{ r.mobile or '-' }}</td>
+                    <td>
+                      {% if r.status %}
+                        <span class="badge
+                          {% if r.status in ['A','approved','SUCCESS'] %} bg-success
+                          {% elif r.status in ['pending_manager', None] %} bg-warning
+                          {% else %} bg-danger {% endif %}">
+                          {{ r.status }}
+                        </span>
+                      {% else %}
+                        <span class="text-muted">-</span>
+                      {% endif %}
+                    </td>
+                    <td><small>{{ r.created_at.strftime('%Y-%m-%d %H:%M:%S') if r.created_at else '-' }}</small></td>
+                    <td><small>{{ r.action_time.strftime('%Y-%m-%d %H:%M:%S') if r.action_time else '-' }}</small></td>
+                    <!-- Still showing r.extra_ref so backend stays the same -->
+                    <td>{{ r.extra_ref or '-' }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+ 
+          <!-- Pagination -->
+          <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+              {% set qs = request.args.to_dict(flat=False) %}
+              {% set current = page %}
+              {% set prev = current-1 %}
+              {% set next = current+1 %}
+ 
+              <li class="page-item {{ 'disabled' if current <= 1 else '' }}">
+                {% set qs_prev = qs.copy() %}
+                {% set _ = qs_prev.update({'page':[prev]}) %}
+                <a class="page-link" href="{{ url_for('audit_logs') }}?{{ urlencode(qs_prev, doseq=True) }}">Previous</a>
+              </li>
+ 
+              <li class="page-item disabled"><span class="page-link">Page {{ page }} / {{ total_pages }}</span></li>
+ 
+              <li class="page-item {{ 'disabled' if current >= total_pages else '' }}">
+                {% set qs_next = qs.copy() %}
+                {% set _ = qs_next.update({'page':[next]}) %}
+                <a class="page-link" href="{{ url_for('audit_logs') }}?{{ urlencode(qs_next, doseq=True) }}">Next</a>
+              </li>
+            </ul>
+          </nav>
+ 
+        {% elif searched %}
+          <div class="alert alert-warning text-center mt-4">
+            ⚠️ No matching logs found for your filters.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+ 
+  <!-- Footer -->
+  <footer class="bg-custom text-white text-center py-3 mt-auto">
+    © 2025 DigiBank. Manager Dashboard. All rights reserved.
+  </footer>
+ 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+ 
+ 

@@ -1,263 +1,569 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Register | DigiBank</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-        rel="stylesheet" />
-  <link rel="stylesheet"
-        href="{{ url_for('static', filename='css/styles.css') }}" />
+ 
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+ 
   <style>
-    :root {
-      --primary-color: #0B4D83;
-      --secondary-color: #1976D2;
+    :root{
+      --brand:#0B4D83; --brand-2:#7a103c; --ink:#1f2937; --muted:#6b7280;
+      --card:#ffffff; --bg:#f5f7fb; --line:#e5e7eb;
     }
-    .form-container {
-      width: 100%;
-      max-width: 1000px;
-      background-color: #fff;
-      padding: 30px;
-      border-radius: 8px;
-      border: 2px solid var(--primary-color);
-    }
-    .form-title {
-      color: var(--primary-color);
-    }
-    .btn-submit {
-      background-color: var(--primary-color);
-      color: white;
-      border: 1px solid var(--primary-color);
-      font-weight: 600;
-    }
-    .btn-submit:hover,
-    .btn-submit:focus {
-      background-color: #7a103c; /* kept as is */
-      border-color: #7a103c;
-    }
-    .btn-outline-custom {
-      color: #ffffff !important;
-      border: 2px solid #ffffff !important;
-      background-color: transparent !important;
-      font-weight: 500;
-    }
-    .btn-outline-custom:hover,
-    .btn-outline-custom:focus,
-    .btn-outline-custom:active {
-      color: #ffffff !important;
-      border-color: #ffffff !important;
-      background-color: transparent !important;
-      box-shadow: none !important;
-    }
-    .custom-navbar {
-      background-color: var(--primary-color) !important;
-    }
-    .navbar-heading {
-      color: #ffffff;
-      margin: 0;
-    }
-    .form-section {
-      padding-top: 120px;
-    }
- 
-    /* ✅ Updated Logo CSS for better contrast on dark background */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap');
- 
-    .digi-bank-logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      transition: transform 0.3s ease;
-    }
-    .digi-bank-logo:hover {
-      transform: scale(1.05);
-    }
-    .logo-icon {
-      width: 50px;
-      height: 50px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 100%);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      box-shadow: 0 6px 18px rgba(102, 126, 234, 0.3), 0 2px 6px rgba(0, 0, 0, 0.1);
-    }
-    .logo-icon::before {
-      content: '';
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      right: 8px;
-      bottom: 8px;
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 8px;
-    }
-    .logo-icon::after {
-      content: 'D';
-      position: absolute;
-      color: transparent;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      background-clip: text;
-      -webkit-background-clip: text;
-      font-weight: 800;
-      font-size: 20px;
-      z-index: 2;
-    }
-    .logo-text {
-      color: #fff;
-    }
-    .main-text {
-      font-size: 20px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      line-height: 1;
-    }
-    .digi {
-      background: linear-gradient(135deg, #87CEEB 0%, #98D8E8 25%, #FFF8DC 50%, #87CEFA 100%);
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-    }
-    .bank {
-      color: #ffffff;
-      margin-left: 3px;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-    }
-    .tagline {
-      font-size: 9px;
-      font-weight: 600;
-      color: #e8f4f8;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-top: 2px;
-    }
+    html,body{ background:var(--bg); color:var(--ink); }
+    .navbar{ background:var(--brand)!important; }
+    .brand-badge{ display:inline-flex; align-items:center; gap:.6rem; color:#fff; font-weight:800; text-decoration:none; }
+    .brand-badge .logo{ width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#667eea 0%,#764ba2 25%,#f093fb 50%,#4facfe 100%); box-shadow:0 6px 16px rgba(102,126,234,.28); }
+    .hero-head{ padding-top:96px; padding-bottom:24px; }
+    .wrap{ max-width:1100px; margin:auto; background:var(--card); border-radius:16px; border:1px solid var(--line); box-shadow:0 10px 30px rgba(11,77,131,.08); overflow:hidden; }
+    .head-strip{ display:flex; align-items:center; justify-content:space-between; gap:1rem; background:#f0f6fb; border-bottom:1px solid #d7e7f7; padding:18px 22px; }
+    .head-strip .title{ color:var(--brand); font-weight:800; margin:0; letter-spacing:.2px; display:flex; align-items:center; gap:.6rem; }
+    .subtle{ color:var(--muted); }
+    .section{ padding:22px; border-bottom:1px dashed var(--line); }
+    .section h5{ display:flex; align-items:center; gap:.5rem; color:var(--brand); font-weight:800; margin-bottom:16px; }
+    .form-label{ font-weight:700; color:#374151; margin-bottom:.35rem; }
+    .input-group-text{ background:#f8fafc; font-weight:600; color:#4b5563; }
+    .req{ color:#dc3545; }
+    .badge-soft{ background:#e9f2fb; color:#0b4d83; border:1px solid #cfe3fb; padding:.35rem .6rem; border-radius:.5rem; font-weight:700; font-size:.9rem; }
+    .actions{ padding:16px 22px 26px; display:flex; align-items:center; justify-content:center; gap:14px; background:#fbfdff; }
+    .btn-brand{ background:var(--brand); color:#fff; font-weight:700; border:none; }
+    .btn-brand:hover{ background:var(--brand-2); color:#fff; }
+    .hint-tile{ display:flex; gap:.75rem; align-items:flex-start; background:#f9fbff; border:1px solid #e6eefb; border-radius:10px; padding:10px 12px; color:#27496d; }
+    .row.gx-3 > [class*="col-"]{ margin-bottom:12px; }
+    .modal-content{ border-radius:14px; } .modal-header{ border-bottom:none; } .modal-footer{ border-top:none; }
   </style>
 </head>
-<body style="background-color: #f8f9fa;">
- 
-  <!-- ✅ Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark custom-navbar fixed-top">
-    <div class="container-fluid d-flex align-items-center justify-content-between">
-     
-      <!-- ✅ Replaced Image with Custom Logo -->
-      <div class="digi-bank-logo">
-        <div class="logo-icon"></div>
-        <div class="logo-text">
-          <div class="main-text">
-            <span class="digi">DiGi</span><span class="bank">Bank</span>
-          </div>
-          <div class="tagline">Digital Excellence</div>
-        </div>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand brand-badge" href="#">
+        <span class="logo"></span>
+        <span>DiGi<span class="text-light">Bank</span></span>
+      </a>
+      <div class="ms-auto">
+        <a class="btn btn-outline-light" href="{{ url_for('login') }}">
+          <i class="bi bi-box-arrow-in-right me-1"></i> Login
+        </a>
       </div>
- 
-      <h5 class="navbar-heading text-white text-center flex-grow-1">
-        Welcome DigiBank Register Page
-      </h5>
-      <a href="{{ url_for('login') }}" class="btn btn-outline-custom">Login</a>
     </div>
   </nav>
  
-  <!-- ✅ Register Form -->
-  <div class="container form-section d-flex justify-content-center align-items-center">
-    <div class="form-container shadow-sm">
-      <h2 class="form-title text-center mb-4">Register With Us</h2>
+  <main class="container hero-head">
+    <div class="wrap">
+      <div class="head-strip">
+        <h3 class="title"><i class="bi bi-person-plus-fill"></i> Register with DigiBank</h3>
+        <span class="subtle">Secure onboarding with role-based email & dual OTP verification</span>
+      </div>
  
-      <form method="post" autocomplete="on">
-        <div class="row g-3">
-          <!-- Row 1 -->
-          <div class="col-md-4">
-            <label for="name" class="form-label">Full Name</label>
-            <input type="text" class="form-control" id="name" name="name" placeholder="Enter your full name" required />
-          </div>
-          <div class="col-md-4">
-            <label for="email" class="form-label">Email Address</label>
-            <input type="email" class="form-control" id="email" name="email" placeholder="you@example.com" required />
-          </div>
-          <div class="col-md-4">
-            <label for="dob" class="form-label">Date of Birth</label>
-            <input type="date" class="form-control" id="dob" name="dob" placeholder="DD/MM/YYYY" required />
+      <form id="signupForm" method="post" novalidate>
+        <input type="hidden" id="department_hidden" name="department" value="Customer"/>
+        <input type="hidden" id="ifsc_hidden" name="ifsc_code" value=""/>
+ 
+        <!-- Role & Organization -->
+        <section class="section">
+          <div class="d-flex align-items-center justify-content-between flex-wrap">
+            <h5 class="m-0"><i class="bi bi-building-lock"></i> Role & Organization</h5>
+            <small class="section-note">Department & IFSC auto-assigned from role/branch</small>
           </div>
  
-          <!-- Row 2 -->
-          <div class="col-md-4">
-            <label for="mobile" class="form-label">Mobile Number</label>
-            <input type="text" class="form-control" id="mobile" name="mobile" placeholder="9876543210" required />
-          </div>
-          <div class="col-md-4">
-            <label for="aadhaar" class="form-label">Aadhaar Number</label>
-            <input type="text" class="form-control" id="aadhaar" name="aadhaar" placeholder="1234 5678 9012" required />
-          </div>
-          <div class="col-md-4">
-            <label for="pan" class="form-label">PAN</label>
-            <input type="text" class="form-control" id="pan" name="pan" placeholder="ABCDE1234F" required />
-          </div>
+          <div class="row g-3 mt-1">
+            <div class="col-md-4">
+              <label class="form-label" for="role">Role <span class="req">*</span></label>
+              <select class="form-select" id="role" name="role" required>
+                <option value="" disabled selected>Select Role</option>
+                <option value="Customer">Customer</option>
+                <option value="Admin">Admin</option>
+                <option value="Manager">Manager</option>
+                <option value="Officer">Officer</option>
+                <option value="Auditor">Auditor</option>
+              </select>
+              <div class="invalid-feedback">Please select your role.</div>
+              <div class="form-text">Admin won’t select a branch; others must select one.</div>
+            </div>
  
-          <!-- Row 3 -->
-          <div class="col-md-4">
-            <label for="gender" class="form-label">Gender</label>
-            <select class="form-select" id="gender" name="gender" required>
-              <option value="" disabled selected>Select Gender</option>
-              <option>Male</option>
-              <option>Female</option>
-              <option>Other</option>
-            </select>
-          </div>
-          <div class="col-md-4">
-            <label for="city" class="form-label">City</label>
-            <input type="text" class="form-control" id="city" name="city" placeholder="Enter your city" required />
-          </div>
-          <div class="col-md-4">
-            <label for="state" class="form-label">State</label>
-            <input type="text" class="form-control" id="state" name="state" placeholder="Enter your state" required />
-          </div>
+            <!-- Branch (visible for all except Admin) -->
+            <div class="col-md-4" id="branch_wrap" style="display:none;">
+              <label class="form-label" for="branch_code">Branch Code <span class="req">*</span></label>
+              <select class="form-select" id="branch_code" name="branch_code">
+                <option value="" disabled selected>Select Branch</option>
+                <option value="BR-HQ-000" data-ifsc="DIGI0000000">BR-HQ-000 — HQ (Admin default)</option>
+                <option value="BR-MUM-001" data-ifsc="DIGI0001001">BR-MUM-001 — Mumbai (HQ)</option>
+                <option value="BR-DEL-002" data-ifsc="DIGI0002002">BR-DEL-002 — New Delhi</option>
+                <option value="BR-PUN-003" data-ifsc="DIGI0003003">BR-PUN-003 — Pune</option>
+                <option value="BR-HYD-004" data-ifsc="DIGI0004004">BR-HYD-004 — Hyderabad</option>
+                <option value="BR-BLR-005" data-ifsc="DIGI0005005">BR-BLR-005 — Bengaluru</option>
+              </select>
+              <div class="invalid-feedback">Please select your branch.</div>
+            </div>
  
-          <!-- Row 4 -->
-          <div class="col-md-4">
-            <label for="country" class="form-label">Country</label>
-            <input type="text" class="form-control" id="country" name="country" placeholder="Enter your country" required />
-          </div>
-          <div class="col-md-4">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required />
-          </div>
-          <div class="col-md-4">
-            <label for="confirm_password" class="form-label">Confirm Password</label>
-            <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Re-enter password" required />
-          </div>
+            <!-- IFSC display (read-only) -->
+            <div class="col-md-4" id="ifsc_wrap" style="display:none;">
+              <label class="form-label" for="ifsc_view">IFSC (Auto) <span class="req">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-123"></i></span>
+                <input class="form-control" id="ifsc_view" type="text" readonly placeholder="Will auto-fill after selecting branch"/>
+              </div>
+              <div class="form-text">Assigned based on the chosen branch.</div>
+            </div>
  
+            <div class="col-md-4">
+              <label class="form-label d-flex align-items-center gap-2 m-0">
+                Department (Auto) <i class="bi bi-info-circle text-muted" title="Assigned based on role"></i>
+              </label>
+              <div class="mt-2">
+                <span id="department_badge" class="badge-soft">Customer</span>
+              </div>
+            </div>
+          </div>
+        </section>
+ 
+        <!-- Personal Details -->
+        <section class="section">
+          <h5><i class="bi bi-person-vcard"></i> Personal Details</h5>
+ 
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label" for="name">Full Name <span class="req">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                <input class="form-control" id="name" name="name" required placeholder="Your full name"/>
+                <div class="invalid-feedback">Please enter your full name.</div>
+              </div>
+            </div>
+ 
+            <div class="col-md-4">
+              <label class="form-label" for="dob">Date of Birth <span class="req">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                <input class="form-control" id="dob" name="dob" type="date" required/>
+                <div class="invalid-feedback">You must be at least 18 years old.</div>
+              </div>
+            </div>
+ 
+            <div class="col-md-4">
+              <label class="form-label" for="gender">Gender <span class="req">*</span></label>
+              <select class="form-select" id="gender" name="gender" required>
+                <option value="" disabled selected>Select</option>
+                <option>Male</option><option>Female</option><option>Other</option>
+              </select>
+              <div class="invalid-feedback">Please select your gender.</div>
+            </div>
+ 
+            <div class="col-md-4">
+              <label class="form-label" for="aadhaar">Aadhaar <span class="req">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-credit-card-2-front"></i></span>
+                <input class="form-control" id="aadhaar" name="aadhaar" inputmode="numeric" pattern="^\d{12}$" required placeholder="12 digits"/>
+                <div class="invalid-feedback">Enter a 12-digit Aadhaar number.</div>
+              </div>
+            </div>
+ 
+            <div class="col-md-4">
+              <label class="form-label" for="pan">PAN <span class="req">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                <input class="form-control" id="pan" name="pan" pattern="^[A-Z]{5}\d{4}[A-Z]$" required placeholder="ABCDE1234F"/>
+              </div>
+              <div class="invalid-feedback">Use uppercase format like ABCDE1234F.</div>
+            </div>
+ 
+            <div class="col-md-4">
+              <label class="form-label" for="mobile">Mobile <span class="req">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-phone"></i></span>
+                <input class="form-control" id="mobile" name="mobile" inputmode="numeric" pattern="^\d{10}$" required placeholder="10 digits"/>
+                <div class="invalid-feedback">Enter a 10-digit mobile number.</div>
+              </div>
+              <div class="d-flex gap-2 mt-2">
+                <button type="button" class="btn btn-sm btn-outline-primary" id="sendMobileOTPBtn">
+                  <i class="bi bi-send"></i> Send OTP to Mobile
+                </button>
+                <div id="mobileOTPStatus" class="align-self-center"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+ 
+        <!-- Contact & Address -->
+        <section class="section">
+          <h5><i class="bi bi-envelope-paper"></i> Contact & Address</h5>
+ 
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" for="email">Email <span class="req">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                <input class="form-control" id="email" name="email" type="email" required placeholder="you@example.com"/>
+              </div>
+              <div class="form-text" id="emailHelp">
+                Customers: enter your personal email.
+                Staff/Admin: system will generate and display your official email here.
+              </div>
+              <div class="invalid-feedback" id="emailInvalid">Please enter a valid email.</div>
+ 
+              <div class="d-flex gap-2 mt-2">
+                <button type="button" class="btn btn-sm btn-outline-primary" id="sendEmailOTPBtn">
+                  <i class="bi bi-send"></i> Send OTP to Email
+                </button>
+                <div id="emailOTPStatus" class="align-self-center"></div>
+              </div>
+            </div>
+ 
+            <div class="col-md-6">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label" for="city">City <span class="req">*</span></label>
+                  <input class="form-control" id="city" name="city" required/>
+                  <div class="invalid-feedback">Please enter your city.</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" for="state">State <span class="req">*</span></label>
+                  <input class="form-control" id="state" name="state" required/>
+                  <div class="invalid-feedback">Please enter your state.</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" for="country">Country <span class="req">*</span></label>
+                  <input class="form-control" id="country" name="country" required/>
+                  <div class="invalid-feedback">Please enter your country.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+ 
+        <!-- Security -->
+        <section class="section">
+          <h5><i class="bi bi-lock-fill"></i> Security</h5>
+ 
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" for="password">Password <span class="req">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-key"></i></span>
+                <input class="form-control" id="password" name="password"
+                       type="password"
+                       pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$"
+                       placeholder="Min 8 chars, 1 letter, 1 number, 1 symbol"
+                       required/>
+              </div>
+              <div class="invalid-feedback">Password must be 8+ chars with a letter, number, and symbol.</div>
+            </div>
+ 
+            <div class="col-md-6">
+              <label class="form-label" for="confirm_password">Confirm Password <span class="req">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
+                <input class="form-control" id="confirm_password" name="confirm_password" type="password" required/>
+              </div>
+              <div class="invalid-feedback">Passwords must match.</div>
+            </div>
+          </div>
+        </section>
+ 
+        <div class="actions">
+          <button type="submit" class="btn btn-brand btn-lg px-5">
+            <i class="bi bi-person-check-fill me-2"></i> Register
+          </button>
         </div>
  
-        <!-- ✅ Centered Button -->
-        <div class="text-center mt-4">
-          <button type="submit" class="btn btn-submit px-5">Register</button>
+        <div class="text-center pb-4">
+          <p class="small m-0">Already have an account?
+            <a href="{{ url_for('login') }}">Login</a>
+          </p>
         </div>
       </form>
- 
-      <!-- Login prompt -->
-      <p class="text-center small mt-3">
-        Already have an account?
-        <a href="{{ url_for('login') }}" style="color: var(--primary-color);">Login</a>
-      </p>
     </div>
-  </div>
+  </main>
  
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    const password = document.getElementById("password");
-    const confirmPassword = document.getElementById("confirm_password");
-    const form = document.querySelector("form");
  
-    form.addEventListener("submit", function (e) {
-      if (password.value !== confirmPassword.value) {
-        e.preventDefault(); // stop form submission
-        alert("Passwords do not match. Please try again.");
-        confirmPassword.focus();
+  <script>
+    // ------- Configs -------
+    const ORG_DOMAIN = "digibank.com";
+    const ROLE_DEPT = {
+      "Customer":"Customer","Admin":"Administration","Manager":"Operations",
+      "Officer":"Retail Banking","Auditor":"Compliance"
+    };
+    const BRANCH_IFSC = {
+      "BR-HQ-000": "DIGI0000000",
+      "BR-MUM-001": "DIGI0001001",
+      "BR-DEL-002": "DIGI0002002",
+      "BR-PUN-003": "DIGI0003003",
+      "BR-HYD-004": "DIGI0004004",
+      "BR-BLR-005": "DIGI0005005"
+    };
+ 
+    const form = document.getElementById('signupForm');
+    const roleSel = document.getElementById('role');
+    const branchWrap = document.getElementById('branch_wrap');
+    const branchSel = document.getElementById('branch_code');
+    const ifscWrap = document.getElementById('ifsc_wrap');
+    const ifscView = document.getElementById('ifsc_view');
+    const ifscHidden = document.getElementById('ifsc_hidden');
+ 
+    const deptHidden = document.getElementById('department_hidden');
+    const deptBadge = document.getElementById('department_badge');
+    const emailInput = document.getElementById('email');
+    const emailHelp = document.getElementById('emailHelp');
+    const nameInput = document.getElementById('name');
+    const dobInput = document.getElementById('dob');
+    const pass1 = document.getElementById('password');
+    const pass2 = document.getElementById('confirm_password');
+ 
+    function isStaff(r){ return ['Admin','Manager','Officer','Auditor'].includes(r); }
+    function canChooseBranch(r){ return r !== 'Admin'; } // everyone except Admin picks a branch
+    function slug(full){ return (full||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'.').replace(/^\.+|\.+$/g,''); }
+ 
+    // Staff official email preview with sequence placeholder (server ensures final sequence)
+    function genStaffEmail(role){
+      const nm = slug(nameInput.value || 'user');
+      const br = (branchSel.value || 'BR-HQ-000'); // Admin uses HQ by default
+      const r  = role.toLowerCase();
+      if (r === 'admin') return `admin.${br.toLowerCase()}.###@${ORG_DOMAIN}`; // ### = server seq
+      return `${nm}.${r}.${br.toLowerCase()}.###@${ORG_DOMAIN}`;               // ### = server seq
+    }
+ 
+    function applyRoleUI(){
+      const role = roleSel.value || 'Customer';
+      const dep  = ROLE_DEPT[role] || 'Customer';
+      deptHidden.value = dep; deptBadge.textContent = dep;
+ 
+      // Branch & IFSC visibility
+      if (canChooseBranch(role)) {
+        branchWrap.style.display = '';
+        ifscWrap.style.display = '';
+        branchSel.setAttribute('required','required');
+      } else {
+        branchWrap.style.display = 'none';
+        ifscWrap.style.display = '';
+        branchSel.removeAttribute('required');
+        branchSel.value = 'BR-HQ-000'; // Admin fixed to HQ
+        updateIFSCView('BR-HQ-000');
       }
+ 
+      // Email handling
+      if (isStaff(role)) {
+        emailInput.readOnly = true;
+        emailInput.value = genStaffEmail(role);
+        emailInput.placeholder = "Auto-assigned by system";
+        emailHelp.textContent = "Staff/Admin: official email is auto-generated; final sequence is set on server.";
+        emailInput.setCustomValidity("");
+      } else {
+        emailInput.readOnly = false;
+        if (!emailInput.value || emailInput.value.includes(`@${ORG_DOMAIN}`)){
+          emailInput.value = "";
+        }
+        emailInput.placeholder = "you@example.com";
+        emailHelp.textContent = "Customers: enter your personal email.";
+      }
+    }
+ 
+    function updateIFSCView(branchCode){
+      const ifsc = BRANCH_IFSC[branchCode] || '';
+      ifscView.value = ifsc;
+      ifscHidden.value = ifsc;
+    }
+ 
+    // Validations
+    function validateAge(){
+      const v = dobInput.value; if (!v) return true;
+      const d = new Date(v + "T00:00:00"), t = new Date();
+      let age = t.getFullYear() - d.getFullYear();
+      if (t.getMonth() < d.getMonth() || (t.getMonth() === d.getMonth() && t.getDate() < d.getDate())) age--;
+      if (age < 18) { dobInput.setCustomValidity("Must be 18+"); return false; }
+      dobInput.setCustomValidity(""); return true;
+    }
+    function validatePasswordsMatch(){
+      if (pass1.value !== pass2.value) { pass2.setCustomValidity("Mismatch"); return false; }
+      pass2.setCustomValidity(""); return true;
+    }
+    function validateCustomerEmail(){
+      const role = roleSel.value || 'Customer';
+      if (isStaff(role)) { emailInput.setCustomValidity(""); return true; }
+      const val = (emailInput.value||'').trim().toLowerCase();
+      if (!val) { emailInput.setCustomValidity("Required"); return false; }
+      const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+      if (!ok) { emailInput.setCustomValidity("Invalid"); return false; }
+      emailInput.setCustomValidity(""); return true;
+    }
+ 
+    // Inline alert helper
+    function showInlineAlert(type, message) {
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${type} alert-dismissible fade show mt-2`;
+      alert.innerHTML = `<i class="bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-info-circle-fill'} me-2"></i>${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+      document.querySelector('main').prepend(alert);
+      setTimeout(() => alert.remove(), 5000);
+    }
+ 
+    // OTP modal (same as your previous — unchanged except kept concise)
+    function generateOTP() { return Math.floor(100000 + Math.random() * 900000); }
+    const otpModalHTML = `
+    <div class="modal fade" id="otpModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title"><i class="bi bi-shield-lock-fill me-2"></i>Verify OTP</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body text-center">
+            <p id="otpMessage" class="mb-3"></p>
+            <div class="d-flex justify-content-center align-items-center gap-2 mb-3">
+              <span id="otpDisplay" class="fw-bold fs-4 text-primary user-select-all">------</span>
+              <button class="btn btn-outline-secondary btn-sm" id="copyOtpBtn"><i class="bi bi-clipboard"></i></button>
+            </div>
+            <input type="text" id="otpInput" class="form-control text-center fw-bold fs-5" maxlength="6" placeholder="Enter 6-digit OTP" inputmode="numeric">
+            <div class="invalid-feedback mt-2">Incorrect OTP. Please try again.</div>
+          </div>
+          <div class="modal-footer d-flex justify-content-between">
+            <button type="button" class="btn btn-outline-secondary" id="resendOtpBtn" disabled>Resend OTP (30s)</button>
+            <button type="button" class="btn btn-success px-4" id="otpVerifyBtn">Verify</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+    document.body.insertAdjacentHTML('beforeend', otpModalHTML);
+    const otpModal = new bootstrap.Modal(document.getElementById('otpModal'));
+    const otpMessage = document.getElementById('otpMessage');
+    const otpInput = document.getElementById('otpInput');
+    const otpInvalid = otpInput.nextElementSibling;
+    const otpDisplay = document.getElementById('otpDisplay');
+    const copyOtpBtn = document.getElementById('copyOtpBtn');
+    const resendOtpBtn = document.getElementById('resendOtpBtn');
+    const otpVerifyBtn = document.getElementById('otpVerifyBtn');
+ 
+    let currentContext = null;
+    let currentOTP = null;
+    let resendTimer = null;
+    let resendCountdown = 30;
+ 
+    function openOTPModal(context, label, value) {
+      currentContext = context;
+      currentOTP = generateOTP();
+      otpMessage.innerHTML = `A 6-digit OTP has been sent to your <strong>${label}</strong> (${value}).<br><small class="text-muted">Use this OTP below to verify.</small>`;
+      otpDisplay.textContent = currentOTP;
+      otpInput.value = "";
+      otpInvalid.style.display = "none";
+      otpModal.show();
+      resendOtpBtn.disabled = true;
+      resendCountdown = 30;
+      resendOtpBtn.textContent = "Resend OTP (30s)";
+      if (resendTimer) clearInterval(resendTimer);
+      resendTimer = setInterval(() => {
+        resendCountdown--;
+        resendOtpBtn.textContent = `Resend OTP (${resendCountdown}s)`;
+        if (resendCountdown <= 0) {
+          clearInterval(resendTimer);
+          resendOtpBtn.disabled = false;
+          resendOtpBtn.textContent = "Resend OTP";
+        }
+      }, 1000);
+    }
+    copyOtpBtn.addEventListener('click', () => {
+      if (currentOTP) {
+        navigator.clipboard.writeText(currentOTP.toString());
+        copyOtpBtn.innerHTML = '<i class="bi bi-clipboard-check text-success"></i>';
+        setTimeout(() => (copyOtpBtn.innerHTML = '<i class="bi bi-clipboard"></i>'), 1500);
+      }
+    });
+    resendOtpBtn.addEventListener('click', () => {
+      currentOTP = generateOTP();
+      otpDisplay.textContent = currentOTP;
+      resendOtpBtn.disabled = true;
+      resendCountdown = 30;
+      resendOtpBtn.textContent = "Resend OTP (30s)";
+      showInlineAlert('info', 'A new OTP has been generated. Please check above.');
+      if (resendTimer) clearInterval(resendTimer);
+      resendTimer = setInterval(() => {
+        resendCountdown--;
+        resendOtpBtn.textContent = `Resend OTP (${resendCountdown}s)`;
+        if (resendCountdown <= 0) { clearInterval(resendTimer); resendOtpBtn.disabled = false; resendOtpBtn.textContent = "Resend OTP"; }
+      }, 1000);
+    });
+ 
+    // Mobile & Email OTP buttons
+    const mobileInput = document.getElementById('mobile');
+    const sendMobileOTPBtn = document.getElementById('sendMobileOTPBtn');
+    const mobileOTPStatus = document.getElementById('mobileOTPStatus');
+    let mobileVerified = false;
+    sendMobileOTPBtn.addEventListener('click', () => {
+      const mobile = mobileInput.value.trim();
+      if (!/^\d{10}$/.test(mobile)) { showInlineAlert('warning', 'Please enter a valid 10-digit mobile number first.'); return; }
+      openOTPModal('mobile', 'mobile number', mobile);
+    });
+ 
+    const emailInput2 = document.getElementById('email');
+    const sendEmailOTPBtn = document.getElementById('sendEmailOTPBtn');
+    const emailOTPStatus = document.getElementById('emailOTPStatus');
+    let emailVerified = false;
+    sendEmailOTPBtn.addEventListener('click', () => {
+      const email = emailInput2.value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showInlineAlert('warning', 'Please enter a valid email first.'); return; }
+      openOTPModal('email', 'email address', email);
+    });
+ 
+    otpVerifyBtn.addEventListener('click', () => {
+      const entered = otpInput.value.trim();
+      if (entered === (currentOTP || '').toString()) {
+        otpInvalid.style.display = "none"; otpModal.hide();
+        if (currentContext === 'mobile') {
+          mobileVerified = true; showInlineAlert('success', 'Mobile number verified successfully ✅');
+          mobileOTPStatus.innerHTML = `<span class="text-success fw-semibold"><i class="bi bi-check-circle me-1"></i> Verified</span>`;
+          mobileInput.setAttribute('readonly', 'readonly'); sendMobileOTPBtn.disabled = true;
+        } else if (currentContext === 'email') {
+          emailVerified = true; showInlineAlert('success', 'Email verified successfully ✅');
+          emailOTPStatus.innerHTML = `<span class="text-success fw-semibold"><i class="bi bi-check-circle me-1"></i> Verified</span>`;
+          emailInput2.setAttribute('readonly', 'readonly'); sendEmailOTPBtn.disabled = true;
+        }
+        currentContext = null;
+      } else {
+        otpInvalid.style.display = "block";
+      }
+    });
+ 
+    // Events
+    document.addEventListener('DOMContentLoaded', applyRoleUI);
+    roleSel.addEventListener('change', () => {
+      applyRoleUI();
+      if (isStaff(roleSel.value)) emailInput.value = genStaffEmail(roleSel.value);
+    });
+    branchSel.addEventListener('change', () => {
+      updateIFSCView(branchSel.value);
+      if (isStaff(roleSel.value)) emailInput.value = genStaffEmail(roleSel.value);
+    });
+    nameInput.addEventListener('input', () => { if (isStaff(roleSel.value)) emailInput.value = genStaffEmail(roleSel.value); });
+ 
+    const emailInputValidator = () => validateCustomerEmail();
+    emailInput.addEventListener('input', emailInputValidator);
+    dobInput.addEventListener('change', validateAge);
+    pass2.addEventListener('input', validatePasswordsMatch);
+ 
+    // Prevent submit until verified + valid + IFSC present
+    form.addEventListener('submit', (e)=>{
+      validateAge(); validateCustomerEmail(); validatePasswordsMatch();
+      form.classList.add('was-validated');
+      if (!form.checkValidity()) { e.preventDefault(); e.stopPropagation(); return; }
+ 
+      // Branch + IFSC rules
+      const role = roleSel.value;
+      if (role !== 'Admin') {
+        if (!branchSel.value) { e.preventDefault(); showInlineAlert('warning','Please select your branch.'); return; }
+        if (!ifscHidden.value) { e.preventDefault(); showInlineAlert('warning','IFSC is missing for selected branch.'); return; }
+      } else {
+        // ensure Admin fixed values
+        branchSel.value = 'BR-HQ-000'; updateIFSCView('BR-HQ-000');
+      }
+ 
+      if (!mobileVerified) { e.preventDefault(); showInlineAlert('warning','Please verify your mobile number first.'); return; }
+      if (!emailVerified)  { e.preventDefault(); showInlineAlert('warning','Please verify your email address first.'); return; }
     });
   </script>
 </body>
 </html>
+ 
  
