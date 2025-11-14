@@ -494,7 +494,7 @@
             <i class="bi bi-graph-up me-2"></i> Reports & Analytics
           </a>
         </li>
-      
+     
       </ul>
     </div>
   </div>
@@ -631,7 +631,7 @@
           <i class="bi bi-people-fill dashboard-icon mb-2"></i>
           <h5>Branch Managers</h5>
           <p>View Branch Managers and its details.</p>
-          <a href="{{ url_for('adminprofile') }}" class="btn btn-manager">Manage Accounts</a>
+          <a href="{{ url_for('list_branch_managers') }}" class="btn btn-manager">Manage Accounts</a>
         </div>
       </div>
  
@@ -641,7 +641,7 @@
           <i class="bi bi-file-earmark-check dashboard-icon mb-2"></i>
           <h5>Underwritting Team</h5>
           <p>Know more about Underwritting Team members</p>
-          <a href="{{ url_for('managerapprovals') }}" class="btn btn-manager">View Applications</a>
+          <a href="{{ url_for('list_underwriting_team') }}" class="btn btn-manager">View Applications</a>
         </div>
       </div>
  
@@ -651,7 +651,7 @@
           <i class="bi bi-list-check dashboard-icon mb-2"></i>
           <h5>Audit Teams</h5>
           <p>Know more about auditor Team members</p>
-          <a href="{{ url_for('transactions_review') }}" class="btn btn-manager">Review Transactions</a>
+          <a href="{{ url_for('list_audit_teams') }}" class="btn btn-manager">Review Transactions</a>
         </div>
       </div>
  
@@ -661,7 +661,7 @@
           <i class="bi bi-graph-up dashboard-icon mb-2"></i>
           <h5>Bank Agents</h5>
           <p>View Bank Agents details</p>
-          <a href="{{ url_for('manreport') }}" class="btn btn-manager">View Reports</a>
+          <a href="{{ url_for('list_bank_agents') }}" class="btn btn-manager">View Reports</a>
         </div>
       </div>
  
@@ -671,7 +671,7 @@
           <i class="bi bi-person-badge dashboard-icon mb-2"></i>
           <h5>Bank Customers</h5>
           <p>View Customers.</p>
-          <a href="{{ url_for('customer_search') }}" class="btn btn-manager">Manage Staff</a>
+          <a href="{{ url_for('manstaff') }}" class="btn btn-manager">Manage Staff</a>
         </div>
       </div>
  
@@ -679,9 +679,9 @@
       <div class="col-md-4 col-sm-6">
         <div class="card dashboard-card p-4 text-center">
           <i class="bi bi-building dashboard-icon mb-2"></i>
-          <h5>Branch Performance</h5>
+          <h5>Team Performance</h5>
           <p>Track KPIs and performance metrics for your branch.</p>
-          <a href="{{ url_for('branchperformance') }}" class="btn btn-manager">View Performance</a>
+          <a href="{{ url_for('team_performance') }}" class="btn btn-manager">View Performance</a>
         </div>
       </div>
  
@@ -704,6 +704,7 @@
   </script>
 </body>
 </html>
+ 
  
  
  

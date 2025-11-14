@@ -219,7 +219,7 @@
       background-color: #0B4D83;
     }
   </style>
-
+ 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap');
     .digi-bank-logo {
@@ -270,7 +270,7 @@
   </style>
 </head>
 <body>
-
+ 
   <!-- Sidebar Offcanvas -->
   <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
     <div class="offcanvas-header">
@@ -290,20 +290,20 @@
           </a>
         </li>
         <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="{{ url_for('manreport') }}">
+          <a class="nav-link text-dark" href="{{ url_for('officer_ekyc_requests') }}">
             <i class="bi bi-file-earmark-person me-2"></i> E-KYC
           </a>
         </li>
       </ul>
     </div>
   </div>
-
+ 
   <!-- Top Bar -->
   <div class="top-bar d-flex align-items-center px-3 py-2" style="background-color:#0B4D83; color:white;">
     <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-label="Toggle sidebar">
       <i class="bi bi-list fs-5"></i>
     </button>
-
+ 
     <a class="navbar-brand digi-bank-logo d-flex align-items-center me-3" href="{{ url_for('home') }}">
       <div class="logo-icon"></div>
       <div class="logo-text ms-2">
@@ -311,15 +311,15 @@
         <div class="tagline">Smart Banking</div>
       </div>
     </a>
-
+ 
     <h5 class="flex-grow-1 text-center m-0">Welcome To Officer's Dashboard</h5>
-
+ 
     <div class="d-flex align-items-center">
       <h5 class="m-0 me-2 fs-6">Welcome, {{ user.email }}</h5>
       <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm ms-3">Logout</a>
     </div>
   </div>
-
+ 
   <!-- Search Bar -->
   <div class="search-chatbar position-relative">
     <form id="searchForm" class="d-flex w-100 align-items-center" action="{{ url_for('searchprofile') }}" method="get" autocomplete="off">
@@ -327,10 +327,10 @@
       <input type="hidden" name="search_by" id="searchBy" value="name">
       <button class="btn btn-manager" type="submit"><i class="bi bi-search"></i></button>
     </form>
-
+ 
     <ul id="suggestions" class="list-group position-absolute w-100" style="top:100%; left:0; margin-top:4px; z-index:1000;"></ul>
   </div>
-
+ 
   <script>
   const input = document.getElementById('searchInput');
   const list  = document.getElementById('suggestions');
@@ -360,7 +360,7 @@
     if (!list.contains(e.target) && e.target !== input) list.innerHTML = '';
   });
   </script>
-
+ 
   <!-- Dashboard Content -->
   <div class="container my-4 flex-grow-1">
     <h3 class="mb-4 text-center">Officer's Tools</h3>
@@ -378,17 +378,19 @@
           <i class="bi bi-file-earmark-person dashboard-icon mb-2"></i>
           <h5>E-KYC</h5>
           <p>For instant and secure customer onboarding</p>
-          <a href="{{ url_for('managerapprovals') }}" class="btn btn-manager">View Applications</a>
+          <a href="{{ url_for('officer_ekyc_requests') }}" class="btn btn-manager">View KYC Applications</a>
         </div>
       </div>
     </div>
   </div>
-
+ 
   <!-- Footer -->
   <footer class="bg-custom text-white text-center py-3 mt-auto">
     © 2025 DigiBank. Manager Dashboard. All rights reserved.
   </footer>
-
+ 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+ 
+ 

@@ -1,755 +1,487 @@
 <!DOCTYPE html>
 <html lang="en">
- 
 <head>
   <meta charset="UTF-8" />
   <title>Update e-KYC - DigiBank</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
- 
-  <!-- Bootstrap + Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
- 
   <style>
-    /* Base */
-    body {
-      background-color: #f8f9fa;
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 0;
+    body{background-color:#f8f9fa;font-family:'Segoe UI',sans-serif;}
+    .top-bar{background:#0B4D83;color:#fff;display:flex;align-items:center;gap:12px;padding:10px 20px;position:sticky;top:0;z-index:1030;}
+    .digi-bank-logo{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff;}
+    .logo-icon{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#667eea,#764ba2,#f093fb,#4facfe);box-shadow:0 6px 16px rgba(0,0,0,.15);}
+    .main-text{font-size:20px;font-weight:800;}
+    .tagline{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#e8f4f8;}
+    .form-section{background:#fff;border-radius:10px;box-shadow:0 4px 14px rgba(0,0,0,.08);padding:26px;margin:24px auto;max-width:880px;}
+    h3{color:#0B4D83;font-weight:700;}
+    .btn-submit{background:#0B4D83;color:#fff;font-weight:600;border:none;border-radius:5px;padding:10px 0;}
+    .btn-submit:hover{background:#7a0f3e;}
+    .btn-verify,.btn-view,.btn-capture,.btn-ghost{background:#0B4D83;color:#fff;border:none;border-radius:6px;padding:7px 16px;font-size:.9rem;}
+    .btn-verify:hover,.btn-view:hover,.btn-capture:hover,.btn-ghost:hover{background:#7a0f3e;}
+    .btn-ghost{background:#eef2f7;color:#0B4D83;border:1px solid #d6dee8;}
+    .identity-section{background:#f9f7f2;padding:16px;border-radius:8px;margin-top:10px;}
+    .identity-section h5{color:#0B4D83;font-weight:700;margin-bottom:10px;text-align:center;}
+    .verified{font-size:.85rem;margin-top:6px;display:block;min-height:22px;}
+    .preview-img{max-width:100%;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,.15);}
+    video{width:100%;border-radius:8px;display:none;margin-top:10px;}
+    canvas{display:none;}
+    .hint{font-size:.8rem;color:#6b7280}
+    .pill{display:inline-block;background:#eef2f7;color:#0B4D83;border:1px solid #d6dee8;border-radius:999px;padding:4px 10px;font-size:.8rem}
+    .otp-boxes{display:flex;gap:8px;margin-top:6px}
+    .otp-boxes input{
+      width:44px;height:48px;border:1px solid #d6dee8;border-radius:8px;
+      text-align:center;font-size:1.1rem;font-weight:700;outline:none;
     }
- 
-    /* Top bar */
-    .top-bar {
-      background-color: #0B4D83;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 20px;
-      user-select: none;
-      position: sticky;
-      top: 0;
-      z-index: 1030;
-    }
- 
-    .digi-bank-logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-      color: white;
-    }
- 
-    .logo-icon {
-      width: 50px;
-      height: 50px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 100%);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      box-shadow: 0 6px 18px rgba(102, 126, 234, 0.3), 0 2px 6px rgba(0, 0, 0, 0.1);
-    }
- 
-    .logo-icon::after {
-      content: 'D';
-      position: absolute;
-      color: transparent;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      background-clip: text;
-      -webkit-background-clip: text;
-      font-weight: 800;
-      font-size: 20px;
-      z-index: 2;
-    }
- 
-    .logo-text .main-text {
-      font-size: 20px;
-      font-weight: 800;
-      color: #fff;
-      line-height: 1;
-    }
- 
-    .tagline {
-      font-size: 9px;
-      font-weight: 600;
-      color: #e8f4f8;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-top: 2px;
-    }
- 
-    /* Sidebar */
-    #sidebarMenu.offcanvas-start {
-      width: 250px;
-    }
- 
-    #sidebarMenu .nav-link {
-      font-size: 0.9rem;
-      padding: 8px 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #333;
-      transition: color 0.3s;
-    }
- 
-    #sidebarMenu .nav-link.active {
-      font-weight: 700;
-      color: #0B4D83 !important;
-      background-color: #f0d7e0;
-      border-radius: 4px;
-    }
- 
-    /* Form section */
-    .form-section {
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
-      padding: 30px;
-      margin: 30px auto;
-      max-width: 880px;
-    }
- 
-    h3 {
-      color: #0B4D83;
-      font-weight: 700;
-    }
- 
-    .stacked-block {
-      margin-bottom: 26px;
-    }
- 
-    label {
-      font-weight: 500;
-      color: #0B4D83;
-      margin-bottom: 6px;
-    }
- 
-    .btn-submit {
-      background-color: #0B4D83;
-      color: white;
-      font-weight: 600;
-      border: none;
-      border-radius: 4px;
-      padding: 10px 0;
-    }
- 
-    .btn-submit:hover {
-      background-color: #7a0f3e;
-    }
- 
-    .btn-verify,
-    .btn-view,
-    .btn-capture {
-      background-color: #0B4D83;
-      color: white;
-      font-weight: 500;
-      border: none;
-      border-radius: 6px;
-      padding: 8px 18px;
-      margin-top: 10px;
-    }
- 
-    .btn-verify:hover,
-    .btn-view:hover,
-    .btn-capture:hover {
-      background-color: #7a0f3e;
-    }
- 
-    .verified {
-      display: block;
-      margin-top: 8px;
-      font-weight: 700;
-    }
- 
-    /* OR */
-    .or-divider {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      justify-content: center;
-      color: #0B4D83;
-      font-weight: 700;
-      margin: 16px 0;
-    }
- 
-    .or-divider::before,
-    .or-divider::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background: #e5e7eb;
-    }
- 
-    /* identity tinted (cream-gray) borderless */
-    .identity-section {
-      background-color: #f9f7f2; /* cream-gray tint requested */
-      padding: 18px;
-      border-radius: 8px;
-    }
- 
-    .identity-section h5 {
-      color: #0B4D83;
-      font-weight: 700;
-      margin-bottom: 12px;
-      text-align: center;
-    }
- 
-    .blur-overlay {
-      position: relative;
-      border-radius: 6px;
-    }
- 
-    .blur-overlay.locked {
-      opacity: 0.5;
-      pointer-events: none;
-    }
- 
-    .blur-overlay.locked::after {
-      content: "🔒 Locked (Other ID verified)";
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 0;
-      bottom: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #0B4D83;
-      font-weight: 700;
-      background: rgba(255,255,255,0.75);
-      border-radius: 6px;
-      pointer-events: none;
-    }
- 
-    /* preview */
-    .preview-img {
-      max-width: 100%;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.15);
-    }
- 
-    video {
-      width: 100%;
-      border-radius: 8px;
-      display: none;
-      margin-top: 10px;
-    }
- 
-    canvas {
-      display: none;
-    }
- 
-    @media (max-width:600px) {
-      .form-section { padding: 20px; margin: 18px; }
-    }
+    .otp-boxes input:focus{border-color:#0B4D83;box-shadow:0 0 0 3px rgba(11,77,131,.15);}
+    .otp-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+    .otp-mini-hint{font-size:.8rem;color:#6b7280}
+    .toast-container{position:fixed;top:12px;right:12px;z-index:2000}
+    .otp-toast .toast-header{background:#0B4D83;color:#fff}
+    .otp-badge{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight:800; letter-spacing:2px; font-size:1.1rem;}
   </style>
 </head>
- 
 <body>
  
-  <!-- Sidebar Offcanvas -->
-  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
-    <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="sidebarMenuLabel">User</h5>
-      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+<div class="top-bar">
+  <a class="digi-bank-logo" href="{{ url_for('home') }}">
+    <div class="logo-icon"></div>
+    <div>
+      <div class="main-text">DiGiBank</div>
+      <div class="tagline">Smart Banking</div>
     </div>
-    <div class="offcanvas-body">
-      <ul class="nav flex-column">
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark active" href="userdashboard.html">
-            <i class="bi bi-speedometer2 me-2"></i> Home
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="{{ url_for('viewaccounts') }}">
-            <i class="bi bi-person-lines-fill me-2"></i> View Accounts
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="loans.html">
-            <i class="bi bi-cash-coin me-2"></i> Loans
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="transactions.html">
-            <i class="bi bi-clock-history me-2"></i> Transaction History
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="balance.html">
-            <i class="bi bi-wallet2 me-2"></i> Check Balance
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="rewards.html">
-            <i class="bi bi-gift-fill me-2"></i> Rewards
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="paybill.html">
-            <i class="bi bi-credit-card me-2"></i> Pay Bill
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="#">
-            <i class="bi bi-person-rolodex me-2"></i> Get Contact
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="#">
-            <i class="bi bi-shield-lock-fill me-2"></i> Privacy & Security
-          </a>
-        </li>
-      </ul>
-    </div>
+  </a>
+  <div class="ms-auto d-flex align-items-center gap-2">
+    <span class="small">Welcome, {{ user.name }}!</span>
+    <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">Logout</a>
   </div>
+</div>
  
-  <!-- Top bar -->
-  <div class="top-bar d-flex align-items-center">
-    <a class="navbar-brand digi-bank-logo" href="{{ url_for('home') }}">
-      <div class="logo-icon"></div>
-      <div class="logo-text">
-        <div class="main-text">
-          <span class="digi">DiGi</span><span class="bank">Bank</span>
-        </div>
-        <div class="tagline">Smart Banking</div>
-      </div>
-    </a>
+<!-- OTP CENTER -->
+<div class="toast-container" id="otpToastContainer"></div>
  
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-      data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-      aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+<nav aria-label="breadcrumb" class="px-3 pt-2">
+  <ol class="breadcrumb mb-0">
+    <li class="breadcrumb-item"><a href="{{ url_for('profile') }}" style="color:#0B4D83;">Profile</a></li>
+    <li class="breadcrumb-item active" style="color:#0B4D83;font-weight:600;">Update e-KYC</li>
+  </ol>
+</nav>
  
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0B4D83 !important; width: 100%;">
-      <div class="container-fluid">
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <!-- Left nav -->
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">My Activities</a></li>
- 
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Open Account</a>
-              <ul class="dropdown-menu" aria-labelledby="accountDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('savingform') }}">Savings Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Salary Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Current Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Safe Custody Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Pension Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">PMJDY Account</a></li>
-              </ul>
-            </li>
- 
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Deposits</a>
-              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Digital Fixed Deposits</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Fixed Deposits</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Recurring Deposits</a></li>
-              </ul>
-            </li>
- 
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="loansDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Loans</a>
-              <ul class="dropdown-menu" aria-labelledby="loansDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Home Loan</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Personal Loan</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Business Loan</a></li>
-              </ul>
-            </li>
- 
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="cardsDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Cards</a>
-              <ul class="dropdown-menu" aria-labelledby="cardsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Credit Cards</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Debit Cards</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Prepaid Cards</a></li>
-              </ul>
-            </li>
- 
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="forexDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Forex</a>
-              <ul class="dropdown-menu" aria-labelledby="forexDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Travel Forex Cards</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Send Money Abroad</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Send Money India</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Foreign Currency Exchange</a></li>
-              </ul>
-            </li>
- 
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="investDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Investments</a>
-              <ul class="dropdown-menu" aria-labelledby="investDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Public Provident Fund</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Floating Rate Saving Bonds</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">National Pension System</a></li>
-              </ul>
-            </li>
-          </ul>
- 
-          <!-- Right side -->
-          <div class="d-flex align-items-center">
-            <h5 class="m-0 me-2 fs-6 text-white">Welcome, {{ user.name }} !</h5>
-            <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">Logout</a>
+<div class="container">
+  <div class="form-section">
+    {% if ekyc %}
+      {% set st = (ekyc.status or '').lower() %}
+      {% if st == 'approved' %}
+        <div class="alert alert-success d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <i class="bi bi-shield-check me-2"></i>
+            Your e-KYC is <strong>verified</strong>.
+            {% if ekyc.updated_at %} Updated at: {{ ekyc.updated_at }}{% endif %}
           </div>
+        </div>
+      {% elif st == 'pending' %}
+        <div class="alert alert-info mb-3">
+          <i class="bi bi-hourglass-split me-1"></i>
+          Your latest e-KYC submission is <strong>pending</strong> officer approval.
+        </div>
+      {% elif st == 'rejected' %}
+        <div class="alert alert-warning mb-3">
+          <i class="bi bi-exclamation-triangle me-1"></i>
+          Your previous e-KYC was <strong>rejected</strong>. Please resubmit correct details below.
+        </div>
+      {% endif %}
+    {% endif %}
+ 
+    <h3 class="text-center mb-3">Update Your e-KYC Details</h3>
+    <p class="text-muted text-center mb-4">
+      Upload your latest photo and verify your Aadhaar & PAN. Mobile number is required but has no OTP.
+      OTP shown here is for demo; final verification is done by an officer.
+    </p>
+ 
+    <form id="ekycForm" action="{{ url_for('updateekyc') }}" method="POST" enctype="multipart/form-data"
+          {% if ekyc and (ekyc.status or '').lower() == 'approved' %}onsubmit="return false;"{% endif %}>
+      {% if not (ekyc and (ekyc.status or '').lower() == 'approved') %}
+ 
+      <!-- Hidden flags (Aadhaar & PAN only) -->
+      <input type="hidden" name="aadhaar_otp_verified" id="aadhaarOtpVerified" value="0">
+      <input type="hidden" name="pan_otp_verified" id="panOtpVerified" value="0">
+ 
+      <!-- Passport Photo -->
+      <div class="mb-4">
+        <label class="form-label">Upload or Capture Passport Photo <span class="text-danger">*</span></label>
+        <input type="file" class="form-control" name="passport_photo" id="passportPhoto" accept="image/*" required>
+        <div class="d-flex flex-wrap gap-2 mt-2">
+          <button type="button" class="btn-view" id="viewPhotoBtn">View</button>
+          <button type="button" class="btn-capture" id="openCameraBtn">Capture Live</button>
+          <button type="button" class="btn-capture" id="capturePhotoBtn" style="display:none;">Take Snapshot</button>
+        </div>
+        <video id="cameraStream" autoplay></video>
+        <canvas id="capturedCanvas"></canvas>
+      </div>
+ 
+      <!-- Mobile (NO OTP, value required but no format validation) -->
+      <div class="mb-4">
+        <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="mobileNumber" name="mobile_number"
+               placeholder="Enter Mobile Number" required>
+        <small class="text-muted">Enter any mobile number; no OTP will be sent.</small>
+      </div>
+ 
+      <!-- Aadhaar -->
+      <div class="identity-section mb-3">
+        <h5><i class="bi bi-person-vcard me-2"></i>Aadhaar Verification</h5>
+ 
+        <label class="form-label">Aadhaar Number <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="aadharNumber" name="aadhar_number"
+               placeholder="Enter 12-digit Aadhaar" maxlength="12" required>
+        <span id="aadharStatus" class="verified"></span>
+ 
+        <div class="otp-actions">
+          <button type="button" id="aadhaarSendOtp" class="btn-verify" disabled>Send OTP</button>
+          <span id="aadhaarTimer" class="otp-mini-hint"></span>
+        </div>
+ 
+        <div class="otp-boxes" id="aadhaarOtpBoxes">
+          <input maxlength="1" inputmode="numeric" disabled>
+          <input maxlength="1" inputmode="numeric" disabled>
+          <input maxlength="1" inputmode="numeric" disabled>
+          <input maxlength="1" inputmode="numeric" disabled>
+          <input maxlength="1" inputmode="numeric" disabled>
+          <input maxlength="1" inputmode="numeric" disabled>
+        </div>
+ 
+        <div class="otp-actions">
+          <button type="button" id="aadhaarVerifyOtp" class="btn-ghost" disabled>Verify</button>
+          <div id="aadhaarOtpHint" class="otp-mini-hint"></div>
         </div>
       </div>
-    </nav>
+ 
+      <!-- PAN -->
+      <div class="identity-section mb-3">
+        <h5><i class="bi bi-credit-card-2-front me-2"></i>PAN Verification</h5>
+ 
+        <label class="form-label">PAN Number <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="panNumber" name="pan_number"
+               placeholder="Enter PAN (ABCDE1234F)" maxlength="10" required>
+        <span id="panStatus" class="verified"></span>
+ 
+        <div class="otp-actions">
+          <button type="button" id="panSendOtp" class="btn-verify" disabled>Send OTP</button>
+          <span id="panTimer" class="otp-mini-hint"></span>
+        </div>
+ 
+        <div class="otp-boxes" id="panOtpBoxes">
+          <input maxlength="1" inputmode="numeric" disabled>
+          <input maxlength="1" inputmode="numeric" disabled>
+          <input maxlength="1" inputmode="numeric" disabled>
+          <input maxlength="1" inputmode="numeric" disabled>
+          <input maxlength="1" inputmode="numeric" disabled>
+          <input maxlength="1" inputmode="numeric" disabled>
+        </div>
+ 
+        <div class="otp-actions">
+          <button type="button" id="panVerifyOtp" class="btn-ghost" disabled>Verify</button>
+          <div id="panOtpHint" class="otp-mini-hint"></div>
+        </div>
+      </div>
+ 
+      <div class="text-center">
+        <button type="submit" class="btn-submit w-50">Submit e-KYC for Review</button>
+      </div>
+      {% else %}
+      <div class="text-center mt-3">
+        <span class="badge bg-success px-3 py-2">
+          <i class="bi bi-shield-lock-fill me-1"></i> e-KYC already verified
+        </span>
+      </div>
+      {% endif %}
+    </form>
   </div>
+</div>
  
-  <!-- Breadcrumb -->
-  <nav aria-label="breadcrumb" style="background-color:#f8f9fa; padding:8px 15px; border-radius:4px; margin:10px 20px;">
-    <ol class="breadcrumb mb-0">
-      <li class="breadcrumb-item"><a href="{{ url_for('profile') }}" style="color:#0B4D83;">Home</a></li>
-      <li class="breadcrumb-item active" aria-current="page" style="color:#0B4D83; font-weight:bold;"> Update EKYC</li>
-    </ol>
-  </nav>
- 
-  <!-- Main form -->
-  <div class="container d-flex justify-content-center">
-    <div class="form-section w-100">
-      <h3 class="text-center mb-4">Update Your e-KYC Details</h3>
- 
-      <form action="{{ url_for('updateekyc') }}" method="POST" enctype="multipart/form-data" id="ekycForm">
-        <!-- Passport Photo -->
-        <div class="stacked-block">
-          <label class="form-label">Upload or Capture Passport Photo <span class="text-danger">*</span></label>
-          <input type="file" class="form-control" name="passport_photo" id="passportPhoto" accept="image/*">
-          <div class="d-flex gap-2 flex-wrap mt-3">
-            <button type="button" class="btn-view" id="viewPhotoBtn">View</button>
-            <button type="button" class="btn-capture" id="openCameraBtn">Capture Live</button>
-            <button type="button" class="btn-capture" id="capturePhotoBtn" style="display:none;">Take Snapshot</button>
-          </div>
-          <video id="cameraStream" autoplay></video>
-          <canvas id="capturedCanvas"></canvas>
-        </div>
- 
-        <!-- Identity Verification (tinted, borderless) -->
-        <div class="identity-section mb-3">
-          <h5><i class="bi bi-person-vcard me-2"></i>Identity Verification</h5>
- 
-          <!-- Aadhaar -->
-          <div class="stacked-block blur-overlay" id="aadhaarSection">
-            <label class="form-label">Aadhaar Number <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="aadharNumber" placeholder="Enter 12-digit Aadhaar" maxlength="12"
-              required>
-            <button type="button" class="btn-verify mt-3" id="verifyAadharBtn">Verify Aadhaar</button>
-            <span id="aadharStatus" class="verified"></span>
-          </div>
- 
-          <div class="or-divider">OR</div>
- 
-          <!-- PAN -->
-          <div class="stacked-block blur-overlay" id="panSection">
-            <label class="form-label">PAN Card Number <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="panNumber" placeholder="Enter PAN (ABCDE1234F)" maxlength="10"
-              required>
-            <button type="button" class="btn-verify mt-3" id="verifyPanBtn">Verify PAN</button>
-            <span id="panStatus" class="verified"></span>
-          </div>
-        </div>
- 
-        <!-- Mobile -->
-        <div class="stacked-block" id="mobileSection">
-          <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" id="mobileNumber" name="mobileNumber" placeholder="Enter 10-digit Mobile"
-            maxlength="10" required>
-          <button type="button" class="btn-verify mt-3" id="verifyMobileBtn">Verify Mobile</button>
-          <span id="mobileStatus" class="verified"></span>
-        </div>
- 
-        <div class="text-center mt-4">
-          <button type="submit" class="btn btn-submit w-50">Update e-KYC</button>
-        </div>
-      </form>
-    </div>
-  </div>
- 
-  <!-- Preview Modal (modernized) -->
-  <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-labelledby="imagePreviewLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content border-0 shadow">
-        <div class="modal-header text-white" style="background-color:#0B4D83;">
-          <h5 class="modal-title" id="imagePreviewLabel"><i class="bi bi-card-image me-2"></i>Uploaded Document Preview</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body text-center">
-          <img id="previewImage" src="" alt="Document Preview" class="preview-img">
-        </div>
+<!-- Preview modal -->
+<div class="modal fade" id="imagePreviewModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header text-white" style="background:#0B4D83;">
+        <h5 class="modal-title"><i class="bi bi-card-image me-2"></i>Photo Preview</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="previewImage" src="" class="preview-img" alt="Preview">
       </div>
     </div>
   </div>
+</div>
  
-  <!-- OTP Modal (blue header) -->
-  <div class="modal fade" id="otpModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content border-0 shadow">
-        <div class="modal-header text-white" style="background-color:#0B4D83;">
-          <h5 class="modal-title"><i class="bi bi-shield-lock-fill me-2"></i>Verify OTP</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body text-center">
-          <!-- dynamic message inserted here -->
-          <p id="otpMessage" class="mb-2"></p>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ====== CONFIG ====== */
+const SHOW_TEST_OTP = true;   // show OTP in toast (demo)
+const OTP_LENGTH = 6;
+const RESEND_SECONDS = 30;
  
-          <div class="d-flex justify-content-center align-items-center gap-2 mb-3">
-            <span id="otpDisplay" class="fw-bold fs-4 text-primary user-select-all">------</span>
-            <button class="btn btn-outline-secondary btn-sm" id="copyOtpBtn" title="Copy OTP"><i class="bi bi-clipboard"></i></button>
-          </div>
+/* ====== Camera & Preview ====== */
+const previewModal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+const passportPhotoInput = document.getElementById('passportPhoto');
+const previewImage = document.getElementById('previewImage');
+const video = document.getElementById('cameraStream');
+const canvas = document.getElementById('capturedCanvas');
+const openCameraBtn = document.getElementById('openCameraBtn');
+const capturePhotoBtn = document.getElementById('capturePhotoBtn');
+let stream = null;
  
-          <input type="text" id="otpInput" class="form-control text-center fw-bold fs-5" maxlength="6" placeholder="Enter 6-digit OTP">
-          <div class="invalid-feedback mt-2">Incorrect OTP. Please try again.</div>
-        </div>
-        <div class="modal-footer d-flex justify-content-between">
-          <button type="button" class="btn btn-outline-secondary" id="resendOtpBtn" disabled>Resend OTP (30s)</button>
-          <button type="button" class="btn btn-success px-4" id="otpVerifyBtn">Verify</button>
-        </div>
-      </div>
+document.getElementById('viewPhotoBtn').addEventListener('click', () => {
+  const file = passportPhotoInput.files[0];
+  if (!file) { alert('Please upload or capture a photo first.'); return; }
+  const r = new FileReader();
+  r.onload = e => { previewImage.src = e.target.result; previewModal.show(); };
+  r.readAsDataURL(file);
+});
+ 
+openCameraBtn.addEventListener('click', async () => {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({video:true});
+    video.srcObject = stream;
+    video.style.display = 'block';
+    capturePhotoBtn.style.display = 'inline-block';
+  } catch(e){ alert('Camera access denied or unavailable.'); }
+});
+ 
+capturePhotoBtn.addEventListener('click', () => {
+  if(!stream) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  ctx.drawImage(video,0,0,canvas.width,canvas.height);
+  stream.getTracks().forEach(t=>t.stop());
+  video.style.display='none';
+  capturePhotoBtn.style.display='none';
+  canvas.toBlob(blob => {
+    const file = new File([blob],'captured_photo.png',{type:'image/png'});
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    passportPhotoInput.files = dt.files;
+    const r = new FileReader();
+    r.onload = e => { previewImage.src = e.target.result; previewModal.show(); };
+    r.readAsDataURL(file);
+  });
+});
+ 
+/* ====== Helpers ====== */
+const digitsOnly = s => s.replace(/\D/g,'');
+const isValidAadhaar = s => /^\d{12}$/.test(s) && !/^0+$/.test(s);
+const isValidPAN = s => /^[A-Z]{5}\d{4}[A-Z]$/.test(s);
+function genOtp(len=OTP_LENGTH){ let x=''; for(let i=0;i<len;i++) x += Math.floor(Math.random()*10); return x; }
+function startTimer(spanEl, btnEl, seconds=RESEND_SECONDS){
+  let s = seconds;
+  btnEl.disabled = true;
+  spanEl.textContent = `Resend in ${s}s`;
+  const id = setInterval(()=>{
+    s--;
+    if(s<=0){ clearInterval(id); spanEl.textContent=''; btnEl.disabled=false; }
+    else { spanEl.textContent = `Resend in ${s}s`; }
+  },1000);
+}
+ 
+/* ====== OTP CENTER (toasts) ====== */
+const toastContainer = document.getElementById('otpToastContainer');
+function showOtpToast(kind, code){
+  if(!SHOW_TEST_OTP) return;
+  const id = `toast-${kind}-${Date.now()}`;
+  const wrapper = document.createElement('div');
+  wrapper.className = 'toast otp-toast';
+  wrapper.id = id;
+  wrapper.setAttribute('role','alert');
+  wrapper.setAttribute('aria-live','assertive');
+  wrapper.setAttribute('aria-atomic','true');
+ 
+  wrapper.innerHTML = `
+    <div class="toast-header">
+      <i class="bi bi-key me-2"></i>
+      <strong class="me-auto">OTP Center</strong>
+      <small class="text-white text-opacity-75">${kind.toUpperCase()}</small>
+      <button type="button" class="btn-close btn-close-white ms-2 mb-1" data-bs-dismiss="toast" aria-label="Close"></button>
     </div>
-  </div>
+    <div class="toast-body d-flex align-items-center justify-content-between gap-3">
+      <div>Use this OTP:</div>
+      <div class="otp-badge">${code}</div>
+      <button class="btn btn-sm btn-light" data-copy="${code}">
+        <i class="bi bi-clipboard"></i> Copy
+      </button>
+    </div>`;
+  toastContainer.appendChild(wrapper);
+  const t = new bootstrap.Toast(wrapper, { delay: 8000 });
+  t.show();
+  wrapper.querySelector('[data-copy]').addEventListener('click', (e)=>{
+    navigator.clipboard.writeText(e.currentTarget.getAttribute('data-copy'));
+    e.currentTarget.innerHTML = '<i class="bi bi-clipboard-check"></i> Copied';
+    setTimeout(()=>{ e.currentTarget.innerHTML = '<i class="bi bi-clipboard"></i> Copy'; }, 1500);
+  });
+}
  
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
- 
-  <script>
-    /* --------------------------
-       Camera / Photo Preview
-       -------------------------- */
-    const openCameraBtn = document.getElementById('openCameraBtn');
-    const capturePhotoBtn = document.getElementById('capturePhotoBtn');
-    const video = document.getElementById('cameraStream');
-    const canvas = document.getElementById('capturedCanvas');
-    const passportPhotoInput = document.getElementById('passportPhoto');
-    const previewModal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
-    const previewImage = document.getElementById('previewImage');
-    let stream = null;
- 
-    // View uploaded file in preview modal
-    document.getElementById('viewPhotoBtn').addEventListener('click', () => {
-      const file = passportPhotoInput.files[0];
-      if (!file) { alert('Please upload or capture a photo first.'); return; }
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        previewImage.src = e.target.result;
-        previewModal.show();
-      };
-      reader.readAsDataURL(file);
+/* ====== OTP Boxes binder ====== */
+function bindOtpBoxes(containerId){
+  const boxWrap = document.getElementById(containerId);
+  const inputs = Array.from(boxWrap.querySelectorAll('input'));
+  function readValue(){ return inputs.map(i=>i.value.trim()).join(''); }
+  function clearAll(){ inputs.forEach(i=>i.value=''); if(!inputs[0].disabled) inputs[0].focus(); }
+  inputs.forEach((inp, idx)=>{
+    inp.addEventListener('input', ()=>{
+      inp.value = inp.value.replace(/\D/g,'').slice(0,1);
+      if(inp.value && idx < inputs.length-1) inputs[idx+1].focus();
     });
- 
-    // Start camera
-    openCameraBtn.addEventListener('click', async () => {
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        video.srcObject = stream;
-        video.style.display = 'block';
-        capturePhotoBtn.style.display = 'inline-block';
-      } catch (err) {
-        alert('Camera access denied or unavailable.');
+    inp.addEventListener('keydown', (e)=>{
+      if(e.key === 'Backspace' && !inp.value && idx>0){
+        inputs[idx-1].focus(); inputs[idx-1].value='';
       }
+      if(e.key === 'ArrowLeft' && idx>0) inputs[idx-1].focus();
+      if(e.key === 'ArrowRight' && idx<inputs.length-1) inputs[idx+1].focus();
     });
- 
-    // Capture snapshot
-    capturePhotoBtn.addEventListener('click', () => {
-      if (!stream) return alert('Camera is not started.');
-      const ctx = canvas.getContext('2d');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      // stop stream
-      stream.getTracks().forEach(t => t.stop());
-      video.style.display = 'none';
-      capturePhotoBtn.style.display = 'none';
-      canvas.toBlob((blob) => {
-        const file = new File([blob], 'captured_photo.png', { type: 'image/png' });
-        const dt = new DataTransfer();
-        dt.items.add(file);
-        passportPhotoInput.files = dt.files;
-        // show preview immediately
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          previewImage.src = e.target.result;
-          previewModal.show();
-        };
-        reader.readAsDataURL(file);
-      });
+    inp.addEventListener('paste',(e)=>{
+      const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'').slice(0,inputs.length);
+      if(!text) return;
+      e.preventDefault();
+      inputs.forEach((x,i)=> x.value = text[i] || '');
     });
+  });
+  return {
+    enable(){ inputs.forEach(i=>i.disabled=false); inputs[0].focus(); },
+    disable(){ inputs.forEach(i=>i.disabled=true); },
+    readValue,
+    clearAll
+  };
+}
  
-    /* --------------------------
-       OTP & Verification Logic
-       -------------------------- */
-    function generateOTP() { return Math.floor(100000 + Math.random() * 900000); }
+const aadhaarOtpUI = bindOtpBoxes('aadhaarOtpBoxes');
+const panOtpUI     = bindOtpBoxes('panOtpBoxes');
  
-    const otpModalEl = document.getElementById('otpModal');
-    const otpModal = new bootstrap.Modal(otpModalEl);
-    const otpMessage = document.getElementById('otpMessage');
-    const otpDisplay = document.getElementById('otpDisplay');
-    const otpInput = document.getElementById('otpInput');
-    const otpInvalid = otpInput.nextElementSibling;
-    const copyOtpBtn = document.getElementById('copyOtpBtn');
-    const resendOtpBtn = document.getElementById('resendOtpBtn');
-    const otpVerifyBtn = document.getElementById('otpVerifyBtn');
+/* ====== State ====== */
+let aadhaarOtp = null, panOtp = null;
  
-    let currentField = null; // 'Aadhaar' | 'PAN' | 'Mobile'
-    let currentOTP = null;
-    let resendTimer = null;
-    let countdown = 30;
+/* ====== Elements ====== */
+const mobileNumber = document.getElementById('mobileNumber');
  
-    let aadharVerified = false, panVerified = false, mobileVerified = false;
+const aadharNumber = document.getElementById('aadharNumber');
+const aadharStatus = document.getElementById('aadharStatus');
+const aadhaarSendOtp = document.getElementById('aadhaarSendOtp');
+const aadhaarVerifyOtp = document.getElementById('aadhaarVerifyOtp');
+const aadhaarTimer = document.getElementById('aadhaarTimer');
+const aadhaarOtpHint = document.getElementById('aadhaarOtpHint');
+const aadhaarOtpVerifiedField = document.getElementById('aadhaarOtpVerified');
  
-    function showInlineAlert(type, message) {
-      const a = document.createElement('div');
-      a.className = `alert alert-${type} alert-dismissible fade show`;
-      a.innerHTML = `<i class="bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-info-circle-fill'} me-2"></i>${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
-      document.querySelector('.form-section').prepend(a);
-      setTimeout(() => a.remove(), 4000);
-    }
+const panNumber = document.getElementById('panNumber');
+const panStatus = document.getElementById('panStatus');
+const panSendOtp = document.getElementById('panSendOtp');
+const panVerifyOtp = document.getElementById('panVerifyOtp');
+const panTimer = document.getElementById('panTimer');
+const panOtpHint = document.getElementById('panOtpHint');
+const panOtpVerifiedField = document.getElementById('panOtpVerified');
  
-    function startResendCountdown() {
-      resendOtpBtn.disabled = true;
-      countdown = 30;
-      resendOtpBtn.textContent = `Resend OTP (${countdown}s)`;
-      if (resendTimer) clearInterval(resendTimer);
-      resendTimer = setInterval(() => {
-        countdown--;
-        resendOtpBtn.textContent = `Resend OTP (${countdown}s)`;
-        if (countdown <= 0) {
-          clearInterval(resendTimer);
-          resendOtpBtn.disabled = false;
-          resendOtpBtn.textContent = 'Resend OTP';
-        }
-      }, 1000);
-    }
+/* ====== Enable Aadhaar/PAN OTP only after mobile has some value ====== */
+function toggleOtpButtons(){
+  const hasMobile = mobileNumber.value.trim().length > 0;
+  aadhaarSendOtp.disabled = !hasMobile;
+  panSendOtp.disabled = !hasMobile;
+}
+mobileNumber.addEventListener('input', toggleOtpButtons);
+toggleOtpButtons();
  
-    function openOTPModalFor(field) {
-      // field: { type: 'Aadhaar'|'PAN'|'Mobile', info: 'used for message' }
-      currentOTP = generateOTP();
-      otpDisplay.textContent = currentOTP;
-      otpInput.value = '';
-      otpInvalid.style.display = 'none';
-      currentField = field;
-      // Set appropriate message:
-      if (field === 'Aadhaar' || field === 'PAN') {
-        otpMessage.innerHTML = `A 6-digit OTP has been sent to the <strong>registered mobile number</strong> linked to the selected ID (for demo the OTP is shown below).`;
-      } else if (field === 'Mobile') {
-        const entered = document.getElementById('mobileNumber').value.trim();
-        otpMessage.innerHTML = `A 6-digit OTP has been sent to the entered mobile number <strong>${entered}</strong> (for demo the OTP is shown below).`;
-      } else {
-        otpMessage.innerHTML = `A 6-digit OTP has been sent.`;
-      }
-      otpModal.show();
-      startResendCountdown();
-      console.log(`[DEBUG] OTP for ${field}: ${currentOTP}`);
-    }
+/* ====== Aadhaar events ====== */
+aadharNumber.addEventListener('input', ()=>{
+  aadharNumber.value = digitsOnly(aadharNumber.value).slice(0,12);
+  const ok = isValidAadhaar(aadharNumber.value);
+  aadharStatus.innerHTML = ok ? '<span class="text-success"><i class="bi bi-check-circle"></i> Looks valid</span>'
+                              : '<span class="text-danger">Enter 12 digits</span>';
+  if(!ok){
+    aadhaarOtpUI.disable(); aadhaarOtpUI.clearAll();
+    aadhaarVerifyOtp.disabled = true; aadhaarOtpHint.textContent='';
+    aadhaarOtpVerifiedField.value = '0';
+  }
+});
  
-    copyOtpBtn.addEventListener('click', async () => {
-      if (!currentOTP) return;
-      try {
-        await navigator.clipboard.writeText(currentOTP.toString());
-        copyOtpBtn.innerHTML = '<i class="bi bi-clipboard-check text-success"></i>';
-        setTimeout(() => copyOtpBtn.innerHTML = '<i class="bi bi-clipboard"></i>', 1200);
-        showInlineAlert('success', 'OTP copied to clipboard.');
-      } catch {
-        showInlineAlert('warning', 'Unable to copy OTP. Please copy manually.');
-      }
-    });
+aadhaarSendOtp.addEventListener('click', ()=>{
+  if(!isValidAadhaar(aadharNumber.value)){ aadharStatus.innerHTML='<span class="text-danger">Enter valid 12-digit Aadhaar</span>'; return; }
+  aadhaarOtp = genOtp();
+  aadhaarOtpUI.enable();
+  aadhaarVerifyOtp.disabled = false;
+  aadharStatus.innerHTML = '<span class="text-primary"><i class="bi bi-send"></i> OTP sent</span>';
+  if(SHOW_TEST_OTP){ aadhaarOtpHint.textContent = 'On-screen OTP shown above'; showOtpToast('aadhaar', aadhaarOtp); }
+  startTimer(aadhaarTimer, aadhaarSendOtp);
+});
  
-    resendOtpBtn.addEventListener('click', () => {
-      currentOTP = generateOTP();
-      otpDisplay.textContent = currentOTP;
-      showInlineAlert('info', 'New OTP generated.');
-      startResendCountdown();
-    });
+aadhaarVerifyOtp.addEventListener('click', ()=>{
+  if(!aadhaarOtp){ alert('Please click Send OTP first.'); return; }
+  const code = aadhaarOtpUI.readValue();
+  if(code === aadhaarOtp){
+    aadhaarOtpVerifiedField.value = '1';
+    aadharStatus.innerHTML = '<span class="text-success"><i class="bi bi-shield-check"></i> Aadhaar OTP verified</span>';
+    aadhaarVerifyOtp.disabled = true; aadhaarOtpUI.disable();
+  } else {
+    aadharStatus.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle"></i> Incorrect OTP</span>';
+  }
+});
  
-    otpVerifyBtn.addEventListener('click', () => {
-      const entered = otpInput.value.trim();
-      if (!entered) return;
-      if (entered === currentOTP.toString()) {
-        otpModal.hide();
-        showInlineAlert('success', `${currentField} verified successfully ✅`);
-        if (currentField === 'Aadhaar') {
-          aadharVerified = true;
-          document.getElementById('aadharStatus').textContent = '✔ Aadhaar verified';
-          document.getElementById('aadharStatus').style.color = 'green';
-          document.getElementById('aadharNumber').readOnly = true;
-          const b = document.getElementById('verifyAadharBtn'); if (b) b.remove();
-          // lock PAN and remove its required attribute
-          document.getElementById('panSection').classList.add('locked');
-          document.getElementById('panNumber').removeAttribute('required');
-        } else if (currentField === 'PAN') {
-          panVerified = true;
-          document.getElementById('panStatus').textContent = '✔ PAN verified';
-          document.getElementById('panStatus').style.color = 'green';
-          document.getElementById('panNumber').readOnly = true;
-          const b = document.getElementById('verifyPanBtn'); if (b) b.remove();
-          // lock Aadhaar and remove its required attribute
-          document.getElementById('aadhaarSection').classList.add('locked');
-          document.getElementById('aadharNumber').removeAttribute('required');
-        } else if (currentField === 'Mobile') {
-          mobileVerified = true;
-          document.getElementById('mobileStatus').textContent = '✔ Mobile verified';
-          document.getElementById('mobileStatus').style.color = 'green';
-          document.getElementById('mobileNumber').readOnly = true;
-          const b = document.getElementById('verifyMobileBtn'); if (b) b.remove();
-        }
-        currentOTP = null;
-        currentField = null;
-      } else {
-        otpInvalid.style.display = 'block';
-      }
-    });
+/* ====== PAN events ====== */
+panNumber.addEventListener('input', ()=>{
+  panNumber.value = panNumber.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,10);
+  const ok = isValidPAN(panNumber.value);
+  panStatus.innerHTML = ok ? '<span class="text-success"><i class="bi bi-check-circle"></i> Looks valid</span>'
+                           : '<span class="text-danger">Format ABCDE1234F</span>';
+  if(!ok){
+    panOtpUI.disable(); panOtpUI.clearAll();
+    panVerifyOtp.disabled = true; panOtpHint.textContent='';
+    panOtpVerifiedField.value = '0';
+  }
+});
  
-    // Handlers to open OTP modal for each verify button
-    document.getElementById('verifyAadharBtn').addEventListener('click', () => {
-      const v = document.getElementById('aadharNumber').value.trim();
-      if (!/^\d{12}$/.test(v)) { showInlineAlert('warning', 'Please enter a valid 12-digit Aadhaar number.'); return; }
-      openOTPModalFor('Aadhaar');
-    });
+panSendOtp.addEventListener('click', ()=>{
+  if(!isValidPAN(panNumber.value)){ panStatus.innerHTML='<span class="text-danger">Enter valid PAN</span>'; return; }
+  panOtp = genOtp();
+  panOtpUI.enable();
+  panVerifyOtp.disabled = false;
+  panStatus.innerHTML = '<span class="text-primary"><i class="bi bi-send"></i> OTP sent</span>';
+  if(SHOW_TEST_OTP){ panOtpHint.textContent = 'On-screen OTP shown above'; showOtpToast('pan', panOtp); }
+  startTimer(panTimer, panSendOtp);
+});
  
-    document.getElementById('verifyPanBtn').addEventListener('click', () => {
-      const v = document.getElementById('panNumber').value.trim().toUpperCase();
-      if (!/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(v)) { showInlineAlert('warning', 'Please enter a valid PAN (ABCDE1234F).'); return; }
-      openOTPModalFor('PAN');
-    });
+panVerifyOtp.addEventListener('click', ()=>{
+  if(!panOtp){ alert('Please click Send OTP first.'); return; }
+  const code = panOtpUI.readValue();
+  if(code === panOtp){
+    panOtpVerifiedField.value = '1';
+    panStatus.innerHTML = '<span class="text-success"><i class="bi bi-shield-check"></i> PAN OTP verified</span>';
+    panVerifyOtp.disabled = true; panOtpUI.disable();
+  } else {
+    panStatus.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle"></i> Incorrect OTP</span>';
+  }
+});
  
-    document.getElementById('verifyMobileBtn').addEventListener('click', () => {
-      const v = document.getElementById('mobileNumber').value.trim();
-      if (!/^\d{10}$/.test(v)) { showInlineAlert('warning', 'Please enter a valid 10-digit mobile number.'); return; }
-      openOTPModalFor('Mobile');
-    });
+/* ====== Submit Guard ====== */
+const formEl = document.getElementById('ekycForm');
+formEl.addEventListener('submit', (e)=>{
+  // Photo required
+  if(!passportPhotoInput.files || passportPhotoInput.files.length === 0){
+    e.preventDefault(); alert('Please upload or capture your passport photo.'); return false;
+  }
  
-    // Form guard: require one ID verified (Aadhaar or PAN) and mobile verified
-    document.getElementById('ekycForm').addEventListener('submit', (e) => {
-      if (!(aadharVerified || panVerified)) {
-        e.preventDefault();
-        showInlineAlert('warning', 'Please verify either Aadhaar or PAN before submitting.');
-        return;
-      }
-      if (!mobileVerified) {
-        e.preventDefault();
-        showInlineAlert('warning', 'Please verify your mobile number before submitting.');
-        return;
-      }
-      // allow submit (server will handle actual persistence)
-    });
+  // Mobile required (no format validation)
+  if(!mobileNumber.value.trim()){
+    e.preventDefault(); alert('Please enter your mobile number.'); return false;
+  }
  
-    // Clean invalid feedback when closing modal
-    otpModalEl.addEventListener('hidden.bs.modal', () => { otpInvalid.style.display = 'none'; });
+  // Aadhaar
+  if(!isValidAadhaar(aadharNumber.value)){ e.preventDefault(); alert('Enter a valid 12-digit Aadhaar.'); return false; }
+  if(document.getElementById('aadhaarOtpVerified').value !== '1'){ e.preventDefault(); alert('Please verify Aadhaar OTP.'); return false; }
  
-  </script>
+  // PAN
+  if(!isValidPAN(panNumber.value)){ e.preventDefault(); alert('Enter a valid PAN (ABCDE1234F).'); return false; }
+  if(document.getElementById('panOtpVerified').value !== '1'){ e.preventDefault(); alert('Please verify PAN OTP.'); return false; }
+ 
+  return true;
+});
+</script>
 </body>
- 
 </html>
  
  

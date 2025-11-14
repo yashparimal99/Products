@@ -871,13 +871,33 @@ def savingform():
 
 @app.route('/profile')
 def profile():
-    user_id = session.get('user_id')
+    if 'user_id' not in session:
+        flash("Please login first.", "warning")
+        return redirect(url_for('login'))
+ 
+    user_id = session['user_id']
+ 
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
     user = cur.fetchone()
+ 
+    # latest ekyc record (if any)
+    cur.execute("""
+        SELECT status, created_at, updated_at
+        FROM ekyc_details
+        WHERE user_id=%s
+        ORDER BY id DESC
+        LIMIT 1
+    """, (user_id,))
+    ekyc = cur.fetchone()
     cur.close()
-   
-    return render_template("profile.html", user=user)
+ 
+    ekyc_status = None
+    if ekyc:
+        ekyc_status = (ekyc['status'] or '').lower()
+ 
+    return render_template('profile.html', user=user, ekyc=ekyc, ekyc_status=ekyc_status)
+ 
 
 @app.route('/update_profile', methods=['GET', 'POST'])
 def update_profile():
@@ -8076,63 +8096,227 @@ def audit_logs_export():
     fname = f"audit_logs_{datetime.now():%Y%m%d_%H%M%S}.csv"
     return send_file(mem, mimetype="text/csv", as_attachment=True, download_name=fname)
  
- #EKUC Update
+ #EKyc Update
 
+ 
+# --- role guard for officer / manager / admin ---
+ 
+ 
+ 
+ 
+def get_latest_ekyc_for_user(user_id):
+    """Return latest ekyc_details row for this user, or None."""
+    cur = mysql.connection.cursor(DictCursor)
+    cur.execute("""
+        SELECT *
+        FROM ekyc_details
+        WHERE user_id = %s
+        ORDER BY id DESC
+        LIMIT 1
+    """, (user_id,))
+    row = cur.fetchone()
+    cur.close()
+    return row
+ 
+ 
 import base64
-
 @app.route('/updateekyc', methods=['GET', 'POST'])
 def updateekyc():
-    user_id = session.get('user_id')
+    if 'user_id' not in session:
+        flash("Please login first.", "warning")
+        return redirect(url_for('login'))
+ 
+    user_id = session['user_id']
+ 
+    # fetch user for header/details
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
     user = cur.fetchone()
     cur.close()
-
-    if 'user_id' not in session:
-        flash("Please login first.", "warning")
-        return redirect(url_for('login'))
-
-    user_id = session['user_id']
-
+ 
     if request.method == 'POST':
         passport_photo = request.files.get('passport_photo')
-        mobile_number = request.form.get('mobileNumber')
-        aadhar_number = request.form.get('aadharNumber')
-        pan_number = request.form.get('panNumber')
-
+        mobile_number  = (request.form.get('mobile_number') or '').strip()
+        aadhar_number  = (request.form.get('aadhar_number') or '').strip()
+        pan_number     = (request.form.get('pan_number') or '').strip()
+ 
         if not passport_photo:
             flash("Please upload your passport photo.", "danger")
             return redirect(url_for('updateekyc'))
-
-        # ✅ Read image as binary
+ 
         photo_data = passport_photo.read()
-
+ 
         cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-
-        # Check if record exists
-        cur.execute("SELECT * FROM ekyc_details WHERE user_id=%s", (user_id,))
+ 
+        # latest record (if any)
+        cur.execute("SELECT id FROM ekyc_details WHERE user_id=%s ORDER BY id DESC LIMIT 1", (user_id,))
         existing = cur.fetchone()
-
-        if existing:
-            cur.execute("""
-                UPDATE ekyc_details
-                SET aadhar_number=%s, pan_number=%s, mobile_number=%s, passport_photo=%s, status=%s, updated_at=NOW()
-                WHERE user_id=%s
-            """, (aadhar_number, pan_number, mobile_number, photo_data, 'verified', user_id))
-        else:
-            cur.execute("""
-                INSERT INTO ekyc_details (user_id, aadhar_number, pan_number, mobile_number, passport_photo, status, created_at)
-                VALUES (%s, %s, %s, %s, %s, %s, NOW())
-            """, (user_id, aadhar_number, pan_number, mobile_number, photo_data, 'verified'))
-
+ 
+       
+        cur.execute("""
+                INSERT INTO ekyc_details
+                    (user_id, aadhar_number, pan_number, mobile_number, passport_photo, status, created_at)
+                VALUES (%s, %s, %s, %s, %s, 'pending', NOW())
+            """, (user_id, aadhar_number, pan_number, mobile_number, photo_data))
+ 
         mysql.connection.commit()
         cur.close()
-
-        flash("Your e-KYC details have been successfully updated and photo stored in database.", "success")
+ 
+        flash("Your e-KYC has been submitted. Status: Pending verification.", "success")
         return redirect(url_for('profile'))
+ 
+    return render_template('ekyc_update.html', user=user)
 
-    return render_template('ekyc_update.html',user=user)
+ 
+@app.route('/officer/ekyc_requests', methods=['GET', 'POST'])
+ 
+def officer_ekyc_requests():
+    cur = mysql.connection.cursor(DictCursor)
+ 
+    # Handle approve / reject
+    if request.method == 'POST':
+        ekyc_id = request.form.get('ekyc_id')
+        action  = request.form.get('action')
+        if ekyc_id and action in ('approve', 'reject'):
+            new_status = 'approved' if action == 'approve' else 'rejected'
+            try:
+                cur.execute("""
+                    UPDATE ekyc_details
+                    SET status=%s, updated_at=NOW()
+                    WHERE id=%s
+                """, (new_status, ekyc_id))
+                mysql.connection.commit()
+                flash(f"e-KYC request {ekyc_id} {new_status}.",
+                      'success' if new_status == 'approved' else 'warning')
+            except Exception as e:
+                mysql.connection.rollback()
+                flash(f"Error updating e-KYC: {e}", 'danger')
+ 
+    # Fetch all e-KYC records (pending first)
+    cur.execute("""
+        SELECT e.id, e.user_id, e.aadhar_number, e.pan_number,
+               e.mobile_number, e.status, e.created_at, e.updated_at,
+               u.name, u.email
+        FROM ekyc_details e
+        JOIN bank_users u ON u.user_id = e.user_id
+        ORDER BY
+            CASE e.status
+                WHEN 'pending' THEN 0
+                WHEN 'approved' THEN 1
+                WHEN 'rejected' THEN 2
+                ELSE 3
+            END,
+            e.created_at DESC
+    """)
+    rows = cur.fetchall()
+    cur.close()
+ 
+    return render_template('officer_ekyc_requests.html', rows=rows)
+ 
+ 
+@app.route('/officer/ekyc/<int:ekyc_id>/approve', methods=['POST'])
+ 
+def approve_ekyc(ekyc_id):
+    officer_id = session.get('user_id')
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("""
+        UPDATE ekyc_details
+        SET status='approved',
+            officer_id=%s,
+            remarks=%s
+        WHERE id=%s
+    """, (officer_id, 'Approved after verification', ekyc_id))
+    mysql.connection.commit()
+    cur.close()
+    flash('e-KYC approved successfully.', 'success')
+    return redirect(url_for('officer_ekyc_requests'))
+ 
+ 
+@app.route('/officer/ekyc/<int:ekyc_id>/reject', methods=['POST'])
+ 
+def reject_ekyc(ekyc_id):
+    officer_id = session.get('user_id')
+    reason = (request.form.get('reason') or 'Rejected by officer').strip()
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("""
+        UPDATE ekyc_details
+        SET status='rejected',
+            officer_id=%s,
+            remarks=%s
+        WHERE id=%s
+    """, (officer_id, reason, ekyc_id))
+    mysql.connection.commit()
+    cur.close()
+    flash('e-KYC rejected.', 'warning')
+    return redirect(url_for('officer_ekyc_requests'))
+ 
+ 
 
+#####======Staff Management=====#####
+ 
+from flask import render_template, jsonify, abort
+from MySQLdb.cursors import DictCursor
+ 
+# ---- helper: fetch by role(s), excluding soft-deleted ----
+def _fetch_by_roles(roles):
+    placeholders = ", ".join(["%s"] * len(roles))
+    sql = f"""
+        SELECT user_id, name, email, aadhaar, role, onboarding_date
+        FROM bank_users
+        WHERE deleted_date IS NULL
+          AND role IN ({placeholders})
+        ORDER BY onboarding_date DESC, name ASC
+    """
+    cur = mysql.connection.cursor(DictCursor)
+    cur.execute(sql, roles)
+    rows = cur.fetchall()
+    cur.close()
+    return rows
+ 
+# ====== Branch Managers ======
+@app.route("/managers")
+def list_branch_managers():
+    # adjust list if your DB uses a single value like "Branch Manager"
+    roles = ["Branch Manager", "Manager"]
+    users = _fetch_by_roles(roles)
+    return render_template("managers_list.html", users=users)
+ 
+# ====== Underwriting Team ======
+@app.route("/underwriting")
+def list_underwriting_team():
+    roles = ["Underwriting_Agent", "Underwriter"]
+    users = _fetch_by_roles(roles)
+    return render_template("underwriting_list.html", users=users)
+ 
+# ====== Audit Teams ======
+@app.route("/auditors")
+
+def list_audit_teams():
+    roles = ["Auditor", "Audit Officer"]
+    users = _fetch_by_roles(roles)
+
+    return render_template("auditors_list.html", users=users)
+ 
+# ====== Bank Agents ======
+@app.route("/agents")
+def list_bank_agents():
+    roles = ["Loan_Agent", "Investment_Agent", "Card_Agent"]
+    users = _fetch_by_roles(roles)
+    return render_template("agents_list.html", users=users)
+ 
+# ---- Full row for "View" modal (shared by all pages) ----
+@app.route("/api/user/<user_id>")
+def api_user_detail(user_id):
+    sql = "SELECT * FROM bank_users WHERE user_id=%s AND deleted_date IS NULL"
+    cur = mysql.connection.cursor(DictCursor)
+    cur.execute(sql, (user_id,))
+    row = cur.fetchone()
+    cur.close()
+    if not row:
+        abort(404)
+    return jsonify(row)
+ 
+ 
    
 if __name__ == '__main__':
     app.run(debug=True)
