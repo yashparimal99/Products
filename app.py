@@ -2952,7 +2952,6 @@ def agent_suggestions():
 
  
 
- 
 ##################### Tushar )Branch Performance) ################
  
 @app.route('/branchperformance')
@@ -3008,6 +3007,7 @@ INVEST_TABLES = [
     ("nps_accounts", "amount_invested", "nps"),
 ]
  
+ 
 def _period_bounds(period: str):
     """Return (start_date, end_date_exclusive) using server local date."""
     today = date.today()
@@ -3028,15 +3028,18 @@ def _period_bounds(period: str):
     end = today + timedelta(days=1)
     return (start, end)
  
+ 
 def _table_exists(cur, tbl):
     try:
         cur.execute(
             "SELECT 1 FROM INFORMATION_SCHEMA.TABLES "
-            "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME=%s", (tbl,)
+            "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME=%s",
+            (tbl,)
         )
         return cur.fetchone() is not None
     except Exception:
         return False
+ 
  
 def _safe_scalar(cur, sql, params=()):
     try:
@@ -3050,11 +3053,17 @@ def _safe_scalar(cur, sql, params=()):
     except Exception:
         return 0
  
-def _city_clause(city, alias="bu"):
-    return (" AND {alias}.city=%s ".format(alias=alias), [city]) if city else ("", [])
  
-def _sum_casa_balances(cur, city=None):
-    total = 0.0 
+def _branch_clause(branch_code, alias="bu"):
+    """Common WHERE filter for branch_code."""
+    return (
+        f" AND {alias}.branch_code=%s ",
+        [branch_code],
+    ) if branch_code else ("", [])
+ 
+ 
+def _sum_casa_balances(cur, branch_code=None):
+    total = 0.0
     for tbl, _ in CASA_TABLES:
         if not _table_exists(cur, tbl):
             continue
@@ -3063,11 +3072,12 @@ def _sum_casa_balances(cur, city=None):
             f"FROM {tbl} a JOIN bank_users bu ON bu.user_id=a.user_id "
             f"WHERE COALESCE(a.status_flag,'A')='A'"
         )
-        clause, params = _city_clause(city, "bu")
+        clause, params = _branch_clause(branch_code, "bu")
         total += float(_safe_scalar(cur, sql + clause, params) or 0)
     return total
  
-def _count_active_accounts(cur, city=None):
+ 
+def _count_active_accounts(cur, branch_code=None):
     tot = 0
     for tbl, _ in CASA_TABLES:
         if not _table_exists(cur, tbl):
@@ -3077,11 +3087,12 @@ def _count_active_accounts(cur, city=None):
             f"FROM {tbl} a JOIN bank_users bu ON bu.user_id=a.user_id "
             f"WHERE COALESCE(a.status_flag,'A')='A'"
         )
-        clause, params = _city_clause(city, "bu")
+        clause, params = _branch_clause(branch_code, "bu")
         tot += int(_safe_scalar(cur, sql + clause, params) or 0)
     return tot
  
-def _avg_casa_balance(cur, city=None):
+ 
+def _avg_casa_balance(cur, branch_code=None):
     s, c = 0.0, 0
     for tbl, _ in CASA_TABLES:
         if not _table_exists(cur, tbl):
@@ -3091,7 +3102,7 @@ def _avg_casa_balance(cur, city=None):
             f"FROM {tbl} a JOIN bank_users bu ON bu.user_id=a.user_id "
             f"WHERE COALESCE(a.status_flag,'A')='A'"
         )
-        clause, params = _city_clause(city, "bu")
+        clause, params = _branch_clause(branch_code, "bu")
         try:
             cur.execute(sql + clause, params)
             row = cur.fetchone() or {}
@@ -3101,7 +3112,8 @@ def _avg_casa_balance(cur, city=None):
             pass
     return (s / c) if c else 0.0
  
-def _sum_deposit_products(cur, city=None):
+ 
+def _sum_deposit_products(cur, branch_code=None):
     tot = 0.0
     for tbl, col, _key in DEPOSIT_TABLES1:
         if not _table_exists(cur, tbl):
@@ -3111,22 +3123,28 @@ def _sum_deposit_products(cur, city=None):
             f"FROM {tbl} d JOIN bank_users bu ON bu.user_id=d.user_id "
             f"WHERE COALESCE(d.status_flag,'A')='A'"
         )
-        clause, params = _city_clause(city, "bu")
+        clause, params = _branch_clause(branch_code, "bu")
         tot += float(_safe_scalar(cur, sql + clause, params) or 0)
     return tot
  
-def _count_new_customers(cur, start_date, end_date, city=None):
-    sql = "SELECT COUNT(*) FROM bank_users bu WHERE bu.onboarding_date >= %s AND bu.onboarding_date < %s"
+ 
+def _count_new_customers(cur, start_date, end_date, branch_code=None):
+    sql = (
+        "SELECT COUNT(*) FROM bank_users bu "
+        "WHERE bu.onboarding_date >= %s AND bu.onboarding_date < %s"
+    )
     params = [start_date, end_date]
-    clause, extra = _city_clause(city, "bu")
+    clause, extra = _branch_clause(branch_code, "bu")
     return int(_safe_scalar(cur, sql + clause, params + extra) or 0)
  
-def _count_total_customers(cur, city=None):
+ 
+def _count_total_customers(cur, branch_code=None):
     sql = "SELECT COUNT(*) FROM bank_users bu WHERE 1=1"
-    clause, params = _city_clause(city, "bu")
+    clause, params = _branch_clause(branch_code, "bu")
     return int(_safe_scalar(cur, sql + clause, params) or 0)
  
-def _count_transactions(cur, start_date, end_date, city=None):
+ 
+def _count_transactions(cur, start_date, end_date, branch_code=None):
     # tolerant if transactions table doesn’t exist
     if not _table_exists(cur, "transactions"):
         return 0
@@ -3134,30 +3152,31 @@ def _count_transactions(cur, start_date, end_date, city=None):
         sql = """
             SELECT COUNT(*) FROM transactions t
             JOIN (
-                SELECT a.account_number, bu.city
+                SELECT a.account_number, bu.branch_code
                 FROM saving_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
                 UNION ALL
-                SELECT a.account_number, bu.city FROM current_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
+                SELECT a.account_number, bu.branch_code FROM current_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
                 UNION ALL
-                SELECT a.account_number, bu.city FROM salary_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
+                SELECT a.account_number, bu.branch_code FROM salary_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
                 UNION ALL
-                SELECT a.account_number, bu.city FROM pmjdy_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
+                SELECT a.account_number, bu.branch_code FROM pmjdy_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
                 UNION ALL
-                SELECT a.account_number, bu.city FROM pension_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
+                SELECT a.account_number, bu.branch_code FROM pension_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
                 UNION ALL
-                SELECT a.account_number, bu.city FROM safecustody_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
+                SELECT a.account_number, bu.branch_code FROM safecustody_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
             ) acc ON acc.account_number=t.from_account
             WHERE t.created_at >= %s AND t.created_at < %s
         """
         params = [start_date, end_date]
-        if city:
-            sql += " AND acc.city=%s"
-            params.append(city)
+        if branch_code:
+            sql += " AND acc.branch_code=%s"
+            params.append(branch_code)
         return int(_safe_scalar(cur, sql, params) or 0)
     except Exception:
         return 0
  
-def _loans_amount(cur, city=None):
+ 
+def _loans_amount(cur, branch_code=None):
     total = 0.0
     for tbl, _key in LOAN_TABLES:
         if not _table_exists(cur, tbl):
@@ -3167,51 +3186,58 @@ def _loans_amount(cur, city=None):
             f"FROM {tbl} l JOIN bank_users bu ON bu.user_id=l.user_id "
             f"WHERE COALESCE(l.status,'approved') IN ('approved','issued','disbursed')"
         )
-        clause, params = _city_clause(city, "bu")
+        clause, params = _branch_clause(branch_code, "bu")
         total += float(_safe_scalar(cur, sql + clause, params) or 0)
     return total
  
+ 
 # ---- Routes expected by your HTML ----
  
-@app.get("/api/perf/cities")
-def api_perf_cities():
+@app.get("/api/perf/branches")
+def api_perf_branches():
+    """Return list of distinct branch_code values."""
     cur = mysql.connection.cursor(DictCursor)
-    cur.execute("SELECT DISTINCT city FROM bank_users WHERE city IS NOT NULL AND city<>'' ORDER BY city")
+    cur.execute(
+        "SELECT DISTINCT branch_code FROM bank_users "
+        "WHERE branch_code IS NOT NULL AND branch_code<>'' "
+        "ORDER BY branch_code"
+    )
     rows = cur.fetchall()
     cur.close()
-    return jsonify([r['city'] for r in rows])
+    return jsonify([r['branch_code'] for r in rows])
+ 
  
 @app.get("/api/perf/kpis")
 def api_perf_kpis():
     period = (request.args.get('period') or 'month').lower()
-    city = (request.args.get('city') or '').strip() or None
+    branch_code = (request.args.get('branch') or '').strip() or None
     start, end = _period_bounds(period)
  
     cur = mysql.connection.cursor(DictCursor)
  
-    new_accounts = _count_new_customers(cur, start, end, city)
-    casa_sum = _sum_casa_balances(cur, city)
-    dep_sum = _sum_deposit_products(cur, city)
+    new_accounts = _count_new_customers(cur, start, end, branch_code)
+    casa_sum = _sum_casa_balances(cur, branch_code)
+    dep_sum = _sum_deposit_products(cur, branch_code)
     total_deposits = casa_sum + dep_sum
-    loans_amt = _loans_amount(cur, city)
-    transactions = _count_transactions(cur, start, end, city)
-    active_accts = _count_active_accounts(cur, city)
-    avg_balance = _avg_casa_balance(cur, city)
-    total_customers= _count_total_customers(cur, city)
+    loans_amt = _loans_amount(cur, branch_code)
+    transactions = _count_transactions(cur, start, end, branch_code)
+    active_accts = _count_active_accounts(cur, branch_code)
+    avg_balance = _avg_casa_balance(cur, branch_code)
+    total_customers = _count_total_customers(cur, branch_code)
  
     # previous same-length period
     prev_len = (end - start)
     prev_start = start - prev_len
     prev_end = end - prev_len
-    prev_new = _count_new_customers(cur, prev_start, prev_end, city)
-    prev_casa = _sum_casa_balances(cur, city)
-    prev_dep = _sum_deposit_products(cur, city)
-    prev_txn = _count_transactions(cur, prev_start, prev_end, city)
+    prev_new = _count_new_customers(cur, prev_start, prev_end, branch_code)
+    prev_casa = _sum_casa_balances(cur, branch_code)
+    prev_dep = _sum_deposit_products(cur, branch_code)
+    prev_txn = _count_transactions(cur, prev_start, prev_end, branch_code)
  
     def pct(curv, prevv):
         if prevv == 0:
             return 0
-        return round(((curv - prevv)/prevv)*100.0, 1)
+        return round(((curv - prevv) / prevv) * 100.0, 1)
  
     # old % fields (kept)
     delta_new = pct(new_accounts, prev_new)
@@ -3238,28 +3264,25 @@ def api_perf_kpis():
         "txn_per_employee": txn_per_employee,
         "total_customers": total_customers,
  
-        # kept (%), in case other parts still reference them
+        # kept (%) in case anything else uses them
         "delta_new_accounts": delta_new,
         "delta_deposits": delta_deposits,
         "delta_transactions": delta_transactions,
  
         # NEW (absolute change)
-        "delta_new_count": delta_new_count,                     # e.g., +37 customers
-        "delta_deposits_abs": round(delta_deposits_abs, 2),    # e.g., +₹1,25,000.00
-        "delta_transactions_count": delta_transactions_count    # e.g., +412 txns
+        "delta_new_count": delta_new_count,
+        "delta_deposits_abs": round(delta_deposits_abs, 2),
+        "delta_transactions_count": delta_transactions_count
     })
+ 
  
 @app.get("/api/perf/trend")
 def api_perf_trend():
     """Return last 6 months monthly aggregates for charts used in the page."""
-    city = (request.args.get('city') or '').strip() or None
+    branch_code = (request.args.get('branch') or '').strip() or None
     # build 6 month windows (end is first day of next month)
     today = date.today().replace(day=1)
-    months = []
-    for i in range(6, 0, -1):
-        start = (today - timedelta(days=1)).replace(day=1)  # ensure month math OK
-        # roll back i-1 times
-    # Simpler: generate from current month going back 5:
+ 
     months = []
     y, m = today.year, today.month
     for _ in range(5, -1, -1):
@@ -3269,20 +3292,19 @@ def api_perf_trend():
             mm += 12
             yy -= 1
         start = date(yy, mm, 1)
-        # end = first day of next month
-        nm, ny = (mm+1, yy)
+        nm, ny = (mm + 1, yy)
         if nm == 13:
-            nm, ny = 1, yy+1
+            nm, ny = 1, yy + 1
         end = date(ny, nm, 1)
         months.append((start, end))
  
     cur = mysql.connection.cursor(DictCursor)
     out = []
     for start, end in months:
-        deposits = _sum_casa_balances(cur, city) + _sum_deposit_products(cur, city)
-        loans    = _loans_amount(cur, city)
-        new_acc  = _count_new_customers(cur, start, end, city)
-        txns     = _count_transactions(cur, start, end, city)
+        deposits = _sum_casa_balances(cur, branch_code) + _sum_deposit_products(cur, branch_code)
+        loans = _loans_amount(cur, branch_code)
+        new_acc = _count_new_customers(cur, start, end, branch_code)
+        txns = _count_transactions(cur, start, end, branch_code)
         out.append({
             "m": start.strftime("%Y-%m-01"),
             "deposits": round(deposits, 2),
@@ -3293,64 +3315,67 @@ def api_perf_trend():
     cur.close()
     return jsonify(out)
  
+ 
 @app.get("/api/perf/employee_efficiency")
 def api_perf_employee_efficiency():
-    """Return per-city efficiency for the bar+line combo."""
-    city_filter = (request.args.get('city') or '').strip()
+    """Return per-branch efficiency for the bar+line combo."""
+    branch_filter = (request.args.get('branch') or '').strip()
     cur = mysql.connection.cursor(DictCursor)
-    cur.execute("SELECT DISTINCT city FROM bank_users WHERE city IS NOT NULL AND city<>'' ORDER BY city")
-    cities = [r['city'] for r in cur.fetchall()]
+    cur.execute(
+        "SELECT DISTINCT branch_code FROM bank_users "
+        "WHERE branch_code IS NOT NULL AND branch_code<>'' "
+        "ORDER BY branch_code"
+    )
+    branches = [r['branch_code'] for r in cur.fetchall()]
     rows = []
-    for c in cities:
-        if city_filter and c != city_filter:
+    for b in branches:
+        if branch_filter and b != branch_filter:
             continue
-        # recompute per-city KPIs for the current month (enough for chart)
         start, end = _period_bounds('month')
-        txns = _count_transactions(cur, start, end, c)
-        customers = _count_total_customers(cur, c)
+        txns = _count_transactions(cur, start, end, b)
+        customers = _count_total_customers(cur, b)
         employees = max(1, customers // 200)
         txn_per_emp = round(txns / employees, 2) if employees else 0
-        # proxy cost-per-txn: smaller branches cost higher → simple formula
         base_cost = 50.0  # nominal
         cost_per_txn = round((base_cost * max(1, 300 - txn_per_emp)) / 300.0, 2)
         rows.append({
-            "city": c,
+            "branch_code": b,
             "txn_per_employee": txn_per_emp,
             "cost_per_txn": cost_per_txn
         })
     cur.close()
     return jsonify(rows)
  
+ 
 @app.get("/api/perf/customer_retention")
 def api_perf_customer_retention():
-    """Simple proxy retention & NPS (if you don’t store them)."""
-    city = (request.args.get('city') or '').strip() or None
+    """Simple proxy retention & NPS based on branch_code."""
+    branch_code = (request.args.get('branch') or '').strip() or None
     cur = mysql.connection.cursor(DictCursor)
-    # proxy: higher active accounts per total customers ⇒ better retention
-    total_customers = _count_total_customers(cur, city)
-    active_accounts = _count_active_accounts(cur, city)
-    retention_rate = 0 if total_customers == 0 else min(100, round((active_accounts / max(1,total_customers)) * 100))
-    # proxy NPS derived from retention and txn density
+    total_customers = _count_total_customers(cur, branch_code)
+    active_accounts = _count_active_accounts(cur, branch_code)
+    retention_rate = 0 if total_customers == 0 else min(
+        100,
+        round((active_accounts / max(1, total_customers)) * 100)
+    )
     start, end = _period_bounds('month')
-    txns = _count_transactions(cur, start, end, city)
+    txns = _count_transactions(cur, start, end, branch_code)
     nps = max(0, min(100, int(0.6 * retention_rate + 0.4 * min(100, txns // 10))))
     cur.close()
     return jsonify({"retention_rate": retention_rate, "nps": nps})
  
+ 
 @app.get("/api/perf/pies")
 def api_perf_pies():
     """
-    Return 5 pies as COUNTS:
+    Return 5 pies as COUNTS filtered by branch_code:
     - accounts: number of active CASA accounts per type
     - loans: number of approved/issued/disbursed loan records per type
     - deposits: number of active deposit records per type (FD/Digital FD/RD)
     - cards: number of active/issued cards per type
     - investments: number of investment records per type
     """
-    
-
-
-    city = (request.args.get('city') or '').strip() or None
+    branch_code = (request.args.get('branch') or '').strip() or None
     cur = mysql.connection.cursor(DictCursor)
  
     # --- Accounts (counts of active accounts) ---
@@ -3363,7 +3388,7 @@ def api_perf_pies():
             f"FROM {tbl} a JOIN bank_users bu ON bu.user_id=a.user_id "
             f"WHERE COALESCE(a.status_flag,'A')='A'"
         )
-        clause, params = _city_clause(city, "bu")
+        clause, params = _branch_clause(branch_code, "bu")
         cnt = int(_safe_scalar(cur, sql + clause, params) or 0)
  
         key = "safecustody" if tbl == "safecustody_accounts" else tbl.split("_")[0]
@@ -3392,7 +3417,7 @@ def api_perf_pies():
             f"FROM {tbl} l JOIN bank_users bu ON bu.user_id=l.user_id "
             f"WHERE COALESCE(l.status,'approved') IN ('approved','issued','disbursed')"
         )
-        clause, params = _city_clause(city, "bu")
+        clause, params = _branch_clause(branch_code, "bu")
         loans[key] = int(_safe_scalar(cur, sql + clause, params) or 0)
  
     # --- Deposits (counts of active deposit records) ---
@@ -3405,7 +3430,7 @@ def api_perf_pies():
             f"FROM {tbl} d JOIN bank_users bu ON bu.user_id=d.user_id "
             f"WHERE COALESCE(d.status_flag,'A')='A'"
         )
-        clause, params = _city_clause(city, "bu")
+        clause, params = _branch_clause(branch_code, "bu")
         deposits[key] = int(_safe_scalar(cur, sql + clause, params) or 0)
  
     # --- Cards (counts) ---
@@ -3419,10 +3444,10 @@ def api_perf_pies():
                 "WHERE LOWER(TRIM(c.card_type)) = LOWER(%s) "
                 "AND COALESCE(c.status_flag,'A')='A'"
             )
-            clause, params = _city_clause(city, "bu")
-            params = [key] + params  # first param is card_type
+            clause, params = _branch_clause(branch_code, "bu")
+            params = [key] + params
             cards[key] = int(_safe_scalar(cur, sql + clause, params) or 0)
-
+ 
     # --- Investments (counts) ---
     investments = {"PPF": 0, "FRSB": 0, "NPS": 0}
     if _table_exists(cur, "investment_applications"):
@@ -3434,9 +3459,10 @@ def api_perf_pies():
                 "WHERE LOWER(TRIM(i.investment_type)) = LOWER(%s) "
                 "AND LOWER(TRIM(i.status)) IN ('approved','active')"
             )
-            clause, params = _city_clause(city, "bu")
+            clause, params = _branch_clause(branch_code, "bu")
             params = [key] + params
             investments[key] = int(_safe_scalar(cur, sql + clause, params) or 0)
+ 
     cur.close()
     return jsonify({
         "accounts": accounts,
@@ -3446,12 +3472,13 @@ def api_perf_pies():
         "investments": investments
     })
  
+ 
 @app.get("/api/perf/branch_detail")
 def api_perf_branch_detail():
-    """Modal details for a given city (last 30 days + summary)."""
-    city = (request.args.get('city') or '').strip()
-    if not city:
-        return jsonify({"error":"City is required"}), 400
+    """Modal details for a given branch_code (last 30 days + summary)."""
+    branch_code = (request.args.get('branch') or '').strip()
+    if not branch_code:
+        return jsonify({"error": "Branch code is required"}), 400
  
     cur = mysql.connection.cursor(DictCursor)
     # 30-day window
@@ -3459,20 +3486,20 @@ def api_perf_branch_detail():
     start = end - timedelta(days=30)
  
     kpis = {
-        "new_accounts": _count_new_customers(cur, start, end, city),
-        "casa_balance": round(_sum_casa_balances(cur, city), 2),
-        "loans_amount": round(_loans_amount(cur, city), 2),
-        "transactions": _count_transactions(cur, start, end, city)
+        "new_accounts": _count_new_customers(cur, start, end, branch_code),
+        "casa_balance": round(_sum_casa_balances(cur, branch_code), 2),
+        "loans_amount": round(_loans_amount(cur, branch_code), 2),
+        "transactions": _count_transactions(cur, start, end, branch_code)
     }
  
     # Top customers by txn count/amount (tolerant if transactions table absent)
     top_customers = []
     if _table_exists(cur, "transactions"):
         try:
-            # Try mapping account_number → user via CASA union
             cur.execute("""
                 WITH acc_map AS (
-                    SELECT a.account_number, bu.user_id, bu.name, bu.email FROM saving_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
+                    SELECT a.account_number, bu.user_id, bu.name, bu.email
+                    FROM saving_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
                     UNION ALL SELECT a.account_number, bu.user_id, bu.name, bu.email FROM current_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
                     UNION ALL SELECT a.account_number, bu.user_id, bu.name, bu.email FROM salary_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
                     UNION ALL SELECT a.account_number, bu.user_id, bu.name, bu.email FROM pmjdy_accounts a JOIN bank_users bu ON bu.user_id=a.user_id
@@ -3483,13 +3510,14 @@ def api_perf_branch_detail():
                 FROM transactions t
                 JOIN acc_map am ON am.account_number = t.from_account
                 JOIN bank_users bu ON bu.email = am.email
-                WHERE t.created_at >= %s AND t.created_at < %s AND bu.city=%s
+                WHERE t.created_at >= %s AND t.created_at < %s AND bu.branch_code=%s
                 GROUP BY am.name, am.email
                 ORDER BY amount DESC
                 LIMIT 10
-            """, (start, end, city))
+            """, (start, end, branch_code))
             top_customers = [{
-                "name": r.get("name"), "email": r.get("email"),
+                "name": r.get("name"),
+                "email": r.get("email"),
                 "txn_count": int(r.get("txn_count") or 0),
                 "amount": float(r.get("amount") or 0)
             } for r in (cur.fetchall() or [])]
@@ -3498,10 +3526,9 @@ def api_perf_branch_detail():
  
     cur.close()
     return jsonify({"kpis": kpis, "top_customers": top_customers})
+ 
 # -------- End Branch Performance API --------
  
- 
-
 
 # TL Dashboard Routes
 
@@ -7602,7 +7629,8 @@ def customer_search():
 
 ####---- Team Performance----###
  
- # ==================== BEGIN: Team Performance (robust city filter) ====================
+ ####---- Team Performance (by branch_code) ----###
+ 
 from flask import render_template, request, jsonify, session, redirect, url_for, flash
 from MySQLdb.cursors import DictCursor
  
@@ -7618,17 +7646,18 @@ def _get_logged_in_user(mysql):
     finally:
         cur.close()
  
-def _get_all_cities(mysql):
+def _get_all_branch_codes(mysql):
     cur = mysql.connection.cursor(DictCursor)
     try:
         cur.execute("""
-            SELECT DISTINCT TRIM(city) AS city
+            SELECT DISTINCT TRIM(branch_code) AS branch_code
             FROM bank_users
-            WHERE city IS NOT NULL AND TRIM(city) <> ''
-            ORDER BY city
+            WHERE branch_code IS NOT NULL
+              AND TRIM(branch_code) <> ''
+            ORDER BY branch_code
         """)
         rows = cur.fetchall()
-        return [r['city'] for r in rows if r.get('city')]
+        return [r['branch_code'] for r in rows if r.get('branch_code')]
     finally:
         cur.close()
  
@@ -7636,78 +7665,88 @@ def _get_all_cities(mysql):
 @app.route('/team_performance')
 def team_performance():
     """
-    Fully dynamic page. 'Bank Users' are bank_users with role='user'.
+    Team Performance filtered by branch_code.
+    Default view: ALL branches aggregated.
     """
     user = _get_logged_in_user(mysql)
     if not user:
         flash('Please login first', 'danger')
         return redirect(url_for('login'))
  
-    sel_city = request.args.get('city', 'All')
+    # Selected branch (URL param). Default: ALL
+    sel_branch = request.args.get('branch', 'ALL').strip() or 'ALL'
  
-    # Cities dropdown
+    # Branch dropdown
     try:
-        db_cities = _get_all_cities(mysql)
+        db_branches = _get_all_branch_codes(mysql)
     except Exception as e:
-        print("City fetch error:", e)
-        db_cities = []
-    cities = ['All'] + db_cities if db_cities else ['All']
+        print("Branch fetch error:", e)
+        db_branches = []
+    branches = ['ALL'] + db_branches if db_branches else ['ALL']
  
-    # --- local counters (TRIM() on both sides) ---
-    def _count_role(role, city):
+    # --- local counters using branch_code ---
+    def _count_role(role, branch_code):
         c = mysql.connection.cursor(DictCursor)
         try:
             c.execute("""
                 SELECT COUNT(*) AS c
                 FROM bank_users
-                WHERE role=%s
-                  AND (TRIM(%s)='All' OR TRIM(city)=TRIM(%s))
-            """, (role, city, city))
-            return c.fetchone()['c']
+                WHERE role = %s
+                  AND (
+                        TRIM(%s) = 'ALL'
+                        OR (branch_code IS NOT NULL AND TRIM(branch_code) = TRIM(%s))
+                      )
+            """, (role, branch_code, branch_code))
+            row = c.fetchone()
+            return row['c'] if row else 0
         finally:
             c.close()
  
-    managers      = _count_role('manager', sel_city)
-    underwriters  = _count_role('underwriter', sel_city)
-    auditors      = _count_role('auditor', sel_city)
-    agents        = _count_role('agent', sel_city)
-    customers     = _count_role('user', sel_city)   # <= role='user'
+    managers     = _count_role('manager',     sel_branch)
+    underwriters = _count_role('underwriter', sel_branch)
+    auditors     = _count_role('auditor',     sel_branch)
+    agents       = _count_role('agent',       sel_branch)
+    customers    = _count_role('user',        sel_branch)   # bank users (role='user')
  
-    # Composition for stacked chart/table (staff roles only)
+    # Composition for stacked chart/table (staff roles only), grouped by branch_code
     comp = []
     cur = mysql.connection.cursor(DictCursor)
     try:
-        if sel_city == 'All':
+        if sel_branch == 'ALL':
+            # Top branches by staff volume
             cur.execute("""
-                SELECT TRIM(city) AS city,
+                SELECT TRIM(branch_code) AS branch,
                        SUM(role='manager')     AS managers,
                        SUM(role='underwriter') AS underwriters,
                        SUM(role='auditor')     AS auditors,
                        SUM(role='agent')       AS agents
                 FROM bank_users
-                WHERE city IS NOT NULL AND TRIM(city) <> ''
-                GROUP BY TRIM(city)
+                WHERE branch_code IS NOT NULL
+                  AND TRIM(branch_code) <> ''
+                GROUP BY TRIM(branch_code)
                 ORDER BY (managers+underwriters+auditors+agents) DESC
                 LIMIT 12
             """)
             comp = cur.fetchall()
         else:
+            # Single branch breakdown
             cur.execute("""
-                SELECT TRIM(%s) AS city,
+                SELECT TRIM(%s) AS branch,
                        SUM(role='manager')     AS managers,
                        SUM(role='underwriter') AS underwriters,
                        SUM(role='auditor')     AS auditors,
                        SUM(role='agent')       AS agents
                 FROM bank_users
-                WHERE TRIM(city)=TRIM(%s)
-            """, (sel_city, sel_city))
+                WHERE branch_code IS NOT NULL
+                  AND TRIM(branch_code) = TRIM(%s)
+            """, (sel_branch, sel_branch))
             row = cur.fetchone() or {}
             comp = [{
-                'city': sel_city,
-                'managers': row.get('managers', 0) if row else 0,
-                'underwriters': row.get('underwriters', 0) if row else 0,
-                'auditors': row.get('auditors', 0) if row else 0,
-                'agents': row.get('agents', 0) if row else 0
+                'branch':       sel_branch,
+                'managers':     row.get('managers', 0) or 0,
+                'underwriters': row.get('underwriters', 0) or 0,
+                'auditors':     row.get('auditors', 0) or 0,
+                'agents':       row.get('agents', 0) or 0
             }]
     finally:
         cur.close()
@@ -7715,8 +7754,8 @@ def team_performance():
     return render_template(
         'team_performance.html',
         user=user,
-        cities=cities,
-        sel_city=sel_city,
+        branches=branches,
+        sel_branch=sel_branch,
         managers=managers,
         underwriters=underwriters,
         auditors=auditors,
@@ -7728,73 +7767,80 @@ def team_performance():
 # ---------- Unified API (KPIs + composition) ----------
 @app.route('/api/team_performance_data')
 def api_team_performance_data():
-    sel_city = request.args.get('city', 'All')
+    sel_branch = request.args.get('branch', 'ALL').strip() or 'ALL'
  
-    def _count_role(role, city):
+    def _count_role(role, branch_code):
         cur = mysql.connection.cursor(DictCursor)
         try:
             cur.execute("""
                 SELECT COUNT(*) AS c
                 FROM bank_users
                 WHERE role=%s
-                  AND (TRIM(%s)='All' OR TRIM(city)=TRIM(%s))
-            """, (role, city, city))
-            return cur.fetchone()['c']
+                  AND (
+                        TRIM(%s)='ALL'
+                        OR (branch_code IS NOT NULL AND TRIM(branch_code)=TRIM(%s))
+                      )
+            """, (role, branch_code, branch_code))
+            row = cur.fetchone()
+            return row['c'] if row else 0
         finally:
             cur.close()
  
     data = {
-        'city': sel_city,
+        'branch': sel_branch,
         'kpi': {
-            'managers':     _count_role('manager', sel_city),
-            'underwriters': _count_role('underwriter', sel_city),
-            'auditors':     _count_role('auditor', sel_city),
-            'agents':       _count_role('agent', sel_city),
-            'customers':    _count_role('user', sel_city),  # <= role='user'
+            'managers':     _count_role('manager',     sel_branch),
+            'underwriters': _count_role('underwriter', sel_branch),
+            'auditors':     _count_role('auditor',     sel_branch),
+            'agents':       _count_role('agent',       sel_branch),
+            'customers':    _count_role('user',        sel_branch),
         }
     }
  
     cur = mysql.connection.cursor(DictCursor)
     try:
-        if sel_city == 'All':
+        if sel_branch == 'ALL':
             cur.execute("""
-                SELECT TRIM(city) AS city,
+                SELECT TRIM(branch_code) AS branch,
                        SUM(role='manager')     AS managers,
                        SUM(role='underwriter') AS underwriters,
                        SUM(role='auditor')     AS auditors,
                        SUM(role='agent')       AS agents
                 FROM bank_users
-                WHERE city IS NOT NULL AND TRIM(city) <> ''
-                GROUP BY TRIM(city)
+                WHERE branch_code IS NOT NULL
+                  AND TRIM(branch_code) <> ''
+                GROUP BY TRIM(branch_code)
                 ORDER BY (managers+underwriters+auditors+agents) DESC
                 LIMIT 12
             """)
             comp = cur.fetchall()
         else:
             cur.execute("""
-                SELECT TRIM(%s) AS city,
+                SELECT TRIM(%s) AS branch,
                        SUM(role='manager')     AS managers,
                        SUM(role='underwriter') AS underwriters,
                        SUM(role='auditor')     AS auditors,
                        SUM(role='agent')       AS agents
                 FROM bank_users
-                WHERE TRIM(city)=TRIM(%s)
-            """, (sel_city, sel_city))
+                WHERE branch_code IS NOT NULL
+                  AND TRIM(branch_code) = TRIM(%s)
+            """, (sel_branch, sel_branch))
             row = cur.fetchone() or {}
             comp = [{
-                'city': sel_city,
-                'managers': row.get('managers', 0) if row else 0,
-                'underwriters': row.get('underwriters', 0) if row else 0,
-                'auditors': row.get('auditors', 0) if row else 0,
-                'agents': row.get('agents', 0) if row else 0
+                'branch':       sel_branch,
+                'managers':     row.get('managers', 0) or 0,
+                'underwriters': row.get('underwriters', 0) or 0,
+                'auditors':     row.get('auditors', 0) or 0,
+                'agents':       row.get('agents', 0) or 0
             }]
     finally:
         cur.close()
  
     data['composition'] = comp
     return jsonify({'ok': True, 'data': data})
+ 
 # ===================== END: Team Performance (robust city filter) ====================
-
+ 
 
 #####===Audit Logs===###
  
@@ -8315,7 +8361,14 @@ def api_user_detail(user_id):
     if not row:
         abort(404)
     return jsonify(row)
- 
+
+#chatbot route
+from chatbot import ask_gemini
+@app.route("/chat", methods=["POST"])
+def chat():
+    user_msg = request.json.get("message")
+    reply = ask_gemini(user_msg)
+    return jsonify({"answer": reply})
  
    
 if __name__ == '__main__':

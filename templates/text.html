@@ -1,347 +1,314 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <title>diGi Bank Products</title>
+    <meta charset="UTF-8" />
+    <title>DigiBank - Loan Eligibility & Approval</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #eef3f8;
+            color: #333;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(to right, #06335f, #0b4d83);
+            padding: 15px 25px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .navbar-menu a {
+            color: white;
+            text-decoration: none;
+            margin-left: 18px;
+            font-weight: 500;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 25px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+        }
+
+        h2 {
+            color: #0b4d83;
+            margin: 0 0 12px;
+        }
+
+        .apply-btn {
+            background: #0b4d83;
+            padding: 12px 20px;
+            display: inline-block;
+            border-radius: 6px;
+            color: white;
+            text-decoration: none;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .eligibility-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 15px;
+            margin-top: 18px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #c8ced6;
+            font-size: 15px;
+        }
+
+        .check-btn {
+            margin-top: 18px;
+            padding: 12px;
+            background: #06335f;
+            color: white;
+            width: 100%;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .eligible {
+            color: green;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .not-eligible {
+            color: red;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        /* Timeline */
+        .timeline-step {
+            padding: 10px;
+            margin-bottom: 8px;
+            border-left: 5px solid #999;
+            background: #f6f7fb;
+            border-radius: 6px;
+            padding-left: 15px;
+        }
+
+        .step-active {
+            border-left-color: #0b4d83 !important;
+            background: #e7f0f9;
+            font-weight: bold;
+        }
+
+        /* Improved Approval Gauge Chart */
+        .gauge-wrapper {
+            width: 260px;
+            height: 260px;
+            margin: 22px auto;
+            position: relative;
+        }
+
+        .gauge-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(#0b4d83 var(--value), #d8e1ec 0deg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 1.5s ease;
+        }
+
+        .gauge-inner {
+            position: absolute;
+            background: white;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: #0b4d83;
+            box-shadow: 0px 3px 8px rgba(0,0,0,0.10);
+        }
+
+        footer {
+            background: #0b4d83;
+            padding: 12px;
+            text-align: center;
+            color: white;
+            margin-top: 25px;
+        }
+    </style>
 </head>
- 
+
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0B4D83 !important;">
-  <div class="container-fluid">
-    <a class="navbar-brand digi-bank-logo" href="#">
-      <div class="logo-icon"></div>
-      <div class="logo-text">
-        <div class="main-text">
-          <span class="digi">DiGi</span><span class="bank">Bank</span>
+
+    <!-- NAVBAR -->
+    <header class="navbar">
+        <div class="navbar-logo">DigiBank</div>
+        <nav class="navbar-menu">
+            <a href="#">Dashboard</a>
+            <a href="#">Loans</a>
+            <a href="#">Profile</a>
+            <a href="#">Logout</a>
+        </nav>
+    </header>
+
+    <div class="container">
+
+        <!-- Loan Information -->
+        <div class="card">
+            <h2>Loan Information & Approval Process</h2>
+            <p>
+                DigiBank offers Home, Personal, and Business loan options with interest rates ranging from
+                <strong>6% to 20% per annum</strong> depending on CIBIL Score, income stability, employment type, and credit history.
+            </p>
+            <p><b>Loan Approval Steps:</b></p>
+            <p>
+                1️⃣ Submit loan application & KYC documents <br>
+                2️⃣ Income & employment verification <br>
+                3️⃣ CIBIL Score & existing liability check <br>
+                4️⃣ Collateral valuation (for secured loans) <br>
+                5️⃣ Final approval & agreement signing <br>
+                6️⃣ Loan amount disbursement to your DigiBank account
+            </p>
+            <a href="#" class="apply-btn">Apply for Loan</a>
         </div>
-        <div class="tagline">Smart Banking</div>
-      </div>
-    </a>
- 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-            aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
- 
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a class="nav-link active" href="{{ url_for('home') }}">Home</a></li>
- 
-        <li class="nav-item dropdown position-static">
-          <a class="nav-link active dropdown-toggle" href="{{ url_for('exploreproduct') }}">
-            Explore Products
-          </a>
-         
-          <div class="dropdown-menu mega-menu" aria-labelledby="exploreDropdown">
-            <div class="container">
-              <div class="row g-4">
-                <!-- Column 1 -->
-                <div class="col-md-3">
-                  <div class="mega-section">
-                    <h6 class="mega-title">Accounts</h6>
-                    <ul class="mega-list">
-                      <li><a href="#">Saving Account</a></li>
-                      <li><a href="#">Salary Account</a></li>
-                      <li><a href="#">Current Account</a></li>
-                      <li><a href="#">Safe Custody</a></li>
-                      <li><a href="#">Pension Account</a></li>
-                      <li><a href="#">PMJDY Account</a></li>
-                    </ul>
-                  </div>
-                </div>
- 
-                <!-- Column 2 -->
-                <div class="col-md-3">
-                  <div class="mega-section">
-                    <h6 class="mega-title">Loans</h6>
-                    <ul class="mega-list">
-                      <li><a href="#">Home Loan</a></li>
-                      <li><a href="#">Personal Loan</a></li>
-                      <li><a href="#">Business Loan</a></li>
-                    </ul>
-                  </div>
- 
-                  <div class="mega-section mt-4">
-                    <h6 class="mega-title">Deposits</h6>
-                    <ul class="mega-list">
-                      <li><a href="#">Digital Fix Deposits</a></li>
-                      <li><a href="#">Fix Deposits</a></li>
-                      <li><a href="#">Recuring Deposits</a></li>
-                    </ul>
-                  </div>
-                </div>
- 
-                <!-- Column 3 -->
-                <div class="col-md-3">
-                  <div class="mega-section">
-                    <h6 class="mega-title">Cards</h6>
-                    <ul class="mega-list">
-                      <li><a href="#">Credit card</a></li>
-                      <li><a href="#">Debit card</a></li>
-                      <li><a href="#">Pre-Paid card</a></li>
-                    </ul>
-                  </div>
- 
-                  <div class="mega-section mt-4">
-                    <h6 class="mega-title">Forex</h6>
-                    <ul class="mega-list">
-                      <li><a href="#">Travel Forex Card</a></li>
-                      <li><a href="#">Send Money Abroad</a></li>
-                      <li><a href="#">Send Money to India</a></li>
-                      <li><a href="#">Foreign Currency Exchange</a></li>
-                    </ul>
-                  </div>
-                </div>
- 
-                <!-- Column 4 -->
-                <div class="col-md-3">
-                  <div class="mega-section">
-                    <h6 class="mega-title">Investments</h6>
-                    <ul class="mega-list">
-                      <li><a href="#">Public Provident Fund</a></li>
-                      <li><a href="#">Floating Rate Saving Bonds</a></li>
-                      <li><a href="#">National Pension System</a></li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
+
+        <!-- Eligibility Checker -->
+        <div class="card">
+            <h2>Loan Eligibility Checker</h2>
+
+            <div class="eligibility-grid">
+                <input type="number" id="age" placeholder="Age (18 - 65)" />
+                <input type="number" id="income" placeholder="Monthly Income (₹)" />
+                <input type="number" id="cibil" placeholder="CIBIL Score (300 - 900)" />
+                <input type="number" id="existingEmi" placeholder="Existing EMI (₹) Optional" />
+                <input type="number" id="desiredLoan" placeholder="Desired Loan Amount (₹)" />
+                <select id="employment">
+                    <option value="">Employment Type</option>
+                    <option value="salaried">Salaried</option>
+                    <option value="self">Self Employed</option>
+                </select>
             </div>
-          </div>
-        </li>
- 
-        <li class="nav-item"><a class="nav-link" href="#">Grab Deals</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Make Payments</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Bank Smart</a></li>
-      </ul>
-   
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-              <!-- ✅ Added Search Bar Here -->
-      <form class="d-flex me-3" role="search">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-light" type="submit">Search</button>
-      </form>
-        <li class="nav-item">
-          <a class="btn btn-outline-light me-2 navbar-btn" href="#">Login</a>
-        </li>
-        <li class="nav-item">
-          <a class="btn btn-light navbar-btn" href="#">Sign Up</a>
-        </li>
-      </ul>
+
+            <button class="check-btn" onclick="checkEligibility()">Check Eligibility</button>
+            <p id="eligibleResult"></p>
+        </div>
+
+        <!-- Approval Probability + Timeline -->
+        <div class="card">
+            <h2>Loan Approval Probability</h2>
+
+            <div class="gauge-wrapper">
+                <div id="gaugeChart" class="gauge-circle" style="--value: 0deg;">
+                    <div id="gaugeVal" class="gauge-inner">--%</div>
+                </div>
+            </div>
+
+            <h3>Loan Processing Timeline</h3>
+            <div id="step1" class="timeline-step">📄 Application Submitted</div>
+            <div id="step2" class="timeline-step">🧾 Document Verification</div>
+            <div id="step3" class="timeline-step">💳 CIBIL & Financial Check</div>
+            <div id="step4" class="timeline-step">📌 Final Approval</div>
+            <div id="step5" class="timeline-step">💰 Loan Disbursed</div>
+        </div>
+
     </div>
-  </div>
-</nav>
- 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap');
- 
-/* Logo Styling */
-.digi-bank-logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  text-decoration: none;
-  transition: transform 0.3s ease;
-}
-.digi-bank-logo:hover {
-  transform: scale(1.05);
-}
-.logo-icon {
-  width: 50px;
-  height: 50px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 100%);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  box-shadow: 0 6px 18px rgba(102, 126, 234, 0.3), 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-.logo-icon::before {
-  content: '';
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  right: 8px;
-  bottom: 8px;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 8px;
-}
-.logo-icon::after {
-  content: 'D';
-  position: absolute;
-  color: transparent;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  background-clip: text;
-  -webkit-background-clip: text;
-  font-weight: 800;
-  font-size: 20px;
-  z-index: 2;
-}
-.logo-text {
-  color: #fff;
-}
-.main-text {
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  line-height: 1;
-}
-.digi {
-  background: linear-gradient(135deg, #87CEEB 0%, #98D8E8 25%, #FFF8DC 50%, #87CEFA 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-}
-.bank {
-  color: #ffffff;
-  margin-left: 3px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-.tagline {
-  font-size: 9px;
-  font-weight: 600;
-  color: #e8f4f8;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-top: 2px;
-}
- 
-/* Mega Menu Styling */
-.dropdown.position-static .dropdown-menu {
-  left: 0 !important;
-  right: 0 !important;
-  width: 100%;
-}
- 
-.mega-menu {
-  background: white;
-  border: none;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-  padding: 30px 20px;
-  margin-top: 0;
-  border-radius: 0;
-}
- 
-.mega-section {
-  padding: 0;
-}
- 
-.mega-title {
-  color: #0B4D83;
-  font-weight: 700;
-  font-size: 15px;
-  margin-bottom: 15px;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #0B4D83;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
- 
-.mega-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
- 
-.mega-list li {
-  margin-bottom: 8px;
-}
- 
-.mega-list a {
-  color: #333;
-  text-decoration: none;
-  font-size: 14px;
-  display: block;
-  padding: 6px 10px;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
- 
-.mega-list a:hover {
-  background-color: #e8f4f9;
-  color: #0B4D83;
-  padding-left: 15px;
-}
-.dropdown:hover .mega-menu {
-  display: block;
-}
-</style>
- 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  // Open mega menu on hover
-  const dropdown = document.querySelector('.dropdown');
-  const menu = document.querySelector('.mega-menu');
- 
-  dropdown.addEventListener('mouseenter', () => {
-    menu.classList.add('show');
-  });
-  dropdown.addEventListener('mouseleave', () => {
-    menu.classList.remove('show');
-  });
- 
-  // Redirect all links in mega menu to explore.html
-  const links = document.querySelectorAll('.mega-list a');
-  links.forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault(); // prevent default Bootstrap dropdown behavior
-      window.location.href = 'explore.html';
-    });
-  });
-});
-</script>
- 
-<div id="adBannerCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-      <div style="height: 500px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
-        <h2 style="color: white; font-size: 48px; font-weight: 700;">Welcome to DiGi Bank – Your Trusted Partner in Smart Banking</h2>
-      </div>
-    </div>
-    <div class="carousel-item">
-      <div style="height: 500px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center;">
-        <h2 style="color: white; font-size: 48px; font-weight: 700;">Smart Banking Solutions</h2>
-      </div>
-    </div>
-    <div class="carousel-item">
-      <div style="height: 500px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); display: flex; align-items: center; justify-content: center;">
-        <h2 style="color: white; font-size: 48px; font-weight: 700;">Bank with Confidence</h2>
-      </div>
-    </div>
-  </div>
- 
-  <button class="carousel-control-prev" type="button" data-bs-target="#adBannerCarousel" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Previous</span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#adBannerCarousel" data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Next</span>
-  </button>
-</div>
- 
-<div class="card mt-4 border-0">
-  <div class="card-body" style="margin-left: 0.5in;">
-    <h3>
-      <span style="color: #0B4D83; font-style: italic;">DiGi Go</span> Easy and Secure Mobile Banking
-    </h3><br>
-    <p>
-      <span style="color: #0B4D83; font-style: italic;"><b>DiGi GO</b></span> is a mobile application designed
-      exclusively for a hassle-free banking and onboarding experience
-      without having to visit an DiGi Bank branch.
-    </p>
-  </div>
-</div>
- 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-    crossorigin="anonymous"></script>
+
+    <footer>© 2025 DigiBank | Secure Digital Banking Solutions</footer>
+
+    <!-- JavaScript -->
+    <script>
+        function checkEligibility() {
+            let age = document.getElementById("age").value;
+            let income = document.getElementById("income").value;
+            let cibil = document.getElementById("cibil").value;
+            let existingEmi = document.getElementById("existingEmi").value || 0;
+            let desiredLoan = document.getElementById("desiredLoan").value;
+            let employment = document.getElementById("employment").value;
+            let result = document.getElementById("eligibleResult");
+
+            if (!age || !income || !cibil || !desiredLoan || !employment) {
+                result.innerHTML = "<span class='not-eligible'>⚠ Please fill all required fields.</span>";
+                return;
+            }
+
+            if (age < 18 || age > 65) {
+                result.innerHTML = "<span class='not-eligible'>❌ Not Eligible: Age criteria not met.</span>";
+                return;
+            }
+
+            if (cibil < 650) {
+                result.innerHTML = "<span class='not-eligible'>❌ Not Eligible: Low CIBIL Score.</span>";
+                updateGauge(30);
+                updateTimeline(1);
+                return;
+            }
+
+            let maxLoan = income * 20 - existingEmi * 10;
+            let probability = Math.min(95, Math.floor((cibil / 900) * 100));
+
+            if (desiredLoan > maxLoan) {
+                result.innerHTML = `<span class='not-eligible'>❌ Not Eligible: Requested amount exceeds limit.<br> Max Eligible Loan: ₹${maxLoan.toLocaleString()}</span>`;
+                updateGauge(45);
+                updateTimeline(2);
+                return;
+            }
+
+            result.innerHTML = `<span class='eligible'>✅ Eligible for Loan!</span><br>
+                Max Loan: ₹${maxLoan.toLocaleString()}<br>
+                Approval Probability: <b>${probability}%</b>`;
+
+            updateGauge(probability);
+            updateTimeline(5);
+        }
+
+        function updateGauge(percent) {
+            let gauge = document.getElementById("gaugeChart");
+            let display = document.getElementById("gaugeVal");
+
+            let angle = Math.round((percent / 100) * 360) + "deg";
+            gauge.style.setProperty("--value", angle);
+
+            display.innerHTML = percent + "%";
+        }
+
+        function updateTimeline(steps) {
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById("step" + i).classList.remove("step-active");
+            }
+            for (let i = 1; i <= steps; i++) {
+                document.getElementById("step" + i).classList.add("step-active");
+            }
+        }
+    </script>
+
 </body>
+
 </html>
- 
- 
