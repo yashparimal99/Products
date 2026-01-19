@@ -1255,6 +1255,8 @@ def generate_transaction_id():
  
  
  
+ 
+ 
 @app.route('/Txnhistory')
 def Txnhistory():
     email = session.get('user_email')
@@ -1262,10 +1264,12 @@ def Txnhistory():
         flash('Please login first', 'danger')
         return redirect(url_for('login'))
  
-    my_accts = get_account_numbers_for_email(email)
+    my_accts = get_account_numbers_for_email(email) or []
  
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     txns = []
+    enriched = []
+ 
     if my_accts:
         placeholders = ','.join(['%s'] * len(my_accts))
         query = f"""
@@ -1276,15 +1280,29 @@ def Txnhistory():
             LIMIT 200
         """
         cur.execute(query, tuple(my_accts + my_accts))
-        txns = cur.fetchall()
+        txns = cur.fetchall() or []
+ 
+        my_set = set(my_accts)
+        for t in txns:
+            # If money is coming into my account → credit, otherwise debit
+            direction = 'credit' if t['to_account'] in my_set else 'debit'
+            enriched.append({
+                **t,
+                'direction': direction
+            })
  
     # pass user for header
     cur.execute("SELECT * FROM bank_users WHERE email=%s", (email,))
     user = cur.fetchone()
     cur.close()
  
-    return render_template('transactions.html', transactions=txns, my_accounts=set(my_accts), user=user)
-
+    return render_template(
+        'transactions.html',
+        transactions=enriched,
+        my_accounts=set(my_accts),
+        user=user
+    )
+ 
  
  
 
@@ -1601,42 +1619,40 @@ def open_deposits():
   
 
 
+ 
 @app.route('/dashboard')
 def dashboard():
-    role = session.get('user_role')
-    email = session.get('user_email')
+    role = session.get('user_role', '')
+    email = session.get('user_email', '')
  
     if not role or not email:
         flash('Please login first', 'danger')
         return redirect(url_for('login'))
  
-    # Fetch the full user details
+    # Normalize the role to lowercase
+    role = role.lower()
+ 
+    # Fetch user details
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("SELECT * FROM bank_users WHERE email = %s", (email,))
     user = cur.fetchone()
     cur.close()
  
-    templates = {
-        'Customer': 'userdashboard.html',
-        'tl': 'TLdashboard.html',
-        'manager': 'managerdashboard.html',
-        'Card_Agent': 'cardagent_dashboard.html',
-        'Loan_Agent': 'loanagent_dashboard.html',
-        'Investment_Agent': 'investagent_dashboard.html',
-        'Underwriting_Agent': 'underwriting.html',
-        'Admin': 'admindashboard.html',
-        'Officer': 'officer_dashboard.html',
-        'Auditor': 'auditor_dashboard.html',
-    }
+    # --- SPECIAL HANDLING FOR UNDERWRITING AGENT ---
+    # Do NOT render template directly; redirect to correct route
+    if role in ["underwriting_agent", "underwriter", "uw_agent"]:
+        return redirect(url_for('agent_dashboard'))
+   
+    if role in ["Loan_Agent", "agent"]:
+        return redirect(url_for('loan_agent_dashboard'))
  
+    # --- MANAGER DASHBOARD (existing logic) ---
     if role == "manager":
         cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
  
-        # Total customers
         cur.execute("SELECT COUNT(*) AS total_customers FROM bank_users WHERE role = 'User'")
         total_customers = cur.fetchone()['total_customers']
  
-        # Pending requests
         cur.execute("SELECT COUNT(*) AS c FROM accounts_requests WHERE status_flag IS NULL")
         acc_count = cur.fetchone()['c']
  
@@ -1654,11 +1670,9 @@ def dashboard():
  
         total_pending = acc_count + dep_count + loan_count + card_count + invest_count
  
-        # 💰 Total Principal Amount (from request_deposits only)
         cur.execute("SELECT COALESCE(SUM(principal_amount),0) AS total_principal FROM request_deposits")
         total_deposits = cur.fetchone()['total_principal']
  
-        # 💰 Total Funded Amount (Approved Loans)
         cur.execute("SELECT COALESCE(SUM(loan_amount),0) AS total_funded FROM loan_requests WHERE status = 'approved'")
         total_funded = cur.fetchone()['total_funded']
  
@@ -1673,10 +1687,22 @@ def dashboard():
             total_funded=total_funded
         )
  
-        return render_template('managerdashboard.html', user=user, total_customers=total_customers)
-   
+    # --- TEMPLATE MAP FOR OTHER ROLES ---
+    templates = {
+        'customer': 'userdashboard.html',
+        'tl': 'TLdashboard.html',
+        'loan_agent': 'loanagent_dashboard.html',
+        'card_agent': 'cardagent_dashboard.html',
+        'investment_agent': 'investagent_dashboard.html',
+        'admin': 'admindashboard.html',
+        'officer': 'officer_dashboard.html',
+        'auditor': 'auditor_dashboard.html',
+    }
+ 
     return render_template(templates.get(role, 'login.html'), user=user)
  
+ 
+  
 
 #Manager Dasboard Routes
 
@@ -2063,35 +2089,6 @@ def update_deposit_request(request_id, action):
  
  
 
-@app.route('/manage_loans')
-def manage_loans():
-    user_id = session.get('user_id')
-    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
-    user = cur.fetchone()
-    cur.close()
- 
-    # Fetch pending or approved_docs loans for Loan Applications table
-    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute("""
-        SELECT * FROM loan_requests
-        WHERE status IN ('pending', 'approved_docs')
-        ORDER BY created_at DESC
-    """)
-    loan_applications = cur.fetchall()
-    cur.close()
- 
-    # Fetch approved loans for Active Loans table
-    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute("""
-        SELECT * FROM loan_requests
-        WHERE status IN ('rejected', 'approved')
-        ORDER BY updated_at DESC
-    """)
-    active_loans = cur.fetchall()
-    cur.close()
- 
-    return render_template('manage-loans.html', user=user, loan_applications=loan_applications, active_loans=active_loans)
  
 
  
@@ -5527,17 +5524,23 @@ def Business_loan():
         mysql.connection.rollback()
         flash(f'Could not submit business loan application: {e}', 'danger')
     return redirect(url_for('userdashloan'))
+
+#view_loans
+
  
-# ========== USER: VIEW LOANS ==========
+# ========== USER: VIEW LOANS (NEW UNIFIED VERSION) ==========
 @app.route('/view_loans')
 def view_loans():
+    # 1) Check login
     email = session.get('user_email')
     if not email:
         flash('Please login first', 'danger')
         return redirect(url_for('login'))
  
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cur.execute("SELECT user_id, name FROM bank_users WHERE email=%s", (email,))
+ 
+    # 2) Get user basic info
+    cur.execute("SELECT user_id, name, email FROM bank_users WHERE email=%s", (email,))
     user = cur.fetchone()
     if not user:
         cur.close()
@@ -5546,50 +5549,224 @@ def view_loans():
  
     loans = []
  
-    def _fetch_and_append(kind, table):
-        cur.execute(f"""
-            SELECT id, user_id, applicant_name, purpose,
-                   interest_type, interest_rate, emi_amount,
-                   loan_amount, loan_tenure_years,
-                   application_date, status, updated_at
-            FROM {table}
-            WHERE user_id=%s
-            ORDER BY application_date DESC, id DESC
-        """, (user['user_id'],))
-        rows = cur.fetchall() or []
-        for r in rows:
-            amount = r.get('loan_amount')
-            tenure = r.get('loan_tenure_years')
-            rate   = r.get('interest_rate')
-            emi    = r.get('emi_amount')
+    # 3) Fetch all loan applications for this user
+    #    We link by:
+    #    - loan_applications.email = logged-in email
+    #    - OR loan_accounts.customer_id = bank_users.user_id (for disbursed loans)
+    query = """
+        SELECT
+            la.id                         AS application_id,
+            la.application_number,
+            la.application_status,
+            la.application_date,
+            la.loan_type,
+            la.loan_purpose,
+            la.loan_amount,
+            la.tenure_months,
+            la.interest_type,
+            la.suggested_interest_rate,
+            la.suggested_emi,
+            la.final_interest_rate,
+            la.sanctioned_amount,
+            la.final_dti,
+            la.manager_final_decision,
+            la.manager_decided_at,
+            la.updated_at,
  
-            if rate is None:
-                rate = _compute_interest_rate(kind, r.get('interest_type'), amount, tenure)
-            if emi is None:
-                emi = compute_emi(amount, rate, tenure)
+            -- joined loan account (if disbursed)
+            acc.id                        AS loan_account_id,
+            acc.loan_account_no,
+            acc.sanctioned_amount         AS acc_sanctioned_amount,
+            acc.interest_rate             AS acc_interest_rate,
+            acc.tenure_months             AS acc_tenure_months,
+            acc.emi_amount                AS acc_emi_amount,
+            acc.total_payable             AS acc_total_payable,
+            acc.start_date,
+            acc.first_emi_date,
+            acc.next_emi_date,
+            acc.outstanding_principal,
+            acc.status                    AS account_status
+        FROM loan_applications la
+        LEFT JOIN loan_accounts acc
+               ON acc.loan_application_id = la.id
+        WHERE la.email = %s
+           OR la.id IN (
+                SELECT loan_application_id
+                FROM loan_accounts
+                WHERE customer_id = %s
+           )
+        ORDER BY la.application_date DESC, la.id DESC
+    """
  
-            loans.append({
-                'loan_kind': kind,
-                'loan_type_label': 'Home Loan' if kind=='home' else ('Personal Loan' if kind=='personal' else 'Business Loan'),
-                'purpose': r.get('purpose'),
-                'interest_type': r.get('interest_type'),
-                'interest_rate': rate,
-                'emi_amount': emi,
-                'loan_tenure_years': tenure,
-                'loan_amount': amount,
-                'application_date': r.get('application_date'),
-                'status': r.get('status'),
-                'status_label': _status_label(r.get('status')),
-                'updated_at': r.get('updated_at'),
-            })
+    cur.execute(query, (user['email'], user['user_id']))
+    rows = cur.fetchall() or []
  
-    _fetch_and_append('home',     'home_loan_applications')
-    _fetch_and_append('personal', 'personal_loan_applications')
-    _fetch_and_append('business', 'business_loan_applications')
+    # 4) Transform rows into a friendly list for the template
+    for r in rows:
+        loan_type = (r.get('loan_type') or '').lower()
+ 
+        # Map loan_type to label like earlier
+        if loan_type == 'home':
+            loan_type_label = 'Home Loan'
+        elif loan_type == 'business':
+            loan_type_label = 'Business Loan'
+        elif loan_type == 'personal':
+            loan_type_label = 'Personal Loan'
+        elif loan_type == 'education':
+            loan_type_label = 'Education Loan'
+        elif loan_type == 'vehicle':
+            loan_type_label = 'Vehicle Loan'
+        elif loan_type == 'agriculture':
+            loan_type_label = 'Agriculture Loan'
+        else:
+            loan_type_label = loan_type.title() if loan_type else 'Loan'
+ 
+        # Decide which interest rate & EMI to show
+        interest_rate = (
+            r.get('final_interest_rate')
+            or r.get('acc_interest_rate')
+            or r.get('suggested_interest_rate')
+        )
+ 
+        emi_amount = (
+            r.get('acc_emi_amount')
+            or r.get('suggested_emi')
+        )
+ 
+        # Tenure in years (if you still want to show like before)
+        tenure_months = r.get('acc_tenure_months') or r.get('tenure_months') or 0
+        loan_tenure_years = (tenure_months / 12.0) if tenure_months else None
+ 
+        # Overall status: use account status if account exists, otherwise application status
+        app_status = r.get('application_status')
+        acc_status = r.get('account_status')
+ 
+        if acc_status in ('active', 'closed', 'defaulted'):
+            overall_status = f"disbursed_{acc_status}"
+        else:
+            overall_status = app_status or 'submitted'
+ 
+        # Simple human label for status
+        status_label = overall_status.replace('_', ' ').title()
+ 
+        loans.append({
+            # Old-style keys (so your existing template can still work with minimal change)
+            'loan_kind': loan_type,                 # e.g. 'home', 'personal', 'business'
+            'loan_type_label': loan_type_label,
+            'purpose': r.get('loan_purpose'),
+            'interest_type': r.get('interest_type'),
+            'interest_rate': interest_rate,
+            'emi_amount': emi_amount,
+            'loan_tenure_years': loan_tenure_years,
+            'loan_amount': r.get('loan_amount'),
+            'application_date': r.get('application_date'),
+            'status': overall_status,
+            'status_label': status_label,
+            'updated_at': r.get('updated_at'),
+ 
+            # New fields (you can show these in view_loans.html if you want)
+            'application_id': r.get('application_id'),
+            'application_number': r.get('application_number'),
+            'application_status': app_status,
+            'manager_final_decision': r.get('manager_final_decision'),
+            'sanctioned_amount': r.get('sanctioned_amount'),
+            'final_dti': r.get('final_dti'),
+            'manager_decided_at': r.get('manager_decided_at'),
+ 
+            'loan_account_id': r.get('loan_account_id'),
+            'loan_account_no': r.get('loan_account_no'),
+            'account_status': r.get('account_status'),
+            'outstanding_principal': r.get('outstanding_principal'),
+            'next_emi_date': r.get('next_emi_date'),
+            'start_date': r.get('start_date'),
+        })
  
     cur.close()
     return render_template('view_loans.html', user=user, loans=loans)
  
+from MySQLdb.cursors import DictCursor
+ 
+@app.route('/loan/<int:loan_account_id>/schedule')
+def loan_schedule(loan_account_id):
+    """
+    Show EMI schedule for a specific loan account to the logged-in customer.
+    """
+    email = session.get('user_email')
+    if not email:
+        flash('Please login first', 'danger')
+        return redirect(url_for('login'))
+ 
+    cur = mysql.connection.cursor(DictCursor)
+    try:
+        # 1) Get current user
+        cur.execute("SELECT user_id, name FROM bank_users WHERE email=%s", (email,))
+        user = cur.fetchone()
+        if not user:
+            flash('User not found.', 'danger')
+            return redirect(url_for('login'))
+ 
+        # 2) Fetch loan account and ensure it belongs to this user
+        cur.execute("""
+            SELECT la.*,
+                   app.application_number,
+                   app.loan_type,
+                   app.loan_purpose,
+                   app.application_date
+            FROM loan_accounts la
+            JOIN loan_applications app ON la.loan_application_id = app.id
+            WHERE la.id = %s
+              AND la.customer_id = %s
+        """, (loan_account_id, user['user_id']))
+        loan_account = cur.fetchone()
+ 
+        if not loan_account:
+            flash("Loan account not found or does not belong to you.", "danger")
+            return redirect(url_for('view_loans'))
+ 
+        # 3) Fetch repayment schedule
+        cur.execute("""
+            SELECT instalment_no,
+                   due_date,
+                   emi_amount,
+                   principal_component,
+                   interest_component,
+                   opening_principal,
+                   closing_principal,
+                   status,
+                   paid_on
+            FROM loan_repayment_schedule
+            WHERE loan_account_id = %s
+            ORDER BY instalment_no
+        """, (loan_account_id,))
+        schedule = cur.fetchall() or []
+ 
+        # 4) Some quick aggregates
+        total_emi = sum((row['emi_amount'] or 0) for row in schedule)
+        total_principal = sum((row['principal_component'] or 0) for row in schedule)
+        total_interest = sum((row['interest_component'] or 0) for row in schedule)
+ 
+        pending_installments = sum(1 for row in schedule if row['status'] == 'pending')
+        paid_installments = sum(1 for row in schedule if row['status'] == 'paid')
+        overdue_installments = sum(1 for row in schedule if row['status'] == 'overdue')
+ 
+        return render_template(
+            'loan_schedule.html',
+            user=user,
+            loan_account=loan_account,
+            schedule=schedule,
+            total_emi=total_emi,
+            total_principal=total_principal,
+            total_interest=total_interest,
+            pending_installments=pending_installments,
+            paid_installments=paid_installments,
+            overdue_installments=overdue_installments
+        )
+ 
+    finally:
+        cur.close()
+ 
+ 
+    
  
 # ========== AGENT: PROFILE & APPLY PAGES ==========
 
@@ -7166,6 +7343,15 @@ def set_pin():
  
 @app.route('/enter_pin', methods=['GET'])
 def enter_pin():
+    if 'user_id' not in session:
+        flash("Please login first.", "warning")
+        return redirect(url_for('login'))
+ 
+    user_id = session['user_id']
+ 
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
     """
     Lightweight PIN prompt page. We always show the nudge to set a PIN.
     Use ?next=accountbal (endpoint key) or ?next=/absolute/path
@@ -7176,7 +7362,7 @@ def enter_pin():
         return redirect(url_for('login'))
  
     next_url = request.args.get('next', '')  # can be 'accountbal' or a path
-    return render_template('enter_pin.html', next=next_url)
+    return render_template('enter_pin.html', next=next_url,user=user)
  
  
 @app.route('/verify_pin', methods=['POST'])
@@ -7616,18 +7802,7 @@ def customer_search():
     return render_template('admincust.html', customers=customers, searched=searched,user=user)
 
 
-# @app.route('/updateekyc')
-# def updateekyc():
-#     user_id = session.get('user_id')
-    
-#     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-#     cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
-#     user = cur.fetchone()
-#     cur.close()
-#     return render_template('ekyc_update.html',user=user)
 
-
-####---- Team Performance----###
  
  ####---- Team Performance (by branch_code) ----###
  
@@ -8061,11 +8236,410 @@ def _gather_audit_rows(filters):
     return rows
  
 # ------------- PAGES -------------
- 
-@app.route("/audit_logs", methods=["GET"])
+
+@app.route("/audit_logs")
 def audit_logs():
-    # 1) read filters
-    types = request.args.getlist("audit_type")   # list from checkboxes
+    user = _current_user()   # or your existing user function
+    if not user:
+        flash("Please login first.", "warning")
+        return redirect(url_for("login"))
+    return render_template("audit_logs.html", user=user)
+ 
+import io, csv
+from math import ceil
+from datetime import datetime
+from urllib.parse import urlencode
+from MySQLdb.cursors import DictCursor
+from flask import request, render_template, send_file, flash, redirect, url_for, session
+ 
+# Make urlencode usable in Jinja
+app.jinja_env.globals['urlencode'] = urlencode
+ 
+ 
+# ---------- Current user helper ----------
+def _current_user():
+    email = session.get('user_email')
+    if not email:
+        return None
+    cur = mysql.connection.cursor(DictCursor)
+    try:
+        cur.execute("SELECT * FROM bank_users WHERE email=%s", (email,))
+        return cur.fetchone()
+    finally:
+        cur.close()
+ 
+ 
+# ---------- Generic helpers ----------
+def _parse_dt(dt_str: str):
+    """Accepts 'YYYY-MM-DDTHH:MM' or 'YYYY-MM-DD'. Returns datetime or None."""
+    if not dt_str:
+        return None
+    for fmt in ("%Y-%m-%dT%H:%M", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(dt_str, fmt)
+        except ValueError:
+            pass
+    return None
+ 
+ 
+def has_column(table_name: str, column_name: str) -> bool:
+    """True if table has the column (in current DB)."""
+    cur = mysql.connection.cursor()
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA=%s AND TABLE_NAME=%s AND COLUMN_NAME=%s
+    """, (app.config['MYSQL_DB'], table_name, column_name))
+    ok = cur.fetchone()[0] > 0
+    cur.close()
+    return ok
+ 
+ 
+def _safe_fetch(cur, sql, args, module_name):
+    """Run query; never crash page. Returns (rows, error_str|None)."""
+    try:
+        cur.execute(sql, tuple(args))
+        return cur.fetchall(), None
+    except Exception as e:
+        app.logger.error("Audit fetch failed for %s: %s", module_name, e, exc_info=True)
+        return [], f"{module_name}: {e.__class__.__name__}: {e}"
+ 
+ 
+# ---------- Unified audit fetcher (same as you have, using loan_applications) ----------
+def _gather_audit_rows(filters):
+    """
+    Output rows with columns:
+      audit_type, ref_id, user_id, name, email, mobile,
+      status, created_at, action_time, extra_ref
+    """
+    types   = filters.get("types") or ["account", "cards", "loans", "investment", "deposit"]
+    user_id = (filters.get("user_id") or "").strip()
+    name    = (filters.get("name") or "").strip()
+    email   = (filters.get("email") or "").strip()
+    mobile  = (filters.get("mobile") or "").strip()
+    dt_from = _parse_dt(filters.get("from_dt"))
+    dt_to   = _parse_dt(filters.get("to_dt"))
+ 
+    rows, errors = [], []
+    cur = mysql.connection.cursor(DictCursor)
+ 
+    # ---------- ACCOUNTS ----------
+    if "account" in types:
+        where, args = [], []
+        if name:
+            where.append("CONCAT_WS(' ', first_name, middle_name, last_name) LIKE %s")
+            args.append(f"%{name}%")
+        if email:
+            where.append("email LIKE %s")
+            args.append(f"%{email}%")
+        if mobile:
+            where.append("mobile LIKE %s")
+            args.append(f"%{mobile}%")
+        if dt_from:
+            where.append("created_at >= %s")
+            args.append(dt_from)
+        if dt_to:
+            where.append("created_at <= %s")
+            args.append(dt_to)
+ 
+        clause = ("WHERE " + " AND ".join(where)) if where else ""
+        sql = f"""
+            SELECT
+              'account' AS audit_type,
+              request_id AS ref_id,
+              NULL AS user_id,
+              CONCAT_WS(' ', first_name, middle_name, last_name) AS name,
+              email, mobile,
+              status_flag AS status,
+              created_at,
+              date_of_action AS action_time,
+              account_number AS extra_ref
+            FROM accounts_requests
+            {clause}
+            ORDER BY created_at DESC
+            LIMIT 5000
+        """
+        data, err = _safe_fetch(cur, sql, args, "accounts_requests")
+        rows += data
+        if err: errors.append(err)
+ 
+    # ---------- CARDS ----------
+    if "cards" in types:
+        where, args = [], []
+        if user_id:
+            where.append("submitted_by_user_id LIKE %s")
+            args.append(f"%{user_id}%")
+        if name:
+            where.append("customer_name LIKE %s")
+            args.append(f"%{name}%")
+        if email:
+            where.append("customer_email LIKE %s")
+            args.append(f"%{email}%")
+        if mobile:
+            where.append("customer_mobile LIKE %s")
+            args.append(f"%{mobile}%")
+        if dt_from:
+            where.append("created_at >= %s")
+            args.append(dt_from)
+        if dt_to:
+            where.append("created_at <= %s")
+            args.append(dt_to)
+ 
+        clause = ("WHERE " + " AND ".join(where)) if where else ""
+        sql = f"""
+            SELECT
+              'cards' AS audit_type,
+              request_id AS ref_id,
+              submitted_by_user_id AS user_id,
+              customer_name AS name,
+              customer_email AS email,
+              customer_mobile AS mobile,
+              status_flag AS status,
+              created_at,
+              date_of_action AS action_time,
+              card_number AS extra_ref
+            FROM card_requests
+            {clause}
+            ORDER BY created_at DESC
+            LIMIT 5000
+        """
+        data, err = _safe_fetch(cur, sql, args, "card_requests")
+        rows += data
+        if err: errors.append(err)
+ 
+    # ---------- LOANS (loan_applications) ----------
+    if "loans" in types:
+        where, args = [], []
+        if name:
+            where.append("full_name LIKE %s")
+            args.append(f"%{name}%")
+        if email:
+            where.append("email LIKE %s")
+            args.append(f"%{email}%")
+        if mobile:
+            where.append("mobile LIKE %s")
+            args.append(f"%{mobile}%")
+        if dt_from:
+            where.append("created_at >= %s")
+            args.append(dt_from)
+        if dt_to:
+            where.append("created_at <= %s")
+            args.append(dt_to)
+ 
+        clause = ("WHERE " + " AND ".join(where)) if where else ""
+        sql = f"""
+            SELECT
+              'loans' AS audit_type,
+              application_number AS ref_id,
+              NULL AS user_id,
+              full_name AS name,
+              email,
+              mobile,
+              application_status AS status,
+              created_at,
+              updated_at AS action_time,
+              loan_amount AS extra_ref
+            FROM loan_applications
+            {clause}
+            ORDER BY created_at DESC
+            LIMIT 5000
+        """
+        data, err = _safe_fetch(cur, sql, args, "loan_applications")
+        rows += data
+        if err: errors.append(err)
+ 
+    # ---------- INVESTMENT ----------
+    if "investment" in types:
+        where, args = [], []
+        inv_has_req_id = has_column('investment_applications', 'request_id')
+        ref_expr = "COALESCE(request_id, application_number)" if inv_has_req_id else "application_number"
+ 
+        if user_id:
+            where.append("user_id LIKE %s")
+            args.append(f"%{user_id}%")
+        if name:
+            where.append("full_name LIKE %s")
+            args.append(f"%{name}%")
+        if dt_from:
+            where.append("(created_at >= %s OR application_date >= %s)")
+            args += [dt_from, dt_from.date()]
+        if dt_to:
+            where.append("(created_at <= %s OR application_date <= %s)")
+            args += [dt_to, dt_to.date()]
+ 
+        clause = ("WHERE " + " AND ".join(where)) if where else ""
+        sql = f"""
+            SELECT
+              'investment' AS audit_type,
+              {ref_expr} AS ref_id,
+              user_id,
+              full_name AS name,
+              NULL AS email,
+              NULL AS mobile,
+              status,
+              created_at,
+              updated_at AS action_time,
+              application_number AS extra_ref
+            FROM investment_applications
+            {clause}
+            ORDER BY created_at DESC
+            LIMIT 5000
+        """
+        data, err = _safe_fetch(cur, sql, args, "investment_applications")
+        rows += data
+        if err: errors.append(err)
+ 
+    # ---------- DEPOSIT ----------
+    if "deposit" in types:
+        where, args = [], []
+        if name:
+            where.append("CONCAT_WS(' ', first_name, middle_name, last_name) LIKE %s")
+            args.append(f"%{name}%")
+        if email:
+            where.append("email LIKE %s")
+            args.append(f"%{email}%")
+        if mobile:
+            where.append("mobile LIKE %s")
+            args.append(f"%{mobile}%")
+        if dt_from:
+            where.append("created_at >= %s")
+            args.append(dt_from)
+        if dt_to:
+            where.append("created_at <= %s")
+            args.append(dt_to)
+ 
+        clause = ("WHERE " + " AND ".join(where)) if where else ""
+        sql = f"""
+            SELECT
+              'deposit' AS audit_type,
+              request_id AS ref_id,
+              NULL AS user_id,
+              CONCAT_WS(' ', first_name, middle_name, last_name) AS name,
+              email, mobile,
+              status_flag AS status,
+              created_at,
+              date_of_action AS action_time,
+              account_number AS extra_ref
+            FROM request_deposits
+            {clause}
+            ORDER BY created_at DESC
+            LIMIT 5000
+        """
+        data, err = _safe_fetch(cur, sql, args, "request_deposits")
+        rows += data
+        if err: errors.append(err)
+ 
+    cur.close()
+ 
+    # normalize + global sort
+    for r in rows:
+        r.setdefault("email", None)
+        r.setdefault("mobile", None)
+        r.setdefault("user_id", None)
+        r.setdefault("status", None)
+        r.setdefault("extra_ref", None)
+ 
+    rows.sort(key=lambda x: (x.get("created_at") or datetime.min), reverse=True)
+    return rows
+ 
+ 
+# ---------- Filter + attach user_id from bank_users (customer/user only) ----------
+def _filter_rows_by_role(rows, allowed_roles=("customer", "user")):
+    """
+    Filter audit rows based on role in bank_users AND
+    attach bank_users.user_id into each row.
+ 
+    Matching is done using email / mobile.
+    """
+    if not rows:
+        return []
+ 
+    # collect unique emails/mobiles
+    emails = sorted({r["email"] for r in rows if r.get("email")})
+    mobiles = sorted({r["mobile"] for r in rows if r.get("mobile")})
+ 
+    if not emails and not mobiles:
+        # we cannot map to bank_users, nothing to show
+        return []
+ 
+    cur = mysql.connection.cursor(DictCursor)
+ 
+    conditions = []
+    params = []
+ 
+    # role filter
+    role_placeholders = ",".join(["%s"] * len(allowed_roles))
+    params.extend(allowed_roles)
+ 
+    if emails:
+        email_placeholders = ",".join(["%s"] * len(emails))
+        conditions.append(f"email IN ({email_placeholders})")
+        params.extend(emails)
+ 
+    if mobiles:
+        mobile_placeholders = ",".join(["%s"] * len(mobiles))
+        conditions.append(f"mobile IN ({mobile_placeholders})")
+        params.extend(mobiles)
+ 
+    where_clause = " AND (" + " OR ".join(conditions) + ")" if conditions else ""
+ 
+    sql = f"""
+        SELECT user_id, email, mobile, role
+        FROM bank_users
+        WHERE role IN ({role_placeholders})
+        {where_clause}
+    """
+ 
+    cur.execute(sql, tuple(params))
+    matched = cur.fetchall()
+    cur.close()
+ 
+    # build lookup maps
+    by_email = {}
+    by_mobile = {}
+    for m in matched:
+        e  = m.get("email")
+        mb = m.get("mobile")
+        if e:
+            by_email[e] = m
+        if mb:
+            by_mobile[mb] = m
+ 
+    # final list: only customers/users, plus user_id attached
+    filtered = []
+    for r in rows:
+        e  = r.get("email")
+        mb = r.get("mobile")
+ 
+        mu = None
+        if e and e in by_email:
+            mu = by_email[e]
+        elif mb and mb in by_mobile:
+            mu = by_mobile[mb]
+ 
+        if not mu:
+            # either not found or role not in allowed_roles (already filtered in SQL)
+            continue
+ 
+        # attach user_id from bank_users if missing
+        if not r.get("user_id"):
+            r["user_id"] = mu.get("user_id")
+ 
+        filtered.append(r)
+ 
+    return filtered
+ 
+ 
+# ---------- ROUTE: Customer Audit Logs (page) ----------
+@app.route("/customer_audit_logs", methods=["GET"])
+def customer_audit_logs():
+    user = _current_user()
+    if not user:
+        flash("Please login first.", "warning")
+        return redirect(url_for("login"))
+ 
+    types = request.args.getlist("audit_type")
+ 
     filters = {
         "user_id": request.args.get("user_id", ""),
         "name":    request.args.get("name", ""),
@@ -8076,43 +8650,65 @@ def audit_logs():
         "types":   types if types else None,
     }
  
-    # 2) pagination
-    try:    page = max(int(request.args.get("page", 1)), 1)
-    except: page = 1
-    try:    per_page = min(max(int(request.args.get("per_page", 20)), 5), 100)
-    except: per_page = 20
+    searched = bool(request.args)
  
-    # 3) fetch
-    rows = _gather_audit_rows(filters)
-    total = len(rows)
+    # pagination
+    try:
+        page = max(int(request.args.get("page", 1)), 1)
+    except ValueError:
+        page = 1
+ 
+    try:
+        per_page = min(max(int(request.args.get("per_page", 20)), 5), 100)
+    except ValueError:
+        per_page = 20
+ 
+    if searched:
+        all_rows = _gather_audit_rows(filters)
+        all_rows = _filter_rows_by_role(all_rows, allowed_roles=("customer", "user"))
+    else:
+        all_rows = []
+ 
+    total = len(all_rows)
     start = (page - 1) * per_page
     end   = start + per_page
-    page_rows = rows[start:end]
-    total_pages = (total + per_page - 1) // per_page
+    page_rows = all_rows[start:end]
+    total_pages = ceil(total / per_page) if total else 1
  
-    # 4) build export querystring (preserve all current filters)
+    base_qs = request.args.to_dict(flat=False)
+    base_qs.pop("page", None)
+ 
+    def _make_page_url(p):
+        qs = base_qs.copy()
+        qs["page"] = [str(p)]
+        return url_for("customer_audit_logs") + "?" + urlencode(qs, doseq=True)
+ 
+    prev_url = _make_page_url(page - 1) if page > 1 and total > 0 else None
+    next_url = _make_page_url(page + 1) if end < total else None
+ 
+    selected_types = types if types else ["account", "cards", "loans", "investment", "deposit"]
     export_qs = request.args.to_dict(flat=False)
-    if types:
-        export_qs["audit_type"] = types
-    else:
-        export_qs.pop("audit_type", None)
  
     return render_template(
-        "audit_logs_admin.html",
+        "customer_audit_logs.html",
+        user=user,
         rows=page_rows,
         total=total,
         page=page,
         per_page=per_page,
         total_pages=total_pages,
+        prev_url=prev_url,
+        next_url=next_url,
         filters=filters,
-        selected_types=types,      # pass list (not set)
-        searched=any([filters["user_id"], filters["name"], filters["email"], filters["mobile"],
-                      filters["from_dt"], filters["to_dt"], types]),
-        export_qs=export_qs
+        selected_types=selected_types,
+        searched=searched,
+        export_qs=export_qs,
     )
  
-@app.route("/audit_logs/export", methods=["GET"])
-def audit_logs_export():
+ 
+# ---------- ROUTE: Customer Audit Logs Export CSV ----------
+@app.route("/customer_audit_logs/export", methods=["GET"])
+def customer_audit_logs_export():
     types = request.args.getlist("audit_type")
     filters = {
         "user_id": request.args.get("user_id", ""),
@@ -8123,25 +8719,417 @@ def audit_logs_export():
         "to_dt":   request.args.get("to_dt", ""),
         "types":   types if types else None,
     }
+ 
     rows = _gather_audit_rows(filters)
+    rows = _filter_rows_by_role(rows, allowed_roles=("customer", "user"))
  
     buf = io.StringIO()
     w = csv.writer(buf)
-    w.writerow(["audit_type","ref_id","user_id","name","email","mobile","status","created_at","action_time","extra_ref"])
+    w.writerow([
+        "audit_type","ref_id","user_id","name","email",
+        "mobile","status","created_at","action_time","extra_ref"
+    ])
+ 
     for r in rows:
         created = r["created_at"].strftime("%Y-%m-%d %H:%M:%S") if r.get("created_at") else ""
         action  = r["action_time"].strftime("%Y-%m-%d %H:%M:%S") if r.get("action_time") else ""
         w.writerow([
-            r["audit_type"], r["ref_id"], r.get("user_id","") or "", r.get("name","") or "",
-            r.get("email","") or "", r.get("mobile","") or "", r.get("status","") or "",
-            created, action, r.get("extra_ref","") or ""
+            r["audit_type"],
+            r["ref_id"],
+            r.get("user_id","") or "",
+            r.get("name","") or "",
+            r.get("email","") or "",
+            r.get("mobile","") or "",
+            r.get("status","") or "",
+            created,
+            action,
+            r.get("extra_ref","") or "",
         ])
  
     mem = io.BytesIO(buf.getvalue().encode("utf-8-sig"))
     mem.seek(0)
-    fname = f"audit_logs_{datetime.now():%Y%m%d_%H%M%S}.csv"
+    fname = f"customer_audit_logs_{datetime.now():%Y%m%d_%H%M%S}.csv"
     return send_file(mem, mimetype="text/csv", as_attachment=True, download_name=fname)
  
+# ================== END CUSTOMER AUDIT LOGS ==================
+ 
+ 
+ 
+ 
+# ================== MANAGER AUDIT LOGS ==================
+from math import ceil
+import io, csv
+from datetime import datetime
+from urllib.parse import urlencode
+from flask import request, render_template, send_file, flash, redirect, url_for, session
+from MySQLdb.cursors import DictCursor
+ 
+# Make sure this line exists only once in your file
+app.jinja_env.globals['urlencode'] = urlencode
+ 
+ 
+# 🔹 Helper: filter rows by status (for manager view)
+def _filter_rows_by_status(rows, status_value: str):
+    """
+    Filter audit rows by status text (case-insensitive).
+    Example statuses: approved, rejected, pending, under_review, disbursed.
+    """
+    status_value = (status_value or "").strip().lower()
+    if not status_value:
+        return rows
+ 
+    filtered = []
+    for r in rows:
+        rs = str(r.get("status") or "").lower()
+        if rs == status_value:
+            filtered.append(r)
+    return filtered
+ 
+ 
+# 🔹 MAIN PAGE: Manager Audit Logs
+@app.route("/manager_audit_logs", methods=["GET"])
+def manager_audit_logs():
+    user = _current_user()
+    if not user:
+        flash("Please login first.", "warning")
+        return redirect(url_for("login"))
+ 
+    # --- read filters from query ---
+    types = request.args.getlist("audit_type")
+ 
+    filters = {
+        "user_id": request.args.get("user_id", ""),
+        "name":    request.args.get("name", ""),
+        "email":   request.args.get("email", ""),
+        "mobile":  request.args.get("mobile", ""),
+        "from_dt": request.args.get("from_dt", ""),
+        "to_dt":   request.args.get("to_dt", ""),
+        "types":   types if types else None,
+        # extra (for our helper, not used by _gather_audit_rows)
+        "status":  request.args.get("status", ""),
+    }
+ 
+    searched = bool(request.args)
+ 
+    # --- pagination ---
+    try:
+        page = max(int(request.args.get("page", 1)), 1)
+    except ValueError:
+        page = 1
+ 
+    try:
+        per_page = min(max(int(request.args.get("per_page", 20)), 5), 100)
+    except ValueError:
+        per_page = 20
+ 
+    if searched:
+        # fetch all logs using existing unified fetcher
+        all_rows = _gather_audit_rows(filters)
+        # then filter by status if user selected
+        all_rows = _filter_rows_by_status(all_rows, filters.get("status"))
+    else:
+        all_rows = []
+ 
+    total = len(all_rows)
+    start = (page - 1) * per_page
+    end   = start + per_page
+    page_rows = all_rows[start:end]
+    total_pages = ceil(total / per_page) if total else 1
+ 
+    # for audit_type checkboxes
+    selected_types = types if types else ["account", "cards", "loans", "investment", "deposit"]
+ 
+    # for Export button – keep all filters
+    export_qs = request.args.to_dict(flat=False)
+ 
+    return render_template(
+        "manager_audit_logs.html",
+        user=user,
+        rows=page_rows,
+        total=total,
+        page=page,
+        per_page=per_page,
+        total_pages=total_pages,
+        filters=filters,
+        selected_types=selected_types,
+        searched=searched,
+        export_qs=export_qs,
+    )
+ 
+ 
+# 🔹 EXPORT: Manager Audit Logs CSV
+@app.route("/manager_audit_logs/export", methods=["GET"])
+def manager_audit_logs_export():
+    types = request.args.getlist("audit_type")
+ 
+    filters = {
+        "user_id": request.args.get("user_id", ""),
+        "name":    request.args.get("name", ""),
+        "email":   request.args.get("email", ""),
+        "mobile":  request.args.get("mobile", ""),
+        "from_dt": request.args.get("from_dt", ""),
+        "to_dt":   request.args.get("to_dt", ""),
+        "types":   types if types else None,
+        "status":  request.args.get("status", ""),
+    }
+ 
+    rows = _gather_audit_rows(filters)
+    rows = _filter_rows_by_status(rows, filters.get("status"))
+ 
+    buf = io.StringIO()
+    w = csv.writer(buf)
+    w.writerow([
+        "audit_type","ref_id","user_id","name","email",
+        "mobile","status","created_at","action_time","extra_ref"
+    ])
+ 
+    for r in rows:
+        created = r["created_at"].strftime("%Y-%m-%d %H:%M:%S") if r.get("created_at") else ""
+        action  = r["action_time"].strftime("%Y-%m-%d %H:%M:%S") if r.get("action_time") else ""
+        w.writerow([
+            r["audit_type"],
+            r["ref_id"],
+            r.get("user_id","") or "",
+            r.get("name","") or "",
+            r.get("email","") or "",
+            r.get("mobile","") or "",
+            r.get("status","") or "",
+            created,
+            action,
+            r.get("extra_ref","") or "",
+        ])
+ 
+    mem = io.BytesIO(buf.getvalue().encode("utf-8-sig"))
+    mem.seek(0)
+    fname = f"manager_audit_logs_{datetime.now():%Y%m%d_%H%M%S}.csv"
+    return send_file(mem, mimetype="text/csv", as_attachment=True, download_name=fname)
+# ================== END MANAGER AUDIT LOGS ==================
+ 
+ 
+ 
+ 
+ 
+from math import ceil
+from flask import request, render_template, send_file, flash, redirect, url_for, session
+ 
+# ---------- Helper: fetch officer eKYC logs (filter by officer email) ----------
+def _fetch_officer_ekyc_logs(filters):
+    """
+    Fetch eKYC logs handled by officers.
+    Joins ekyc_details with bank_users for both customer and officer.
+    Filter by officer EMAIL (not user_id).
+    """
+    customer_user_id = (filters.get("user_id") or "").strip()
+    officer_email    = (filters.get("officer_email") or "").strip()
+    name             = (filters.get("name") or "").strip()      # customer name
+    email            = (filters.get("email") or "").strip()     # customer email
+    mobile           = (filters.get("mobile") or "").strip()    # customer mobile
+    status           = (filters.get("status") or "").strip()
+    dt_from          = _parse_dt(filters.get("from_dt"))
+    dt_to            = _parse_dt(filters.get("to_dt"))
+ 
+    where = []
+    args  = []
+ 
+    # Filter by customer user_id
+    if customer_user_id:
+        where.append("e.user_id LIKE %s")
+        args.append(f"%{customer_user_id}%")
+ 
+    # Filter by officer email
+    if officer_email:
+        where.append("ou.email LIKE %s")
+        args.append(f"%{officer_email}%")
+ 
+    # Filter by customer name
+    if name:
+        where.append("CONCAT_WS(' ', cu.first_name, cu.middle_name, cu.last_name) LIKE %s")
+        args.append(f"%{name}%")
+ 
+    # Filter by customer email
+    if email:
+        where.append("cu.email LIKE %s")
+        args.append(f"%{email}%")
+ 
+    # Filter by mobile (from ekyc_details or bank_users)
+    if mobile:
+        where.append("COALESCE(e.mobile_number, cu.mobile) LIKE %s")
+        args.append(f"%{mobile}%")
+ 
+    # Filter by eKYC status
+    if status:
+        where.append("e.status = %s")
+        args.append(status)
+ 
+    # Date range on updated_at (officer action time)
+    if dt_from:
+        where.append("e.updated_at >= %s")
+        args.append(dt_from)
+    if dt_to:
+        where.append("e.updated_at <= %s")
+        args.append(dt_to)
+ 
+    # Only logs where officer is actually an officer
+    where.append("ou.role IN ('officer','OFFICER')")
+ 
+    clause = "WHERE " + " AND ".join(where) if where else ""
+ 
+    sql = f"""
+        SELECT
+          e.id AS ekyc_id,
+          e.user_id AS customer_user_id,
+          e.officer_id AS officer_user_id,
+          e.aadhar_number,
+          e.pan_number,
+          e.mobile_number AS ekyc_mobile,
+          e.status,
+          e.remarks,
+          e.created_at,
+          e.updated_at AS action_time,
+          CONCAT_WS(' ', cu.first_name, cu.middle_name, cu.last_name) AS customer_name,
+          cu.email  AS customer_email,
+          cu.mobile AS customer_mobile,
+          CONCAT_WS(' ', ou.first_name, ou.middle_name, ou.last_name) AS officer_name,
+          ou.email AS officer_email
+        FROM ekyc_details e
+        LEFT JOIN bank_users cu ON e.user_id = cu.user_id          -- customer
+        LEFT JOIN bank_users ou ON e.officer_id = ou.user_id       -- officer
+        {clause}
+        ORDER BY e.updated_at DESC
+        LIMIT 5000
+    """
+ 
+    cur = mysql.connection.cursor(DictCursor)
+    rows, err = _safe_fetch(cur, sql, args, "officer_ekyc_logs")
+    cur.close()
+    if err:
+        app.logger.error(err)
+    return rows
+ 
+ 
+# ---------- PAGE: Officer Audit Logs ----------
+@app.route("/officer_audit_logs", methods=["GET"])
+def officer_audit_logs():
+    user = _current_user()
+    if not user:
+        flash("Please login first.", "warning")
+        return redirect(url_for("login"))
+ 
+    # ---- read filters from query ----
+    filters = {
+        "user_id":       request.args.get("user_id", ""),        # customer user_id
+        "name":          request.args.get("name", ""),           # customer name
+        "email":         request.args.get("email", ""),          # customer email
+        "mobile":        request.args.get("mobile", ""),         # customer mobile
+        "officer_email": request.args.get("officer_email", ""),  # officer email
+        "status":        request.args.get("status", ""),         # pending/approved/rejected
+        "from_dt":       request.args.get("from_dt", ""),
+        "to_dt":         request.args.get("to_dt", ""),
+    }
+ 
+    searched = bool(request.args)
+ 
+    # ---- pagination ----
+    try:
+        page = max(int(request.args.get("page", 1)), 1)
+    except ValueError:
+        page = 1
+ 
+    try:
+        per_page = min(max(int(request.args.get("per_page", 20)), 5), 100)
+    except ValueError:
+        per_page = 20
+ 
+    # ---- fetch logs only when searched ----
+    if searched:
+        all_rows = _fetch_officer_ekyc_logs(filters)
+    else:
+        all_rows = []
+ 
+    total = len(all_rows)
+    start = (page - 1) * per_page
+    end   = start + per_page
+    page_rows = all_rows[start:end]
+    total_pages = ceil(total / per_page) if total else 1
+ 
+    # for Export button – keep all current query params
+    export_qs = request.args.to_dict(flat=False)
+ 
+    return render_template(
+        "officer_audit_logs.html",
+        user=user,
+        rows=page_rows,
+        total=total,
+        page=page,
+        per_page=per_page,
+        total_pages=total_pages,
+        filters=filters,
+        searched=searched,
+        export_qs=export_qs,
+    )
+ 
+ 
+# ---------- EXPORT: Officer Audit Logs CSV ----------
+@app.route("/officer_audit_logs/export", methods=["GET"])
+def officer_audit_logs_export():
+    filters = {
+        "user_id":       request.args.get("user_id", ""),
+        "name":          request.args.get("name", ""),
+        "email":         request.args.get("email", ""),
+        "mobile":        request.args.get("mobile", ""),
+        "officer_email": request.args.get("officer_email", ""),
+        "status":        request.args.get("status", ""),
+        "from_dt":       request.args.get("from_dt", ""),
+        "to_dt":         request.args.get("to_dt", ""),
+    }
+ 
+    rows = _fetch_officer_ekyc_logs(filters)
+ 
+    buf = io.StringIO()
+    w = csv.writer(buf)
+    w.writerow([
+        "ekyc_id",
+        "customer_user_id",
+        "customer_name",
+        "customer_email",
+        "customer_mobile",
+        "officer_name",
+        "officer_email",
+        "status",
+        "remarks",
+        "created_at",
+        "action_time",
+        "aadhar_number",
+        "pan_number",
+        "ekyc_mobile"
+    ])
+ 
+    for r in rows:
+        created = r["created_at"].strftime("%Y-%m-%d %H:%M:%S") if r.get("created_at") else ""
+        action  = r["action_time"].strftime("%Y-%m-%d %H:%M:%S") if r.get("action_time") else ""
+        w.writerow([
+            r.get("ekyc_id", ""),
+            r.get("customer_user_id", ""),
+            r.get("customer_name", "") or "",
+            r.get("customer_email", "") or "",
+            r.get("customer_mobile", "") or "",
+            r.get("officer_name", "") or "",
+            r.get("officer_email", "") or "",
+            r.get("status", "") or "",
+            r.get("remarks", "") or "",
+            created,
+            action,
+            r.get("aadhar_number", "") or "",
+            r.get("pan_number", "") or "",
+            r.get("ekyc_mobile", "") or "",
+        ])
+ 
+    mem = io.BytesIO(buf.getvalue().encode("utf-8-sig"))
+    mem.seek(0)
+    fname = f"officer_audit_logs_{datetime.now():%Y%m%d_%H%M%S}.csv"
+    return send_file(mem, mimetype="text/csv", as_attachment=True, download_name=fname)
+ 
+
  #EKyc Update
 
  
@@ -8369,6 +9357,2549 @@ def chat():
     user_msg = request.json.get("message")
     reply = ask_gemini(user_msg)
     return jsonify({"answer": reply})
+
+
+#Bank Users List---------Yash-----
+
+@app.route('/bankuser_manend')
+def bankuser_manend():
+    user_id = session['user_id']
+ 
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    return render_template('Bank_user_list.html',user=user)
+
+@app.route("/api/bank_users")
+def api_bank_users():
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    cur.execute("""
+        SELECT 
+            user_id,
+            name,
+            ifsc_code,
+            status
+        FROM bank_users
+        WHERE deleted_date IS NULL
+        ORDER BY onboarding_date DESC
+    """)
+
+    rows = cur.fetchall()
+
+    users = []
+    for r in rows:
+        users.append({
+            "customer_id": r["user_id"],      # JS expects this name
+            "name": r["name"],
+            "account_number": r["user_id"],   # TEMP mapping (no account_number column)
+            "ifsc": r["ifsc_code"],
+            "status": r["status"]
+        })
+
+    return jsonify({
+        "success": True,
+        "users": users,
+        "total": len(users),
+        "total_pages": 1
+    })
+@app.route("/api/bank_user/<user_id>")
+def api_bank_user(user_id):
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    cur.execute("""
+        SELECT 
+            user_id,
+            name,
+            pan,
+            aadhaar,
+            dob,
+            mobile,
+            email,
+            gender,
+            address,
+            city,
+            state,
+            country,
+            onboarding_date,
+            status,
+            branch_code,
+            ifsc_code
+        FROM bank_users
+        WHERE user_id = %s
+    """, (user_id,))
+
+    user = cur.fetchone()
+
+    if not user:
+        return jsonify({"success": False, "error": "User not found"}), 404
+
+    return jsonify({
+        "success": True,
+        "user": {
+            "customer_id": user["user_id"],
+            "name": user["name"],
+            "dob": user["dob"],
+            "address": user["address"],
+            "account_number": user["user_id"],  # TEMP (no account_number column)
+            "account_type": "savings",          # TEMP static (can change later)
+            "balance": 0,                       # TEMP
+            "ifsc": user["ifsc_code"],
+            "branch_code": user["branch_code"],
+            "pan": user["pan"],
+            "aadhaar": user["aadhaar"],
+            "email": user["email"],
+            "phone": user["mobile"],
+            "branch_name": "Main Branch",       # TEMP (no branch table yet)
+            "branch_city": user["city"],
+            "kyc_status": "Verified" if user["pan"] else "Pending",
+            "nominee": "Not Added",
+            "loans": [],
+            "credit_card": "No",
+            "fdAccounts": []
+        }
+    })
+
+
+##  LOAN ######
+
+## Loan ###
+
+from MySQLdb.cursors import DictCursor
+from decimal import Decimal
+
+# If you already have ACCOUNT_TABLES2, you can use that.
+# Example structure (you probably already defined it):
+# ACCOUNT_TABLES2 = [
+#     ("saving_accounts", "savings"),
+#     ("current_accounts", "current"),
+#     ("salary_accounts", "salary"),
+#     ("pmjdy_accounts", "pmjdy"),
+#     ("pension_accounts", "pension"),
+#     ("safecustody_accounts", "safecustody"),
+# ]
+import os, time, math
+from flask import (
+    render_template, request, redirect,
+    url_for, flash, send_file, abort
+)
+from werkzeug.utils import secure_filename
+from MySQLdb.cursors import DictCursor
+
+from MySQLdb.cursors import DictCursor
+from decimal import Decimal
+
+from MySQLdb.cursors import DictCursor
+from flask import session
+
+LOAN_DOC_FOLDER = os.path.join(app.config['UPLOAD_FOLDER'], 'loan_docs')
+os.makedirs(LOAN_DOC_FOLDER, exist_ok=True)
+
+
+import random
+from datetime import datetime
+
+def generate_loan_application_number():
+    """
+    Generate unique loan application number: LN20251118-1234
+    """
+    cur = mysql.connection.cursor()
+    try:
+        while True:
+            base = datetime.utcnow().strftime("LN%Y%m%d")
+            suffix = f"{random.randint(1000, 9999)}"
+            candidate = f"{base}-{suffix}"
+            cur.execute(
+                "SELECT 1 FROM loan_applications WHERE application_number = %s",
+                (candidate,),
+            )
+            if not cur.fetchone():
+                return candidate
+    finally:
+        cur.close()
+
+def calculate_interest_rate(loan_type, interest_type, cibil_score):
+    base_rate_map = {
+        'home': 8.5,
+        'personal': 13.0,
+        'business': 13.5,
+        'education': 10.0,
+        'vehicle': 9.5,
+        'agriculture': 7.5
+    }
+    rate = base_rate_map.get(loan_type, 10.0)
+
+    # CIBIL adjustment
+    if cibil_score >= 800:
+        rate -= 0.5
+    elif cibil_score >= 750:
+        pass
+    elif cibil_score >= 700:
+        rate += 1.0
+    elif cibil_score >= 650:
+        rate += 2.0
+    else:
+        rate += 3.0
+
+    # Interest type adj
+    if interest_type == 'fixed':
+        rate += 0.25
+    elif interest_type == 'floating':
+        rate -= 0.25
+
+    rate = max(7.0, min(rate, 20.0))
+    return rate
+
+
+def calculate_emi_and_dti(loan_amount, tenure_months, annual_income, monthly_income,
+                          loan_type, interest_type, cibil_score):
+    if monthly_income is None or monthly_income <= 0:
+        # derive from annual
+        if annual_income and annual_income > 0:
+            monthly_income = annual_income / 12
+        else:
+            return None, None  # cannot compute
+
+    rate = calculate_interest_rate(loan_type, interest_type, cibil_score)
+    r = rate / 12 / 100.0
+    n = tenure_months
+
+    if r <= 0 or n <= 0 or loan_amount <= 0:
+        return None, None
+
+    emi = loan_amount * r * math.pow(1 + r, n) / (math.pow(1 + r, n) - 1)
+    dti = (emi / monthly_income) * 100.0
+
+    return round(emi, 2), round(dti, 2)
+
+
+
+
+
+def get_approved_accounts_for_user(user_id):
+    """
+    Return approved accounts (status_flag='A') for this user,
+    and fetch IFSC + Branch Code from bank_users table.
+    """
+    cur = mysql.connection.cursor(DictCursor)
+    accounts = []
+    try:
+        for table_name, acct_type in ACCOUNT_TABLES2:
+            # a = account table, u = bank_users
+            cur.execute(f"""
+                SELECT 
+                    a.account_number,
+                    a.user_id,
+                    a.balance,
+                    a.status_flag,
+                    u.ifsc_code,
+                    u.branch_code
+                FROM {table_name} AS a
+                JOIN bank_users AS u
+                    ON a.user_id = u.user_id
+                WHERE a.user_id = %s
+                  AND a.status_flag = 'A'
+            """, (user_id,))
+
+            rows = cur.fetchall()
+            for row in rows:
+                accounts.append({
+                    "table_name": table_name,
+                    "account_type": acct_type,                         # from ACCOUNT_TABLES2
+                    "account_number": row.get("account_number"),
+                    "ifsc_code": row.get("ifsc_code") or "",
+                    "branch_code": row.get("branch_code") or "",
+                    "balance": row.get("balance") or Decimal("0.00"),
+                    "status_flag": row.get("status_flag"),
+                })
+
+        return accounts
+    finally:
+        cur.close()
+
+from decimal import Decimal
+from MySQLdb.cursors import DictCursor
+import time, os, json
+from werkzeug.utils import secure_filename
+
+LOAN_DOC_FOLDER = os.path.join(app.root_path, 'loan_docs')
+@app.route('/loan/apply', methods=['GET', 'POST'])
+def apply_loan():
+    user = _current_user()
+    if not user:
+        flash("Please login to apply for a loan.", "warning")
+        return redirect(url_for('login'))
+ 
+    # ---------- GET: Show Loan Form ----------
+    if request.method == 'GET':
+        try:
+            # Helper that returns only approved accounts for this customer
+            accounts = get_approved_accounts_for_user(user['user_id'])
+            return render_template('form 8.html', user=user, accounts=accounts)
+        except Exception as e:
+            print("ERROR /loan/apply GET:", e)
+            flash("Unable to load loan form right now. Please try again later.", "danger")
+            return redirect(url_for('dashboard'))
+ 
+    # ---------- POST: Process Loan Application ----------
+    cur = mysql.connection.cursor(DictCursor)
+    try:
+        form = request.form
+        files = request.files
+ 
+        # Debug: Check if required fields are present
+        required_fields = [
+            'fullName', 'email', 'mobile',
+            'employmentType', 'annualIncome',
+            'loanType', 'loanPurpose', 'interestType',
+            'cibilScore', 'loanAmount', 'tenure',
+            'monthlyIncome', 'accountSelection'
+        ]
+ 
+        missing_fields = [field for field in required_fields if not form.get(field)]
+        if missing_fields:
+            print(f"Missing required fields: {missing_fields}")
+            flash(f"Missing required fields: {', '.join(missing_fields)}", "danger")
+            return redirect(url_for('apply_loan'))
+ 
+        # ---------- Basic numeric validation ----------
+        try:
+            loan_amount = Decimal(str(form.get('loanAmount') or 0))
+            tenure_months = int(form.get('tenure') or 0)
+            annual_income = Decimal(str(form.get('annualIncome') or 0))
+            monthly_income = Decimal(str(form.get('monthlyIncome') or 0))
+            cibil_score = int(form.get('cibilScore') or 0)
+        except (ValueError, InvalidOperation) as e:
+            print("Number conversion error:", e)
+            flash("Invalid number format in form fields.", "danger")
+            return redirect(url_for('apply_loan'))
+ 
+        # ---------- Generate Application Number ----------
+        application_number = generate_loan_application_number()
+        print(f"Generated application number: {application_number}")
+ 
+        # Start transaction
+        cur.execute("START TRANSACTION")
+ 
+        # ==================================================
+        # 1. Insert into loan_applications (main table)
+        # ==================================================
+        insert_main_sql = """
+            INSERT INTO loan_applications (
+                application_number, application_date, application_place,
+                full_name, date_of_birth, email, mobile, pan_number,
+                loan_type, loan_purpose, loan_amount, tenure_months,
+                interest_type, cibil_score, annual_income, monthly_income,
+                suggested_interest_rate, suggested_emi, total_payable_amount,
+                total_interest, application_status
+            ) VALUES (
+                %s, %s, %s,
+                %s, %s, %s, %s, %s,
+                %s, %s, %s, %s,
+                %s, %s, %s, %s,
+                %s, %s, %s,
+                %s, 'submitted'
+            )
+        """
+ 
+        # Simple EMI calculation (you already show a detailed one on UI)
+        suggested_interest_rate = Decimal('10.5')
+        monthly_interest_rate = suggested_interest_rate / 12 / 100
+ 
+        if monthly_interest_rate > 0 and tenure_months > 0:
+            suggested_emi = loan_amount * monthly_interest_rate * (
+                (1 + monthly_interest_rate) ** tenure_months
+            ) / (
+                ((1 + monthly_interest_rate) ** tenure_months) - 1
+            )
+        else:
+            suggested_emi = loan_amount if tenure_months == 0 else (loan_amount / max(tenure_months, 1))
+ 
+        total_payable = suggested_emi * max(tenure_months, 1)
+        total_interest = total_payable - loan_amount
+ 
+        main_values = (
+            application_number,
+            form.get('applicationDate') or time.strftime('%Y-%m-%d'),
+            form.get('applicationPlace', 'Unknown'),
+            form.get('fullName'),
+            form.get('dob'),
+            form.get('email'),
+            form.get('mobile'),
+            form.get('panNumber'),
+            form.get('loanType'),
+            form.get('loanPurpose'),
+            loan_amount,
+            tenure_months,
+            form.get('interestType'),
+            cibil_score,
+            annual_income,
+            monthly_income,
+            suggested_interest_rate,
+            suggested_emi,
+            total_payable,
+            total_interest
+        )
+ 
+        print("Executing main insert...")
+        cur.execute(insert_main_sql, main_values)
+        loan_id = cur.lastrowid
+        print(f"Inserted loan application with ID: {loan_id}")
+ 
+        # ==================================================
+        # 2. Bank details (from selected account + bank_users)
+        # ==================================================
+        account_selection = form.get('accountSelection')       # selected account_number
+        account_number = account_selection
+ 
+        ifsc_code = ""
+        branch_code = ""
+        account_type = form.get('accountType') or ''
+ 
+        if user and user.get('user_id'):
+            try:
+                cur.execute("""
+                    SELECT ifsc_code, branch_code
+                    FROM bank_users
+                    WHERE user_id = %s
+                """, (user['user_id'],))
+                user_bank_info = cur.fetchone()
+                if user_bank_info:
+                    ifsc_code = user_bank_info.get('ifsc_code') or ''
+                    branch_code = user_bank_info.get('branch_code') or ''
+                    print(f"Fetched from bank_users - IFSC: {ifsc_code}, Branch: {branch_code}")
+            except Exception as e:
+                print(f"Could not fetch bank details from bank_users: {e}")
+                # Continue with empty values
+ 
+        # ==================================================
+        # 3. Insert into loan_application_details
+        # ==================================================
+        insert_details_sql = """
+            INSERT INTO loan_application_details (
+                loan_application_id, age, gender, current_address, permanent_address,
+                nationality, marital_status, employment_type, company_name,
+                account_number, ifsc_code, branch_code, account_type,
+                loan_specific_data, has_co_applicant, assets_data
+            ) VALUES (
+                %s, %s, %s, %s, %s,
+                %s, %s, %s, %s,
+                %s, %s, %s, %s,
+                %s, %s, %s
+            )
+        """
+ 
+        # Loan-type specific JSON
+        loan_specific_data = {}
+        loan_type = form.get('loanType')
+ 
+        if loan_type == 'home':
+            loan_specific_data = {
+                'property_value': form.get('propertyValue'),
+                'construction_stage': form.get('constructionStage'),
+                'builder_name': form.get('builderName'),
+                'property_location': form.get('homePropertyLocation'),
+                'property_area_sqft': form.get('propertyArea')
+            }
+        elif loan_type == 'business':
+            loan_specific_data = {
+                'business_plan': form.get('businessPlan'),
+                'collateral_details': form.get('collateralDetails'),
+                'business_age_years': form.get('businessAge'),
+                'business_turnover': form.get('businessTurnover')
+            }
+        elif loan_type == 'personal':
+            loan_specific_data = {
+                'existing_loans': form.get('existingLoans'),
+                'other_monthly_emis': form.get('totalObligation'),
+                'loan_usage': form.get('loanUsage')
+            }
+        # (You can add education / vehicle / agriculture similarly if needed)
+ 
+        # Assets JSON
+        assets_data = []
+        asset_type = form.get('assetType')
+        if asset_type and form.get('assetValue'):
+            asset_data = {
+                'type': asset_type,
+                'value': form.get('assetValue'),
+                'description': form.get('assetDescription')
+            }
+            assets_data.append(asset_data)
+ 
+        details_values = (
+            loan_id,
+            int(form.get('age') or 0),
+            form.get('gender', ''),
+            form.get('currentAddress', ''),
+            form.get('permanentAddress', ''),
+            form.get('nationality', ''),
+            form.get('maritalStatus', ''),
+            form.get('employmentType', ''),
+            form.get('companyName', ''),
+            account_number,
+            ifsc_code,
+            branch_code,
+            account_type,
+            json.dumps(loan_specific_data),
+            1 if form.get('hasCoApplicant') == 'on' else 0,
+            json.dumps(assets_data)
+        )
+ 
+        print("Executing details insert...")
+        cur.execute(insert_details_sql, details_values)
+        print("Inserted loan application details")
+ 
+        # ==================================================
+        # 4. Save uploaded documents into application_documents
+        # ==================================================
+        def save_doc(field_name, doc_type):
+            file = files.get(field_name)
+            if not file or file.filename == '':
+                print(f"No file uploaded for {field_name}")
+                return
+ 
+            original_name = file.filename
+            safe_name = secure_filename(original_name)
+            unique_name = f"{doc_type}_{loan_id}_{int(time.time())}_{safe_name}"
+            full_path = os.path.join(LOAN_DOC_FOLDER, unique_name)
+ 
+            os.makedirs(LOAN_DOC_FOLDER, exist_ok=True)
+            file.save(full_path)
+            rel_path = os.path.relpath(full_path, app.root_path)
+ 
+            cur.execute("""
+                INSERT INTO application_documents
+                (loan_application_id, document_type, file_name, file_path)
+                VALUES (%s, %s, %s, %s)
+            """, (loan_id, doc_type, original_name, rel_path))
+            print(f"Saved document: {doc_type}")
+ 
+        # Save all documents (mandatory + optional)
+        save_doc('identityProof', 'identity_proof')
+        save_doc('addressProof', 'address_proof')
+        save_doc('incomeProof', 'income_proof')
+        save_doc('bankStatement', 'bank_statement')
+        save_doc('propertyDocuments', 'property_documents')
+        save_doc('applicantSignatureFile', 'applicant_signature')
+        save_doc('coApplicantSignatureFile', 'co_applicant_signature')
+ 
+        # ==================================================
+        # 5. Add entry to application_audit_trail
+        # ==================================================
+        cur.execute("""
+            INSERT INTO application_audit_trail
+            (loan_application_id, action, description, new_status)
+            VALUES (%s, %s, %s, %s)
+        """, (loan_id, 'created', 'Loan application submitted', 'submitted'))
+ 
+        # ---------- Commit Transaction ----------
+        mysql.connection.commit()
+        print("Transaction committed successfully")
+ 
+        # ✅ Success message shown on success page
+        flash(
+            f"Form has been submitted successfully. "
+            f"Your Loan Application No is {application_number}.",
+            "success"
+        )
+ 
+        # Redirect to pretty success page
+        return redirect(url_for('loan_application_success', loan_id=loan_id))
+ 
+    except Exception as e:
+        mysql.connection.rollback()
+        print("ERROR in /loan/apply POST:", str(e))
+        import traceback
+        traceback.print_exc()
+        flash(f"Error submitting application: {str(e)}", "danger")
+        return redirect(url_for('apply_loan'))
+ 
+    finally:
+        cur.close()
+ 
+ 
+@app.route('/loan/apply/success/<int:loan_id>')
+
+def loan_application_success(loan_id):
+
+    user = _current_user()
+
+    if not user:
+
+        flash("Please login to view your application status.", "warning")
+
+        return redirect(url_for("login"))
+ 
+    cur = mysql.connection.cursor(DictCursor)
+
+    try:
+
+        cur.execute("""
+
+            SELECT 
+
+                id,
+
+                application_number,
+
+                full_name,
+
+                loan_type,
+
+                loan_amount,
+
+                tenure_months,
+
+                suggested_emi,
+
+                total_payable_amount,
+
+                total_interest,
+
+                application_status,
+
+                application_date
+
+            FROM loan_applications
+
+            WHERE id = %s
+
+        """, (loan_id,))
+
+        application = cur.fetchone()
+ 
+        if not application:
+
+            flash("Loan application not found.", "danger")
+
+            return redirect(url_for("dashboard"))
+ 
+    finally:
+
+        cur.close()
+ 
+    return render_template(
+
+        "loan_application_success.html",
+
+        user=user,
+
+        application=application
+
+    )
+
+ 
+
+@app.route('/debug/loan-applications')
+def debug_loan_applications():
+    cur = mysql.connection.cursor(DictCursor)
+    try:
+        # Check loan_applications table
+        cur.execute("SHOW TABLES LIKE 'loan_applications'")
+        table_exists = cur.fetchone()
+        
+        if not table_exists:
+            return "loan_applications table doesn't exist"
+        
+        cur.execute("SELECT * FROM loan_applications ORDER BY created_at DESC LIMIT 10")
+        applications = cur.fetchall()
+        
+        # Check application_documents table
+        cur.execute("SHOW TABLES LIKE 'application_documents'")
+        docs_table_exists = cur.fetchone()
+        
+        result = {
+            'table_exists': True,
+            'applications_count': len(applications),
+            'applications': applications,
+            'docs_table_exists': bool(docs_table_exists)
+        }
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        return f"Error: {str(e)}"
+    finally:
+        cur.close()
+# Underwriting Dashboard
+from flask import Flask, render_template, request, redirect, url_for, flash, session, send_file, jsonify
+import os
+import json
+import time
+from decimal import Decimal
+from MySQLdb.cursors import DictCursor
+
+from flask import Flask, render_template, request, redirect, url_for, flash, session, send_file, jsonify
+import os
+import json
+import time
+from decimal import Decimal
+from MySQLdb.cursors import DictCursor
+
+from flask import Flask, render_template, request, redirect, url_for, flash, session, send_file, jsonify
+import os
+import json
+import time
+import uuid
+from decimal import Decimal
+from MySQLdb.cursors import DictCursor
+import zipfile
+from io import BytesIO
+
+# ========== UNDERWRITING ROUTES ==========
+
+def get_current_datetime():
+    return datetime.now()
+from decimal import Decimal
+from MySQLdb.cursors import DictCursor
+import time, os, json
+from werkzeug.utils import secure_filename
+from flask import render_template, request, flash, redirect, url_for, jsonify, send_file
+
+# Updated file saving function for hybrid schema
+def save_upload(file, subdir='loan_docs'):
+    """
+    Save uploaded file into UPLOAD_FOLDER/subdir and return relative path.
+    If no file uploaded, returns None.
+    """
+    if not file or file.filename == '':
+        return None
+
+    # Use app root path if UPLOAD_FOLDER not configured
+    upload_root = app.config.get('UPLOAD_FOLDER', os.path.join(app.root_path, 'uploads'))
+    os.makedirs(upload_root, exist_ok=True)
+
+    safe_name = secure_filename(file.filename)
+    ext = os.path.splitext(safe_name)[1].lower()
+    unique_name = f"{uuid.uuid4().hex}{ext}"
+
+    folder = os.path.join(upload_root, subdir)
+    os.makedirs(folder, exist_ok=True)
+
+    full_path = os.path.join(folder, unique_name)
+    file.save(full_path)
+
+    # Return relative path from app root
+    rel_path = os.path.relpath(full_path, app.root_path)
+    return rel_path
+
+from flask import render_template, request, redirect, url_for, flash
+from decimal import Decimal, InvalidOperation
+from MySQLdb.cursors import DictCursor
+# ------------------ Agent Dashboard ------------------
+
+@app.route('/agent/dashboard')
+
+def agent_dashboard():
+
+    user = _current_user()
+
+    if not user:
+
+        flash("Please login first.", "warning")
+
+        return redirect(url_for("login"))
+ 
+    cur = mysql.connection.cursor(DictCursor)
+ 
+    try:
+
+        # Fetch applications waiting for agent review
+
+        cur.execute("""
+
+            SELECT id, application_number, full_name, loan_type, loan_amount,
+
+                   application_status, created_at
+
+            FROM loan_applications
+
+            WHERE application_status IN ('submitted')
+
+            ORDER BY created_at DESC
+
+        """)
+
+        applications = cur.fetchall()
+ 
+        return render_template("underwriter_dashboard.html", applications=applications)
+ 
+    finally:
+
+        cur.close()
+ 
+ 
+# ------------------ View Single Application ------------------
+
+@app.route('/agent/application/<int:loan_id>')
+
+def agent_view_application(loan_id):
+
+    user = _current_user()
+
+    if not user:
+
+        flash("Please login first.", "warning")
+
+        return redirect(url_for('login'))
+ 
+    cur = mysql.connection.cursor(DictCursor)
+ 
+    try:
+
+        # Main application + extra details
+
+        cur.execute("""
+
+            SELECT la.*, lad.*
+
+            FROM loan_applications la
+
+            LEFT JOIN loan_application_details lad
+
+                   ON la.id = lad.loan_application_id
+
+            WHERE la.id = %s
+
+        """, (loan_id,))
+
+        application = cur.fetchone()
+ 
+        if not application:
+
+            flash("Application not found.", "danger")
+
+            return redirect(url_for('agent_dashboard'))
+ 
+        # Documents
+
+        cur.execute("""
+
+            SELECT *
+
+            FROM application_documents
+
+            WHERE loan_application_id = %s
+
+        """, (loan_id,))
+
+        documents = cur.fetchall()
+ 
+    finally:
+
+        cur.close()
+ 
+    # 👉 IMPORTANT: we pass as "app" (used in agent_view.html)
+
+    return render_template(
+
+        "agent_view.html",
+
+        app=application,
+
+        documents=documents,
+
+        user=user
+
+    )
+ 
+ 
+# ------------------ Document Preview & Download (by doc_id) ------------------
+
+@app.route('/agent/document/preview/<int:doc_id>')
+
+def agent_preview_document(doc_id):
+
+    cur = mysql.connection.cursor(DictCursor)
+
+    try:
+
+        cur.execute("""
+
+            SELECT file_path
+
+            FROM application_documents
+
+            WHERE id = %s
+
+        """, (doc_id,))
+
+        row = cur.fetchone()
+
+    finally:
+
+        cur.close()
+ 
+    if not row:
+
+        flash("File not found.", "danger")
+
+        return redirect(request.referrer or url_for('agent_dashboard'))
+ 
+    file_path = row['file_path']   # make sure this column name matches your table
+
+    full_path = os.path.join(app.root_path, file_path)
+ 
+    if not os.path.exists(full_path):
+
+        flash("File not found on server.", "danger")
+
+        return redirect(request.referrer or url_for('agent_dashboard'))
+ 
+    return send_file(full_path)
+ 
+ 
+@app.route('/agent/document/download/<int:doc_id>')
+
+def agent_download_document(doc_id):
+
+    cur = mysql.connection.cursor(DictCursor)
+
+    try:
+
+        cur.execute("""
+
+            SELECT file_path
+
+            FROM application_documents
+
+            WHERE id = %s
+
+        """, (doc_id,))
+
+        row = cur.fetchone()
+
+    finally:
+
+        cur.close()
+ 
+    if not row:
+
+        flash("File not found.", "danger")
+
+        return redirect(request.referrer or url_for('agent_dashboard'))
+ 
+    file_path = row['file_path']   # make sure this matches your column
+
+    full_path = os.path.join(app.root_path, file_path)
+ 
+    if not os.path.exists(full_path):
+
+        flash("File not found on server.", "danger")
+
+        return redirect(request.referrer or url_for('agent_dashboard'))
+ 
+    return send_file(full_path, as_attachment=True)
+ 
+ 
+# ------------------ Verify Document ------------------
+
+@app.route('/agent/document/verify/<int:doc_id>', methods=['POST'])
+
+def agent_verify_document(doc_id):
+
+    user = _current_user()
+
+    if not user:
+
+        return jsonify({"status": "error", "msg": "Login required"}), 401
+ 
+    data = request.get_json(silent=True) or {}
+
+    verified_flag = 1 if data.get("verified") in (1, "1", True, "true") else 0
+ 
+    cur = mysql.connection.cursor()
+
+    try:
+
+        cur.execute("""
+
+            UPDATE application_documents
+
+            SET verified = %s,
+
+                verified_by = %s,
+
+                verified_at = CASE WHEN %s = 1 THEN NOW() ELSE NULL END
+
+            WHERE id = %s
+
+        """, (verified_flag, user['user_id'], verified_flag, doc_id))
+
+        mysql.connection.commit()
+
+    finally:
+
+        cur.close()
+ 
+    return jsonify({"status": "success"})
+
+ 
+ 
+# ------------------ Approve Application (Agent → Manager) ------------------
+
+@app.route('/agent/application/<int:app_id>/approve', methods=['POST'])
+
+def agent_approve_application(app_id):
+
+    user = _current_user()
+
+    if not user:
+
+        flash("Please login first.", "warning")
+
+        return redirect(url_for('login'))
+ 
+    cur = mysql.connection.cursor()
+
+    try:
+
+        # You can also set agent_id, approved_at etc. if you have columns
+
+        cur.execute("""
+
+            UPDATE loan_applications
+
+            SET application_status = 'agent_approved'
+
+            WHERE id = %s
+
+        """, (app_id,))
+
+        mysql.connection.commit()
+
+    finally:
+
+        cur.close()
+ 
+    flash("Application approved and sent to Manager.", "success")
+
+    return redirect(url_for('agent_dashboard'))
+ 
+ 
+# ------------------ Reject Application ------------------
+
+@app.route('/agent/application/<int:app_id>/reject', methods=['POST'])
+
+def agent_reject_application(app_id):
+
+    user = _current_user()
+
+    if not user:
+
+        flash("Please login first.", "warning")
+
+        return redirect(url_for('login'))
+ 
+    reason = request.form.get('reason')
+ 
+    cur = mysql.connection.cursor()
+
+    try:
+
+        # Minimal version: only status
+
+        # If you have a rejection_reason column, you can extend this
+
+        cur.execute("""
+
+            UPDATE loan_applications
+
+            SET application_status = 'rejected'
+
+            WHERE id = %s
+
+        """, (app_id,))
+
+        mysql.connection.commit()
+
+    finally:
+
+        cur.close()
+ 
+    flash("Application rejected.", "info")
+
+    return redirect(url_for('agent_dashboard'))
+
+ ##### manager###
+
+
+@app.route('/manage_loans')
+def manage_loans():
+    user_id = session.get('user_id')
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM bank_users WHERE user_id=%s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+ 
+    # Fetch pending or approved_docs loans for Loan Applications table
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("""
+        SELECT * FROM loan_requests
+        WHERE status IN ('pending', 'approved_docs')
+        ORDER BY created_at DESC
+    """)
+    loan_applications = cur.fetchall()
+    cur.close()
+ 
+    # Fetch approved loans for Active Loans table
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("""
+        SELECT * FROM loan_requests
+        WHERE status IN ('rejected', 'approved')
+        ORDER BY updated_at DESC
+    """)
+    active_loans = cur.fetchall()
+    cur.close()
+ 
+    return render_template('manage-loans.html', user=user, loan_applications=loan_applications, active_loans=active_loans)
+ 
+from flask import (
+    render_template, request, redirect,
+    url_for, flash, abort
+)
+from MySQLdb.cursors import DictCursor
+import json
+ 
+########################################
+# Helper (assumed already exists)
+########################################
+# def _current_user():
+#     ...
+#     return {"user_id": ..., "email": ..., "role": ...}
+ 
+ 
+########################################
+# 1. LOAN AGENT – DASHBOARD
+########################################
+@app.route("/loan_agent/dashboard")
+def loan_agent_dashboard():
+    """
+    Loan Agent sees all applications where:
+      - he/she is assigned as agent
+      - asset_status is 'pending' (needs evaluation)
+    """
+    user = _current_user()
+    if not user or user.get('role') != 'agent':
+        flash("Please login as Loan Agent.", "warning")
+        return redirect(url_for("login"))
+ 
+    cur = mysql.connection.cursor(DictCursor)
+    cur.execute("""
+        SELECT la.*, lad.loan_specific_data, lad.assets_data
+        FROM loan_applications la
+        LEFT JOIN loan_application_details lad
+            ON la.id = lad.loan_application_id
+        WHERE la.assigned_agent = %s
+          AND la.asset_status = 'pending'
+        ORDER BY la.id DESC
+    """, (user['email'],))
+ 
+    applications = cur.fetchall()
+    cur.close()
+ 
+    # Normalize JSON
+    for app in applications:
+ 
+        # loan info JSON
+        try:
+            app["loaninfo"] = json.loads(app.get("loan_specific_data") or "{}")
+        except Exception:
+            app["loaninfo"] = {}
+ 
+        # assets JSON
+        try:
+            asset = json.loads(app.get("assets_data") or "{}")
+        except Exception:
+            asset = {}
+ 
+        # Normalize asset structure:
+        # - if single dict → make list
+        # - if list → keep
+        # - else → empty list
+        if isinstance(asset, dict):
+            app["assetinfo"] = [asset]
+        elif isinstance(asset, list):
+            app["assetinfo"] = asset
+        else:
+            app["assetinfo"] = []
+ 
+    return render_template("loan_agent_dashboard.html", applications=applications)
+ 
+ 
+########################################
+# 2. LOAN AGENT – ASSET EVALUATION PAGE
+########################################
+@app.route("/loan_agent/asset/<int:loan_id>", methods=["GET", "POST"])
+def loanagent_view_asset(loan_id):
+    """
+    Agent opens a single application:
+      - Views applicant details
+      - Views loan details (loan_specific_data)
+      - Views asset details (assets_data)
+      - Enters evaluated value + remarks
+      - Approves or rejects (asset_status)
+      - Sends result back to Manager (stored in DB)
+    """
+    user = _current_user()
+    if not user or user.get("role") != "agent":
+        flash("Please login as Loan Agent.", "warning")
+        return redirect(url_for("login"))
+ 
+    cur = mysql.connection.cursor(DictCursor)
+ 
+    # ---------- POST: Save evaluation ----------
+    if request.method == "POST":
+        decision        = request.form.get("decision")          # "approved" or "rejected"
+        evaluated_value = request.form.get("evaluated_value")   # numeric (string)
+        remarks         = request.form.get("remarks")
+ 
+        if decision not in ("approved", "rejected"):
+            flash("Please choose Approve or Reject.", "danger")
+            cur.close()
+            return redirect(request.url)
+ 
+        # Update loan_applications with evaluation data
+        cur.execute("""
+            UPDATE loan_applications
+               SET asset_status           = %s,
+                   asset_evaluated_value  = %s,
+                   asset_evaluator_remark = %s,
+                   asset_evaluated_by     = %s,
+                   asset_evaluated_at     = NOW()
+             WHERE id = %s
+               AND assigned_agent = %s
+        """, (decision, evaluated_value, remarks, user["email"], loan_id, user["email"]))
+ 
+        mysql.connection.commit()
+        cur.close()
+ 
+        flash("Asset evaluation submitted and sent to Manager dashboard.", "success")
+        return redirect(url_for("loan_agent_dashboard"))
+ 
+    # ---------- GET: Show details ----------
+    cur.execute("""
+        SELECT la.*, lad.loan_specific_data, lad.assets_data
+        FROM loan_applications la
+        LEFT JOIN loan_application_details lad
+            ON la.id = lad.loan_application_id
+        WHERE la.id = %s
+          AND la.assigned_agent = %s
+    """, (loan_id, user["email"]))
+    application = cur.fetchone()
+    cur.close()
+ 
+    if not application:
+        abort(404)
+ 
+    # Normalize JSON fields
+    try:
+        loaninfo = json.loads(application.get("loan_specific_data") or "{}")
+    except Exception:
+        loaninfo = {}
+ 
+    try:
+        asset_raw = json.loads(application.get("assets_data") or "[]")
+    except Exception:
+        asset_raw = {}
+ 
+    if isinstance(asset_raw, dict):
+        assetinfo = [asset_raw]
+    elif isinstance(asset_raw, list):
+        assetinfo = asset_raw
+    else:
+        assetinfo = []
+ 
+    application["loaninfo"]  = loaninfo
+    application["assetinfo"] = assetinfo
+ 
+    return render_template("loanagent_view_asset.html", app=application)
+ 
+ 
+########################################
+# 3. MANAGER – MAIN DASHBOARD (LIST VIEW)
+from MySQLdb.cursors import DictCursor
+from MySQLdb.cursors import DictCursor
+from decimal import Decimal, InvalidOperation
+from datetime import date
+
+@app.route("/manager/dashboard")
+def manager_dashboard():
+    """
+    Manager dashboard:
+      1) Applications awaiting review (agent_approved / pending_manager)
+      2) Manager approved / disbursed loans + loan account info
+      3) EMI tracking for all active loans
+    """
+    user = _current_user()
+    if not user or user.get("role") != "manager":
+        flash("You are not authorised to access manager dashboard.", "danger")
+        return redirect(url_for("login"))
+
+    cur = mysql.connection.cursor(DictCursor)
+
+    try:
+        # 1) Applications awaiting manager review
+        cur.execute("""
+            SELECT 
+                id,
+                application_number,
+                full_name,
+                loan_type,
+                loan_amount,
+                application_status,
+                created_at
+            FROM loan_applications
+            WHERE application_status IN ('agent_approved', 'pending_manager')
+            ORDER BY created_at DESC, id DESC
+        """)
+        applications_pending = cur.fetchall() or []
+
+        # 2) Manager approved / disbursed / rejected + loan account number
+        cur.execute("""
+            SELECT 
+                la.id,
+                la.application_number,
+                la.full_name,
+                la.loan_type,
+                la.loan_amount,
+                la.final_interest_rate,
+                la.sanctioned_amount,
+                la.application_status,
+                la.manager_decided_at,
+                acc.loan_account_no
+            FROM loan_applications la
+            LEFT JOIN loan_accounts acc
+              ON acc.loan_application_id = la.id
+            WHERE la.application_status IN ('manager_approved', 'disbursed', 'rejected')
+            ORDER BY la.manager_decided_at DESC, la.id DESC
+        """)
+        applications_approved = cur.fetchall() or []
+
+        # 3) EMI tracking for all active loan accounts
+        cur.execute("""
+            SELECT
+                acc.id AS loan_account_id,
+                acc.loan_account_no,
+                la.full_name,
+                la.loan_type,
+                acc.sanctioned_amount,
+                acc.outstanding_principal,
+                acc.emi_amount,
+                SUM(CASE WHEN sch.status = 'paid' THEN 1 ELSE 0 END)    AS paid_emi_count,
+                SUM(CASE WHEN sch.status = 'pending' THEN 1 ELSE 0 END) AS pending_emi_count,
+                SUM(CASE WHEN sch.status = 'overdue' THEN 1 ELSE 0 END) AS overdue_emi_count,
+                MIN(CASE WHEN sch.status = 'overdue' THEN sch.due_date ELSE NULL END) AS first_overdue_date
+            FROM loan_accounts acc
+            JOIN loan_applications la
+              ON la.id = acc.loan_application_id
+            LEFT JOIN loan_repayment_schedule sch
+              ON sch.loan_account_id = acc.id
+            WHERE acc.status = 'active'
+            GROUP BY
+                acc.id,
+                acc.loan_account_no,
+                la.full_name,
+                la.loan_type,
+                acc.sanctioned_amount,
+                acc.outstanding_principal,
+                acc.emi_amount
+            ORDER BY acc.created_at DESC, acc.id DESC
+        """)
+        emi_loans = cur.fetchall() or []
+
+    finally:
+        cur.close()
+
+    return render_template(
+        "manager_dashboard.html",
+        manager=user,
+        applications_pending=applications_pending,
+        applications_approved=applications_approved,
+        emi_loans=emi_loans
+    )
+
+
+
+
+ 
+########################################
+# 4. MANAGER – DETAILED REVIEW PAGE
+########################################
+@app.route("/manager/loan/<int:app_id>")
+
+def manager_review_loan(app_id):
+
+    """
+
+    Manager opens a single loan:
+
+      - See applicant + loan + system suggestion
+
+      - See asset evaluation status (pending/approved/rejected)
+
+      - See agent evaluation details (value, remarks)
+
+      - See declared asset data from assets_data
+
+      - Calculate DTI & risk
+
+      - Take final approve/reject decision
+
+    """
+
+    user = _current_user()
+
+    if not user or user.get("role") != "manager":
+
+        flash("Please login as Manager.", "warning")
+
+        return redirect(url_for("login"))
+ 
+    cur = mysql.connection.cursor(DictCursor)
+
+    cur.execute("""
+
+        SELECT la.*, lad.loan_specific_data, lad.assets_data
+
+        FROM loan_applications la
+
+        LEFT JOIN loan_application_details lad
+
+            ON la.id = lad.loan_application_id
+
+        WHERE la.id = %s
+
+    """, (app_id,))
+
+    app = cur.fetchone()
+
+    cur.close()
+ 
+    if not app:
+
+        abort(404)
+ 
+    # ---------- Normalize assets_data JSON for template ----------
+
+    raw_assets = app.get("assets_data")
+ 
+    try:
+
+        parsed_assets = json.loads(raw_assets) if raw_assets else None
+
+    except Exception:
+
+        parsed_assets = None
+ 
+    # We want app["assetinfo"] always as a list of dicts (or empty list)
+
+    if isinstance(parsed_assets, dict):
+
+        app["assetinfo"] = [parsed_assets]
+
+    elif isinstance(parsed_assets, list):
+
+        app["assetinfo"] = parsed_assets
+
+    else:
+
+        app["assetinfo"] = []
+ 
+    return render_template("manager_loan_review.html", app=app)
+
+ 
+    # manager_loan_review.html is the file you pasted in your last message
+    # (the one with Assign Agent + DTI + Final Decision)
+ 
+ 
+########################################
+# 5. MANAGER – ASSIGN AGENT FOR ASSET EVALUATION
+########################################
+@app.route("/manager/loan/<int:app_id>/assign_agent", methods=["POST"])
+def assign_agent(app_id):
+    """
+    Manager assigns a loan agent for asset verification.
+    Conditions:
+      - Only manager can do this
+      - Sets agent_assigned = 1
+      - Sets assigned_agent = selected email
+      - Sets asset_status = 'pending' (so it appears in agent dashboard)
+    """
+    user = _current_user()
+    if not user or user.get("role") != "manager":
+        flash("You are not authorised to assign an agent.", "danger")
+        return redirect(url_for("login"))
+ 
+    agent_email = request.form.get("agent_email")
+    if not agent_email:
+        flash("Please select an agent.", "warning")
+        return redirect(url_for("manager_review_loan", app_id=app_id))
+ 
+    cur = mysql.connection.cursor(DictCursor)
+    cur.execute("""
+        UPDATE loan_applications
+           SET agent_assigned = 1,
+               assigned_agent = %s,
+               asset_status   = 'pending'
+         WHERE id = %s
+    """, (agent_email, app_id))
+    mysql.connection.commit()
+    cur.close()
+ 
+    flash("Agent assigned successfully for asset evaluation.", "success")
+    return redirect(url_for("manager_review_loan", app_id=app_id))
+ 
+ 
+########################################
+# 6. MANAGER – FINAL DECISION (APPROVE / REJECT)
+@app.route("/manager/loan/<int:app_id>/final_decision", methods=["POST"])
+def manager_final_decision(app_id):
+    user = _current_user()
+    if not user or user.get("role") != "manager":
+        flash("You are not authorised to take final decision.", "danger")
+        return redirect(url_for("login"))
+
+    decision        = request.form.get("decision")           # 'approve' or 'reject'
+    interest_rate   = request.form.get("interest_rate")
+    sanction_amount = request.form.get("sanction_amount")
+    final_dti       = request.form.get("final_dti")
+
+    if decision not in ("approve", "reject"):
+        flash("Invalid decision selected.", "danger")
+        return redirect(url_for("manager_review_loan", app_id=app_id))
+
+    if not interest_rate or not sanction_amount:
+        flash("Please fill Interest Rate and Sanction Amount.", "warning")
+        return redirect(url_for("manager_review_loan", app_id=app_id))
+
+    cur = mysql.connection.cursor(DictCursor)
+
+    # Check asset evaluation status
+    cur.execute("""
+        SELECT agent_assigned, asset_status
+        FROM loan_applications
+        WHERE id = %s
+    """, (app_id,))
+    row = cur.fetchone()
+    if not row:
+        cur.close()
+        abort(404)
+
+    if row["agent_assigned"] == 1 and row["asset_status"] == "pending":
+        cur.close()
+        flash("Asset evaluation is still pending. You cannot finalize this loan yet.", "warning")
+        return redirect(url_for("manager_review_loan", app_id=app_id))
+
+    # Decide application_status based on final decision
+    if decision == "approve":
+        new_status = "manager_approved"
+    else:
+        new_status = "manager_rejected"
+
+    cur.execute("""
+        UPDATE loan_applications
+           SET manager_final_decision = %s,
+               final_interest_rate    = %s,
+               sanctioned_amount      = %s,
+               final_dti              = %s,
+               manager_decided_by     = %s,
+               manager_decided_at     = NOW(),
+               application_status     = %s
+         WHERE id = %s
+    """, (
+        decision,
+        interest_rate,
+        sanction_amount,
+        final_dti or None,
+        user["email"],
+        new_status,
+        app_id
+    ))
+
+    mysql.connection.commit()
+    cur.close()
+
+    if decision == "approve":
+        flash("Loan approved by Manager. You can now create the Loan Account and disburse.", "success")
+    else:
+        flash("Loan rejected by Manager.", "warning")
+
+    return redirect(url_for("manager_dashboard"))
+
+from decimal import Decimal
+from datetime import date
+
+
+
+from decimal import Decimal, InvalidOperation
+from datetime import date
+
+# helper to add months safely
+def _add_months(d, months):
+    """
+    Add `months` to a date, keeping day in range.
+    """
+    month = d.month - 1 + months
+    year = d.year + month // 12
+    month = month % 12 + 1
+
+    # days per month
+    days_in_month = [31,
+        29 if (year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)) else 28,
+        31, 30, 31, 30, 31, 31, 30, 31, 30, 31
+    ]
+    day = min(d.day, days_in_month[month - 1])
+    return date(year, month, day)
+
+
+
+
+def generate_transaction_id(prefix="TXN"):
+    ts = datetime.now().strftime("%Y%m%d%H%M%S")
+    rand = uuid.uuid4().hex[:6].upper()
+    return f"{prefix}{ts}-{rand}"
+
+
+from decimal import Decimal, InvalidOperation
+from datetime import date
+from MySQLdb.cursors import DictCursor
+
+
+from decimal import Decimal, InvalidOperation
+from datetime import date
+from MySQLdb.cursors import DictCursor
+
+def generate_loan_account_no():
+    """
+    Very simple generator: e.g. LN202512030001
+    """
+    today = date.today().strftime("%Y%m%d")
+    cur = mysql.connection.cursor()
+    cur.execute(
+        "SELECT COUNT(*) FROM loan_accounts WHERE DATE(created_at) = CURDATE()"
+    )
+    cnt = cur.fetchone()[0] or 0
+    cur.close()
+    return f"LN{today}{cnt+1:04d}"
+
+
+from decimal import Decimal, InvalidOperation
+from datetime import date
+from MySQLdb.cursors import DictCursor
+
+def generate_loan_account_no():
+    """
+    Very simple generator: e.g. LN202512030001
+    """
+    today = date.today().strftime("%Y%m%d")
+    cur = mysql.connection.cursor()
+    cur.execute(
+        "SELECT COUNT(*) FROM loan_accounts WHERE DATE(created_at) = CURDATE()"
+    )
+    cnt = cur.fetchone()[0] or 0
+    cur.close()
+    return f"LN{today}{cnt+1:04d}"
+
+
+@app.route("/manager/loan/<int:app_id>/create_account_and_disburse", methods=["POST"])
+def manager_create_loan_account_and_disburse(app_id):
+    user = _current_user()
+    if not user or user.get("role") != "manager":
+        flash("You are not authorised to perform this action.", "danger")
+        return redirect(url_for("login"))
+
+    cur = mysql.connection.cursor(DictCursor)
+    try:
+        # 1) Fetch loan application + account_number from loan_application_details
+        cur.execute("""
+            SELECT 
+                la.id,
+                la.application_number,
+                la.loan_type,
+                la.loan_amount,
+                la.sanctioned_amount,
+                la.final_interest_rate,
+                la.tenure_months,
+                la.application_status,
+                la.email,
+                la.manager_decided_at,
+                lad.account_number
+            FROM loan_applications la
+            LEFT JOIN loan_application_details lad
+              ON lad.loan_application_id = la.id
+            WHERE la.id = %s
+        """, (app_id,))
+        app = cur.fetchone()
+
+        if not app:
+            flash("Loan application not found.", "danger")
+            return redirect(url_for("manager_dashboard"))
+
+        # must be manager_approved
+        if app["application_status"] != "manager_approved":
+            flash("Loan is not manager approved; cannot create loan account.", "warning")
+            return redirect(url_for("manager_dashboard"))
+
+        # 2) Check if loan account already exists
+        cur.execute("""
+            SELECT id, loan_account_no
+            FROM loan_accounts
+            WHERE loan_application_id = %s
+        """, (app_id,))
+        existing = cur.fetchone()
+        if existing:
+            flash(f"Loan account already exists: {existing['loan_account_no']}", "info")
+            return redirect(url_for("manager_dashboard"))
+
+        # 3) Get customer_id from bank_users using email
+        cur.execute("""
+            SELECT user_id, name
+            FROM bank_users
+            WHERE email = %s
+            LIMIT 1
+        """, (app["email"],))
+        cust = cur.fetchone()
+        if not cust:
+            flash("Customer not found in bank_users for this application email.", "danger")
+            return redirect(url_for("manager_dashboard"))
+
+        customer_id = cust["user_id"]
+
+        # 4) ✅ Fetch account number from loan_application_details
+        customer_account_no = app.get("account_number")
+        if not customer_account_no:
+            flash("Customer account number not found in loan_application_details; cannot disburse.", "danger")
+            return redirect(url_for("manager_dashboard"))
+
+        # 5) Core loan values (principal, rate, tenure)
+        principal_raw = app["sanctioned_amount"] or app["loan_amount"]
+        interest_rate_raw = app["final_interest_rate"]
+        tenure_months = app["tenure_months"] or 0
+
+        try:
+            principal = Decimal(str(principal_raw or "0"))
+            interest_rate = Decimal(str(interest_rate_raw or "0"))
+        except InvalidOperation:
+            flash("Invalid principal or interest rate stored in database.", "danger")
+            return redirect(url_for("manager_dashboard"))
+
+        if principal <= 0:
+            flash("Principal amount is zero or invalid; please check application data.", "danger")
+            return redirect(url_for("manager_dashboard"))
+
+        if tenure_months <= 0:
+            flash("Invalid tenure in months; cannot generate EMI schedule.", "danger")
+            return redirect(url_for("manager_dashboard"))
+
+        # 6) EMI calculation
+        if interest_rate > 0:
+            monthly_rate = interest_rate / Decimal("12") / Decimal("100")
+            emi = principal * monthly_rate * ((1 + monthly_rate) ** tenure_months) / \
+                  (((1 + monthly_rate) ** tenure_months) - 1)
+        else:
+            monthly_rate = Decimal("0")
+            emi = principal / tenure_months
+
+        emi = emi.quantize(Decimal("0.01"))
+        total_payable = (emi * tenure_months).quantize(Decimal("0.01"))
+
+        # 7) Dates
+        today = date.today()
+        start_date = today
+        first_emi_date = _add_months(today, 1)
+        next_emi_date = first_emi_date
+
+        # 8) Generate loan account number
+        loan_account_no = generate_loan_account_no()
+
+        # 9) Start transaction (important for FOR UPDATE + balance update + inserts)
+        cur.execute("START TRANSACTION")
+
+        # 10) Insert into loan_accounts
+        cur.execute("""
+            INSERT INTO loan_accounts (
+                loan_application_id,
+                loan_account_no,
+                customer_id,
+                loan_type,
+                sanctioned_amount,
+                interest_rate,
+                tenure_months,
+                emi_amount,
+                total_payable,
+                start_date,
+                first_emi_date,
+                next_emi_date,
+                outstanding_principal,
+                status
+            ) VALUES (
+                %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'active'
+            )
+        """, (
+            app["id"],
+            loan_account_no,
+            customer_id,
+            app["loan_type"],
+            principal,
+            interest_rate,
+            tenure_months,
+            emi,
+            total_payable,
+            start_date,
+            first_emi_date,
+            next_emi_date,
+            principal
+        ))
+
+        loan_account_id = cur.lastrowid
+
+        # 11) Lock + fetch actual account table using helper
+        acct_info = find_account_by_number(customer_account_no, for_update=True)
+        if not acct_info:
+            raise Exception(f"Customer bank account {customer_account_no} not found in any account table.")
+
+        # 12) Insert into loan_disbursements
+        bank_pool_account = "LOAN_POOL_001"   # bank internal / GL account
+
+        cur.execute("""
+            INSERT INTO loan_disbursements (
+                loan_account_id,
+                disbursed_amount,
+                debit_account_no,
+                credit_account_no,
+                mode,
+                remarks,
+                disbursed_by
+            ) VALUES (
+                %s,%s,%s,%s,%s,%s,%s
+            )
+        """, (
+            loan_account_id,
+            principal,
+            bank_pool_account,
+            customer_account_no,
+            'internal',
+            f'Initial disbursement for {loan_account_no}',
+            user.get("email", "system")
+        ))
+
+        # 13) ✅ CREDIT customer's account balance in the correct product table
+        cur.execute(f"""
+            UPDATE {acct_info['table_name']}
+               SET balance = balance + %s
+             WHERE account_number = %s
+        """, (float(principal), customer_account_no))
+
+        if cur.rowcount == 0:
+            raise Exception(
+                f"Customer bank account {customer_account_no} not updated in {acct_info['table_name']}."
+            )
+
+        # 14) Insert transaction so it appears in Txn history
+        txn_id = generate_transaction_id("LNDSB")
+        cur.execute("""
+            INSERT INTO transactions (
+                transaction_id,
+                from_account,
+                to_account,
+                amount,
+                note,
+                status
+            ) VALUES (%s,%s,%s,%s,%s,%s)
+        """, (
+            txn_id,
+            bank_pool_account,
+            customer_account_no,
+            float(principal),
+            f"Loan disbursal credit for {loan_account_no}",
+            "SUCCESS"
+        ))
+
+        # 15) EMI schedule rows
+        schedule_rows = []
+        opening_principal = principal
+        monthly_rate = interest_rate / Decimal("12") / Decimal("100") if interest_rate > 0 else Decimal("0")
+
+        for instalment_no in range(1, tenure_months + 1):
+            due_date = _add_months(first_emi_date, instalment_no - 1)
+
+            if monthly_rate > 0:
+                interest_component = (opening_principal * monthly_rate).quantize(Decimal("0.01"))
+            else:
+                interest_component = Decimal("0.00")
+
+            principal_component = (emi - interest_component).quantize(Decimal("0.01"))
+            closing_principal = (opening_principal - principal_component).quantize(Decimal("0.01"))
+            if closing_principal < 0:
+                closing_principal = Decimal("0.00")
+
+            schedule_rows.append((
+                loan_account_id,
+                instalment_no,
+                due_date,
+                emi,
+                principal_component,
+                interest_component,
+                opening_principal,
+                closing_principal
+            ))
+
+            opening_principal = closing_principal
+
+        cur.executemany("""
+            INSERT INTO loan_repayment_schedule (
+                loan_account_id,
+                instalment_no,
+                due_date,
+                emi_amount,
+                principal_component,
+                interest_component,
+                opening_principal,
+                closing_principal
+            ) VALUES (
+                %s,%s,%s,%s,%s,%s,%s,%s
+            )
+        """, schedule_rows)
+
+        # 16) Mark application as disbursed
+        cur.execute("""
+            UPDATE loan_applications
+               SET application_status = 'disbursed'
+             WHERE id = %s
+        """, (app_id,))
+
+        mysql.connection.commit()
+
+        flash(
+            f"Loan account {loan_account_no} created, amount disbursed and EMI schedule generated.",
+            "success"
+        )
+        return redirect(url_for("manager_dashboard"))
+
+    except Exception as e:
+        mysql.connection.rollback()
+        print("ERROR in manager_create_loan_account_and_disburse:", e)
+        flash(f"Error while creating loan account and disbursing amount: {e}", "danger")
+        return redirect(url_for("manager_dashboard"))
+    finally:
+        cur.close()
+
+
+
+@app.route("/manager/loan/<int:loan_account_id>/schedule")
+def manager_view_loan_schedule(loan_account_id):
+    user = _current_user()
+    if not user or user.get("role") != "manager":
+        flash("You are not authorised to view loan schedules.", "danger")
+        return redirect(url_for("login"))
+
+    cur = mysql.connection.cursor(DictCursor)
+    try:
+        # Loan account header
+        cur.execute("""
+            SELECT
+                acc.id,
+                acc.loan_account_no,
+                acc.customer_id,
+                acc.loan_type,
+                acc.sanctioned_amount,
+                acc.interest_rate,
+                acc.tenure_months,
+                acc.emi_amount,
+                acc.total_payable,
+                acc.start_date,
+                acc.first_emi_date,
+                acc.status,
+                la.application_number,
+                la.full_name
+            FROM loan_accounts acc
+            JOIN loan_applications la
+              ON la.id = acc.loan_application_id
+            WHERE acc.id = %s
+        """, (loan_account_id,))
+        account = cur.fetchone()
+
+        if not account:
+            flash("Loan account not found.", "danger")
+            return redirect(url_for("manager_dashboard"))
+
+        # Schedule rows
+        cur.execute("""
+            SELECT
+                instalment_no,
+                due_date,
+                emi_amount,
+                principal_component,
+                interest_component,
+                opening_principal,
+                closing_principal,
+                status,
+                paid_on
+            FROM loan_repayment_schedule
+            WHERE loan_account_id = %s
+            ORDER BY instalment_no
+        """, (loan_account_id,))
+        schedule = cur.fetchall()
+
+    finally:
+        cur.close()
+
+    return render_template(
+        "loan_emi_schedule.html",
+        account=account,
+        schedule=schedule
+    )
+
+@app.route("/manager/loan/<int:loan_account_id>/details")
+def manager_loan_detail(loan_account_id):
+    """
+    Manager view: detailed page for a single loan with EMI schedule & charts.
+    """
+    user = _current_user()
+    if not user or user.get("role") != "manager":
+        flash("You are not authorised to view loan details.", "danger")
+        return redirect(url_for("login"))
+
+    cur = mysql.connection.cursor(DictCursor)
+    try:
+        # 1) Fetch loan account + linked application
+        cur.execute("""
+            SELECT
+                acc.id,
+                acc.loan_account_no,
+                acc.customer_id,
+                acc.loan_type,
+                acc.sanctioned_amount,
+                acc.interest_rate,
+                acc.tenure_months,
+                acc.emi_amount,
+                acc.total_payable,
+                acc.start_date,
+                acc.first_emi_date,
+                acc.status,
+                acc.outstanding_principal,
+                la.application_number,
+                la.full_name,
+                la.email
+            FROM loan_accounts acc
+            JOIN loan_applications la
+              ON la.id = acc.loan_application_id
+            WHERE acc.id = %s
+        """, (loan_account_id,))
+        account = cur.fetchone()
+
+        if not account:
+            flash("Loan account not found.", "danger")
+            return redirect(url_for("manager_dashboard"))
+
+        # 2) Fetch EMI schedule
+        cur.execute("""
+            SELECT
+                instalment_no,
+                due_date,
+                emi_amount,
+                principal_component,
+                interest_component,
+                opening_principal,
+                closing_principal,
+                status,
+                paid_on
+            FROM loan_repayment_schedule
+            WHERE loan_account_id = %s
+            ORDER BY instalment_no
+        """, (loan_account_id,))
+        schedule = cur.fetchall() or []
+
+    finally:
+        cur.close()
+
+    # --- Aggregations for summary & charts ---
+    labels = []
+    emi_values = []
+    principal_values = []
+    interest_values = []
+    outstanding_values = []
+    status_list = []
+
+    paid_emi_count = 0
+    pending_emi_count = 0
+    overdue_emi_count = 0
+    next_due_date = None
+
+    for row in schedule:
+        inst = row["instalment_no"]
+        labels.append(f"EMI {inst}")
+
+        emi_values.append(float(row["emi_amount"]))
+        principal_values.append(float(row["principal_component"]))
+        interest_values.append(float(row["interest_component"]))
+        outstanding_values.append(float(row["closing_principal"]))
+
+        s = row["status"]
+        status_list.append(s)
+
+        if s == "paid":
+            paid_emi_count += 1
+        elif s == "pending":
+            pending_emi_count += 1
+            # first upcoming pending EMI
+            if next_due_date is None:
+                next_due_date = row["due_date"]
+        elif s == "overdue":
+            overdue_emi_count += 1
+            # overdue is more important than pending
+            if next_due_date is None or row["due_date"] < next_due_date:
+                next_due_date = row["due_date"]
+
+    # Prepare a simple dict for counts
+    emi_stats = {
+        "paid": paid_emi_count,
+        "pending": pending_emi_count,
+        "overdue": overdue_emi_count,
+        "total": len(schedule),
+        "next_due_date": next_due_date
+    }
+
+    return render_template(
+        "manager_loan_detail.html",
+        manager=user,
+        account=account,
+        schedule=schedule,
+        emi_stats=emi_stats,
+        labels=labels,
+        emi_values=emi_values,
+        principal_values=principal_values,
+        interest_values=interest_values,
+        outstanding_values=outstanding_values,
+        status_list=status_list,
+    )
+
+@app.route("/my_loans/<int:loan_account_id>/schedule")
+def loan_emi_schedule(loan_account_id):
+    email = session.get('user_email')
+    if not email:
+        flash("Please login first.", "danger")
+        return redirect(url_for("login"))
+
+    cur = mysql.connection.cursor(DictCursor)
+    try:
+        # --- Get current user ---
+        cur.execute("SELECT user_id, name FROM bank_users WHERE email=%s", (email,))
+        user = cur.fetchone()
+        if not user:
+            flash("User not found.", "danger")
+            return redirect(url_for("login"))
+
+        # --- Get the loan account (ensure it belongs to this user) ---
+        cur.execute("""
+            SELECT 
+                la.id,
+                la.loan_account_no,
+                la.loan_type,
+                la.sanctioned_amount,
+                la.emi_amount,
+                la.tenure_months,
+                la.outstanding_principal,
+                la.status,
+                app.application_number,
+                app.application_date
+            FROM loan_accounts la
+            JOIN loan_applications app
+              ON app.id = la.loan_application_id
+            WHERE la.id = %s
+              AND la.customer_id = %s
+        """, (loan_account_id, user["user_id"]))
+        loan_account = cur.fetchone()
+
+        if not loan_account:
+            flash("Loan account not found for your profile.", "danger")
+            return redirect(url_for("view_loans"))
+
+        # --- Fetch EMI schedule for this loan ---
+        cur.execute("""
+            SELECT 
+                id,
+                instalment_no,
+                due_date,
+                emi_amount,
+                principal_component,
+                interest_component,
+                opening_principal,
+                closing_principal,
+                status,
+                paid_on
+            FROM loan_repayment_schedule
+            WHERE loan_account_id = %s
+            ORDER BY instalment_no
+        """, (loan_account_id,))
+        schedule = cur.fetchall() or []
+
+        # --- Summary calculations ---
+        total_principal = sum(Decimal(str(r["principal_component"])) for r in schedule) if schedule else Decimal("0.00")
+        total_interest  = sum(Decimal(str(r["interest_component"])) for r in schedule) if schedule else Decimal("0.00")
+        total_emi       = sum(Decimal(str(r["emi_amount"]))          for r in schedule) if schedule else Decimal("0.00")
+
+        paid_installments     = sum(1 for r in schedule if r["status"] == "paid")
+        pending_installments  = sum(1 for r in schedule if r["status"] == "pending")
+        overdue_installments  = sum(1 for r in schedule if r["status"] == "overdue")
+
+        # --- Next due EMI (first pending/overdue) ---
+        next_due = None
+        for r in schedule:
+            if r["status"] in ("pending", "overdue"):
+                next_due = r
+                break
+
+    finally:
+        cur.close()
+
+    return render_template(
+        "loan_emi_schedule.html",
+        user=user,
+        loan_account=loan_account,
+        schedule=schedule,
+        total_principal=total_principal,
+        total_interest=total_interest,
+        total_emi=total_emi,
+        paid_installments=paid_installments,
+        pending_installments=pending_installments,
+        overdue_installments=overdue_installments,
+        next_due=next_due,
+    )
+
+LOAN_POOL_ACCOUNT = "LOAN_POOL_001"   # same as used during disbursal
+
+
+@app.route("/my_loans/<int:loan_account_id>/pay_emi/<int:instalment_no>", methods=["POST"])
+def pay_emi(loan_account_id, instalment_no):
+    email = session.get('user_email')
+    if not email:
+        flash("Please login first.", "danger")
+        return redirect(url_for("login"))
+
+    cur = mysql.connection.cursor(DictCursor)
+    try:
+        # --- Get current user ---
+        cur.execute("SELECT user_id, name FROM bank_users WHERE email=%s", (email,))
+        user = cur.fetchone()
+        if not user:
+            flash("User not found.", "danger")
+            return redirect(url_for("login"))
+
+        # --- Fetch loan account + linked application ---
+        cur.execute("""
+            SELECT 
+                la.id,
+                la.loan_account_no,
+                la.customer_id,
+                la.outstanding_principal,
+                la.status,
+                la.loan_application_id,
+                app.application_number,
+                app.loan_type
+            FROM loan_accounts la
+            JOIN loan_applications app
+              ON app.id = la.loan_application_id
+            WHERE la.id = %s
+              AND la.customer_id = %s
+        """, (loan_account_id, user["user_id"]))
+        loan = cur.fetchone()
+
+        if not loan:
+            flash("Loan account not found for your profile.", "danger")
+            return redirect(url_for("view_loans"))
+
+        if loan["status"] not in ("active",):
+            flash("Only active loans can be repaid.", "warning")
+            return redirect(url_for("loan_emi_schedule", loan_account_id=loan_account_id))
+
+        # --- EMI row the user is trying to pay ---
+        cur.execute("""
+            SELECT *
+            FROM loan_repayment_schedule
+            WHERE loan_account_id = %s
+              AND instalment_no = %s
+        """, (loan_account_id, instalment_no))
+        emi_row = cur.fetchone()
+
+        if not emi_row:
+            flash("EMI record not found.", "danger")
+            return redirect(url_for("loan_emi_schedule", loan_account_id=loan_account_id))
+
+        if emi_row["status"] == "paid":
+            flash("This EMI is already paid.", "info")
+            return redirect(url_for("loan_emi_schedule", loan_account_id=loan_account_id))
+
+        # --- Ensure it's the NEXT due EMI (first pending/overdue) ---
+        cur.execute("""
+            SELECT MIN(instalment_no) AS next_no
+            FROM loan_repayment_schedule
+            WHERE loan_account_id = %s
+              AND status IN ('pending','overdue')
+        """, (loan_account_id,))
+        row = cur.fetchone()
+        next_no = row["next_no"]
+
+        if not next_no or int(next_no) != instalment_no:
+            flash("You can only pay the next due EMI.", "warning")
+            return redirect(url_for("loan_emi_schedule", loan_account_id=loan_account_id))
+
+        emi_amount = Decimal(str(emi_row["emi_amount"]))
+
+        # --- Get debit CASA account from loan_application_details ---
+        cur.execute("""
+            SELECT account_number
+            FROM loan_application_details
+            WHERE loan_application_id = %s
+            LIMIT 1
+        """, (loan["loan_application_id"],))
+        lad = cur.fetchone()
+
+        if not lad or not lad["account_number"]:
+            flash("Linked bank account not found for this loan.", "danger")
+            return redirect(url_for("loan_emi_schedule", loan_account_id=loan_account_id))
+
+        debit_acct_no = lad["account_number"].strip()
+
+        # --- Lock customer account and check balance ---
+        acct = find_account_by_number(debit_acct_no, for_update=True)
+        if not acct:
+            flash("Debit account not found in the system.", "danger")
+            return redirect(url_for("loan_emi_schedule", loan_account_id=loan_account_id))
+
+        
+
+        if acct["balance"] < emi_amount:
+            flash("Insufficient balance to pay this EMI.", "warning")
+            return redirect(url_for("loan_emi_schedule", loan_account_id=loan_account_id))
+
+        # --- START TRANSACTION for all updates ---
+        cur.execute("START TRANSACTION")
+
+        # 1) Debit customer account
+        new_cust_balance = acct["balance"] - emi_amount
+        cur.execute(
+            f"UPDATE {acct['table_name']} SET balance = %s WHERE account_number = %s",
+            (float(new_cust_balance), debit_acct_no),
+        )
+
+        # 2) Credit loan pool account (if exists in any account table)
+        pool_acct = find_account_by_number(LOAN_POOL_ACCOUNT, for_update=True)
+        if pool_acct:
+            new_pool_balance = pool_acct["balance"] + emi_amount
+            cur.execute(
+                f"UPDATE {pool_acct['table_name']} SET balance = %s WHERE account_number = %s",
+                (float(new_pool_balance), LOAN_POOL_ACCOUNT),
+            )
+
+        # 3) Mark EMI as paid
+        today = date.today()
+        cur.execute("""
+            UPDATE loan_repayment_schedule
+               SET status = 'paid',
+                   paid_on = %s
+             WHERE id = %s
+        """, (today, emi_row["id"]))
+
+        # 4) Update outstanding principal = this row's closing principal
+        cur.execute("""
+            UPDATE loan_accounts
+               SET outstanding_principal = %s
+             WHERE id = %s
+        """, (emi_row["closing_principal"], loan_account_id))
+
+        # 5) Insert transaction row (for Txn history)
+        txn_id = generate_transaction_id("LNEMI")
+        cur.execute("""
+            INSERT INTO transactions (
+                transaction_id,
+                from_account,
+                to_account,
+                amount,
+                note,
+                status
+            ) VALUES (%s,%s,%s,%s,%s,%s)
+        """, (
+            txn_id,
+            debit_acct_no,
+            LOAN_POOL_ACCOUNT,
+            float(emi_amount),
+            f"EMI {instalment_no} payment for loan {loan['loan_account_no']}",
+            "SUCCESS"
+        ))
+
+        # 6) If no more pending/overdue EMIs, close the loan
+        cur.execute("""
+            SELECT COUNT(*) AS remaining
+            FROM loan_repayment_schedule
+            WHERE loan_account_id = %s
+              AND status IN ('pending','overdue')
+        """, (loan_account_id,))
+        cnt_row = cur.fetchone()
+        if cnt_row and cnt_row["remaining"] == 0:
+            cur.execute("""
+                UPDATE loan_accounts
+                   SET status = 'closed'
+                 WHERE id = %s
+            """, (loan_account_id,))
+
+        # --- Commit all ---
+        mysql.connection.commit()
+        flash("EMI paid successfully.", "success")
+        return redirect(url_for("loan_emi_schedule", loan_account_id=loan_account_id))
+
+    except Exception as e:
+        mysql.connection.rollback()
+        print("ERROR in pay_emi:", e)
+        flash("Error while processing EMI payment.", "danger")
+        return redirect(url_for("loan_emi_schedule", loan_account_id=loan_account_id))
+    finally:
+        cur.close()
+
+
+
+
+@app.route("/my_loans/<int:loan_account_id>/pay_emi/<int:instalment_no>/confirm")
+def confirm_pay_emi(loan_account_id, instalment_no):
+    email = session.get('user_email')
+    if not email:
+        flash("Please login first.", "danger")
+        return redirect(url_for("login"))
+
+    cur = mysql.connection.cursor(DictCursor)
+    try:
+        # 1) Current user
+        cur.execute("SELECT user_id, name FROM bank_users WHERE email=%s", (email,))
+        user = cur.fetchone()
+        if not user:
+            flash("User not found.", "danger")
+            return redirect(url_for("login"))
+
+        # 2) Loan account – must belong to this user
+        cur.execute("""
+            SELECT 
+                la.id,
+                la.loan_account_no,
+                la.customer_id,
+                la.outstanding_principal,
+                la.status,
+                la.loan_application_id,
+                app.application_number,
+                app.loan_type
+            FROM loan_accounts la
+            JOIN loan_applications app
+              ON app.id = la.loan_application_id
+            WHERE la.id = %s
+              AND la.customer_id = %s
+        """, (loan_account_id, user["user_id"]))
+        loan = cur.fetchone()
+
+        if not loan:
+            flash("Loan account not found for your profile.", "danger")
+            return redirect(url_for("view_loans"))
+
+        if loan["status"] not in ("active",):
+            flash("Only active loans can be repaid.", "warning")
+            return redirect(url_for("loan_emi_schedule", loan_account_id=loan_account_id))
+
+        # 3) EMI row user wants to pay
+        cur.execute("""
+            SELECT *
+            FROM loan_repayment_schedule
+            WHERE loan_account_id = %s
+              AND instalment_no = %s
+        """, (loan_account_id, instalment_no))
+        emi = cur.fetchone()
+
+        if not emi:
+            flash("EMI record not found.", "danger")
+            return redirect(url_for("loan_emi_schedule", loan_account_id=loan_account_id))
+
+        if emi["status"] == "paid":
+            flash("This EMI is already paid.", "info")
+            return redirect(url_for("loan_emi_schedule", loan_account_id=loan_account_id))
+
+        # 4) Make sure it’s the NEXT due EMI
+        cur.execute("""
+            SELECT MIN(instalment_no) AS next_no
+            FROM loan_repayment_schedule
+            WHERE loan_account_id = %s
+              AND status IN ('pending','overdue')
+        """, (loan_account_id,))
+        row = cur.fetchone()
+        next_no = row["next_no"]
+
+        if not next_no or int(next_no) != instalment_no:
+            flash("You can only pay the next due EMI.", "warning")
+            return redirect(url_for("loan_emi_schedule", loan_account_id=loan_account_id))
+
+        emi_amount = Decimal(str(emi["emi_amount"]))
+
+        # 5) Get linked CASA account from loan_application_details
+        cur.execute("""
+            SELECT account_number
+            FROM loan_application_details
+            WHERE loan_application_id = %s
+            LIMIT 1
+        """, (loan["loan_application_id"],))
+        lad = cur.fetchone()
+
+        if not lad or not lad["account_number"]:
+            flash("Linked bank account not found for this loan.", "danger")
+            return redirect(url_for("loan_emi_schedule", loan_account_id=loan_account_id))
+
+        debit_acct_no = lad["account_number"].strip()
+
+        # 6) Fetch account (no lock – just display balance)
+        acct = find_account_by_number(debit_acct_no, for_update=False)
+        if not acct:
+            flash("Debit account not found in the system.", "danger")
+            return redirect(url_for("loan_emi_schedule", loan_account_id=loan_account_id))
+
+        available = acct["balance"]
+        remaining_balance = available - emi_amount
+
+    finally:
+        cur.close()
+
+    return render_template(
+        "emi_payment_confirm.html",
+        user=user,
+        loan=loan,
+        emi=emi,
+        debit_acct=acct,
+        emi_amount=emi_amount,
+        remaining_balance=remaining_balance,
+    )
+
+
+
+
+# Session Timeout
+
+from datetime import timedelta
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
+app.config['SESSION_REFRESH_EACH_REQUEST'] = True
+ 
+# Add this after your configurations and before your routes
+@app.before_request
+def before_request():
+    # Make session permanent and set lifetime
+    session.permanent = True
+    session.modified = True
+ 
+@app.route('/session_timeout')
+def session_timeout():
+    session.clear()
+    flash('Your session has expired due to inactivity. Please log in again.', 'warning')
+    return redirect(url_for('login'))
+ 
+@app.route('/refresh_session')
+def refresh_session():
+    # Simply accessing this route will refresh the session due to before_request
+    return '', 204
  
    
 if __name__ == '__main__':

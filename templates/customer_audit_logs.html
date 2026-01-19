@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>DigiBank Admin - Audit Logs</title>
+  <title>DigiBank - Customer Audit Logs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
  
   <!-- Bootstrap & Icons & Fonts -->
@@ -157,6 +157,7 @@
           <a class="nav-link text-dark" href="{{ url_for('transactions_review') }}"><i class="bi bi-person-lines-fill"></i> Profile</a>
         </li>
         <li class="nav-item mb-2">
+          <!-- keep parent Audit Logs active so user knows section -->
           <a class="nav-link text-dark active" href="{{ url_for('audit_logs') }}"><i class="bi bi-bar-chart-line-fill"></i> Audit Logs</a>
         </li>
       </ul>
@@ -181,7 +182,7 @@
       </div>
     </a>
  
-    <h5 class="flex-grow-1 text-center m-0">Audit Logs</h5>
+    <h5 class="flex-grow-1 text-center m-0">Customer Audit Logs</h5>
  
     <div class="d-flex align-items-center">
       <h5 class="m-0 me-2 fs-6">
@@ -198,7 +199,7 @@
     <div class="card shadow-sm">
       <div class="card-body">
         <!-- Filters -->
-        <form class="mb-4" method="GET" action="{{ url_for('audit_logs') }}">
+        <form class="mb-4" method="GET" action="{{ url_for('customer_audit_logs') }}">
           <!-- Row 1: user/name/email/mobile -->
           <div class="row g-3">
             <div class="col-md-3">
@@ -276,7 +277,7 @@
             </div>
             <div class="col-md-4 text-end">
               <button type="submit" class="btn btn-primary px-4 me-2">Search</button>
-              <a class="btn btn-secondary px-4" href="{{ url_for('audit_logs') }}">Clear</a>
+              <a class="btn btn-secondary px-4" href="{{ url_for('customer_audit_logs') }}">Clear</a>
             </div>
           </div>
  
@@ -284,7 +285,7 @@
           {% if searched %}
           <div class="mt-3 d-flex justify-content-end">
             <a class="btn btn-success"
-               href="{{ url_for('audit_logs_export') }}?{{ urlencode(export_qs, doseq=True) }}">
+               href="{{ url_for('customer_audit_logs_export') }}?{{ urlencode(export_qs, doseq=True) }}">
               Download CSV
             </a>
           </div>
@@ -295,7 +296,7 @@
         {% if not searched %}
           <div class="alert alert-info">
             🔍 Use the filters above (User ID / Name / Email / Mobile / Date range / Audit Type) and click
-            <strong>Search</strong> to view audit logs.
+            <strong>Search</strong> to view customer audit logs.
           </div>
         {% endif %}
  
@@ -326,7 +327,6 @@
                   <th>Status</th>
                   <th>Created At</th>
                   <th>Action Time</th>
-                  <!-- Renamed header only -->
                   <th>Account Number</th>
                 </tr>
               </thead>
@@ -344,8 +344,8 @@
                     <td>
                       {% if r.status %}
                         <span class="badge
-                          {% if r.status in ['A','approved','SUCCESS'] %} bg-success
-                          {% elif r.status in ['pending_manager', None] %} bg-warning
+                          {% if r.status in ['A','approved','SUCCESS','Approved','APPROVED'] %} bg-success
+                          {% elif r.status in ['pending_manager','P','Pending','PENDING', None] %} bg-warning
                           {% else %} bg-danger {% endif %}">
                           {{ r.status }}
                         </span>
@@ -363,7 +363,6 @@
                         {{ r.action_time.strftime('%Y-%m-%d %H:%M:%S') if r.action_time else '-' }}
                       </small>
                     </td>
-                    <!-- Still showing r.extra_ref so backend stays the same -->
                     <td>{{ r.extra_ref or '-' }}</td>
                   </tr>
                 {% endfor %}
@@ -383,7 +382,7 @@
                 {% set qs_prev = qs.copy() %}
                 {% set _ = qs_prev.update({'page':[prev]}) %}
                 <a class="page-link"
-                   href="{{ url_for('audit_logs') }}?{{ urlencode(qs_prev, doseq=True) }}">
+                   href="{{ url_for('customer_audit_logs') }}?{{ urlencode(qs_prev, doseq=True) }}">
                   Previous
                 </a>
               </li>
@@ -396,7 +395,7 @@
                 {% set qs_next = qs.copy() %}
                 {% set _ = qs_next.update({'page':[next]}) %}
                 <a class="page-link"
-                   href="{{ url_for('audit_logs') }}?{{ urlencode(qs_next, doseq=True) }}">
+                   href="{{ url_for('customer_audit_logs') }}?{{ urlencode(qs_next, doseq=True) }}">
                   Next
                 </a>
               </li>
@@ -405,7 +404,7 @@
  
         {% elif searched %}
           <div class="alert alert-warning text-center mt-4">
-            ⚠️ No matching logs found for your filters.
+            ⚠️ No matching customer logs found for your filters.
           </div>
         {% endif %}
       </div>
@@ -414,7 +413,7 @@
  
   <!-- Footer -->
   <footer class="bg-custom text-white text-center py-3 mt-auto">
-    © 2025 DigiBank. Manager Dashboard. All rights reserved.
+    © 2025 DigiBank. Customer Audit Logs. All rights reserved.
   </footer>
  
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

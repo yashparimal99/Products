@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manager | Loan Review</title>
+ 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+ 
+    <style>
+        :root {
+            --brand: #0B4D83;      /* DigiBank primary */
+            --brand-alt: #97144D;  /* Accent (maroon) */
+            --bg-page: #f1f5f9;    /* light slate */
+            --border-soft: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --card-bg: #ffffff;
+        }
+ 
+        body {
+            background: radial-gradient(circle at top left, #e3f2fd 0, #f1f5f9 40%, #ffffff 100%);
+            font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-main);
+        }
+ 
+        .page-shell {
+            max-width: 1150px;
+            margin: 24px auto 40px;
+        }
+ 
+        /* Back button row */
+        .page-shell .back-row {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 10px;
+        }
+ 
+        /* Top header strip */
+        .top-header {
+            background: linear-gradient(90deg, #0B4D83, #186cc4);
+            border-radius: 16px;
+            padding: 16px 22px;
+            color: #f9fafb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+        }
+ 
+        .top-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+ 
+        .top-subtitle {
+            font-size: 13px;
+            font-weight: 500;
+            opacity: 0.95;
+        }
+ 
+        .badge-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.4);
+            background-color: rgba(15,23,42,0.15);
+            color: #e2f3ff;
+        }
+ 
+        .badge-chip i {
+            font-size: 14px;
+        }
+ 
+        /* Cards */
+        .card-block {
+            background-color: var(--card-bg);
+            border-radius: 14px;
+            border: 1px solid var(--border-soft);
+            padding: 18px 20px;
+            margin-top: 18px;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+        }
+ 
+        /* Coloured left border band for sections */
+        .card-block.sectioned {
+            border-left: 4px solid var(--brand);
+        }
+ 
+        .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--brand);
+        }
+ 
+        .section-title i {
+            font-size: 18px;
+        }
+ 
+        .field-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+ 
+        .field-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+ 
+        .section-divider {
+            border-top: 1px dashed var(--border-soft);
+            margin: 18px 0 14px;
+        }
+ 
+        .metric-box {
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background-color: #f8fafc;
+            padding: 10px 12px;
+            height: 100%;
+        }
+ 
+        .metric-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+ 
+        .metric-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+ 
+        .value-box {
+            border-radius: 10px;
+            background-color: #f3f4f6;
+            padding: 10px 12px;
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+ 
+        .risk-low  { color: #15803d; }
+        .risk-med  { color: #f97316; }
+        .risk-high { color: #b91c1c; }
+ 
+        .alert-soft {
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+ 
+        .alert-soft i {
+            margin-right: 6px;
+        }
+ 
+        label.form-label {
+            font-weight: 600;
+            font-size: 13px;
+        }
+ 
+        .btn {
+            font-weight: 600;
+        }
+ 
+        /* Make layout feel tight & aligned */
+        .main-column {
+            margin-top: 12px;
+        }
+ 
+        /* Accent small title bars inside cards */
+        .subheading-pill {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            background-color: #eef2ff;
+            color: #3730a3;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+ 
+<body>
+ 
+<div class="page-shell">
+ 
+    <!-- Back button row -->
+    <div class="back-row">
+        <a href="{{ url_for('manager_dashboard') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+ 
+    <!-- Top header with gradient and chips -->
+    <div class="top-header">
+        <div>
+            <div class="top-title">
+                Loan Review — {{ app.full_name or "Applicant" }}
+            </div>
+            <div class="top-subtitle">
+                Application  <strong>{{ app.application_number }}</strong>
+                &nbsp; • &nbsp;
+                Loan Type: <strong>{{ app.loan_type }}</strong>
+            </div>
+        </div>
+        <div class="d-flex flex-wrap gap-2 justify-content-end">
+            <span class="badge-chip">
+                <i class="bi bi-shield-lock"></i>
+                CIBIL: {{ app.cibil_score }}
+            </span>
+ 
+            {% if app.agent_assigned == 1 %}
+                <span class="badge-chip">
+                    <i class="bi bi-person-badge"></i>
+                    Agent: {{ app.assigned_agent }}
+                </span>
+            {% else %}
+                <span class="badge-chip">
+                    <i class="bi bi-person-plus"></i>
+                    No Agent Assigned
+                </span>
+            {% endif %}
+ 
+            {% if app.manager_final_decision %}
+                <span class="badge-chip">
+                    <i class="bi bi-clipboard-check"></i>
+                    Final: {{ app.manager_final_decision|title }}
+                </span>
+            {% endif %}
+        </div>
+    </div>
+ 
+    <!-- MAIN COLUMN -->
+    <div class="main-column">
+ 
+        <!-- Applicant & Loan details -->
+        <div class="card-block sectioned">
+ 
+            <div class="section-title">
+                <i class="bi bi-person-vcard"></i>
+                Applicant & Loan Snapshot
+            </div>
+ 
+            <div class="row g-3 mb-2">
+                <div class="col-md-4">
+                    <div class="field-label">Full Name</div>
+                    <div class="field-value">{{ app.full_name }}</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="field-label">Application</div>
+                    <div class="field-value">{{ app.application_number }}</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="field-label">Date of Birth</div>
+                    <div class="field-value">{{ app.date_of_birth }}</div>
+                </div>
+ 
+                <div class="col-md-4">
+                    <div class="field-label">Email</div>
+                    <div class="field-value">{{ app.email }}</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="field-label">Mobile</div>
+                    <div class="field-value">{{ app.mobile }}</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="field-label">PAN</div>
+                    <div class="field-value">{{ app.pan_number }}</div>
+                </div>
+            </div>
+ 
+            <div class="section-divider"></div>
+ 
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="field-label">Loan Type</div>
+                    <div class="field-value">{{ app.loan_type }}</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="field-label">Loan Purpose</div>
+                    <div class="field-value">{{ app.loan_purpose }}</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="field-label">Tenure (Months)</div>
+                    <div class="field-value">{{ app.tenure_months }}</div>
+                </div>
+ 
+                <div class="col-md-4">
+                    <div class="field-label">Requested Amount</div>
+                    <div class="field-value">₹{{ app.loan_amount }}</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="field-label">CIBIL Score</div>
+                    <div class="field-value" id="cibil">{{ app.cibil_score }}</div>
+                </div>
+            </div>
+        </div>
+ 
+        <!-- Income & Suggestions + Declared Assets + Asset Evaluation + Existing EMI -->
+        <div class="card-block">
+ 
+            <div class="section-title">
+                <i class="bi bi-bar-chart-line"></i>
+                Income, System Suggestion & Asset Evaluation
+            </div>
+ 
+            <!-- Income + Suggestion -->
+            <span class="subheading-pill">Income & System Suggestion</span>
+            <div class="row g-3 mb-2">
+                <div class="col-md-4">
+                    <div class="field-label">Annual Income</div>
+                    <div class="field-value">₹{{ app.annual_income }}</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="field-label">Monthly Income</div>
+                    <div class="field-value">
+                        ₹<span id="income">{{ app.monthly_income }}</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="field-label">Suggested Rate (%)</div>
+                    <div class="field-value">{{ app.suggested_interest_rate }}%</div>
+                </div>
+ 
+                <div class="col-md-4">
+                    <div class="field-label">Suggested EMI</div>
+                    <div class="field-value">
+                        ₹<span id="proposed_emi">{{ app.suggested_emi }}</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="field-label">Total Payable</div>
+                    <div class="field-value">₹{{ app.total_payable_amount }}</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="field-label">Total Interest</div>
+                    <div class="field-value">₹{{ app.total_interest }}</div>
+                </div>
+            </div>
+ 
+            <div class="section-divider"></div>
+ 
+            <!-- Declared Asset Details (from assets_data) -->
+            <span class="subheading-pill" style="background:#dcfce7;color:#166534;">
+                Declared Asset Details
+            </span>
+ 
+            {% if app.assetinfo and app.assetinfo|length > 0 %}
+                <div class="row g-3 mb-2">
+                    {% for asset in app.assetinfo %}
+                        <div class="col-md-6">
+                            <div class="metric-box">
+                                <div class="metric-label mb-1">
+                                    Asset {{ loop.index }}
+                                </div>
+                                <div class="small">
+                                    <table class="table table-sm table-borderless mb-0">
+                                        <tbody>
+                                        {% for key, value in asset.items() %}
+                                            <tr>
+                                                <td class="text-muted" style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em;">
+                                                    <strong>{{ key.replace("_", " ") }}</strong>
+                                                </td>
+                                                <td class="text-end" style="font-size:13px; font-weight:600;">
+                                                    {{ value }}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert-soft bg-light border mb-2">
+                    <i class="bi bi-info-circle"></i>
+                    No asset evaluation required.
+                </div>
+            {% endif %}
+ 
+            <div class="section-divider"></div>
+ 
+            <!-- Asset Evaluation -->
+            <span class="subheading-pill" style="background:#fee2e2;color:#b91c1c;">
+                Asset Evaluation
+            </span>
+ 
+            {% if app.agent_assigned == 0 %}
+                <p class="text-muted mb-2 fw-semibold">
+                    No asset verification agent is assigned. Assign an agent to start field/asset verification.
+                </p>
+ 
+                <form method="POST" action="{{ url_for('assign_agent', app_id=app.id) }}" class="mt-2">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-7">
+                            <label class="form-label">Select Loan Agent</label>
+                            <select name="agent_email" class="form-control" required>
+                                <option value="">-- Select Agent --</option>
+                                <option value="agent.ramverma@digibank.com">Ram Verma (agent.ramverma@digibank.com)</option>
+                                <option value="agent.sita@example.com">Sita Patel (agent.sita@example.com)</option>
+                                <option value="agent.rahul@example.com">Rahul Verma (agent.rahul@example.com)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-5 text-md-end">
+                            <button class="btn btn-primary">
+                                <i class="bi bi-person-plus"></i> Assign Agent
+                            </button>
+                        </div>
+                    </div>
+                </form>
+ 
+            {% else %}
+                <div class="alert-soft bg-light border mb-2">
+                    <i class="bi bi-person-badge"></i>
+                    <strong>Agent Assigned:</strong> {{ app.assigned_agent }}<br>
+                    <strong>Asset Status:</strong>
+                    {% if app.asset_status == "pending" %}
+                        <span class="badge bg-warning text-dark fw-bold">Evaluation Pending</span>
+                    {% elif app.asset_status == "approved" %}
+                        <span class="badge bg-success fw-bold">Approved by Agent</span>
+                    {% elif app.asset_status == "rejected" %}
+                        <span class="badge bg-danger fw-bold">Rejected by Agent</span>
+                    {% endif %}
+                </div>
+ 
+                {% if app.asset_status in ["approved","rejected"] %}
+                    <div class="row g-3 mb-2">
+                        <div class="col-md-4">
+                            <div class="metric-box">
+                                <div class="metric-label">Evaluated Value</div>
+                                <div class="metric-value">₹{{ app.asset_evaluated_value or "-" }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="metric-box">
+                                <div class="metric-label">Agent Remarks</div>
+                                <div class="small fw-semibold mb-1">
+                                    {{ app.asset_evaluator_remark or "-" }}
+                                </div>
+                                <div class="text-muted" style="font-size:11px;">
+                                    <strong>By:</strong> {{ app.asset_evaluated_by or "-" }}
+                                    &nbsp;|&nbsp;
+                                    <strong>On:</strong> {{ app.asset_evaluated_at or "-" }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+ 
+                    <div class="alert-soft bg-success-soft">
+                        <i class="bi bi-check-circle-fill text-success"></i>
+                        Asset evaluation is <strong>completed</strong>. You can proceed with final decision.
+                    </div>
+                {% elif app.asset_status == "pending" %}
+                    <div class="alert-soft bg-warning-subtle">
+                        <i class="bi bi-hourglass-split text-warning"></i>
+                        Asset evaluation is <strong>pending</strong>. Final approval is blocked until evaluation is completed.
+                    </div>
+                {% endif %}
+            {% endif %}
+ 
+            <div class="section-divider"></div>
+ 
+            <!-- Existing EMI -->
+            <span class="subheading-pill" style="background:#e0f2fe;color:#075985;">
+                Existing Obligations
+            </span>
+ 
+            <div class="mb-2 col-md-4">
+                <label class="form-label">Existing EMI (₹)</label>
+                <input type="number" id="existing_emi" class="form-control" value="0">
+            </div>
+ 
+        </div>
+ 
+        <!-- Final Decision -->
+        <div class="card-block sectioned" style="border-left-color: var(--brand-alt);">
+            <div class="section-title">
+                <i class="bi bi-check2-square"></i>
+                Manager Final Decision
+            </div>
+ 
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <label class="form-label">Total EMI (Existing + Proposed)</label>
+                    <div class="value-box" id="total_emi">₹0</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">DTI Percentage</label>
+                    <div class="value-box" id="dti">0%</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Risk Level</label>
+                    <div id="risk_level" class="value-box risk-low">
+                        <span>Low Risk</span>
+                    </div>
+                </div>
+            </div>
+ 
+            <div class="mb-3">
+                <div class="field-label">System Suggested Outcome</div>
+                <div id="decision" class="value-box">
+                    <span><strong>System Suggestion</strong></span>
+                    <span><strong>Approve</strong></span>
+                </div>
+            </div>
+ 
+            <form method="POST" action="{{ url_for('manager_final_decision', app_id=app.id) }}">
+ 
+                {% if app.agent_assigned == 1 and app.asset_status == "pending" %}
+                    <div class="alert-soft bg-warning-subtle mb-3">
+                        <i class="bi bi-exclamation-triangle-fill text-warning"></i>
+                        Asset evaluation is pending. You cannot finalize the loan yet.
+                    </div>
+                {% endif %}
+ 
+                {% if app.agent_assigned == 0 or app.asset_status in ["approved","rejected"] %}
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Final Interest Rate (%)</label>
+                            <input type="number" class="form-control" name="interest_rate" step="0.01" required>
+                        </div>
+ 
+                        <div class="col-md-6">
+                            <label class="form-label">Final Sanction Amount (₹)</label>
+                            <input type="number" class="form-control" name="sanction_amount" required>
+                        </div>
+                    </div>
+ 
+                    <input type="hidden" id="final_dti" name="final_dti">
+ 
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span class="text-muted small fw-semibold">
+                            Use DTI, risk band and asset evaluation before finalizing.
+                        </span>
+                        <div class="d-flex gap-2">
+                            <button type="submit" name="decision" value="reject" class="btn btn-outline-danger">
+                                <i class="bi bi-x-circle"></i> Reject Loan
+                            </button>
+                            <button type="submit" name="decision" value="approve" class="btn btn-success">
+                                <i class="bi bi-check-circle"></i> Approve Loan
+                            </button>
+                        </div>
+                    </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+ 
+<script>
+function recalcDTI() {
+    let income   = parseFloat(document.getElementById("income").innerText);
+    let proposed = parseFloat(document.getElementById("proposed_emi").innerText);
+    let cibil    = parseInt(document.getElementById("cibil").innerText);
+    let existing = parseFloat(document.getElementById("existing_emi").value);
+ 
+    if (isNaN(existing)) existing = 0;
+ 
+    let total = proposed + existing;
+    let dti   = income > 0 ? ((total / income) * 100).toFixed(2) : 0;
+ 
+    document.getElementById("total_emi").innerText = "₹" + total;
+    document.getElementById("dti").innerText       = dti + "%";
+    document.getElementById("final_dti").value     = dti;
+ 
+    let riskBox  = document.getElementById("risk_level");
+    let decisionBox = document.getElementById("decision");
+ 
+    let risk = "Low";
+ 
+    if (dti > 50 || cibil < 650) risk = "High";
+    else if (dti > 35 || cibil < 720) risk = "Medium";
+ 
+    if (risk === "Low") {
+        riskBox.innerHTML = "<span>Low Risk</span>";
+        riskBox.className = "value-box risk-low";
+        decisionBox.innerHTML = "<span><strong>System Suggestion</strong></span><span><strong>Approve</strong></span>";
+    }
+    else if (risk === "Medium") {
+        riskBox.innerHTML = "<span>Medium Risk</span>";
+        riskBox.className = "value-box risk-med";
+        decisionBox.innerHTML = "<span><strong>System Suggestion</strong></span><span><strong>Review</strong></span>";
+    }
+    else {
+        riskBox.innerHTML = "<span>High Risk</span>";
+        riskBox.className = "value-box risk-high";
+        decisionBox.innerHTML = "<span><strong>System Suggestion</strong></span><span><strong>Reject</strong></span>";
+    }
+}
+ 
+document.getElementById("existing_emi").addEventListener("input", recalcDTI);
+recalcDTI();
+</script>
+ 
+</body>
+</html>
+ 
+ 

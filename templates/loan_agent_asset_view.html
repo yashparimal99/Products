@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Asset Evaluation | Loan Agent</title>
+ 
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+ 
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+ 
+    <style>
+        :root {
+            --primary: #0B4D83;
+            --primary-light: #1e78d6;
+            --bg: #f4f6f9;
+            --card-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+            --border: #e2e8f0;
+        }
+ 
+        body {
+            background: var(--bg);
+            font-family: "Segoe UI", system-ui, sans-serif;
+            color: #0f172a;
+        }
+ 
+        /* Header */
+        .header-wrapper {
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            color: white;
+            padding: 22px 40px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.15);
+        }
+ 
+        .header-content {
+            max-width: 1350px;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+ 
+        .header-title h4 {
+            margin: 0;
+            font-weight: 700;
+        }
+ 
+        .header-title small {
+            opacity: 0.9;
+        }
+ 
+        .logout-btn {
+            background: white;
+            color: var(--primary);
+            border-radius: 999px;
+            font-weight: 600;
+            padding: 6px 16px;
+        }
+ 
+        /* Breadcrumb */
+        .breadcrumb {
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 0;
+            font-size: 14px;
+        }
+ 
+        /* Page wrapper */
+        .page-wrapper {
+            max-width: 1100px;
+            margin: 30px auto 60px;
+            padding: 0 20px;
+        }
+ 
+        /* Card */
+        .card {
+            border-radius: 16px;
+            border: none;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 25px;
+        }
+ 
+        .card-header {
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            color: white;
+            font-weight: 600;
+            padding: 14px 20px;
+            border-radius: 16px 16px 0 0;
+        }
+ 
+        .info-table td {
+            padding: 6px 10px;
+            font-size: 14px;
+        }
+ 
+        /* Buttons */
+        .action-btn {
+            border-radius: 999px;
+            padding: 8px 20px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+ 
+<body>
+ 
+<!-- Header -->
+<div class="header-wrapper">
+    <div class="header-content">
+        <div class="header-title">
+            <h4>DigiBank — Loan Agent Dashboard</h4>
+            <small>Asset Evaluation & Verification</small>
+        </div>
+ 
+        <a href="{{ url_for('logout') }}" class="btn logout-btn">
+            <i class="bi bi-box-arrow-right me-1"></i> Logout
+        </a>
+    </div>
+</div>
+ 
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb px-4 py-2">
+        <li class="breadcrumb-item">
+            <a href="{{ url_for('loan_agent_dashboard') }}"
+               class="text-decoration-none" style="color:#0B4D83;">
+                Dashboard
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            Asset Evaluation
+        </li>
+    </ol>
+</nav>
+ 
+<!-- Page Content -->
+<div class="page-wrapper">
+ 
+    <a href="{{ url_for('loan_agent_dashboard') }}" class="btn btn-outline-secondary mb-3">
+        <i class="bi bi-arrow-left"></i> Back to Dashboard
+    </a>
+ 
+    <!-- Applicant Overview -->
+    <div class="card">
+        <div class="card-header">Applicant Overview</div>
+        <div class="card-body">
+            <p><strong>Name:</strong> {{ app.full_name }}</p>
+            <p><strong>Application No:</strong> {{ app.application_number }}</p>
+            <p><strong>Email:</strong> {{ app.email }}</p>
+            <p><strong>Mobile:</strong> {{ app.mobile }}</p>
+        </div>
+    </div>
+ 
+    <!-- Loan Details -->
+    <div class="card">
+        <div class="card-header">Loan Details</div>
+        <div class="card-body">
+            <table class="table table-bordered info-table">
+                {% for k, v in loaninfo.items() %}
+                <tr>
+                    <td class="fw-semibold">{{ k.replace("_", " ") | title }}</td>
+                    <td>{{ v }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+ 
+    <!-- Asset Details -->
+    <div class="card">
+        <div class="card-header">Asset Details (Customer Provided)</div>
+        <div class="card-body">
+            <table class="table table-bordered info-table">
+                {% for k, v in assetinfo.items() %}
+                <tr>
+                    <td class="fw-semibold">{{ k.replace("_", " ") | title }}</td>
+                    <td>{{ v }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+ 
+    <!-- Final Evaluation -->
+    <div class="card">
+        <div class="card-header">Agent Final Evaluation</div>
+        <div class="card-body">
+ 
+            <form method="POST">
+ 
+                <div class="mb-3">
+                    <label class="fw-semibold">Final Asset Type</label>
+                    <input type="text" class="form-control"
+                           name="asset_type"
+                           value="{{ assetinfo.get('asset_type', '') }}" required>
+                </div>
+ 
+                <div class="mb-3">
+                    <label class="fw-semibold">Evaluated Asset Value (₹)</label>
+                    <input type="number" class="form-control" name="asset_value" required>
+                </div>
+ 
+                <div class="mb-3">
+                    <label class="fw-semibold">Agent Remarks</label>
+                    <textarea class="form-control" name="remarks" rows="3" required></textarea>
+                </div>
+ 
+                <div class="d-flex gap-3">
+                    <button name="decision" value="approve"
+                            class="btn btn-success action-btn">
+                        <i class="bi bi-check-circle"></i> Approve Asset
+                    </button>
+ 
+                    <button name="decision" value="reject"
+                            class="btn btn-danger action-btn">
+                        <i class="bi bi-x-circle"></i> Reject Asset
+                    </button>
+                </div>
+ 
+            </form>
+ 
+        </div>
+    </div>
+ 
+</div>
+ 
+</body>
+</html>
+ 
+ 

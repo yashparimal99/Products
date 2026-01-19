@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>DigiBank Admin - Audit Logs</title>
+  <title>DigiBank - Manager Audit Logs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
  
   <!-- Bootstrap & Icons & Fonts -->
@@ -11,7 +11,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Inter:wght@600;700;800&display=swap%22 rel="stylesheet">
  
   <style>
-    /* --- Page base + layout --- */
     body {
       background-color:#f8f9fa;
       font-family:"Poppins", sans-serif;
@@ -23,7 +22,7 @@
       height: 100vh;
     }
  
-    /* Sidebar Offcanvas (kept so header toggle works) */
+    /* Sidebar Offcanvas */
     #sidebarMenu.offcanvas-start { width: 250px; }
     #sidebarMenu .offcanvas-body { padding: 0.5rem 1rem; }
     #sidebarMenu .nav-link {
@@ -48,7 +47,7 @@
       border-radius:4px;
     }
  
-    /* --- Header --- */
+    /* Header */
     .top-bar button.btn-outline-light {
       border: 1.5px solid white; color: white; background: transparent;
       padding: 4px 10px; font-size: 1.3rem; border-radius: 4px;
@@ -77,10 +76,9 @@
     }
     .logout-btn:hover { background:white; color:#0B4D83; }
  
-    /* --- Footer --- */
     footer.bg-custom { background-color:#0B4D83; }
  
-    /* --- DigiBank Logo styles --- */
+    /* DigiBank Logo */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap');
     .digi-bank-logo { display:flex; align-items:center; gap:12px; text-decoration:none; transition: transform .3s ease; }
     .digi-bank-logo:hover { transform: scale(1.05); }
@@ -113,7 +111,6 @@
       letter-spacing:2px; text-transform:uppercase; margin-top:2px;
     }
  
-    /* --- Page-specific styling --- */
     .card { border:none; border-radius:12px; }
     .form-control, .form-select { border-radius:10px; }
     .btn-primary { background:#0B4D83; border:none; border-radius:8px; }
@@ -128,21 +125,11 @@
       padding:6px 10px;
       background:#fff;
     }
-    .btn-manager {
-      background-color:#0B4D83;
-      color:#fff;
-      border:none;
-      padding:8px 18px;
-      font-size:.9rem;
-      border-radius:25px;
-      transition: background-color .3s;
-    }
-    .btn-manager:hover { background-color:#7a0f3e; color:#fff; }
   </style>
 </head>
 <body>
  
-  <!-- Optional Sidebar -->
+  <!-- Sidebar -->
   <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
     <div class="offcanvas-header">
       <h5 class="offcanvas-title" id="sidebarMenuLabel">Menu</h5>
@@ -157,7 +144,7 @@
           <a class="nav-link text-dark" href="{{ url_for('transactions_review') }}"><i class="bi bi-person-lines-fill"></i> Profile</a>
         </li>
         <li class="nav-item mb-2">
-          <a class="nav-link text-dark active" href="{{ url_for('audit_logs') }}"><i class="bi bi-bar-chart-line-fill"></i> Audit Logs</a>
+          <a class="nav-link text-dark active" href="{{ url_for('manager_audit_logs') }}"><i class="bi bi-bar-chart-line-fill"></i> Manager Logs</a>
         </li>
       </ul>
     </div>
@@ -181,7 +168,7 @@
       </div>
     </a>
  
-    <h5 class="flex-grow-1 text-center m-0">Audit Logs</h5>
+    <h5 class="flex-grow-1 text-center m-0">Manager Audit Logs</h5>
  
     <div class="d-flex align-items-center">
       <h5 class="m-0 me-2 fs-6">
@@ -197,24 +184,25 @@
   <div class="container mt-4">
     <div class="card shadow-sm">
       <div class="card-body">
+ 
         <!-- Filters -->
-        <form class="mb-4" method="GET" action="{{ url_for('audit_logs') }}">
-          <!-- Row 1: user/name/email/mobile -->
+        <form class="mb-4" method="GET" action="{{ url_for('manager_audit_logs') }}">
+          <!-- Row 1: customer filters -->
           <div class="row g-3">
             <div class="col-md-3">
               <input type="text" name="user_id" class="form-control" placeholder="User ID"
                      value="{{ filters.get('user_id','') }}">
             </div>
             <div class="col-md-3">
-              <input type="text" name="name" class="form-control" placeholder="Name"
+              <input type="text" name="name" class="form-control" placeholder="Customer Name"
                      value="{{ filters.get('name','') }}">
             </div>
             <div class="col-md-3">
-              <input type="email" name="email" class="form-control" placeholder="Email"
+              <input type="email" name="email" class="form-control" placeholder="Customer Email"
                      value="{{ filters.get('email','') }}">
             </div>
             <div class="col-md-3">
-              <input type="text" name="mobile" class="form-control" placeholder="Mobile"
+              <input type="text" name="mobile" class="form-control" placeholder="Customer Mobile"
                      value="{{ filters.get('mobile','') }}">
             </div>
           </div>
@@ -223,7 +211,7 @@
           <div class="row g-3 mt-1">
             <div class="col-12">
               <div class="d-flex flex-wrap align-items-center gap-3">
-                <span class="fw-semibold">Filter Audit Type:</span>
+                <span class="fw-semibold">Module Type:</span>
                 {% set tsel = selected_types or [] %}
                 <label class="form-check form-check-inline">
                   <input class="form-check-input" type="checkbox" name="audit_type" value="account"
@@ -254,8 +242,19 @@
             </div>
           </div>
  
-          <!-- Row 3: from/to datetime + per_page + buttons -->
-          <div class="row g-3 mt-1 align-items-end">
+          <!-- Row 3: status + dates -->
+          <div class="row g-3 mt-1">
+            <div class="col-md-3">
+              <label class="form-label">Status</label>
+              <select name="status" class="form-select">
+                <option value="">All</option>
+                <option value="approved"   {{ 'selected' if filters.get('status')=='approved'   else '' }}>Approved</option>
+                <option value="rejected"   {{ 'selected' if filters.get('status')=='rejected'   else '' }}>Rejected</option>
+                <option value="pending"    {{ 'selected' if filters.get('status')=='pending'    else '' }}>Pending</option>
+                <option value="under_review" {{ 'selected' if filters.get('status')=='under_review' else '' }}>Under Review</option>
+                <option value="disbursed"  {{ 'selected' if filters.get('status')=='disbursed'  else '' }}>Disbursed</option>
+              </select>
+            </div>
             <div class="col-md-3">
               <label class="form-label">From (Date & Time)</label>
               <input type="datetime-local" name="from_dt" class="form-control"
@@ -266,7 +265,7 @@
               <input type="datetime-local" name="to_dt" class="form-control"
                      value="{{ filters.get('to_dt','') }}">
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
               <label class="form-label">Per Page</label>
               <select class="form-select" name="per_page">
                 {% for n in [10,20,50,100] %}
@@ -274,28 +273,32 @@
                 {% endfor %}
               </select>
             </div>
-            <div class="col-md-4 text-end">
+          </div>
+ 
+          <!-- Row 4: buttons -->
+          <div class="row g-3 mt-3">
+            <div class="col-12 text-end">
               <button type="submit" class="btn btn-primary px-4 me-2">Search</button>
-              <a class="btn btn-secondary px-4" href="{{ url_for('audit_logs') }}">Clear</a>
+              <a class="btn btn-secondary px-4" href="{{ url_for('manager_audit_logs') }}">Clear</a>
             </div>
           </div>
  
-          <!-- Export (preserve filters) – only when searched -->
+          <!-- Export button -->
           {% if searched %}
           <div class="mt-3 d-flex justify-content-end">
             <a class="btn btn-success"
-               href="{{ url_for('audit_logs_export') }}?{{ urlencode(export_qs, doseq=True) }}">
+               href="{{ url_for('manager_audit_logs_export') }}?{{ urlencode(export_qs, doseq=True) }}">
               Download CSV
             </a>
           </div>
           {% endif %}
         </form>
  
-        <!-- Initial info message when no search yet -->
+        <!-- Info message -->
         {% if not searched %}
           <div class="alert alert-info">
-            🔍 Use the filters above (User ID / Name / Email / Mobile / Date range / Audit Type) and click
-            <strong>Search</strong> to view audit logs.
+            🔍 Use the filters above (Customer / Module / Status / Date range) and click
+            <strong>Search</strong> to view manager actions on customer requests.
           </div>
         {% endif %}
  
@@ -317,17 +320,16 @@
             <table class="table table-bordered table-hover align-middle">
               <thead class="table-light text-center">
                 <tr>
-                  <th>Audit Type</th>
+                  <th>Module</th>
                   <th>Ref ID</th>
                   <th>User ID</th>
-                  <th>Name</th>
+                  <th>Customer Name</th>
                   <th>Email</th>
                   <th>Mobile</th>
                   <th>Status</th>
                   <th>Created At</th>
                   <th>Action Time</th>
-                  <!-- Renamed header only -->
-                  <th>Account Number</th>
+                  <th>Key Ref / Amount</th>
                 </tr>
               </thead>
               <tbody>
@@ -345,8 +347,9 @@
                       {% if r.status %}
                         <span class="badge
                           {% if r.status in ['A','approved','SUCCESS'] %} bg-success
-                          {% elif r.status in ['pending_manager', None] %} bg-warning
-                          {% else %} bg-danger {% endif %}">
+                          {% elif r.status in ['pending','under_review', None] %} bg-warning
+                          {% elif r.status in ['rejected','R','failed'] %} bg-danger
+                          {% else %} bg-secondary {% endif %}">
                           {{ r.status }}
                         </span>
                       {% else %}
@@ -363,7 +366,6 @@
                         {{ r.action_time.strftime('%Y-%m-%d %H:%M:%S') if r.action_time else '-' }}
                       </small>
                     </td>
-                    <!-- Still showing r.extra_ref so backend stays the same -->
                     <td>{{ r.extra_ref or '-' }}</td>
                   </tr>
                 {% endfor %}
@@ -383,7 +385,7 @@
                 {% set qs_prev = qs.copy() %}
                 {% set _ = qs_prev.update({'page':[prev]}) %}
                 <a class="page-link"
-                   href="{{ url_for('audit_logs') }}?{{ urlencode(qs_prev, doseq=True) }}">
+                   href="{{ url_for('manager_audit_logs') }}?{{ urlencode(qs_prev, doseq=True) }}">
                   Previous
                 </a>
               </li>
@@ -396,7 +398,7 @@
                 {% set qs_next = qs.copy() %}
                 {% set _ = qs_next.update({'page':[next]}) %}
                 <a class="page-link"
-                   href="{{ url_for('audit_logs') }}?{{ urlencode(qs_next, doseq=True) }}">
+                   href="{{ url_for('manager_audit_logs') }}?{{ urlencode(qs_next, doseq=True) }}">
                   Next
                 </a>
               </li>
@@ -405,16 +407,15 @@
  
         {% elif searched %}
           <div class="alert alert-warning text-center mt-4">
-            ⚠️ No matching logs found for your filters.
+            ⚠️ No matching manager logs found for your filters.
           </div>
         {% endif %}
       </div>
     </div>
   </div>
  
-  <!-- Footer -->
   <footer class="bg-custom text-white text-center py-3 mt-auto">
-    © 2025 DigiBank. Manager Dashboard. All rights reserved.
+    © 2025 DigiBank. Manager Audit Logs. All rights reserved.
   </footer>
  
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

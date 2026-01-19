@@ -1,133 +1,219 @@
 <!DOCTYPE html>
 <html lang="en">
- 
 <head>
-  <meta charset="UTF-8" />
-  <title>My Loans - DigiBank</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
- 
-  <!-- Bootstrap CSS & Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
- 
-  <style>
-    body {
-      background-color: #f8f9fa;
-      font-family: 'Segoe UI', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
- 
-    /* Offcanvas */
-    #sidebarMenu.offcanvas-start {
-      width: 250px;
-    }
- 
-    #sidebarMenu .nav-link {
-      font-size: .9rem;
-      padding: 8px 12px;
-      color: #333;
-      display: flex;
-      gap: 8px;
-    }
- 
-    #sidebarMenu .nav-link.active {
-      font-weight: 700;
-      color: #0B4D83 !important;
-      background: #f0d7e0;
-      border-radius: 4px;
-    }
- 
-    #sidebarMenu .nav-link:hover {
-      color: #7a0f3e;
-      background: #f9e5ef;
-      border-radius: 4px;
-    }
- 
-    /* Top bar */
-    .top-bar {
-      background: #0B4D83;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 20px;
-      position: sticky;
-      top: 0;
-      z-index: 1030;
-    }
- 
-    .top-bar h5 {
-      margin: 0;
-      font-weight: 700;
-      flex-grow: 1;
-      text-align: center;
-    }
- 
-    .logout-btn {
-      background: transparent;
-      border: 1.5px solid #fff;
-      color: #fff;
-      padding: 5px 15px;
-      border-radius: 4px;
-      font-weight: 600;
-    }
- 
-    .logout-btn:hover {
-      background: #fff;
-      color: #0B4D83;
-    }
- 
-    /* Filters */
-    .filters {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-    }
- 
-    /* Loan row card */
-    .loan-row {
-      background: #fff;
-      border-radius: 8px;
-      padding: 16px;
-      margin-top: 14px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
-    }
- 
-    .loan-left {
-      border-right: 1px solid #eee;
-      padding-right: 14px;
-    }
- 
-    .loan-amount {
-      font-weight: 700;
-      color: #0B4D83;
-    }
- 
-    .meta {
-      color: #666;
-      font-size: .9rem;
-    }
- 
-    .badge {
-      font-size: .75rem;
-    }
- 
-    @media (max-width: 768px) {
-      .loan-left {
-        border-right: none;
-        padding-right: 0;
-        margin-bottom: 10px;
-      }
-    }
- 
-    footer.bg-custom {
-      background: #0B4D83;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>My Loans — DigiBank</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css"/>
+
+    <style>
+        :root {
+            --brand: #0B4D83;
+            --brand-alt: #97144D;
+            --bg-page: #f1f5f9;
+            --border-soft: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+        }
+
+        body {
+            background: radial-gradient(circle at top left, #e3f2fd 0, #f1f5f9 40%, #ffffff 100%);
+            font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-main);
+        }
+
+        .page-shell {
+            max-width: 1150px;
+            margin: 24px auto 40px;
+        }
+
+        .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .top-row-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .top-header {
+            background: linear-gradient(90deg, #0B4D83, #186cc4);
+            border-radius: 16px;
+            padding: 18px 22px;
+            color: #f9fafb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+            margin-bottom: 18px;
+        }
+
+        .top-header-main {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .top-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .top-title i {
+            font-size: 22px;
+        }
+
+        .top-subtitle {
+            font-size: 13px;
+            font-weight: 500;
+            opacity: 0.95;
+        }
+
+        .badge-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.4);
+            background-color: rgba(15,23,42,0.15);
+            color: #e2f3ff;
+        }
+
+        .badge-chip i {
+            font-size: 14px;
+        }
+
+        .card-block {
+            background-color: #ffffff;
+            border-radius: 14px;
+            border: 1px solid var(--border-soft);
+            padding: 16px 20px 20px;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+        }
+
+        .card-header-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .card-title-text {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .card-subtext {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        table.dataTable thead th {
+            background-color: #0B4D83;
+            color: #ffffff !important;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        table.dataTable tbody td {
+            vertical-align: middle;
+            font-size: 13px;
+        }
+
+        .amount-cell {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-draft {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+
+        .status-submitted {
+            background-color: #e0f2fe;
+            color: #075985;
+        }
+
+        .status-under-review,
+        .status-agent-approved,
+        .status-pending-manager,
+        .status-manager-approved {
+            background-color: #fef9c3;
+            color: #92400e;
+        }
+
+        .status-approved,
+        .status-disbursed-active {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .status-disbursed-closed {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+
+        .status-disbursed-defaulted {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .status-rejected {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .badge-pill-soft {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background-color: #eff6ff;
+            color: #1d4ed8;
+            font-size: 11px;
+        }
+
+        .text-small-muted {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .btn-schedule {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-weight: 600;
+        }
+    </style>
+    
   <style>
     body {
       background-color: #f8f9fa;
@@ -176,6 +262,23 @@
       border-radius: 4px;
     }
  
+    .top-bar button.btn-outline-light {
+      border: 1.5px solid white;
+      color: white;
+      background: transparent;
+      padding: 4px 10px;
+      font-size: 1.3rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+    }
+ 
+    .top-bar button.btn-outline-light:hover {
+      background-color: white;
+      color: #0B4D83;
+    }
+ 
+ 
     /* Top Bar */
     .top-bar {
       background-color: #0B4D83;
@@ -195,22 +298,7 @@
       font-weight: 700;
       flex-grow: 1;
       text-align: center;
-    }
- 
-    .top-bar button.btn-outline-light {
-      border: 1.5px solid white;
       color: white;
-      background: transparent;
-      padding: 4px 10px;
-      font-size: 1.3rem;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.2s, color 0.2s;
-    }
- 
-    .top-bar button.btn-outline-light:hover {
-      background-color: white;
-      color: #0B4D83;
     }
  
     .logout-btn {
@@ -230,62 +318,127 @@
       color: #0B4D83;
     }
  
-    /* Tabs */
-    .nav-tabs .nav-link {
+    /* Search Bar Row with Sidebar Toggle & Chatbot */
+    .search-chatbar {
+      max-width: 900px;
+      margin: 15px auto 40px auto;
+      padding: 0 15px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+ 
+    /* Sidebar toggle button */
+    .search-chatbar .btn-toggle-sidebar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 5px;
+      border: 1.5px solid #ccc;
+      color: #444;
+      background: white;
+      transition: border-color 0.3s, color 0.3s;
+      cursor: pointer;
+      flex-shrink: 0;
+      min-width: 42px;
+      padding: 6px 8px;
+      font-size: 1.3rem;
+    }
+ 
+    .search-chatbar .btn-toggle-sidebar:hover {
+      border-color: #0B4D83;
       color: #0B4D83;
-      font-weight: 600;
     }
  
-    .nav-tabs .nav-link.active {
+    /* Search input centered and wide */
+    .search-chatbar input[type="text"] {
+      flex-grow: 1;
+      padding: 10px 14px;
+      border-radius: 5px;
+      border: 1.5px solid #ccc;
+      font-size: 1rem;
+      outline-offset: 0;
+      transition: border-color 0.3s;
+      width: 9000px;
+      margin: 0 auto;
+      display: block;
+    }
+ 
+    .search-chatbar input[type="text"]:focus {
+      border-color: #0B4D83;
+      box-shadow: 0 0 5px rgba(151, 20, 77, 0.5);
+    }
+ 
+    /* Chatbot button right aligned */
+    .search-chatbar .chatbot-btn {
       background-color: #0B4D83;
+      border: none;
       color: white;
-      border-color: #0B4D83 #0B4D83 #fff;
+      padding: 10px 14px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease;
+      font-size: 1.3rem;
+      flex-shrink: 0;
     }
  
-    /* Deposit Card */
-    .deposit-info-section {
+    .search-chatbar .chatbot-btn:hover {
+      background-color: #7a0f3e;
+    }
+ 
+    /* Dashboard Cards */
+    .dashboard-card {
+      transition: 0.3s;
+      height: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 20px 30px 20px;
+      text-align: center;
       background: white;
       border-radius: 8px;
-      padding: 20px;
-      margin-top: 20px;
-      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
     }
  
-    .deposit-info-left {
-      border-right: 1px solid #ddd;
-      padding-right: 20px;
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
     }
  
-    .deposit-info-right {
-      padding-left: 20px;
-    }
- 
-    .deposit-label {
-      font-weight: 600;
-      color: #444;
-    }
- 
-    .deposit-value {
-      font-size: 1.1rem;
+    .dashboard-icon {
+      font-size: 32px;
       color: #0B4D83;
-      font-weight: 700;
+      margin-bottom: 15px;
     }
  
-    @media (max-width: 576px) {
-      .deposit-info-left {
-        border-right: none;
-        border-bottom: 1px solid #ddd;
-        padding-right: 0;
-        padding-bottom: 15px;
-        margin-bottom: 15px;
-      }
+    .dashboard-card h5 {
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
  
-      .deposit-info-right {
-        padding-left: 0;
-      }
+    .dashboard-card p {
+      flex-grow: 1;
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 15px;
+    }
+ 
+    .btn-digibank {
+      background-color: #0B4D83;
+      color: #fff;
+      border: none;
+      padding: 8px 18px;
+      font-size: 0.9rem;
+      border-radius: 25px;
+      transition: background-color 0.3s ease;
+    }
+ 
+    .btn-digibank:hover {
+      background-color: #7a0f3e;
+      color: white;
     }
  
     /* Footer */
@@ -370,26 +523,30 @@
 
   </style>
 </head>
- 
 <body>
- 
+
+
   <!-- Sidebar Offcanvas -->
   <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
     <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="sidebarMenuLabel">DigiBank</h5>
-      <
+      <h5 class="offcanvas-title" id="sidebarMenuLabel">Welcome, {{ user.name }} ! </h5>
       <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
       <ul class="nav flex-column">
         <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="{{ url_for('dashboard') }}">
+          <a class="nav-link text-dark active" href="{{ url_for('home') }}">
             <i class="bi bi-speedometer2 me-2"></i> Home
           </a>
         </li>
         <li class="nav-item mb-2">
-          <a class="nav-link text-dark active" href="{{ url_for('viewaccounts') }}">
+          <a class="nav-link text-dark" href="{{ url_for('viewaccounts') }}">
             <i class="bi bi-person-lines-fill me-2"></i> View Accounts
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('userdashloan') }}">
+            <i class="bi bi-cash-coin me-2"></i> Loans
           </a>
         </li>
         <li class="nav-item mb-2">
@@ -403,8 +560,8 @@
           </a>
         </li>
         <li class="nav-item mb-2">
-          <a class="nav-link text-dark" href="{{ url_for('quicktransfer') }}">
-            <i class="bi bi-send me-2"></i> Quick Transfer
+          <a class="nav-link text-dark" href="{{ url_for('profile') }}">
+            <i class="bi bi-gift-fill me-2"></i> Profile
           </a>
         </li>
         <li class="nav-item mb-2">
@@ -412,22 +569,30 @@
             <i class="bi bi-credit-card me-2"></i> Pay Bill
           </a>
         </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="#">
+            <i class="bi bi-person-rolodex me-2"></i> Get Contact
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="#">
+            <i class="bi bi-shield-lock-fill me-2"></i> Privacy & Security
+          </a>
+        </li>
+ 
       </ul>
     </div>
   </div>
-
-  <!-- Top Bar -->
-  <div class="top-bar">
-    <button class="btn btn-outline-light btn-sm" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
+ 
+  <!-- ---------------------------- -->
+  <div class="top-bar d-flex align-items-center">
+    <!-- left toggle -->
+    <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
       aria-controls="sidebarMenu" aria-label="Toggle sidebar">
       <i class="bi bi-list"></i>
     </button>
-
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#0B4D83; width:100%;">
-      <div class="container-fluid">
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <!-- 🔽 Custom DigiBank Logo -->
+ 
+    <!-- 🔽 Custom DigiBank Logo -->
     <a class="navbar-brand digi-bank-logo" href="{{ url_for('home') }}">
       <div class="logo-icon"></div>
       <div class="logo-text">
@@ -443,59 +608,70 @@
             aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}">Home</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">My Activities</a></li>
-
-            <!-- Open Account -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0B4D83 !important; width: 100%;">
+      <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <!-- <li class="nav-item"><a class="nav-link active" href="{{ url_for('home') }}">Home</a></li> -->
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">My Activities</a>
+            </li>
+            <!-- Open Account Dropdown -->
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown"
                 aria-expanded="false">Open Account</a>
               <ul class="dropdown-menu" aria-labelledby="accountDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Savings Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Salary Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Current Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Safe Custody Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Pension Account</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">PMJDY Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Savings
+                    Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Salary Account</a>
+                </li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Current
+                    Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Safe Custody
+                    Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Pension
+                    Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">PMJDY Account</a>
+                </li>
               </ul>
             </li>
-
-            <!-- Deposits -->
+            <!-- Deposits Dropdown -->
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Deposits</a>
+              <button class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false">Deposits</button>
               <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Digital Fixed Deposits</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Fixed Deposits</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Recurring Deposits</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Digital Fixed
+                    Deposits</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Fixed
+                    Deposits</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Recurring
+                    Deposits</a></li>
               </ul>
             </li>
-
-            <!-- Loans -->
+            <!-- Deposits Dropdown -->
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="loansDropdown" role="button" data-bs-toggle="dropdown"
+              <a class="nav-link dropdown-toggle" href="#" id="loanDropdown" role="button" data-bs-toggle="dropdown"
                 aria-expanded="false">Loans</a>
-              <ul class="dropdown-menu" aria-labelledby="loansDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('homeloan') }}">Home Loan</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('personal_loan') }}">Personal Loan</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('Business_loan') }}">Business Loan</a></li>
+              <ul class="dropdown-menu" aria-labelledby="loanDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('userdashloan') }}">Home Loan</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('userdashloan') }}">Personal Loan</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('userdashloan') }}">Busniness Loan</a></li>
+ 
+ 
               </ul>
             </li>
-
-            <!-- Cards -->
+            <!-- Deposits Dropdown -->
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="cardsDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Cards</a>
-              <ul class="dropdown-menu" aria-labelledby="cardsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_cards', preset='credit') }}">Credit Cards</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_cards', preset='debit') }}">Debit Cards</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_cards', preset='prepaid') }}">Prepaid Cards</a></li>
+              <button class="nav-link dropdown-toggle" id="cardDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false" type="button">Cards</button>
+              <ul class="dropdown-menu" aria-labelledby="cardDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Credit Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Debit Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Prepaid Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Forex Cards</a></li>
               </ul>
             </li>
-
-
-
-            <!-- Investments -->
+            
+            <!-- Deposits Dropdown -->
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="investDropdown" role="button" data-bs-toggle="dropdown"
                 aria-expanded="false">Investments</a>
@@ -506,168 +682,278 @@
               </ul>
             </li>
           </ul>
-
           <div class="d-flex align-items-center">
-            <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name if user else '' }}!</h5>
-            <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">Logout</a>
+            <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name }} ! </h5>
+            <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">
+              Logout
+            </a>
           </div>
+ 
         </div>
       </div>
     </nav>
+    <!-- End of custom navbar -->
+ 
+  </div>
+ 
+ 
+ 
   </div>
 
-  <!-- Breadcrumb -->
-  <nav aria-label="breadcrumb" class="bg-light px-3 py-2 mt-3">
-    <ol class="breadcrumb mb-0">
-      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color: #0B4D83;">Dashboard</a></li>
-      <li class="breadcrumb-item active" aria-current="page" style="color: #0B4D83; font-weight: bold;">View Loans</li>
-    </ol>
-  </nav>
-  <div class="container mt-4">
- 
- 
-    <!-- Account Tabs -->
-    <ul class="nav nav-tabs" id="accountTabs" role="tablist">
-      <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('viewaccounts') }}">My Accounts</a>
-      </li>
-      <li class="nav-item" role="presentation"><a href="{{ url_for('viewdeposits') }}" class="nav-link ">My
-          Deposits</a></li>
-      <li class="nav-item" role="presentation">
-        <a class="nav-link active" href="{{ url_for('view_loans') }}">My Loans</a>
-      </li>
-      <li class="nav-item" role="presentation">
-        <a class="nav-link" href="{{ url_for('view_investments') }}">My Investments</a>
-      </li>
-      <li class="nav-item" role="presentation"><a class="nav-link" href="{{ url_for('view_cards') }}">My Cards</a></li>
-    </ul>
- 
-    <!-- Tab Content (placeholders for non-navigational tabs) -->
-    <div class="tab-content mt-3" id="accountTabsContent">
-      <div class="tab-pane fade show active" id="balance" role="tabpanel" aria-labelledby="balance-tab">
-        <p class="text-muted">Your loan details are shown below.</p>
-      </div>
- 
- 
- 
-    </div>
- 
- 
-    <!-- Loans list -->
-    <div id="loanList" class="mt-2">
-      {% if loans %}
-      {% for L in loans %}
-      <div class="loan-row row" data-kind="{{ L.loan_kind }}" data-status="{{ L.status }}">
-        <div class="col-md-5 loan-left">
-          <div style="font-size: 20px;" class="fw-semibold" >
-            {{ L.loan_type_label }}
-            {% if L.loan_kind == 'home' %}<span class="badge bg-info ms-1">Home</span>{% endif %}
-            {% if L.loan_kind == 'personal' %}<span class="badge bg-secondary ms-1">Personal</span>{% endif %}
-            {% if L.loan_kind == 'business' %}<span class="badge bg-dark ms-1">Business</span>{% endif %}
-          </div>
- 
-          <div class="meta mt-1">
-            <div style="font-size: 20px;">Purpose: <span class="deposit-label">{{ L.purpose or '—' }}</span></div>
-            <div style="font-size: 20px;">Interest Type: <span class="deposit-value">{{ L.interest_type or '—' }}</span></div>
-            {% if L.interest_rate is not none %}
-            <div style="font-size: 20px;">Interest Rate: <span class="deposit-value">{{ '%.2f'|format(L.interest_rate) }}%</span></div>
-            {% endif %}
-          </div>
+<div class="page-shell">
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="mb-3">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+              <strong>{{ message }}</strong>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
         </div>
- 
-        <div class="col-md-3 text-md-center mt-2 mt-md-0">
-          <div style="font-size: 20px;" class="meta">Loan Amount</div>
-          <div class="deposit-value">₹ {{ '{:,.2f}'.format(L.loan_amount or 0) }}</div>
- 
-          {% if L.emi_amount is not none %}
-          <div style="font-size: 20px;">EMI: <span class="deposit-value">₹ {{ '{:,.2f}'.format(L.emi_amount) }}</span></div>
-          {% endif %}
-          {% if L.loan_tenure_years %}
-          <div style="font-size: 20px;">Tenure: <span class="deposit-value">{{ L.loan_tenure_years }}</span> yrs</div>
-          {% endif %}
-        </div>
- 
-        <div class="col-md-2 text-md-center mt-2 mt-md-0">
-          <div style="font-size: 15px;" class="meta">Applied Date</div>
-          <div style="font-size: 15px;" class="fw-semibold">
-            {% if L.application_date %}{{ L.application_date }}{% else %}—{% endif %}
-          </div>
-        </div>
- 
-        <div class="col-md-2 text-md-end mt-2 mt-md-0">
-          <div style="font-size: 15px;" class="meta mb-1">Manager Decision</div>
-          <div style="font-size: 20px;" class="small text-muted">
-            {% if L.updated_at %}{{ L.updated_at.strftime('%Y-%m-%d %H:%M') }}{% else %}{% endif %}
-          </div>
-          <span class="badge
-            {% if L.status == 'approved' %}bg-success
-            {% elif L.status == 'declined' %}bg-danger
-            {% elif L.status == 'issued' %}bg-primary
-            {% else %}bg-warning text-dark{% endif %}">
-            {{ L.status_label }}
-          </span>
-        </div>
-      </div>
-      {% endfor %}
-      {% else %}
-      <div class="alert alert-info mt-3">No loan applications found.</div>
       {% endif %}
+    {% endwith %}
+
+    <!-- Top small row -->
+    <div class="top-row">
+        <div class="top-row-title">
+            DigiBank • My Loans
+        </div>
+        <!-- <div>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-speedometer2"></i> Back to Dashboard
+            </a>
+            <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+        </div> -->
     </div>
- 
-    <footer class="text-white text-center py-3 mt-5 bg-custom">
-      © 2025 DigiBank. All rights reserved.
-    </footer>
-  </div>
-  </div>
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    // Robust client-side filters (don’t attach to rows)
-    const list = document.getElementById('loanList');
-    const typeBtn = document.getElementById('typeFilterBtn');
-    const statusBtn = document.getElementById('statusFilterBtn');
-    const typeMenu = document.getElementById('typeMenu');
-    const statusMenu = document.getElementById('statusMenu');
- 
-    let activeKind = 'all';
-    let activeStatus = 'all';
- 
-    function applyFilters() {
-      const rows = list.querySelectorAll('.loan-row');
-      rows.forEach(r => {
-        const kind = (r.getAttribute('data-kind') || '').toLowerCase();
-        const st = (r.getAttribute('data-status') || '').toLowerCase();
-        const okKind = (activeKind === 'all') || (kind === activeKind);
-        const okSt = (activeStatus === 'all') || (st === activeStatus);
-        r.style.display = (okKind && okSt) ? '' : 'none';
-      });
-    }
- 
-    typeMenu.querySelectorAll('[data-kind]').forEach(a => {
-      a.addEventListener('click', e => {
-        e.preventDefault();
-        activeKind = a.getAttribute('data-kind');
-        typeBtn.textContent =
-          activeKind === 'all' ? 'All Loan Types' :
-            activeKind === 'home' ? 'Home Loan' :
-              activeKind === 'personal' ? 'Personal Loan' : 'Business Loan';
-        applyFilters();
-      });
+
+    <!-- Gradient header -->
+    <div class="top-header">
+        <div class="top-header-main">
+            <h1 class="top-title">
+                <i class="bi bi-cash-coin"></i>
+                Hello, {{ user.name or 'Customer' }}
+            </h1>
+            <div class="top-subtitle">
+                Here is a consolidated view of all your loan applications and active loan accounts.
+            </div>
+        </div>
+        <div class="d-flex flex-column gap-2 align-items-end">
+            <span class="badge-chip">
+                <i class="bi bi-file-earmark-text"></i>
+                Total Applications: {{ loans|length }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Loans table -->
+    <div class="card-block">
+        <div class="card-header-line">
+            <div>
+                <div class="card-title-text">My Loans & Applications</div>
+                <div class="card-subtext">
+                    Track status, EMI and loan account details in one place. Click on <strong>View EMI Schedule</strong> for active loans.
+                </div>
+            </div>
+        </div>
+
+        {% if loans|length == 0 %}
+            <div class="alert alert-info mb-0">
+                You do not have any loan applications yet.
+                <a href="{{ url_for('apply_loan') }}" class="alert-link">Click here to apply for a new loan.</a>
+            </div>
+        {% else %}
+            <div class="table-responsive">
+                <table id="loansTable" class="table table-striped table-bordered align-middle w-100">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Loan / Account</th>
+                            <th>Type & Purpose</th>
+                            <th>Amount (₹)</th>
+                            <th>EMI (₹)</th>
+                            <th>Tenure</th>
+                            <th>Status</th>
+                            <th>Dates</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for loan in loans %}
+                        {% set s = (loan.status or '') %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+
+                            <!-- Loan / Account -->
+                            <td>
+                                <div class="fw-semibold">
+                                    {% if loan.loan_account_no %}
+                                        A/c: {{ loan.loan_account_no }}
+                                    {% else %}
+                                        App: {{ loan.application_number }}
+                                    {% endif %}
+                                </div>
+                                <div class="text-small-muted">
+                                    Application No: {{ loan.application_number }}
+                                </div>
+                                {% if loan.outstanding_principal %}
+                                    <div class="text-small-muted">
+                                        Outstanding: ₹{{ "{:,.0f}".format(loan.outstanding_principal|float) }}
+                                    </div>
+                                {% endif %}
+                            </td>
+
+                            <!-- Type & Purpose -->
+                            <td>
+                                <div class="fw-semibold">
+                                    {{ loan.loan_type_label }}
+                                </div>
+                                <div class="text-small-muted">
+                                    {{ loan.purpose or '-' }}
+                                </div>
+                                {% if loan.loan_account_no %}
+                                    <span class="badge-pill-soft mt-1">
+                                        <i class="bi bi-shield-check"></i> Disbursed
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <!-- Amount -->
+                            <td class="amount-cell">
+                                {% if loan.loan_amount is not none %}
+                                    ₹{{ "{:,.0f}".format(loan.loan_amount|float) }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                                <div class="text-small-muted">
+                                    {% if loan.sanctioned_amount %}
+                                        Sanctioned: ₹{{ "{:,.0f}".format(loan.sanctioned_amount|float) }}
+                                    {% endif %}
+                                </div>
+                            </td>
+
+                            <!-- EMI -->
+                            <td class="amount-cell">
+                                {% if loan.emi_amount %}
+                                    ₹{{ "{:,.0f}".format(loan.emi_amount|float) }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                                <div class="text-small-muted">
+                                    {% if loan.interest_rate %}
+                                        Rate: {{ "%.2f"|format(loan.interest_rate|float) }}%
+                                    {% else %}
+                                        Rate: -
+                                    {% endif %}
+                                </div>
+                            </td>
+
+                            <!-- Tenure -->
+                            <td>
+                                {% if loan.loan_tenure_years %}
+                                    {{ "%.1f"|format(loan.loan_tenure_years|float) }} yrs
+                                {% else %}
+                                    -
+                                {% endif %}
+                                <div class="text-small-muted">
+                                    {% if loan.tenure_months %}
+                                        ({{ loan.tenure_months }} months)
+                                    {% endif %}
+                                </div>
+                            </td>
+
+                            <!-- Status -->
+                            <td>
+                                {% set status_class = '' %}
+                                {% if s.startswith('disbursed_') %}
+                                    {% if 'active' in s %}
+                                        {% set status_class = 'status-disbursed-active' %}
+                                    {% elif 'closed' in s %}
+                                        {% set status_class = 'status-disbursed-closed' %}
+                                    {% elif 'defaulted' in s %}
+                                        {% set status_class = 'status-disbursed-defaulted' %}
+                                    {% endif %}
+                                {% elif s == 'draft' %}
+                                    {% set status_class = 'status-draft' %}
+                                {% elif s == 'submitted' %}
+                                    {% set status_class = 'status-submitted' %}
+                                {% elif s in ['under_review','agent_approved','pending_manager','manager_approved'] %}
+                                    {% set status_class = 'status-under-review' %}
+                                {% elif s == 'approved' %}
+                                    {% set status_class = 'status-approved' %}
+                                {% elif s == 'rejected' %}
+                                    {% set status_class = 'status-rejected' %}
+                                {% else %}
+                                    {% set status_class = 'status-draft' %}
+                                {% endif %}
+
+                                <span class="status-badge {{ status_class }}">
+                                    {{ loan.status_label }}
+                                </span>
+
+                                {% if loan.manager_final_decision %}
+                                    <div class="text-small-muted mt-1">
+                                        Manager decision: {{ loan.manager_final_decision|title }}
+                                    </div>
+                                {% endif %}
+                            </td>
+
+                            <!-- Dates -->
+                            <td>
+                                <div class="text-small-muted">
+                                    Applied: {{ loan.application_date or '-' }}
+                                </div>
+                                {% if loan.start_date %}
+                                    <div class="text-small-muted">
+                                        Start: {{ loan.start_date }}
+                                    </div>
+                                {% endif %}
+                                {% if loan.next_emi_date %}
+                                    <div class="text-small-muted">
+                                        Next EMI: {{ loan.next_emi_date }}
+                                    </div>
+                                {% endif %}
+                            </td>
+
+                            <!-- Action -->
+                            <td>
+                                {% if loan.loan_account_id %}
+                                    <a href="{{ url_for('loan_emi_schedule', loan_account_id=loan.loan_account_id) }}"
+                                       class="btn btn-outline-primary btn-schedule">
+                                        <i class="bi bi-calendar-week"></i> View EMI Schedule
+                                    </a>
+                                {% else %}
+                                    <span class="text-small-muted">Not disbursed yet</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- JS -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#loansTable').DataTable({
+            pageLength: 10,
+            order: [[0, 'asc']]
+        });
     });
- 
-    statusMenu.querySelectorAll('[data-status]').forEach(a => {
-      a.addEventListener('click', e => {
-        e.preventDefault();
-        activeStatus = a.getAttribute('data-status');
-        statusBtn.textContent =
-          activeStatus === 'all' ? 'All Statuses' :
-            activeStatus === 'pending_manager' ? 'Pending' :
-              activeStatus.charAt(0).toUpperCase() + activeStatus.slice(1);
-        applyFilters();
-      });
-    });
-  </script>
+</script>
+
 </body>
- 
 </html>
- 
- 

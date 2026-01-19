@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Underwriting Agent Dashboard</title>
+ 
+    <!-- BOOTSTRAP + ICONS -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    />
+ 
+    <style>
+        :root {
+            --brand: #0b4d83;
+            --brand-2: #7a103c;
+            --bg-soft: #f3f4f6;
+            --ink: #111827;
+            --muted: #6b7280;
+        }
+ 
+        body {
+            background: var(--bg-soft);
+            font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--ink);
+            margin: 0;
+            min-height: 100vh;
+        }
+ 
+        .top-bar {
+            background: linear-gradient(90deg, var(--brand) 0%, var(--brand-2) 100%);
+            padding: 12px 0;
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.2);
+        }
+ 
+        .top-bar .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.15rem;
+        }
+ 
+        .top-bar .brand-badge {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.9rem;
+        }
+
+        /* Logout button style */
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.18);
+            border: none;
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.25s;
+        }
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+ 
+        .page-shell {
+            padding: 20px 0 32px;
+        }
+ 
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #111827;
+        }
+ 
+        .page-subtitle {
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+ 
+        .card-modern {
+            border-radius: 16px;
+            border: 1px solid #e5e7eb;
+            background-color: #ffffff;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+        }
+ 
+        .card-modern .card-header {
+            border-radius: 16px 16px 0 0;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f9fafb;
+            font-weight: 600;
+            font-size: 0.98rem;
+        }
+ 
+        .header-pill {
+            border-radius: 999px;
+            padding: 3px 10px;
+            background: rgba(11, 77, 131, 0.08);
+            color: #0b4d83;
+            font-size: 0.75rem;
+        }
+ 
+        .table-modern thead {
+            background: #f3f4f6;
+        }
+ 
+        .table-modern thead th {
+            font-size: 0.78rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: #6b7280;
+        }
+ 
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 0.76rem;
+            font-weight: 600;
+        }
+ 
+        .status-submitted { background: rgba(59, 130, 246, 0.1); color: #1d4ed8; }
+        .status-under_review { background: rgba(245, 158, 11, 0.16); color: #b45309; }
+        .status-agent_approved { background: rgba(16, 185, 129, 0.16); color: #047857; }
+        .status-rejected { background: rgba(239, 68, 68, 0.12); color: #b91c1c; }
+ 
+        .empty-state { text-align: center; padding: 32px 16px; }
+    </style>
+</head>
+ 
+<body>
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <div class="container d-flex justify-content-between align-items-center">
+
+            <!-- Brand -->
+            <div class="brand">
+                <div class="brand-badge">DB</div>
+                <div>DigiBank Underwriting</div>
+            </div>
+
+            <!-- Right side: description + logout -->
+            <div class="d-flex align-items-center gap-3">
+
+                <div class="text-end d-none d-md-block" style="font-size: 0.85rem;">
+                    <div class="fw-semibold">Underwriting Agent Dashboard</div>
+                    <div style="opacity: 0.9;">
+                        Review submitted loan applications & verify documents
+                    </div>
+                </div>
+
+                <!-- LOGOUT BUTTON -->
+                <a href="{{ url_for('logout') }}" class="logout-btn">
+                    <i class="bi bi-box-arrow-right"></i>
+                    Logout
+                </a>
+
+            </div>
+
+        </div>
+    </div>
+ 
+    <!-- CONTENT -->
+    <div class="page-shell">
+        <div class="container">
+ 
+            <div class="mb-3">
+                <div class="page-title">Loan Applications Queue</div>
+                <div class="page-subtitle">
+                    All customer applications currently in <strong>submitted</strong> status.
+                </div>
+            </div>
+ 
+            <div class="card card-modern">
+                <div class="card-header px-4 py-3 d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-card-checklist me-2"></i> Applications Awaiting Review</span>
+                    <span class="header-pill"><i class="bi bi-lightning-charge-fill me-1"></i> Real-time queue</span>
+                </div>
+ 
+                <div class="card-body p-0">
+                    {% if applications|length == 0 %}
+                        <div class="empty-state">
+                            <div class="empty-state-icon"><i class="bi bi-inboxes"></i></div>
+                            <div class="fw-semibold mb-1">No loan applications right now</div>
+                            <div>New applications will appear here once customers submit them.</div>
+                        </div>
+                    {% else %}
+                    <div class="table-responsive">
+                        <table class="table table-modern mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="ps-4">Application No.</th>
+                                    <th>Applicant</th>
+                                    <th>Loan Type</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Submitted On</th>
+                                    <th class="pe-4 text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for app in applications %}
+                                <tr>
+                                    <td class="ps-4 fw-semibold">{{ app.application_number }}</td>
+                                    <td>{{ app.full_name }}</td>
+                                    <td>{{ app.loan_type }}</td>
+                                    <td>₹{{ "{:,.2f}".format(app.loan_amount) }}</td>
+                                    <td>
+                                        <span class="status-pill status-{{ app.application_status }}">
+                                            <i class="bi bi-circle-fill" style="font-size: 0.5rem;"></i>
+                                            {{ app.application_status.replace("_", " ") }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if app.created_at %}
+                                            {{ app.created_at.strftime("%Y-%m-%d %H:%M") }}
+                                        {% else %} - {% endif %}
+                                    </td>
+                                    <td class="pe-4 text-end">
+                                        <a href="{{ url_for('agent_view_application', loan_id=app.id) }}"
+                                           class="btn btn-sm btn-outline-primary btn-review">
+                                            <i class="bi bi-eye-fill me-1"></i> Review
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+ 
+        </div>
+    </div>
+ 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

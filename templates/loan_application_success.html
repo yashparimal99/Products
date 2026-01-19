@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Loan Application Submitted</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ 
+    <!-- Optional: use same font/style family as your form -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+ 
+    <style>
+        :root {
+            --primary: #1b3147;
+            --secondary: #3498db;
+            --accent: #2ecc71;
+            --danger: #e74c3c;
+            --bg-soft: #f4f7fb;
+            --text-main: #1f2933;
+            --text-muted: #6b7280;
+        }
+ 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+ 
+        body {
+            background: radial-gradient(circle at top left, #e3f2fd 0, #f5f7fa 40%, #eef3fb 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+ 
+        .page-shell {
+            max-width: 800px;
+            width: 100%;
+        }
+ 
+        .card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 14px 30px rgba(15, 30, 60, 0.15);
+            padding: 24px 24px 26px;
+            position: relative;
+            overflow: hidden;
+        }
+ 
+        .card::before {
+            content: "";
+            position: absolute;
+            top: -80px;
+            right: -80px;
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle, rgba(52, 152, 219, 0.3), transparent);
+            opacity: 0.8;
+        }
+ 
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 14px;
+        }
+ 
+        .icon-circle {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 26px;
+            flex-shrink: 0;
+            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.45);
+        }
+ 
+        .title-block h1 {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+ 
+        .title-block p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+ 
+        /* Flash message from Flask */
+        .flash-wrapper {
+            margin-bottom: 8px;
+        }
+ 
+        .flash-message {
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+ 
+        .flash-success {
+            background: #ecfdf3;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+ 
+        .flash-danger {
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+ 
+        .flash-message i {
+            font-size: 16px;
+        }
+ 
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 18px;
+            margin-top: 12px;
+        }
+ 
+        .summary-card,
+        .details-card {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 14px 14px 16px;
+            border: 1px solid #e5e7eb;
+        }
+ 
+        .summary-card h2,
+        .details-card h2 {
+            font-size: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--primary);
+        }
+ 
+        .summary-card h2 i,
+        .details-card h2 i {
+            color: var(--secondary);
+        }
+ 
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 13px;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+ 
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+ 
+        .summary-label {
+            color: var(--text-muted);
+        }
+ 
+        .summary-value {
+            font-weight: 600;
+        }
+ 
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #ecfdf3;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+            margin-top: 8px;
+        }
+ 
+        .badge-status i {
+            font-size: 14px;
+        }
+ 
+        .info-note {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+ 
+        .actions-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 18px;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+ 
+        .btn {
+            border: none;
+            border-radius: 999px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+ 
+        .btn-primary {
+            background: linear-gradient(135deg, #1b3147, #2563eb);
+            color: #ffffff;
+        }
+ 
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+ 
+        .btn-outline {
+            background: #ffffff;
+            color: var(--primary);
+            border: 1px solid #cbd5f5;
+        }
+ 
+        .small-text {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+ 
+        @media (max-width: 768px) {
+            .card {
+                padding: 20px 16px 22px;
+            }
+ 
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page-shell">
+    <div class="card">
+        <!-- Flash messages from Flask (e.g. "Form has been submitted...") -->
+        <div class="flash-wrapper">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ 'success' if category == 'success' else 'danger' }}">
+                        <i class="fas fa-info-circle"></i>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
+ 
+        <div class="card-header">
+            <div class="icon-circle">
+                <i class="fas fa-check"></i>
+            </div>
+            <div class="title-block">
+                <h1>Loan Application Submitted</h1>
+                <p>Your form has been submitted successfully. Our team will review your request shortly.</p>
+            </div>
+        </div>
+ 
+        <div class="summary-grid">
+            <!-- Left: Application summary -->
+            <div class="summary-card">
+                <h2><i class="fas fa-file-alt"></i> Application Summary</h2>
+ 
+                <div class="summary-item">
+                    <span class="summary-label">Application No</span>
+                    <span class="summary-value">{{ application.application_number }}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Applicant Name</span>
+                    <span class="summary-value">{{ application.full_name }}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Loan Type</span>
+                    <span class="summary-value">{{ application.loan_type|title }}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Loan Amount</span>
+                    <span class="summary-value">
+                        ₹{{ "{:,.0f}".format(application.loan_amount|float) if application.loan_amount else "-" }}
+                    </span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Tenure</span>
+                    <span class="summary-value">
+                        {{ application.tenure_months }} months
+                    </span>
+                </div>
+ 
+                <span class="badge-status">
+                    <i class="fas fa-hourglass-half"></i>
+                    Status: {{ application.application_status|replace('_',' ')|title }}
+                </span>
+            </div>
+ 
+            <!-- Right: EMI / financial highlights -->
+            <div class="details-card">
+                <h2><i class="fas fa-rupee-sign"></i> EMI Snapshot</h2>
+ 
+                <div class="summary-item">
+                    <span class="summary-label">Suggested EMI</span>
+                    <span class="summary-value">
+                        ₹{{ "{:,.2f}".format(application.suggested_emi|float) if application.suggested_emi else "-" }}
+                    </span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Total Payable Amount</span>
+                    <span class="summary-value">
+                        ₹{{ "{:,.2f}".format(application.total_payable_amount|float) if application.total_payable_amount else "-" }}
+                    </span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Total Interest</span>
+                    <span class="summary-value">
+                        ₹{{ "{:,.2f}".format(application.total_interest|float) if application.total_interest else "-" }}
+                    </span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Submitted On</span>
+                    <span class="summary-value">
+                        {{ application.application_date }}
+                    </span>
+                </div>
+ 
+                <p class="info-note">
+                    This is a system-generated acknowledgement. You will receive further communication
+                    on your registered email / mobile once the underwriting team reviews your application.
+                </p>
+            </div>
+        </div>
+ 
+        <div class="actions-row">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                <i class="fas fa-home"></i> Back to Dashboard
+            </a>
+ 
+            <div class="small-text">
+                Need help? Contact DigiBank support with your Application No:
+                <strong>{{ application.application_number }}</strong>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+ 
+ 

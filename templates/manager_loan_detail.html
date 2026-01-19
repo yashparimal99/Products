@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Loan Details – DigiBank</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --brand: #0B4D83;
+            --brand-alt: #97144D;
+            --bg-page: #f1f5f9;
+            --border-soft: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+        }
+
+        body {
+            background: radial-gradient(circle at top left, #e3f2fd 0, #f1f5f9 40%, #ffffff 100%);
+            font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-main);
+        }
+
+        .page-shell {
+            max-width: 1150px;
+            margin: 24px auto 40px;
+        }
+
+        .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .top-row-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .top-header {
+            background: linear-gradient(90deg, #0B4D83, #186cc4);
+            border-radius: 16px;
+            padding: 16px 22px;
+            color: #f9fafb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+            margin-bottom: 18px;
+        }
+
+        .top-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .top-subtitle {
+            font-size: 13px;
+            font-weight: 500;
+            opacity: 0.95;
+        }
+
+        .card-block {
+            background-color: #ffffff;
+            border-radius: 14px;
+            border: 1px solid var(--border-soft);
+            padding: 16px 20px 20px;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+            margin-bottom: 18px;
+        }
+
+        .kpi-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        .kpi-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background-color: #ecfdf3;
+            color: #166534;
+        }
+
+        .status-closed {
+            background-color: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .status-defaulted {
+            background-color: #fef2f2;
+            color: #b91c1c;
+        }
+
+        table.schedule-table thead th {
+            background-color: #0B4D83;
+            color: #ffffff;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        table.schedule-table tbody td {
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        .badge-emi-status {
+            font-size: 11px;
+        }
+
+        .small-muted {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-shell">
+
+    <!-- Top small row -->
+    <div class="top-row">
+        <div class="top-row-title">
+            DigiBank • Manager Loan Detail
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('manager_dashboard') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+            <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="top-header">
+        <div>
+            <div class="top-title">
+                Loan A/c {{ account.loan_account_no }} – {{ account.full_name }}
+            </div>
+            <div class="top-subtitle">
+                {{ account.loan_type|title }} Loan • Application {{ account.application_number }} • {{ account.email }}
+            </div>
+        </div>
+        <div>
+            {% if account.status == 'active' %}
+                <span class="status-pill status-active">
+                    <i class="bi bi-check-circle"></i> Active
+                </span>
+            {% elif account.status == 'closed' %}
+                <span class="status-pill status-closed">
+                    <i class="bi bi-lock"></i> Closed
+                </span>
+            {% elif account.status == 'defaulted' %}
+                <span class="status-pill status-defaulted">
+                    <i class="bi bi-exclamation-triangle"></i> Defaulted
+                </span>
+            {% else %}
+                <span class="status-pill status-closed">
+                    {{ account.status|capitalize }}
+                </span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Summary KPIs -->
+    <div class="card-block">
+        <div class="row g-3">
+            <div class="col-6 col-md-3">
+                <div class="kpi-label">Sanctioned Amount</div>
+                <div class="kpi-value">
+                    ₹{{ "{:,.0f}".format(account.sanctioned_amount|float) }}
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="kpi-label">Outstanding Principal</div>
+                <div class="kpi-value">
+                    ₹{{ "{:,.0f}".format(account.outstanding_principal|float) }}
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="kpi-label">EMI Amount</div>
+                <div class="kpi-value">
+                    ₹{{ "{:,.0f}".format(account.emi_amount|float) }}
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="kpi-label">Tenure (Months)</div>
+                <div class="kpi-value">
+                    {{ account.tenure_months }}
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="kpi-label">Interest Rate</div>
+                <div class="kpi-value">
+                    {{ "{:.2f}".format(account.interest_rate|float) }}%
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-3">
+
+        <div class="row g-3">
+            <div class="col-6 col-md-2">
+                <div class="kpi-label">Total EMIs</div>
+                <div class="kpi-value">
+                    {{ emi_stats.total }}
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="kpi-label text-success">Paid</div>
+                <div class="kpi-value text-success">
+                    {{ emi_stats.paid }}
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="kpi-label text-warning">Pending</div>
+                <div class="kpi-value text-warning">
+                    {{ emi_stats.pending }}
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="kpi-label text-danger">Overdue</div>
+                <div class="kpi-value text-danger">
+                    {{ emi_stats.overdue }}
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="kpi-label">Next EMI Due</div>
+                <div class="kpi-value">
+                    {% if emi_stats.next_due_date %}
+                        {{ emi_stats.next_due_date }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row g-3">
+        <div class="col-md-7">
+            <div class="card-block">
+                <h6 class="mb-2">Outstanding Principal Over Time</h6>
+                <p class="small-muted mb-3">
+                    How the principal reduces with each EMI.
+                </p>
+                <canvas id="principalLineChart" height="130"></canvas>
+                <div id="principalChartInfo" class="small-muted mt-2"></div>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="card-block">
+                <h6 class="mb-2">EMI Principal vs Interest</h6>
+                <p class="small-muted mb-3">
+                    Split between principal and interest for each EMI.
+                </p>
+                <canvas id="emiStackedChart" height="130"></canvas>
+                <div id="emiChartInfo" class="small-muted mt-2"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EMI Schedule Table -->
+    <div class="card-block">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="mb-0">Full EMI Schedule</h6>
+            <span class="small-muted">
+                Start Date: {{ account.start_date }} • First EMI: {{ account.first_emi_date }}
+            </span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered schedule-table mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Due Date</th>
+                        <th>EMI (₹)</th>
+                        <th>Principal (₹)</th>
+                        <th>Interest (₹)</th>
+                        <th>Opening Principal (₹)</th>
+                        <th>Closing Principal (₹)</th>
+                        <th>Status</th>
+                        <th>Paid On</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in schedule %}
+                        <tr>
+                            <td>{{ row.instalment_no }}</td>
+                            <td>{{ row.due_date }}</td>
+                            <td>{{ "{:,.0f}".format(row.emi_amount|float) }}</td>
+                            <td>{{ "{:,.0f}".format(row.principal_component|float) }}</td>
+                            <td>{{ "{:,.0f}".format(row.interest_component|float) }}</td>
+                            <td>{{ "{:,.0f}".format(row.opening_principal|float) }}</td>
+                            <td>{{ "{:,.0f}".format(row.closing_principal|float) }}</td>
+                            <td>
+                                {% if row.status == 'paid' %}
+                                    <span class="badge bg-success badge-emi-status">Paid</span>
+                                {% elif row.status == 'pending' %}
+                                    <span class="badge bg-secondary badge-emi-status">Pending</span>
+                                {% elif row.status == 'overdue' %}
+                                    <span class="badge bg-danger badge-emi-status">Overdue</span>
+                                {% else %}
+                                    <span class="badge bg-light text-dark badge-emi-status">
+                                        {{ row.status|capitalize }}
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ row.paid_on if row.paid_on else '-' }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Safely load data from backend; default to [] if missing
+    const labelsRaw          = {{ labels | default([]) | tojson }};
+    const principalValsRaw   = {{ principal_values | default([]) | tojson }};
+    const interestValsRaw    = {{ interest_values | default([]) | tojson }};
+    const outstandingValsRaw = {{ outstanding_values | default([]) | tojson }};
+
+    const labels        = Array.isArray(labelsRaw) ? labelsRaw : [];
+    const principalVals = Array.isArray(principalValsRaw) ? principalValsRaw : [];
+    const interestVals  = Array.isArray(interestValsRaw) ? interestValsRaw : [];
+    const outstandingVals = Array.isArray(outstandingValsRaw) ? outstandingValsRaw : [];
+
+    const principalInfoEl = document.getElementById('principalChartInfo');
+    const emiInfoEl       = document.getElementById('emiChartInfo');
+
+    // Helper to check if we have valid numeric data
+    function hasValidData(arr) {
+        return Array.isArray(arr) && arr.length > 0;
+    }
+
+    // 1) Line chart for outstanding principal
+    const lineCanvas = document.getElementById('principalLineChart');
+    if (lineCanvas && hasValidData(labels) && hasValidData(outstandingVals)) {
+        try {
+            const ctxLine = lineCanvas.getContext('2d');
+            new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Outstanding Principal (₹)',
+                        data: outstandingVals,
+                        borderWidth: 2,
+                        tension: 0.3,
+                        pointRadius: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        x: { title: { display: true, text: 'EMI Number' } },
+                        y: { title: { display: true, text: 'Amount (₹)' } }
+                    }
+                }
+            });
+            if (principalInfoEl) {
+                principalInfoEl.textContent = '';
+            }
+        } catch (err) {
+            console.error('Error creating principal line chart:', err);
+            if (principalInfoEl) {
+                principalInfoEl.textContent = 'Chart unavailable due to an internal error.';
+            }
+        }
+    } else if (principalInfoEl) {
+        principalInfoEl.textContent = 'No data available to display the principal trend.';
+    }
+
+    // 2) Stacked bar chart for principal vs interest
+    const barCanvas = document.getElementById('emiStackedChart');
+    if (barCanvas && hasValidData(labels) && hasValidData(principalVals) && hasValidData(interestVals)) {
+        try {
+            const ctxBar = barCanvas.getContext('2d');
+            new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Principal (₹)',
+                            data: principalVals,
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Interest (₹)',
+                            data: interestVals,
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            title: { display: true, text: 'EMI Number' }
+                        },
+                        y: {
+                            stacked: true,
+                            title: { display: true, text: 'Amount (₹)' }
+                        }
+                    }
+                }
+            });
+            if (emiInfoEl) {
+                emiInfoEl.textContent = '';
+            }
+        } catch (err) {
+            console.error('Error creating EMI stacked chart:', err);
+            if (emiInfoEl) {
+                emiInfoEl.textContent = 'Chart unavailable due to an internal error.';
+            }
+        }
+    } else if (emiInfoEl) {
+        emiInfoEl.textContent = 'No data available to display EMI principal/interest split.';
+    }
+</script>
+
+</body>
+</html>

@@ -343,6 +343,164 @@
 </div>
  
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<style>
+        body { font-family: Arial; margin: 0; background: #fff; }
+
+        #chatButton {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #0066ff;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            color: white;
+            font-size: 28px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+        }
+
+        #chatBox {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 360px;
+            height: 480px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.3);
+            display: none;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background: #0066ff;
+            color: white;
+            padding: 12px;
+            font-size: 18px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chat-body {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        .msg {
+            padding: 10px;
+            margin: 8px 0;
+            max-width: 80%;
+            border-radius: 8px;
+            font-size: 14px;
+            white-space: pre-wrap;
+            line-height: 1.4;
+        }
+
+        .user { background: #e3f0ff; margin-left: auto; }
+        .bot { background: #f1f1f1; margin-right: auto; }
+
+        .chat-inputBox {
+            padding: 8px;
+            display: flex;
+            border-top: 1px solid #ccc;
+        }
+
+        textarea {
+            flex: 1;
+            resize: none;
+            padding: 8px;
+        }
+
+        .sendBtn {
+            width: 60px;
+            background: #0066ff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+    </style>
+
+    <script>
+
+        /* ▶ FIXED: NEW CLEAN CHAT ON EVERY OPEN */
+        function toggleChat() {
+
+            // Remove old chat history
+            localStorage.removeItem("chatHistory");
+
+            // Clear UI messages
+            document.getElementById("chatMessages").innerHTML = "";
+
+            // Show chatbox
+            document.getElementById("chatBox").style.display = "flex";
+        }
+
+        function loadHistory() {
+            let history = JSON.parse(localStorage.getItem("chatHistory") || "[]");
+            let box = document.getElementById("chatMessages");
+            box.innerHTML = "";
+
+            history.forEach(m => {
+                box.innerHTML += `<div class='msg ${m.role}'>${m.text}</div>`;
+            });
+
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function saveMessage(role, text) {
+            let history = JSON.parse(localStorage.getItem("chatHistory") || "[]");
+            history.push({ role, text });
+            localStorage.setItem("chatHistory", JSON.stringify(history));
+        }
+
+        function sendMessage() {
+
+            let input = document.getElementById("userMessage");
+            let msg = input.value.trim();
+            if (!msg) return;
+
+            saveMessage("user", msg);
+            loadHistory();
+
+            input.value = "";
+
+            fetch("/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: msg })
+            })
+            .then(res => res.json())
+            .then(data => {
+                saveMessage("bot", data.answer);
+                loadHistory();
+            });
+        }
+    </script>
+</head>
+
+<body>
+
+<button id="chatButton" onclick="toggleChat()">💬</button>
+
+<div id="chatBox">
+    <div class="chat-header">
+        DigiBank Chatbot
+        <span onclick="document.getElementById('chatBox').style.display='none'" style="cursor:pointer;">❌</span>
+    </div>
+
+    <div class="chat-body" id="chatMessages"></div>
+
+    <div class="chat-inputBox">
+        <textarea id="userMessage" placeholder="Type message..."></textarea>
+        <button onclick="sendMessage()" class="sendBtn">Send</button>
+    </div>
+</div>
 </body>
 </html>
  

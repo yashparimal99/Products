@@ -285,6 +285,240 @@
     }
   </style>
   <style>
+  body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px 0 0 0;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+ 
+    /* Sidebar Offcanvas */
+    #sidebarMenu.offcanvas-start {
+      width: 250px;
+    }
+ 
+    #sidebarMenu .offcanvas-body {
+      padding: 0.5rem 1rem;
+    }
+ 
+    #sidebarMenu .nav-link {
+      font-size: 0.9rem;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #333;
+      transition: color 0.3s;
+    }
+ 
+    #sidebarMenu .nav-link i {
+      font-size: 1.1rem;
+    }
+ 
+    #sidebarMenu .nav-link.active {
+      font-weight: 700;
+      color: #0B4D83 !important;
+      background-color: #f0d7e0;
+      border-radius: 4px;
+    }
+ 
+    #sidebarMenu .nav-link:hover {
+      color: #7a0f3e;
+      background-color: #f9e5ef;
+      border-radius: 4px;
+    }
+ 
+    .top-bar button.btn-outline-light {
+      border: 1.5px solid white;
+      color: white;
+      background: transparent;
+      padding: 4px 10px;
+      font-size: 1.3rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+    }
+ 
+    .top-bar button.btn-outline-light:hover {
+      background-color: white;
+      color: #0B4D83;
+    }
+ 
+ 
+    /* Top Bar */
+    .top-bar {
+      background-color: #0B4D83;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      user-select: none;
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+    }
+ 
+    .top-bar h5 {
+      margin: 0;
+      font-weight: 700;
+      flex-grow: 1;
+      text-align: center;
+      color: white;
+    }
+ 
+    .logout-btn {
+      background: transparent;
+      border: 1.5px solid white;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+      flex-shrink: 0;
+    }
+ 
+    .logout-btn:hover {
+      background-color: white;
+      color: #0B4D83;
+    }
+ 
+    /* Search Bar Row with Sidebar Toggle & Chatbot */
+    .search-chatbar {
+      max-width: 900px;
+      margin: 15px auto 40px auto;
+      padding: 0 15px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+ 
+    /* Sidebar toggle button */
+    .search-chatbar .btn-toggle-sidebar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 5px;
+      border: 1.5px solid #ccc;
+      color: #444;
+      background: white;
+      transition: border-color 0.3s, color 0.3s;
+      cursor: pointer;
+      flex-shrink: 0;
+      min-width: 42px;
+      padding: 6px 8px;
+      font-size: 1.3rem;
+    }
+ 
+    .search-chatbar .btn-toggle-sidebar:hover {
+      border-color: #0B4D83;
+      color: #0B4D83;
+    }
+ 
+    /* Search input centered and wide */
+    .search-chatbar input[type="text"] {
+      flex-grow: 1;
+      padding: 10px 14px;
+      border-radius: 5px;
+      border: 1.5px solid #ccc;
+      font-size: 1rem;
+      outline-offset: 0;
+      transition: border-color 0.3s;
+      width: 9000px;
+      margin: 0 auto;
+      display: block;
+    }
+ 
+    .search-chatbar input[type="text"]:focus {
+      border-color: #0B4D83;
+      box-shadow: 0 0 5px rgba(151, 20, 77, 0.5);
+    }
+ 
+    /* Chatbot button right aligned */
+    .search-chatbar .chatbot-btn {
+      background-color: #0B4D83;
+      border: none;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+ 
+    .search-chatbar .chatbot-btn:hover {
+      background-color: #7a0f3e;
+    }
+ 
+    /* Dashboard Cards */
+    .dashboard-card {
+      transition: 0.3s;
+      height: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 20px 30px 20px;
+      text-align: center;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+    }
+ 
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+    }
+ 
+    .dashboard-icon {
+      font-size: 32px;
+      color: #0B4D83;
+      margin-bottom: 15px;
+    }
+ 
+    .dashboard-card h5 {
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+ 
+    .dashboard-card p {
+      flex-grow: 1;
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 15px;
+    }
+ 
+    .btn-digibank {
+      background-color: #0B4D83;
+      color: #fff;
+      border: none;
+      padding: 8px 18px;
+      font-size: 0.9rem;
+      border-radius: 25px;
+      transition: background-color 0.3s ease;
+    }
+ 
+    .btn-digibank:hover {
+      background-color: #7a0f3e;
+      color: white;
+    }
+ 
+    /* Footer */
+    footer.bg-custom {
+      background-color: #0B4D83;
+    
+    
+    }
+  </style>
+  <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap');
  
 .digi-bank-logo {
@@ -364,11 +598,72 @@
 </head>
 <body>
  
+ <!-- Sidebar Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="sidebarMenuLabel">Welcome, {{ user.name }} ! </h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark active" href="{{ url_for('home') }}">
+            <i class="bi bi-speedometer2 me-2"></i> Home
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('viewaccounts') }}">
+            <i class="bi bi-person-lines-fill me-2"></i> View Accounts
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('userdashloan') }}">
+            <i class="bi bi-cash-coin me-2"></i> Loans
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('Txnhistory') }}">
+            <i class="bi bi-clock-history me-2"></i> Transaction History
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('accountbal') }}">
+            <i class="bi bi-wallet2 me-2"></i> Check Balance
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('profile') }}">
+            <i class="bi bi-gift-fill me-2"></i> Profile
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('paybill') }}">
+            <i class="bi bi-credit-card me-2"></i> Pay Bill
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="#">
+            <i class="bi bi-person-rolodex me-2"></i> Get Contact
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="#">
+            <i class="bi bi-shield-lock-fill me-2"></i> Privacy & Security
+          </a>
+        </li>
+ 
+      </ul>
+    </div>
+  </div>
  
   <!-- ---------------------------- -->
   <div class="top-bar d-flex align-items-center">
     <!-- left toggle -->
-    
+    <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
+      aria-controls="sidebarMenu" aria-label="Toggle sidebar">
+      <i class="bi bi-list"></i>
+    </button>
+ 
     <!-- 🔽 Custom DigiBank Logo -->
     <a class="navbar-brand digi-bank-logo" href="{{ url_for('home') }}">
       <div class="logo-icon"></div>
@@ -385,9 +680,6 @@
             aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
- 
-    <!-- title wrapper with flex-grow to take center space -->
-    <!-- <h5 class="m-0 text-center flex-grow-1">DigiBank User Dashboard</h5> -->
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0B4D83 !important; width: 100%;">
       <div class="container-fluid">
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -416,8 +708,8 @@
             </li>
             <!-- Deposits Dropdown -->
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Deposits</a>
+              <button class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false">Deposits</button>
               <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
                 <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Digital Fixed
                     Deposits</a></li>
@@ -429,55 +721,46 @@
             </li>
             <!-- Deposits Dropdown -->
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
+              <a class="nav-link dropdown-toggle" href="#" id="loanDropdown" role="button" data-bs-toggle="dropdown"
                 aria-expanded="false">Loans</a>
-              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Home Loan</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Personal Loan</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Busniness Loan</a></li>
+              <ul class="dropdown-menu" aria-labelledby="loanDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('userdashloan') }}">Home Loan</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('userdashloan') }}">Personal Loan</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('userdashloan') }}">Busniness Loan</a></li>
  
  
               </ul>
             </li>
             <!-- Deposits Dropdown -->
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Cards</a>
-              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Credit Cards</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Debit Cards</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Prepaid Cards</a></li>
+              <button class="nav-link dropdown-toggle" id="cardDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false" type="button">Cards</button>
+              <ul class="dropdown-menu" aria-labelledby="cardDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Credit Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Debit Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Prepaid Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Forex Cards</a></li>
               </ul>
             </li>
+            
             <!-- Deposits Dropdown -->
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Forex</a>
-              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Travel Forex Cards</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Send Money Abroad</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Send Money India</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Foregin Currency Exchange</a></li>
-              </ul>
-            </li>
-            <!-- Deposits Dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button" data-bs-toggle="dropdown"
+              <a class="nav-link dropdown-toggle" href="#" id="investDropdown" role="button" data-bs-toggle="dropdown"
                 aria-expanded="false">Investments</a>
-              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Public Provident Fund</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Floating Rate Saving Bonds</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">National Pension System</a></li>
+              <ul class="dropdown-menu" aria-labelledby="investDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('userdashinvest') }}">Public Provident Fund</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('userdashinvest') }}">Floating Rate Saving Bonds</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('userdashinvest') }}">National Pension System</a></li>
               </ul>
             </li>
           </ul>
           <div class="d-flex align-items-center">
-            <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name }} !</h5>
+            <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name }} ! </h5>
             <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">
               Logout
             </a>
           </div>
-         
+ 
         </div>
       </div>
     </nav>
@@ -488,6 +771,18 @@
  
  
   </div>
+ <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="bg-light px-3 py-2 mt-3">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#0B4D83;">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page" style="color:#0B4D83; font-weight:bold;">Check Loan Eligibility</li>
+    </ol>
+  </nav>
+ 
+ 
+ 
+ 
+  
  
 
 
@@ -544,7 +839,7 @@
             <p class="mb-2"><span class="info-icon" style="background: #e8f5e9;"><i
                   class="bi bi-currency-rupee text-success"></i></span> Loan disbursement</p>
           </div>
-          <a href="#" class="btn apply-btn mt-3 text-white">Apply Now <i class="bi bi-chevron-right ms-2"></i></a>
+          <a href="{{ url_for('apply_loan') }}" class="btn apply-btn mt-3 text-white">Apply Now <i class="bi bi-chevron-right ms-2"></i></a>
         </div>
       </div>
 

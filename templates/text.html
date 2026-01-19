@@ -3,312 +3,688 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>DigiBank - Loan Eligibility & Approval</title>
+    <title>Dashboard - DigiBank</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Bootstrap CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 
     <style>
         body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 20px 0 0 0;
             margin: 0;
-            font-family: "Segoe UI", Arial, sans-serif;
-            background: #eef3f8;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Sidebar Offcanvas */
+        #sidebarMenu.offcanvas-start {
+            width: 250px;
+        }
+
+        #sidebarMenu .offcanvas-body {
+            padding: 0.5rem 1rem;
+        }
+
+        #sidebarMenu .nav-link {
+            font-size: 0.9rem;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
             color: #333;
+            transition: color 0.3s;
         }
 
-        /* Navbar */
-        .navbar {
-            background: linear-gradient(to right, #06335f, #0b4d83);
-            padding: 15px 25px;
+        #sidebarMenu .nav-link i {
+            font-size: 1.1rem;
+        }
+
+        #sidebarMenu .nav-link.active {
+            font-weight: 700;
+            color: #0B4D83 !important;
+            background-color: #f0d7e0;
+            border-radius: 4px;
+        }
+
+        #sidebarMenu .nav-link:hover {
+            color: #7a0f3e;
+            background-color: #f9e5ef;
+            border-radius: 4px;
+        }
+
+        .top-bar button.btn-outline-light {
+            border: 1.5px solid white;
             color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .navbar-logo {
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .navbar-menu a {
-            color: white;
-            text-decoration: none;
-            margin-left: 18px;
-            font-weight: 500;
-        }
-
-        .container {
-            width: 90%;
-            max-width: 1100px;
-            margin: 25px auto;
-        }
-
-        .card {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.08);
-            margin-bottom: 25px;
-        }
-
-        h2 {
-            color: #0b4d83;
-            margin: 0 0 12px;
-        }
-
-        .apply-btn {
-            background: #0b4d83;
-            padding: 12px 20px;
-            display: inline-block;
-            border-radius: 6px;
-            color: white;
-            text-decoration: none;
-            margin-top: 15px;
-            font-weight: bold;
-        }
-
-        .eligibility-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-            gap: 15px;
-            margin-top: 18px;
-        }
-
-        input,
-        select {
-            width: 100%;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #c8ced6;
-            font-size: 15px;
-        }
-
-        .check-btn {
-            margin-top: 18px;
-            padding: 12px;
-            background: #06335f;
-            color: white;
-            width: 100%;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
+            background: transparent;
+            padding: 4px 10px;
+            font-size: 1.3rem;
+            border-radius: 4px;
             cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
         }
 
-        .eligible {
-            color: green;
-            font-weight: bold;
-            font-size: 18px;
+        .top-bar button.btn-outline-light:hover {
+            background-color: white;
+            color: #0B4D83;
         }
 
-        .not-eligible {
-            color: red;
-            font-weight: bold;
-            font-size: 18px;
-        }
 
-        /* Timeline */
-        .timeline-step {
-            padding: 10px;
-            margin-bottom: 8px;
-            border-left: 5px solid #999;
-            background: #f6f7fb;
-            border-radius: 6px;
-            padding-left: 15px;
-        }
-
-        .step-active {
-            border-left-color: #0b4d83 !important;
-            background: #e7f0f9;
-            font-weight: bold;
-        }
-
-        /* Improved Approval Gauge Chart */
-        .gauge-wrapper {
-            width: 260px;
-            height: 260px;
-            margin: 22px auto;
-            position: relative;
-        }
-
-        .gauge-circle {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: conic-gradient(#0b4d83 var(--value), #d8e1ec 0deg);
+        /* Top Bar */
+        .top-bar {
+            background-color: #0B4D83;
+            color: white;
             display: flex;
-            justify-content: center;
             align-items: center;
-            transition: background 1.5s ease;
+            justify-content: space-between;
+            padding: 10px 20px;
+            user-select: none;
+            position: sticky;
+            top: 0;
+            z-index: 1030;
         }
 
-        .gauge-inner {
-            position: absolute;
-            background: white;
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 32px;
-            font-weight: bold;
-            color: #0b4d83;
-            box-shadow: 0px 3px 8px rgba(0,0,0,0.10);
-        }
-
-        footer {
-            background: #0b4d83;
-            padding: 12px;
+        .top-bar h5 {
+            margin: 0;
+            font-weight: 700;
+            flex-grow: 1;
             text-align: center;
             color: white;
-            margin-top: 25px;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1.5px solid white;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            flex-shrink: 0;
+        }
+
+        .logout-btn:hover {
+            background-color: white;
+            color: #0B4D83;
+        }
+
+        /* Search Bar Row with Sidebar Toggle & Chatbot */
+        .search-chatbar {
+            max-width: 900px;
+            margin: 15px auto 40px auto;
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Sidebar toggle button */
+        .search-chatbar .btn-toggle-sidebar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            border: 1.5px solid #ccc;
+            color: #444;
+            background: white;
+            transition: border-color 0.3s, color 0.3s;
+            cursor: pointer;
+            flex-shrink: 0;
+            min-width: 42px;
+            padding: 6px 8px;
+            font-size: 1.3rem;
+        }
+
+        .search-chatbar .btn-toggle-sidebar:hover {
+            border-color: #0B4D83;
+            color: #0B4D83;
+        }
+
+        /* Search input centered and wide */
+        .search-chatbar input[type="text"] {
+            flex-grow: 1;
+            padding: 10px 14px;
+            border-radius: 5px;
+            border: 1.5px solid #ccc;
+            font-size: 1rem;
+            outline-offset: 0;
+            transition: border-color 0.3s;
+            width: 9000px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .search-chatbar input[type="text"]:focus {
+            border-color: #0B4D83;
+            box-shadow: 0 0 5px rgba(151, 20, 77, 0.5);
+        }
+
+        /* Chatbot button right aligned */
+        .search-chatbar .chatbot-btn {
+            background-color: #0B4D83;
+            border: none;
+            color: white;
+            padding: 10px 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .search-chatbar .chatbot-btn:hover {
+            background-color: #7a0f3e;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-card {
+            transition: 0.3s;
+            height: 280px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px 20px 30px 20px;
+            text-align: center;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .dashboard-icon {
+            font-size: 32px;
+            color: #0B4D83;
+            margin-bottom: 15px;
+        }
+
+        .dashboard-card h5 {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-card p {
+            flex-grow: 1;
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .btn-digibank {
+            background-color: #0B4D83;
+            color: #fff;
+            border: none;
+            padding: 8px 18px;
+            font-size: 0.9rem;
+            border-radius: 25px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-digibank:hover {
+            background-color: #7a0f3e;
+            color: white;
+        }
+
+        /* Footer */
+        footer.bg-custom {
+            background-color: #0B4D83;
+        }
+    </style>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+        }
+
+        .btn-submit {
+            background-color: #0B4D83;
+            color: #fff;
+            font-weight: 600;
+            border: none;
+            padding: 10px 0;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+
+        .btn-submit:hover {
+            background-color: #0B4D83;
+        }
+    </style>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap');
+
+        .digi-bank-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+
+        .digi-bank-logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 6px 18px rgba(102, 126, 234, 0.3), 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+        }
+
+        .logo-icon::after {
+            content: 'D';
+            position: absolute;
+            color: transparent;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            background-clip: text;
+            -webkit-background-clip: text;
+            font-weight: 800;
+            font-size: 20px;
+            z-index: 2;
+        }
+
+        .logo-text {
+            color: #fff;
+        }
+
+        .main-text {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            line-height: 1;
+        }
+
+        .digi {
+            background: linear-gradient(135deg, #87CEEB 0%, #98D8E8 25%, #FFF8DC 50%, #87CEFA 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .bank {
+            color: #ffffff;
+            margin-left: 3px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .tagline {
+            font-size: 9px;
+            font-weight: 600;
+            color: #e8f4f8;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 2px;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- NAVBAR -->
-    <header class="navbar">
-        <div class="navbar-logo">DigiBank</div>
-        <nav class="navbar-menu">
-            <a href="#">Dashboard</a>
-            <a href="#">Loans</a>
-            <a href="#">Profile</a>
-            <a href="#">Logout</a>
-        </nav>
-    </header>
-
-    <div class="container">
-
-        <!-- Loan Information -->
-        <div class="card">
-            <h2>Loan Information & Approval Process</h2>
-            <p>
-                DigiBank offers Home, Personal, and Business loan options with interest rates ranging from
-                <strong>6% to 20% per annum</strong> depending on CIBIL Score, income stability, employment type, and credit history.
-            </p>
-            <p><b>Loan Approval Steps:</b></p>
-            <p>
-                1️⃣ Submit loan application & KYC documents <br>
-                2️⃣ Income & employment verification <br>
-                3️⃣ CIBIL Score & existing liability check <br>
-                4️⃣ Collateral valuation (for secured loans) <br>
-                5️⃣ Final approval & agreement signing <br>
-                6️⃣ Loan amount disbursement to your DigiBank account
-            </p>
-            <a href="#" class="apply-btn">Apply for Loan</a>
+    <!-- Sidebar Offcanvas -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="sidebarMenuLabel">User</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
+        <div class="offcanvas-body">
+            <ul class="nav flex-column">
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark active" href="userdashboard.html">
+                        <i class="bi bi-speedometer2 me-2"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark" href="{{ url_for('viewaccounts') }}">
+                        <i class="bi bi-person-lines-fill me-2"></i> View Accounts
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark" href="loans.html">
+                        <i class="bi bi-cash-coin me-2"></i> Loans
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark" href="transactions.html">
+                        <i class="bi bi-clock-history me-2"></i> Transaction History
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark" href="balance.html">
+                        <i class="bi bi-wallet2 me-2"></i> Check Balance
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark" href="rewards.html">
+                        <i class="bi bi-gift-fill me-2"></i> Rewards
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark" href="paybill.html">
+                        <i class="bi bi-credit-card me-2"></i> Pay Bill
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark" href="#">
+                        <i class="bi bi-person-rolodex me-2"></i> Get Contact
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark" href="#">
+                        <i class="bi bi-shield-lock-fill me-2"></i> Privacy & Security
+                    </a>
+                </li>
 
-        <!-- Eligibility Checker -->
-        <div class="card">
-            <h2>Loan Eligibility Checker</h2>
+            </ul>
+        </div>
+    </div>
 
-            <div class="eligibility-grid">
-                <input type="number" id="age" placeholder="Age (18 - 65)" />
-                <input type="number" id="income" placeholder="Monthly Income (₹)" />
-                <input type="number" id="cibil" placeholder="CIBIL Score (300 - 900)" />
-                <input type="number" id="existingEmi" placeholder="Existing EMI (₹) Optional" />
-                <input type="number" id="desiredLoan" placeholder="Desired Loan Amount (₹)" />
-                <select id="employment">
-                    <option value="">Employment Type</option>
-                    <option value="salaried">Salaried</option>
-                    <option value="self">Self Employed</option>
-                </select>
+    <!-- ---------------------------- -->
+    <div class="top-bar d-flex align-items-center">
+        <!-- left toggle -->
+        <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
+            aria-controls="sidebarMenu" aria-label="Toggle sidebar">
+            <i class="bi bi-list"></i>
+        </button>
+        <!-- 🔽 Custom DigiBank Logo -->
+        <a class="navbar-brand digi-bank-logo" href="{{ url_for('home') }}">
+            <div class="logo-icon"></div>
+            <div class="logo-text">
+                <div class="main-text">
+                    <span class="digi">DiGi</span><span class="bank">Bank</span>
+                </div>
+                <div class="tagline">Smart Banking</div>
             </div>
+        </a>
 
-            <button class="check-btn" onclick="checkEligibility()">Check Eligibility</button>
-            <p id="eligibleResult"></p>
-        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-        <!-- Approval Probability + Timeline -->
-        <div class="card">
-            <h2>Loan Approval Probability</h2>
+        <!-- title wrapper with flex-grow to take center space -->
+        <!-- <h5 class="m-0 text-center flex-grow-1">DigiBank User Dashboard</h5> -->
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0B4D83 !important; width: 100%;">
+            <div class="container-fluid">
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <!-- <li class="nav-item"><a class="nav-link active" href="{{ url_for('home') }}">Home</a></li> -->
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">My Activities</a>
+                        </li>
+                        <!-- Open Account Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">Open Account</a>
+                            <ul class="dropdown-menu" aria-labelledby="accountDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Savings
+                                        Account</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Salary Account</a>
+                                </li>
+                                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Current
+                                        Account</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Safe Custody
+                                        Account</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Pension
+                                        Account</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">PMJDY Account</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <!-- Deposits Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">Deposits</a>
+                            <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Digital Fixed
+                                        Deposits</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Fixed
+                                        Deposits</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Recurring
+                                        Deposits</a></li>
+                            </ul>
+                        </li>
+                        <!-- Deposits Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">Loans</a>
+                            <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Home Loan</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Personal Loan</a>
+                                </li>
+                                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Busniness Loan</a>
+                                </li>
 
-            <div class="gauge-wrapper">
-                <div id="gaugeChart" class="gauge-circle" style="--value: 0deg;">
-                    <div id="gaugeVal" class="gauge-inner">--%</div>
+
+                            </ul>
+                        </li>
+                        <!-- Deposits Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">Cards</a>
+                            <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Credit Cards</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Debit Cards</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Prepaid Cards</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <!-- Deposits Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">Forex</a>
+                            <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Travel Forex
+                                        Cards</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Send Money Abroad</a>
+                                </li>
+                                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Send Money India</a>
+                                </li>
+                                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Foregin Currency
+                                        Exchange</a></li>
+                            </ul>
+                        </li>
+                        <!-- Deposits Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">Investments</a>
+                            <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Public Provident
+                                        Fund</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Floating Rate Saving
+                                        Bonds</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">National Pension
+                                        System</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name }} !</h5>
+                        <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">
+                            Logout
+                        </a>
+                    </div>
+
                 </div>
             </div>
-
-            <h3>Loan Processing Timeline</h3>
-            <div id="step1" class="timeline-step">📄 Application Submitted</div>
-            <div id="step2" class="timeline-step">🧾 Document Verification</div>
-            <div id="step3" class="timeline-step">💳 CIBIL & Financial Check</div>
-            <div id="step4" class="timeline-step">📌 Final Approval</div>
-            <div id="step5" class="timeline-step">💰 Loan Disbursed</div>
-        </div>
+        </nav>
+        <!-- End of custom navbar -->
 
     </div>
 
-    <footer>© 2025 DigiBank | Secure Digital Banking Solutions</footer>
 
-    <!-- JavaScript -->
+
+    </div>
+
+
+
+
+
+    <!-- Flash alerts (Bootstrap 5) -->
+    <div class="container mt-2">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ 'warning' if category=='warning' else category }} alert-dismissible fade show"
+            role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+
+
+    <!-- Dashboard Content -->
+    <!-- <div class="container my-4 flex-grow-1">
+    <h3 class="mb-4 text-center">User Application Form</h3>
+    <div class="row g-4 justify-content-center"> -->
+
+    <div class="container my-5">
+        <!-- <h3 class="text-danger mb-4">Account Opening Form</h3> -->
+        <h3 style="color: #0B4D83;" class="mb-4">Investment Application Form</h3>
+        <form action="{{ url_for('open_account') }}" method="post">
+            <div class="row mb-3">
+                <label for="fName" class="col-sm-2 col-form-label">First Name</label>
+                <div class="col-sm-4">
+                    <input type="text" id="fName" name="first_name" class="form-control"
+                        style="border: 0.5px solid #0B4D83;" required>
+                </div>
+                <label for="mName" class="col-sm-2 col-form-label">Middle Name</label>
+                <div class="col-sm-4">
+                    <input type="text" id="mName" name="middle_name" class="form-control"
+                        style="border: 0.5px solid #0B4D83;" required>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="lName" class="col-sm-2 col-form-label">Last Name</label>
+                <div class="col-sm-4">
+                    <input type="text" id="lName" name="last_name" class="form-control"
+                        style="border: 0.5px solid #0B4D83;" required>
+                </div>
+                <label for="emailAddress" class="col-sm-2 col-form-label">Email Address</label>
+                <div class="col-sm-4">
+                    <input type="email" id="emailAddress" name="email" class="form-control"
+                        style="border: 0.5px solid #0B4D83;" required>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="mobileNumber" class="col-sm-2 col-form-label">Mobile Number</label>
+                <div class="col-sm-4">
+                    <input type="tel" id="mobileNumber" name="mobile" class="form-control"
+                        style="border: 0.5px solid #0B4D83;" required>
+                </div>
+                <label for="ANumber" class="col-sm-2 col-form-label">Aadhar Number</label>
+                <div class="col-sm-4">
+                    <input type="text" id="ANumber" name="aadhar" class="form-control"
+                        style="border: 0.5px solid #0B4D83;" required>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="accountType" class="col-sm-2 col-form-label">Investment Type</label>
+                <div class="col-sm-4">
+                    <select id="accountType" name="InvestType" class="form-select" style="border: 0.5px solid #0B4D83;"
+                        required>
+                        <option value="" selected disabled>Select Investment type</option>
+                        <option value="PPF">Public Provident Fund</option>
+                        <option value="FRSB">Floating Rate Saving Bonds</option>
+                        <option value="NPS">National Pension System</option>
+
+                    </select>
+
+                </div>
+                <label for="Amount" class="col-sm-2 col-form-label">Amount to Invest</label>
+                <div class="col-sm-4">
+                    <input type="text" id="Amount" name="Amount" class="form-control"
+                        style="border: 0.5px solid #0B4D83;" required>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="Nominee" class="col-sm-2 col-form-label">Nominee / Beneficiary </label>
+                <div class="col-sm-4">
+                    <input type="text" id="Nominee" name="Nominee" class="form-control"
+                        style="border: 0.5px solid #0B4D83;" required>
+                </div>
+                <label for="Address" class="col-sm-2 col-form-label"> Address</label>
+                <div class="col-sm-4">
+                    <input type="text" id="Address" name="Address" class="form-control"
+                        style="border: 0.5px solid #0B4D83;" required>
+                </div>
+            </div>
+
+           
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <button type="submit" class="btn-submit w-100">Submit Application</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- </div>
+  </div> -->
+
+
+
+
+    <!-- Footer -->
+    <footer class="bg-custom text-white text-center py-3 mt-auto" style="background-color: #0B4D83;">
+        © 2025 DigiBank. All rights reserved.
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-        function checkEligibility() {
-            let age = document.getElementById("age").value;
-            let income = document.getElementById("income").value;
-            let cibil = document.getElementById("cibil").value;
-            let existingEmi = document.getElementById("existingEmi").value || 0;
-            let desiredLoan = document.getElementById("desiredLoan").value;
-            let employment = document.getElementById("employment").value;
-            let result = document.getElementById("eligibleResult");
-
-            if (!age || !income || !cibil || !desiredLoan || !employment) {
-                result.innerHTML = "<span class='not-eligible'>⚠ Please fill all required fields.</span>";
-                return;
-            }
-
-            if (age < 18 || age > 65) {
-                result.innerHTML = "<span class='not-eligible'>❌ Not Eligible: Age criteria not met.</span>";
-                return;
-            }
-
-            if (cibil < 650) {
-                result.innerHTML = "<span class='not-eligible'>❌ Not Eligible: Low CIBIL Score.</span>";
-                updateGauge(30);
-                updateTimeline(1);
-                return;
-            }
-
-            let maxLoan = income * 20 - existingEmi * 10;
-            let probability = Math.min(95, Math.floor((cibil / 900) * 100));
-
-            if (desiredLoan > maxLoan) {
-                result.innerHTML = `<span class='not-eligible'>❌ Not Eligible: Requested amount exceeds limit.<br> Max Eligible Loan: ₹${maxLoan.toLocaleString()}</span>`;
-                updateGauge(45);
-                updateTimeline(2);
-                return;
-            }
-
-            result.innerHTML = `<span class='eligible'>✅ Eligible for Loan!</span><br>
-                Max Loan: ₹${maxLoan.toLocaleString()}<br>
-                Approval Probability: <b>${probability}%</b>`;
-
-            updateGauge(probability);
-            updateTimeline(5);
-        }
-
-        function updateGauge(percent) {
-            let gauge = document.getElementById("gaugeChart");
-            let display = document.getElementById("gaugeVal");
-
-            let angle = Math.round((percent / 100) * 360) + "deg";
-            gauge.style.setProperty("--value", angle);
-
-            display.innerHTML = percent + "%";
-        }
-
-        function updateTimeline(steps) {
-            for (let i = 1; i <= 5; i++) {
-                document.getElementById("step" + i).classList.remove("step-active");
-            }
-            for (let i = 1; i <= steps; i++) {
-                document.getElementById("step" + i).classList.add("step-active");
-            }
-        }
+        setTimeout(() => {
+            document.querySelectorAll('.alert').forEach(a => {
+                if (a.classList.contains('show')) new bootstrap.Alert(a).close();
+            });
+        }, 5000);
     </script>
 
+    <!-- <script>
+    function logout() {
+      alert("Logout clicked! Implement logout logic here.");
+      // e.g. window.location.href = "login.html";
+    }
+  </script> -->
 </body>
 
 </html>

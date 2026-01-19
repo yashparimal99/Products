@@ -1,0 +1,2455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Application Form</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1b3147;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --bg-soft: #f4f7fb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at top left, #e3f2fd 0, #f5f7fa 40%, #eef3fb 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px 40px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 22px 20px;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+            margin-bottom: 24px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+        }
+
+        .header-main {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        header h1 {
+            font-size: 26px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        header h1 i {
+            font-size: 26px;
+        }
+
+        header p {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+
+        .header-badge {
+            padding: 8px 14px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.12);
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(15, 30, 60, 0.12);
+            padding: 26px 24px 30px;
+            margin-bottom: 30px;
+        }
+
+        .required-note {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .required-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 999px;
+            background: var(--accent);
+        }
+
+        .form-section {
+            margin-bottom: 26px;
+            padding: 18px 18px 20px;
+            border-radius: 12px;
+            background: var(--bg-soft);
+            border: 1px solid #dde5f2;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--secondary);
+            padding: 6px;
+            border-radius: 999px;
+            background: rgba(52, 152, 219, 0.12);
+        }
+
+        .section-step {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: white;
+            border: 1px solid #d3ddf0;
+            color: #555;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -8px;
+        }
+
+        .form-group {
+            flex: 1 0 280px;
+            margin: 0 8px 18px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 13px;
+        }
+
+        .required::after {
+            content: " *";
+            color: var(--danger);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 13px;
+            border: 1px solid #d6dde8;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+            background-color: #fff;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.16);
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .checkbox-group input {
+            width: auto;
+        }
+
+        .btn {
+            padding: 9px 18px;
+            border: none;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.35);
+        }
+
+        .btn-secondary {
+            background-color: var(--light);
+            color: var(--dark);
+        }
+
+        .btn-secondary:hover {
+            background-color: #dde4ea;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.35);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .dynamic-section {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+            margin-top: 4px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .loan-calculator {
+            background-color: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 10px;
+            border: 1px solid #dbe5f3;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .loan-calculator-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .loan-calculator-header h3 {
+            margin: 0;
+            font-size: 18px;
+            color: var(--primary);
+        }
+
+        .calculator-results {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .calculator-result-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .calculator-result-card .label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .calculator-result-card .value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+
+        .calculator-breakdown {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .breakdown-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .breakdown-row:last-child {
+            border-bottom: none;
+        }
+
+        .breakdown-label {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .breakdown-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .interest-rate-suggestion {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            padding: 10px;
+            background: #e9f7fe;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .interest-rate-suggestion i {
+            color: var(--secondary);
+        }
+
+        .cibil-hint {
+            font-size: 11px;
+            margin-top: 3px;
+            display: block;
+            color: #555;
+        }
+
+        .form-progress {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-progress::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background-color: #e0e0e0;
+            z-index: 1;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .progress-step.active .step-circle {
+            background-color: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+        }
+
+        .progress-step.completed .step-circle {
+            background-color: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .step-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: white;
+            border: 2px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 5px;
+            transition: all 0.3s;
+        }
+
+        .step-label {
+            font-size: 12px;
+            text-align: center;
+            max-width: 80px;
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 11px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .input-error {
+            border-color: var(--danger) !important;
+        }
+
+        .input-success {
+            border-color: var(--success);
+        }
+
+        .section-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .dynamic-field-group {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            border-left: 3px solid var(--secondary);
+        }
+
+        .date-input-group {
+            position: relative;
+        }
+
+        .date-input-group i {
+            position: absolute;
+            right: 12px;
+            top: 38px;
+            color: #666;
+            pointer-events: none;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background-color: var(--success);
+        }
+
+        .notification.error {
+            background-color: var(--danger);
+        }
+
+        .notification.info {
+            background-color: var(--secondary);
+        }
+
+        .notification.warning {
+            background-color: var(--warning);
+        }
+
+        .document-upload {
+            border: 1.5px dashed #cfd8ea;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+            background-color: #ffffff;
+        }
+
+        .document-upload:hover {
+            border-color: var(--secondary);
+            background-color: #f3f7ff;
+        }
+
+        .upload-icon {
+            font-size: 26px;
+            color: #9fa8c5;
+            margin-bottom: 6px;
+        }
+
+        .upload-text {
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .upload-hint {
+            font-size: 11px;
+            color: #777;
+            margin-bottom: 8px;
+        }
+
+        .signature-upload {
+            border-radius: 10px;
+            border: 1px solid #d6dde8;
+            padding: 12px 14px;
+            background: #ffffff;
+        }
+
+        .form-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 4px;
+            gap: 10px;
+            padding-top: 14px;
+            border-top: 1px dashed #cbd5e1;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 4px;
+            color: var(--secondary);
+            cursor: pointer;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 230px;
+            background-color: var(--dark);
+            color: white;
+            text-align: left;
+            border-radius: 6px;
+            padding: 6px 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -115px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 11px;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .asset-item {
+            background-color: #f8fafc;
+            border-radius: 10px;
+            padding: 12px 12px 10px;
+            margin-bottom: 10px;
+            border: 1px solid #dbe5f3;
+        }
+
+        .asset-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .asset-header h4 {
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .remove-asset {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* EMI Suggestion Section Styles */
+        .emi-suggestion-section {
+            display: none;
+            margin-top: 20px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .emi-suggestion-card {
+            background: linear-gradient(135deg, #1b3147 0%, #3498db 100%);
+            border-radius: 12px;
+            padding: 25px;
+            color: white;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .emi-suggestion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .emi-suggestion-header h3 {
+            margin: 0;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .emi-suggestion-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .emi-suggestion-content {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .emi-suggestion-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .emi-suggestion-label {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .emi-suggestion-value {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .emi-suggestion-details {
+            grid-column: 1 / -1;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .emi-details-title {
+            font-size: 16px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .emi-details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .emi-detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .emi-detail-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .emi-detail-value {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .emi-suggestion-note {
+            margin-top: 15px;
+            font-size: 12px;
+            opacity: 0.8;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .calculate-emi-btn {
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .form-group {
+                flex: 1 0 100%;
+            }
+
+            .form-footer {
+                flex-direction: column-reverse;
+                align-items: stretch;
+            }
+
+            .calculator-results {
+                grid-template-columns: 1fr;
+            }
+
+            .form-progress {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .progress-step {
+                flex: 1 0 25%;
+            }
+
+            .emi-suggestion-content {
+                grid-template-columns: 1fr;
+            }
+
+            .emi-details-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="header-main">
+            <h1><i class="fas fa-hand-holding-usd"></i>Loan Application Form</h1>
+            <p>Apply for Loan with smart eligibility checks and EMI preview.</p>
+        </div>
+        <div class="header-badge">
+            <i class="fas fa-shield-alt"></i>
+            Secure • Paperless • Fast
+        </div>
+    </header>
+
+    <!-- Progress Indicator -->
+    <div class="form-progress">
+        <div class="progress-step active" id="step1">
+            <div class="step-circle">1</div>
+            <div class="step-label">Applicant Details</div>
+        </div>
+        <div class="progress-step" id="step2">
+            <div class="step-circle">2</div>
+            <div class="step-label">Employment</div>
+        </div>
+        <div class="progress-step" id="step3">
+            <div class="step-circle">3</div>
+            <div class="step-label">Bank Details</div>
+        </div>
+        <div class="progress-step" id="step4">
+            <div class="step-circle">4</div>
+            <div class="step-label">Loan Details</div>
+        </div>
+        <div class="progress-step" id="step5">
+            <div class="step-circle">5</div>
+            <div class="step-label">Documents</div>
+        </div>
+    </div>
+
+    <div class="form-container">
+        <div class="required-note">
+            <span class="required-dot"></span>
+            <span>Fields marked with <strong>*</strong> are mandatory.</span>
+        </div>
+
+        <!-- IMPORTANT: method, action, enctype -->
+        <form id="loanApplicationForm"
+              method="POST"
+              action="{{ url_for('apply_loan') }}"
+              enctype="multipart/form-data"
+              novalidate>
+
+            <!-- Section 1: Applicant Details -->
+            <div class="form-section" id="section1">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-user"></i> Applicant Details
+                    </h2>
+                    <div class="section-step">Step 1 of 5</div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fullName" class="required">Full Name</label>
+                        <input type="text" id="fullName" name="fullName" required>
+                        <div class="error-message" id="fullNameError">Please enter your full name</div>
+                    </div>
+
+                    <div class="form-group date-input-group">
+                        <label for="dob" class="required">Date of Birth</label>
+                        <input type="date" id="dob" name="dob" required max="">
+                        <i class="fas fa-calendar-alt"></i>
+                        <div class="error-message" id="dobError">Please enter a valid date of birth</div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="age">Age (Auto-calculated)</label>
+                        <input type="number" id="age" name="age" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="gender" class="required">Gender</label>
+                        <select id="gender" name="gender" required>
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <div class="error-message" id="genderError">Please select your gender</div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="currentAddress" class="required">Current Address</label>
+                        <textarea id="currentAddress" name="currentAddress" rows="3" required></textarea>
+                        <div class="error-message" id="currentAddressError">Please enter your current address</div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="sameAsCurrent" name="sameAsCurrent">
+                        <label for="sameAsCurrent">Permanent address same as current</label>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="permanentAddress" class="required">Permanent Address</label>
+                        <textarea id="permanentAddress" name="permanentAddress" rows="3" required></textarea>
+                        <div class="error-message" id="permanentAddressError">Please enter your permanent address</div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email" class="required">Email Address</label>
+                        <input type="email" id="email" name="email" required>
+                        <div class="error-message" id="emailError">Please enter a valid email address</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mobile" class="required">Mobile No.</label>
+                        <input type="tel" id="mobile" name="mobile"
+                               pattern="[0-9]{10}" maxlength="10"
+                               placeholder="10-digit mobile number" required>
+                        <div class="error-message" id="mobileError">Please enter a valid 10-digit mobile number</div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nationality" class="required">Nationality</label>
+                        <select id="nationality" name="nationality" required>
+                            <option value="">Select Nationality</option>
+                            <option value="indian">Indian</option>
+                            <option value="nri">NRI</option>
+                            <option value="oci">OCI</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <div class="error-message" id="nationalityError">Please select your nationality</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="maritalStatus" class="required">Marital Status</label>
+                        <select id="maritalStatus" name="maritalStatus" required>
+                            <option value="">Select Marital Status</option>
+                            <option value="unmarried">Unmarried</option>
+                            <option value="married">Married</option>
+                            <option value="divorced">Divorced</option>
+                            <option value="widowed">Widowed</option>
+                        </select>
+                        <div class="error-message" id="maritalStatusError">Please select your marital status</div>
+                    </div>
+                </div>
+
+                <!-- Dynamic fields based on marital status -->
+                <div id="maritalStatusDynamicFields" class="dynamic-section"></div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="panNumber" class="required">PAN Number</label>
+                        <input type="text" id="panNumber" name="panNumber"
+                               pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
+                               placeholder="ABCDE1234F" required>
+                        <div class="error-message" id="panNumberError">Please enter a valid PAN number</div>
+                    </div>
+                </div>
+
+                <div class="section-navigation">
+                    <button type="button" class="btn btn-secondary" id="nextToSection2">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Section 2: Employment Details -->
+            <div class="form-section" id="section2" style="display:none;">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-briefcase"></i> Employment Details
+                    </h2>
+                    <div class="section-step">Step 2 of 5</div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="employmentType" class="required">Employment Type</label>
+                        <select id="employmentType" name="employmentType" required>
+                            <option value="">Select Employment Type</option>
+                            <option value="salaried">Salaried</option>
+                            <option value="business">Business / Self Employed</option>
+                            <option value="professional">Professional</option>
+                            <option value="retired">Retired</option>
+                            <option value="student">Student</option>
+                            <option value="unemployed">Unemployed</option>
+                        </select>
+                        <div class="error-message" id="employmentTypeError">Please select your employment type</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="annualIncome" class="required">Annual Income (₹)</label>
+                        <input type="number" id="annualIncome" name="annualIncome" min="0" required>
+                        <div class="error-message" id="annualIncomeError">Please enter your annual income</div>
+                    </div>
+                </div>
+
+                <!-- Dynamic fields based on employment type -->
+                <div id="employmentDynamicFields" class="dynamic-section"></div>
+
+                <div class="section-navigation">
+                    <button type="button" class="btn btn-secondary" id="prevToSection1">
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="nextToSection3">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Section 3: Bank Details -->
+            <div class="form-section" id="section3" style="display:none;">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-university"></i> Bank Details
+                    </h2>
+                    <div class="section-step">Step 3 of 5</div>
+                </div>
+
+                <p class="section-description">
+                    Select the DigiBank account from which your EMIs will be auto-debited.
+                    Only <strong>approved accounts</strong> are shown here.
+                </p>
+
+                <div class="section-grid">
+                    <div class="section-main-card">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="accountSelection" class="required">Select Debit Account</label>
+                                <select id="accountSelection" name="accountSelection" class="form-control" required>
+    <option value="">Select Your Account</option>
+    {% if accounts and accounts|length > 0 %}
+        {% for a in accounts %}
+            <option value="{{ a.account_number }}"
+                    data-ifsc="{{ a.ifsc_code or '' }}"
+                    data-branch="{{ a.branch_code or '' }}"
+                    data-type="{{ a.account_type }}">
+                {{ a.account_type|capitalize }} - {{ a.account_number }}
+            </option>
+        {% endfor %}
+    {% else %}
+        <option value="" disabled>No approved accounts available</option>
+    {% endif %}
+</select>
+                                <div class="error-message" id="accountSelectionError">Please select your account</div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="accountNumber">Account Number</label>
+                                <input type="text" id="accountNumber" name="accountNumber" class="form-control" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="ifscCode">IFSC Code</label>
+                                <input type="text" id="ifscCode" name="ifscCode" class="form-control" readonly>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="branchCode">Branch Code</label>
+                                <input type="text" id="branchCode" name="branchCode" class="form-control" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="accountType">Account Type</label>
+                                <input type="text" id="accountType" name="accountType" class="form-control" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-navigation">
+                    <button type="button" class="btn btn-secondary" id="prevToSection2">
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button type="button" class="btn btn-primary" id="nextToSection4">
+                        Next: Loan & Assets <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Section 4: Loan Details -->
+            <div class="form-section" id="section4" style="display:none;">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-file-invoice-dollar"></i> Loan Details & Eligibility
+                    </h2>
+                    <div class="section-step">Step 4 of 5</div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="loanType" class="required">Loan Type</label>
+                        <select id="loanType" name="loanType" required>
+                            <option value="">Select Loan Type</option>
+                            <option value="home">Home Loan</option>
+                            <option value="business">Business Loan</option>
+                            <option value="personal">Personal Loan</option>
+                            <option value="education">Education Loan</option>
+                            <option value="vehicle">Vehicle Loan</option>
+                            <option value="agriculture">Agriculture Loan</option>
+                        </select>
+                        <div class="error-message" id="loanTypeError">Please select loan type</div>
+                    </div>
+
+                    <!-- UPDATED: free-text field, not dropdown -->
+                    <div class="form-group">
+                        <label for="loanPurpose" class="required">Purpose of Loan</label>
+                        <input type="text"
+                               id="loanPurpose"
+                               name="loanPurpose"
+                               placeholder="e.g. Home renovation, business expansion, medical emergency"
+                               required>
+                        <div class="error-message" id="loanPurposeError">Please enter purpose of loan</div>
+                    </div>
+                </div>
+
+                <!-- Dynamic fields based on loan type -->
+                <div id="loanDynamicFields" class="dynamic-section"></div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="interestType" class="required">
+                            Interest Type
+                            <span class="tooltip">
+                                <i class="fas fa-info-circle"></i>
+                                <span class="tooltiptext">
+                                    Fixed: EMI remains same for whole tenure.<br>
+                                    Floating: EMI/tenure may change as per market rate.
+                                </span>
+                            </span>
+                        </label>
+                        <select id="interestType" name="interestType" required>
+                            <option value="">Select Interest Type</option>
+                            <option value="fixed">Fixed</option>
+                            <option value="floating">Floating</option>
+                        </select>
+                        <div class="error-message" id="interestTypeError">Please select interest type</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cibilScore" class="required">CIBIL Score</label>
+                        <div class="btn-group">
+                            <input type="number" id="cibilScore" name="cibilScore"
+                                   min="300" max="900"
+                                   placeholder="Enter CIBIL (300–900)" required>
+                            <button type="button" class="btn btn-secondary" id="checkCibil">
+                                <i class="fas fa-external-link-alt"></i> Check CIBIL
+                            </button>
+                        </div>
+                        <span class="cibil-hint" id="cibilHint">Higher CIBIL may help you get a lower interest rate.</span>
+                        <div class="error-message" id="cibilScoreError">Please enter a valid CIBIL score (300-900)</div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="loanAmount" class="required">Required Loan Amount (₹)</label>
+                        <input type="number" id="loanAmount" name="loanAmount" min="10000" max="10000000" required>
+                        <div class="error-message" id="loanAmountError">Please enter a valid loan amount</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tenure" class="required">Tenure (Months)</label>
+                        <input type="number" id="tenure" name="tenure" min="6" max="360" required>
+                        <div class="error-message" id="tenureError">Please enter a valid tenure</div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="monthlyIncome" class="required">Monthly Income (₹)</label>
+                        <input type="number" id="monthlyIncome" name="monthlyIncome" min="0" required>
+                        <div class="error-message" id="monthlyIncomeError">Please enter your monthly income</div>
+                    </div>
+                </div>
+
+                <!-- Calculate EMI Button -->
+                <div class="form-row">
+                    <button type="button" class="btn btn-primary calculate-emi-btn" id="calculateEMI">
+                        <i class="fas fa-calculator"></i> Calculate EMI
+                    </button>
+                </div>
+
+                <!-- EMI Suggestion Section -->
+                <div class="emi-suggestion-section" id="emiSuggestionSection">
+                    <div class="emi-suggestion-card">
+                        <div class="emi-suggestion-header">
+                            <h3><i class="fas fa-lightbulb"></i> Your EMI Suggestion</h3>
+                            <span class="emi-suggestion-badge">Based on your profile</span>
+                        </div>
+
+                        <div class="emi-suggestion-content">
+                            <div class="emi-suggestion-item">
+                                <div class="emi-suggestion-label">Suggested EMI</div>
+                                <div class="emi-suggestion-value" id="suggestedEMI">₹0</div>
+                            </div>
+                            <div class="emi-suggestion-item">
+                                <div class="emi-suggestion-label">Interest Rate</div>
+                                <div class="emi-suggestion-value" id="suggestedRate">0%</div>
+                            </div>
+                            <div class="emi-suggestion-item">
+                                <div class="emi-suggestion-label">Total Payable Amount</div>
+                                <div class="emi-suggestion-value" id="totalPayableAmount">₹0</div>
+                            </div>
+                            <div class="emi-suggestion-item">
+                                <div class="emi-suggestion-label">Total Interest</div>
+                                <div class="emi-suggestion-value" id="totalPayableInterest">₹0</div>
+                            </div>
+
+                            <div class="emi-suggestion-details">
+                                <div class="emi-details-title">
+                                    <i class="fas fa-info-circle"></i> Loan Breakdown
+                                </div>
+                                <div class="emi-details-grid">
+                                    <div class="emi-detail-item">
+                                        <span class="emi-detail-label">Loan Amount</span>
+                                        <span class="emi-detail-value" id="detailLoanAmount">₹0</span>
+                                    </div>
+                                    <div class="emi-detail-item">
+                                        <span class="emi-detail-label">Loan Tenure</span>
+                                        <span class="emi-detail-value" id="detailLoanTenure">0 months</span>
+                                    </div>
+                                    <div class="emi-detail-item">
+                                        <span class="emi-detail-label">Interest Type</span>
+                                        <span class="emi-detail-value" id="detailInterestType">-</span>
+                                    </div>
+                                    <div class="emi-detail-item">
+                                        <span class="emi-detail-label">CIBIL Score</span>
+                                        <span class="emi-detail-value" id="detailCibilScore">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="emi-suggestion-note">
+                            Note: This is an estimated calculation. Final terms may vary based on bank approval.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-navigation">
+                    <button type="button" class="btn btn-secondary" id="prevToSection3">
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="nextToSection5">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Section 5: Co-applicant & Assets & Documents -->
+            <div class="form-section" id="section5" style="display:none;">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-users"></i> Co-applicant, Assets & Documents
+                    </h2>
+                    <div class="section-step">Step 5 of 5</div>
+                </div>
+
+                <!-- Co-applicant -->
+                <div class="form-row">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="hasCoApplicant" name="hasCoApplicant">
+                        <label for="hasCoApplicant">I have a co-applicant</label>
+                    </div>
+                </div>
+
+                <div id="coApplicantSection" class="dynamic-section">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="coApplicantName">Co-applicant Name</label>
+                            <input type="text" id="coApplicantName" name="coApplicantName">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="coApplicantRelationship">Relationship</label>
+                            <select id="coApplicantRelationship" name="coApplicantRelationship">
+                                <option value="">Select Relationship</option>
+                                <option value="spouse">Spouse</option>
+                                <option value="parent">Parent</option>
+                                <option value="sibling">Sibling</option>
+                                <option value="business-partner">Business Partner</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="coApplicantIncome">Co-applicant Annual Income (₹)</label>
+                            <input type="number" id="coApplicantIncome" name="coApplicantIncome" min="0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assets -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="assetType">Asset Type (Optional)</label>
+                        <select id="assetType" name="assetType">
+                            <option value="">Select Asset Type</option>
+                            <option value="residential-property">Residential Property</option>
+                            <option value="commercial-property">Commercial Property</option>
+                            <option value="land">Land</option>
+                            <option value="vehicle">Vehicle</option>
+                            <option value="fixed-deposits">Fixed Deposits</option>
+                            <option value="shares">Shares</option>
+                            <option value="mutual-funds">Mutual Funds</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="assetValue">Asset Value (₹)</label>
+                        <input type="number" id="assetValue" name="assetValue" min="0">
+                    </div>
+                </div>
+
+                <div id="assetDynamicFields" class="dynamic-section"></div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="assetDescription">Asset Description</label>
+                        <textarea id="assetDescription" name="assetDescription" rows="2"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <button type="button" class="btn btn-secondary" id="addAsset">
+                        <i class="fas fa-plus"></i> Add Asset to List
+                    </button>
+                </div>
+
+                <div id="assetList"></div>
+
+                <!-- Documents -->
+                <div class="form-row" style="margin-top:8px;">
+                    <div class="form-group">
+                        <div class="document-upload">
+                            <div class="upload-icon">
+                                <i class="fas fa-id-card"></i>
+                            </div>
+                            <p class="upload-text"><span class="required">Identity Proof</span> (Aadhaar, PAN, Passport, etc.)</p>
+                            <p class="upload-hint">Allowed: PDF / JPG / PNG</p>
+                            <input type="file" id="identityProof" name="identityProof"
+                                   accept=".pdf,.jpg,.jpeg,.png" required>
+                            <div class="error-message" id="identityProofError">Please upload identity proof</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="document-upload">
+                            <div class="upload-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <p class="upload-text"><span class="required">Address Proof</span> (Utility Bill, Rental Agreement, etc.)</p>
+                            <p class="upload-hint">Allowed: PDF / JPG / PNG</p>
+                            <input type="file" id="addressProof" name="addressProof"
+                                   accept=".pdf,.jpg,.jpeg,.png" required>
+                            <div class="error-message" id="addressProofError">Please upload address proof</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <div class="document-upload">
+                            <div class="upload-icon">
+                                <i class="fas fa-receipt"></i>
+                            </div>
+                            <p class="upload-text"><span class="required">Income Proof</span> (Salary Slips / ITR)</p>
+                            <p class="upload-hint">Last 3 months salary slips or last 2 ITRs</p>
+                            <input type="file" id="incomeProof" name="incomeProof"
+                                   accept=".pdf,.jpg,.jpeg,.png" required>
+                            <div class="error-message" id="incomeProofError">Please upload income proof</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="document-upload">
+                            <div class="upload-icon">
+                                <i class="fas fa-passport"></i>
+                            </div>
+                            <p class="upload-text"><span class="required">Bank Statement / Passbook</span></p>
+                            <p class="upload-hint">Last 6 months statement</p>
+                            <input type="file" id="bankStatement" name="bankStatement"
+                                   accept=".pdf,.jpg,.jpeg,.png" required>
+                            <div class="error-message" id="bankStatementError">Please upload bank statement</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <div class="document-upload">
+                            <div class="upload-icon">
+                                <i class="fas fa-file-contract"></i>
+                            </div>
+                            <p class="upload-text">Property Documents (If applicable)</p>
+                            <p class="upload-hint">For Home/Business secured loans</p>
+                            <input type="file" id="propertyDocuments" name="propertyDocuments"
+                                   accept=".pdf,.jpg,.jpeg,.png">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Declaration & Signatures -->
+                <div class="form-row" style="margin-top:4px;">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="declaration" name="declaration" required>
+                        <label for="declaration" class="required">
+                            I hereby declare that the information provided is true and complete. I understand that providing false information may lead to rejection of my loan application.
+                        </label>
+                    </div>
+                    <div class="error-message" id="declarationError">Please accept the declaration</div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="required">Applicant Signature Upload</label>
+                        <div class="signature-upload">
+                            <p class="upload-hint">Upload scanned signature (JPG/PNG/PDF)</p>
+                            <input type="file" id="applicantSignatureFile" name="applicantSignatureFile"
+                                   accept=".pdf,.jpg,.jpeg,.png" required>
+                            <div class="error-message" id="applicantSignatureError">Please upload your signature</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Co-applicant Signature Upload (If any)</label>
+                        <div class="signature-upload">
+                            <p class="upload-hint">Upload co-applicant signature (optional)</p>
+                            <input type="file" id="coApplicantSignatureFile" name="coApplicantSignatureFile"
+                                   accept=".pdf,.jpg,.jpeg,.png">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Date & Place + Buttons -->
+                <div class="form-row" style="margin-top:4px;">
+                    <div class="form-group">
+                        <label for="applicationDate" class="required">Application Date</label>
+                        <input type="date" id="applicationDate" name="applicationDate" required>
+                        <div class="error-message" id="applicationDateError">Please enter application date</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="applicationPlace" class="required">Place</label>
+                        <input type="text" id="applicationPlace" name="applicationPlace" required>
+                        <div class="error-message" id="applicationPlaceError">Please enter application place</div>
+                    </div>
+                </div>
+
+                <div class="form-footer">
+                    <button type="button" class="btn btn-secondary" id="prevToSection4">
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <div>
+                        <button type="button" class="btn btn-secondary" id="saveDraft">
+                            <i class="fas fa-save"></i> Save as Draft
+                        </button>
+
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-paper-plane"></i> Submit Application
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Notification System Container -->
+<div id="notificationArea"></div>
+
+<script>
+    // Simple notification system (for EMI, validation warnings, etc.)
+    class NotificationSystem {
+        constructor() {
+            this.notificationArea = document.getElementById('notificationArea');
+        }
+
+        show(message, type = 'info', duration = 5000) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${this.getIcon(type)}"></i>
+                <span>${message}</span>
+            `;
+
+            this.notificationArea.appendChild(notification);
+
+            // Animate in
+            setTimeout(() => notification.classList.add('show'), 100);
+
+            // Auto remove
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, duration);
+        }
+
+        getIcon(type) {
+            const icons = {
+                success: 'check-circle',
+                error: 'exclamation-circle',
+                info: 'info-circle',
+                warning: 'exclamation-triangle'
+            };
+            return icons[type] || 'info-circle';
+        }
+    }
+
+    const notifications = new NotificationSystem();
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const sections = document.querySelectorAll('.form-section');
+        const progressSteps = document.querySelectorAll('.progress-step');
+        let currentSection = 0;
+
+        function showSection(index) {
+            sections.forEach((section, i) => {
+                section.style.display = i === index ? 'block' : 'none';
+            });
+
+            progressSteps.forEach((step, i) => {
+                if (i < index) {
+                    step.classList.add('completed');
+                    step.classList.remove('active');
+                } else if (i === index) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            });
+
+            currentSection = index;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Navigation buttons
+        document.getElementById('nextToSection2').addEventListener('click', function() {
+            if (validateSection(0)) showSection(1);
+        });
+        document.getElementById('nextToSection3').addEventListener('click', function() {
+            if (validateSection(1)) showSection(2);
+        });
+        document.getElementById('nextToSection4').addEventListener('click', function() {
+            if (validateSection(2)) showSection(3);
+        });
+        document.getElementById('nextToSection5').addEventListener('click', function() {
+            if (validateSection(3)) showSection(4);
+        });
+
+        document.getElementById('prevToSection1').addEventListener('click', function() { showSection(0); });
+        document.getElementById('prevToSection2').addEventListener('click', function() { showSection(1); });
+        document.getElementById('prevToSection3').addEventListener('click', function() { showSection(2); });
+        document.getElementById('prevToSection4').addEventListener('click', function() { showSection(3); });
+
+        // Validation for each section
+        function validateSection(sectionIndex) {
+            let isValid = true;
+            const section = sections[sectionIndex];
+            const inputs = section.querySelectorAll('input, select, textarea');
+
+            inputs.forEach(input => {
+                // Required handling
+                if (input.type === 'checkbox') {
+                    if (input.required && !input.checked) {
+                        isValid = false;
+                        showError(input, 'This field is required');
+                    } else {
+                        hideError(input);
+                    }
+                    return;
+                }
+
+                if (input.type === 'file') {
+                    if (input.required && input.files.length === 0) {
+                        isValid = false;
+                        showError(input, 'This document is required');
+                    } else {
+                        hideError(input);
+                    }
+                    return;
+                }
+
+                if (input.hasAttribute('required') && !input.value.trim()) {
+                    isValid = false;
+                    showError(input, 'This field is required');
+                } else if (input.type === 'email' && input.value && !isValidEmail(input.value)) {
+                    isValid = false;
+                    showError(input, 'Please enter a valid email address');
+                } else if (input.id === 'mobile' && input.value && !isValidMobile(input.value)) {
+                    isValid = false;
+                    showError(input, 'Please enter a valid 10-digit mobile number');
+                } else if (input.id === 'panNumber' && input.value && !isValidPAN(input.value)) {
+                    isValid = false;
+                    showError(input, 'Please enter a valid PAN number');
+                } else if (input.id === 'cibilScore' && input.value) {
+                    const cibil = parseInt(input.value, 10);
+                    if (isNaN(cibil) || cibil < 300 || cibil > 900) {
+                        isValid = false;
+                        showError(input, 'Please enter a valid CIBIL score (300-900)');
+                    } else {
+                        hideError(input);
+                    }
+                } else {
+                    hideError(input);
+                }
+            });
+
+            return isValid;
+        }
+
+        function showError(input, message) {
+            const errorElement = document.getElementById(input.id + 'Error');
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+            input.classList.add('input-error');
+            input.classList.remove('input-success');
+        }
+
+        function hideError(input) {
+            const errorElement = document.getElementById(input.id + 'Error');
+            if (errorElement) {
+                errorElement.style.display = 'none';
+            }
+            input.classList.remove('input-error');
+            if (input.value && input.type !== 'file' && input.type !== 'checkbox') {
+                input.classList.add('input-success');
+            }
+        }
+
+        function isValidEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function isValidMobile(mobile) {
+            const re = /^[0-9]{10}$/;
+            return re.test(mobile);
+        }
+
+        function isValidPAN(pan) {
+            const re = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+            return re.test(pan);
+        }
+
+        // DOB & age
+        const dobInput = document.getElementById('dob');
+        const ageInput = document.getElementById('age');
+
+        const today = new Date();
+        const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+        dobInput.max = maxDate.toISOString().split('T')[0];
+
+        const defaultDob = new Date(today.getFullYear() - 25, today.getMonth(), today.getDate());
+        dobInput.value = defaultDob.toISOString().split('T')[0];
+        updateAge();
+
+        function updateAge() {
+            if (!dobInput.value) {
+                ageInput.value = '';
+                return;
+            }
+            const dob = new Date(dobInput.value);
+            const today = new Date();
+            let age = today.getFullYear() - dob.getFullYear();
+            const monthDiff = today.getMonth() - dob.getMonth();
+
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+                age--;
+            }
+            ageInput.value = age;
+
+            if (age < 21 || age > 65) {
+                showError(dobInput, 'For this loan, applicant age must be between 21 and 65 years.');
+            } else {
+                hideError(dobInput);
+            }
+        }
+
+        dobInput.addEventListener('change', updateAge);
+
+        // Application date default
+        const appDateInput = document.getElementById('applicationDate');
+        appDateInput.valueAsDate = new Date();
+
+        // Same as current address
+        document.getElementById('sameAsCurrent').addEventListener('change', function () {
+            if (this.checked) {
+                document.getElementById('permanentAddress').value =
+                    document.getElementById('currentAddress').value;
+            }
+        });
+
+        // Account selection → fill details
+       // In your form.html, update the account selection handler
+const accountSelection = document.getElementById('accountSelection');
+if (accountSelection) {
+    accountSelection.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const acctNo = this.value || '';
+        const ifsc = selectedOption ? (selectedOption.getAttribute('data-ifsc') || '') : '';
+        const branch = selectedOption ? (selectedOption.getAttribute('data-branch') || '') : '';
+        const type = selectedOption ? (selectedOption.getAttribute('data-type') || '') : '';
+
+        document.getElementById('accountNumber').value = acctNo;
+        document.getElementById('ifscCode').value = ifsc;
+        document.getElementById('branchCode').value = branch;
+        document.getElementById('accountType').value = type;
+    });
+}
+
+        // Marital Status dynamic fields
+        document.getElementById('maritalStatus').addEventListener('change', function () {
+            const maritalStatus = this.value;
+            const dynamicFields = document.getElementById('maritalStatusDynamicFields');
+            dynamicFields.innerHTML = '';
+
+            if (maritalStatus === 'married') {
+                dynamicFields.innerHTML = `
+                    <div class="dynamic-field-group">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="spouseName">Spouse Name</label>
+                                <input type="text" id="spouseName" name="spouseName">
+                            </div>
+                            <div class="form-group">
+                                <label for="spouseOccupation">Spouse Occupation</label>
+                                <input type="text" id="spouseOccupation" name="spouseOccupation">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="spouseIncome">Spouse Annual Income (₹)</label>
+                                <input type="number" id="spouseIncome" name="spouseIncome" min="0">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (maritalStatus === 'divorced') {
+                dynamicFields.innerHTML = `
+                    <div class="dynamic-field-group">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="divorceDate">Date of Divorce</label>
+                                <input type="date" id="divorceDate" name="divorceDate">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (maritalStatus === 'widowed') {
+                dynamicFields.innerHTML = `
+                    <div class="dynamic-field-group">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="spouseDeathDate">Date of Spouse's Death</label>
+                                <input type="date" id="spouseDeathDate" name="spouseDeathDate">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="dependents">Number of Dependents</label>
+                                <input type="number" id="dependents" name="dependents" min="0" max="10">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            dynamicFields.style.display = dynamicFields.innerHTML ? 'block' : 'none';
+        });
+
+        // Employment type dynamic fields
+        document.getElementById('employmentType').addEventListener('change', function () {
+            const employmentType = this.value;
+            const dynamicFields = document.getElementById('employmentDynamicFields');
+            dynamicFields.innerHTML = '';
+
+            if (employmentType === 'salaried') {
+                dynamicFields.innerHTML = `
+                    <div class="dynamic-field-group">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="companyName" class="required">Company Name</label>
+                                <input type="text" id="companyName" name="companyName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="employeeId" class="required">Employee ID</label>
+                                <input type="text" id="employeeId" name="employeeId" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="designation" class="required">Designation</label>
+                                <input type="text" id="designation" name="designation" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="experience" class="required">Current Company Experience (Years)</label>
+                                <input type="number" id="experience" name="experience" min="0" max="50" step="0.5" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="salarySlips">Latest Salary Slips (3 months)</label>
+                                <input type="file" id="salarySlips" name="salarySlips" accept=".pdf,.jpg,.jpeg,.png">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (employmentType === 'business' || employmentType === 'professional') {
+                dynamicFields.innerHTML = `
+                    <div class="dynamic-field-group">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="companyName" class="required">Business Name</label>
+                                <input type="text" id="companyName" name="companyName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="businessType" class="required">Type of Business / Profession</label>
+                                <input type="text" id="businessType" name="businessType" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="designation" class="required">Designation / Role</label>
+                                <input type="text" id="designation" name="designation" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="experience" class="required">Business Experience (Years)</label>
+                                <input type="number" id="experience" name="experience" min="0" max="50" step="0.5" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="businessRegistration">Business Registration Number</label>
+                                <input type="text" id="businessRegistration" name="businessRegistration">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="itrDocuments">ITR Documents (Last 2 years)</label>
+                                <input type="file" id="itrDocuments" name="itrDocuments" accept=".pdf,.jpg,.jpeg,.png">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (employmentType === 'student') {
+                dynamicFields.innerHTML = `
+                    <div class="dynamic-field-group">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="institutionNameEmp" class="required">Institution Name</label>
+                                <input type="text" id="institutionNameEmp" name="institutionNameEmp" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="courseNameEmp" class="required">Course Name</label>
+                                <input type="text" id="courseNameEmp" name="courseNameEmp" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="expectedGraduation" class="required">Expected Graduation Year</label>
+                                <input type="number" id="expectedGraduation" name="expectedGraduation" min="2023" max="2035" required>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (employmentType === 'retired') {
+                dynamicFields.innerHTML = `
+                    <div class="dynamic-field-group">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="previousOccupation" class="required">Previous Occupation</label>
+                                <input type="text" id="previousOccupation" name="previousOccupation" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="pensionAmount">Monthly Pension Amount (₹)</label>
+                                <input type="number" id="pensionAmount" name="pensionAmount" min="0">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="retirementYear" class="required">Year of Retirement</label>
+                                <input type="number" id="retirementYear" name="retirementYear" min="1950" max="2025" required>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (employmentType === 'unemployed') {
+                dynamicFields.innerHTML = `
+                    <div class="dynamic-field-group">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="unemploymentDuration" class="required">Duration of Unemployment (Months)</label>
+                                <input type="number" id="unemploymentDuration" name="unemploymentDuration" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="previousEmployment">Previous Employment Details</label>
+                                <textarea id="previousEmployment" name="previousEmployment" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            dynamicFields.style.display = dynamicFields.innerHTML ? 'block' : 'none';
+        });
+
+        // Loan type dynamic fields (NOTE: loanPurpose is now free-text, not controlled here)
+        document.getElementById('loanType').addEventListener('change', function () {
+            const loanType = this.value;
+            const dynamicFields = document.getElementById('loanDynamicFields');
+            dynamicFields.innerHTML = '';
+
+            if (loanType === 'home') {
+                dynamicFields.innerHTML = `
+                    <div class="dynamic-field-group">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="propertyValue" class="required">Property Value (₹)</label>
+                                <input type="number" id="propertyValue" name="propertyValue" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="constructionStage" class="required">Construction Stage</label>
+                                <select id="constructionStage" name="constructionStage" required>
+                                    <option value="">Select Stage</option>
+                                    <option value="under-construction">Under Construction</option>
+                                    <option value="ready-to-move">Ready to Move</option>
+                                    <option value="resale">Resale</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="builderName">Builder Name</label>
+                                <input type="text" id="builderName" name="builderName">
+                            </div>
+                            <div class="form-group">
+                                <label for="homePropertyLocation" class="required">Property Location</label>
+                                <input type="text" id="homePropertyLocation" name="homePropertyLocation" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="propertyArea">Property Area (Sq. Ft.)</label>
+                                <input type="number" id="propertyArea" name="propertyArea" min="0">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (loanType === 'business') {
+                dynamicFields.innerHTML = `
+                    <div class="dynamic-field-group">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="businessPlan" class="required">Business Plan Summary</label>
+                                <textarea id="businessPlan" name="businessPlan" rows="3" required></textarea>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="collateralDetails">Collateral Details</label>
+                                <textarea id="collateralDetails" name="collateralDetails" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="businessAge" class="required">Business Age (Years)</label>
+                                <input type="number" id="businessAge" name="businessAge" min="0" max="50" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="businessTurnover">Annual Turnover (₹)</label>
+                                <input type="number" id="businessTurnover" name="businessTurnover" min="0">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (loanType === 'personal') {
+                dynamicFields.innerHTML = `
+                    <div class="dynamic-field-group">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="existingLoans" class="required">Existing Loans</label>
+                                <select id="existingLoans" name="existingLoans" required>
+                                    <option value="">Select</option>
+                                    <option value="no">No</option>
+                                    <option value="yes">Yes</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="totalObligation">Other Monthly EMIs (₹)</label>
+                                <input type="number" id="totalObligation" name="totalObligation" min="0">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="loanUsage">Loan Usage Details</label>
+                                <textarea id="loanUsage" name="loanUsage" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (loanType === 'education') {
+                dynamicFields.innerHTML = `
+                    <div class="dynamic-field-group">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="courseNameLoan" class="required">Course Name</label>
+                                <input type="text" id="courseNameLoan" name="courseNameLoan" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="institutionNameLoan" class="required">Institution Name</label>
+                                <input type="text" id="institutionNameLoan" name="institutionNameLoan" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="courseDuration" class="required">Course Duration (Years)</label>
+                                <input type="number" id="courseDuration" name="courseDuration" min="1" max="10" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="educationLevel" class="required">Education Level</label>
+                                <select id="educationLevel" name="educationLevel" required>
+                                    <option value="">Select Level</option>
+                                    <option value="undergraduate">Undergraduate</option>
+                                    <option value="postgraduate">Postgraduate</option>
+                                    <option value="diploma">Diploma</option>
+                                    <option value="phd">PhD</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="totalFees">Total Course Fees (₹)</label>
+                                <input type="number" id="totalFees" name="totalFees" min="0">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (loanType === 'vehicle') {
+                dynamicFields.innerHTML = `
+                    <div class="dynamic-field-group">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="vehicleTypeLoan" class="required">Vehicle Type</label>
+                                <select id="vehicleTypeLoan" name="vehicleTypeLoan" required>
+                                    <option value="">Select Type</option>
+                                    <option value="car">Car</option>
+                                    <option value="bike">Bike</option>
+                                    <option value="commercial">Commercial Vehicle</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="vehicleModelLoan" class="required">Vehicle Model</label>
+                                <input type="text" id="vehicleModelLoan" name="vehicleModelLoan" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="vehicleMakeLoan" class="required">Vehicle Make</label>
+                                <input type="text" id="vehicleMakeLoan" name="vehicleMakeLoan" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="vehicleYearLoan" class="required">Manufacturing Year</label>
+                                <input type="number" id="vehicleYearLoan" name="vehicleYearLoan" min="2010" max="2025" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="vehiclePrice">Vehicle Price (₹)</label>
+                                <input type="number" id="vehiclePrice" name="vehiclePrice" min="0">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (loanType === 'agriculture') {
+                dynamicFields.innerHTML = `
+                    <div class="dynamic-field-group">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="landArea" class="required">Land Area (Acres)</label>
+                                <input type="number" id="landArea" name="landArea" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cropType" class="required">Crop Type</label>
+                                <input type="text" id="cropType" name="cropType" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="season" class="required">Season</label>
+                                <select id="season" name="season" required>
+                                    <option value="">Select Season</option>
+                                    <option value="kharif">Kharif</option>
+                                    <option value="rabi">Rabi</option>
+                                    <option value="zaid">Zaid</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="irrigationType">Irrigation Type</label>
+                                <select id="irrigationType" name="irrigationType">
+                                    <option value="">Select Type</option>
+                                    <option value="well">Well</option>
+                                    <option value="canal">Canal</option>
+                                    <option value="rainfed">Rainfed</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            dynamicFields.style.display = dynamicFields.innerHTML ? 'block' : 'none';
+        });
+
+        // Asset type dynamic fields
+        document.getElementById('assetType').addEventListener('change', function () {
+            const assetType = this.value;
+            const dynamicFields = document.getElementById('assetDynamicFields');
+            dynamicFields.innerHTML = '';
+
+            if (assetType === 'residential-property' || assetType === 'commercial-property') {
+                dynamicFields.innerHTML = `
+                    <div class="dynamic-field-group">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="assetPropertyArea">Property Area (Sq. Ft.)</label>
+                                <input type="number" id="assetPropertyArea" name="assetPropertyArea" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="assetPropertyLocation">Property Location</label>
+                                <input type="text" id="assetPropertyLocation" name="assetPropertyLocation">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="propertyOwnership">Ownership Type</label>
+                                <select id="propertyOwnership" name="propertyOwnership">
+                                    <option value="">Select Type</option>
+                                    <option value="freehold">Freehold</option>
+                                    <option value="leasehold">Leasehold</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (assetType === 'vehicle') {
+                dynamicFields.innerHTML = `
+                    <div class="dynamic-field-group">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="assetVehicleMake">Vehicle Make</label>
+                                <input type="text" id="assetVehicleMake" name="assetVehicleMake">
+                            </div>
+                            <div class="form-group">
+                                <label for="assetVehicleModel">Vehicle Model</label>
+                                <input type="text" id="assetVehicleModel" name="assetVehicleModel">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="assetVehicleYear">Manufacturing Year</label>
+                                <input type="number" id="assetVehicleYear" name="assetVehicleYear" min="2010" max="2025">
+                            </div>
+                            <div class="form-group">
+                                <label for="registrationNumber">Registration Number</label>
+                                <input type="text" id="registrationNumber" name="registrationNumber">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (assetType === 'land') {
+                dynamicFields.innerHTML = `
+                    <div class="dynamic-field-group">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="assetLandArea">Land Area (Acres)</label>
+                                <input type="number" id="assetLandArea" name="assetLandArea" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="landLocation">Land Location</label>
+                                <input type="text" id="landLocation" name="landLocation">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="landType">Land Type</label>
+                                <select id="landType" name="landType">
+                                    <option value="">Select Type</option>
+                                    <option value="agricultural">Agricultural</option>
+                                    <option value="residential">Residential</option>
+                                    <option value="commercial">Commercial</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (assetType === 'fixed-deposits' || assetType === 'shares' || assetType === 'mutual-funds') {
+                dynamicFields.innerHTML = `
+                    <div class="dynamic-field-group">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="issuerName">Issuer Name</label>
+                                <input type="text" id="issuerName" name="issuerName">
+                            </div>
+                            <div class="form-group">
+                                <label for="maturityDate">Maturity Date</label>
+                                <input type="date" id="maturityDate" name="maturityDate">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="investmentDate">Investment Date</label>
+                                <input type="date" id="investmentDate" name="investmentDate">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            dynamicFields.style.display = dynamicFields.innerHTML ? 'block' : 'none';
+        });
+
+        // Co-applicant toggle
+        document.getElementById('hasCoApplicant').addEventListener('change', function () {
+            const coApplicantSection = document.getElementById('coApplicantSection');
+            coApplicantSection.style.display = this.checked ? 'block' : 'none';
+        });
+
+        // Check CIBIL button
+        document.getElementById('checkCibil').addEventListener('click', function() {
+            window.open('https://www.cibil.com/freecibilscore', '_blank');
+            notifications.show('Redirecting to official CIBIL website to check your score', 'info');
+        });
+
+        // Calculate EMI button
+        document.getElementById('calculateEMI').addEventListener('click', function() {
+            calculateEMI();
+        });
+
+        function calculateEMI() {
+            const loanType = document.getElementById('loanType').value;
+            const interestType = document.getElementById('interestType').value;
+            const cibilInput = document.getElementById('cibilScore');
+            const loanAmount = parseFloat(document.getElementById('loanAmount').value) || 0;
+            const tenure = parseFloat(document.getElementById('tenure').value) || 0;
+            const monthlyIncome = parseFloat(document.getElementById('monthlyIncome').value) || 0;
+
+            const cibilRaw = cibilInput.value.trim();
+            const cibil = parseInt(cibilRaw, 10);
+
+            if (!loanType || !interestType || !cibilRaw || !loanAmount || !tenure) {
+                notifications.show('Please fill all required fields to calculate EMI', 'error');
+                return;
+            }
+
+            if (isNaN(cibil) || cibil < 300 || cibil > 900) {
+                notifications.show('Please enter a valid CIBIL score between 300 and 900', 'error');
+                return;
+            }
+
+            const baseRateMap = {
+                home: 8.5,
+                personal: 13.0,
+                business: 13.5,
+                education: 10.0,
+                vehicle: 9.5,
+                agriculture: 7.5
+            };
+
+            let rate = baseRateMap[loanType] || 10.0;
+
+            if (cibil >= 800) {
+                rate -= 0.5;
+            } else if (cibil >= 750) {
+                // no change
+            } else if (cibil >= 700) {
+                rate += 1.0;
+            } else if (cibil >= 650) {
+                rate += 2.0;
+            } else {
+                rate += 3.0;
+            }
+
+            if (interestType === 'fixed') {
+                rate += 0.25;
+            } else if (interestType === 'floating') {
+                rate -= 0.25;
+            }
+
+            if (rate < 7) rate = 7;
+            if (rate > 20) rate = 20;
+
+            const monthlyInterestRate = rate / 12 / 100;
+            const emi = loanAmount * monthlyInterestRate *
+                Math.pow(1 + monthlyInterestRate, tenure) /
+                (Math.pow(1 + monthlyInterestRate, tenure) - 1);
+
+            const totalPayment = emi * tenure;
+            const totalInterest = totalPayment - loanAmount;
+
+            document.getElementById('suggestedEMI').textContent = '₹' + emi.toFixed(2);
+            document.getElementById('suggestedRate').textContent = rate.toFixed(2) + '%';
+            document.getElementById('totalPayableAmount').textContent = '₹' + totalPayment.toFixed(2);
+            document.getElementById('totalPayableInterest').textContent = '₹' + totalInterest.toFixed(2);
+
+            document.getElementById('detailLoanAmount').textContent = '₹' + loanAmount.toFixed(2);
+            document.getElementById('detailLoanTenure').textContent = tenure + ' months';
+            document.getElementById('detailInterestType').textContent =
+                interestType.charAt(0).toUpperCase() + interestType.slice(1);
+            document.getElementById('detailCibilScore').textContent = cibil;
+
+            document.getElementById('emiSuggestionSection').style.display = 'block';
+            document.getElementById('emiSuggestionSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            notifications.show('EMI calculation completed successfully!', 'success');
+
+            // Soft DTI check
+            if (monthlyIncome > 0) {
+                const dti = (emi / monthlyIncome) * 100;
+                if (dti > 70) {
+                    notifications.show('Warning: EMI is more than 70% of your monthly income. This may affect approval.', 'warning', 7000);
+                }
+            }
+        }
+
+        // Add asset functionality
+        let assetCount = 0;
+        document.getElementById('addAsset').addEventListener('click', function () {
+            const assetTypeSelect = document.getElementById('assetType');
+            const assetType = assetTypeSelect.value;
+            const assetTypeText = assetTypeSelect.options[assetTypeSelect.selectedIndex]?.text || '';
+            const assetValue = document.getElementById('assetValue').value;
+            const assetDescription = document.getElementById('assetDescription').value;
+
+            if (!assetType || !assetValue) {
+                notifications.show('Please select asset type and enter asset value to add.', 'error');
+                return;
+            }
+
+            assetCount++;
+            const assetList = document.getElementById('assetList');
+            const assetItem = document.createElement('div');
+            assetItem.className = 'asset-item';
+            assetItem.innerHTML = `
+                <div class="asset-header">
+                    <h4>Asset #${assetCount}</h4>
+                    <button type="button" class="remove-asset" title="Remove this asset">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Asset Type</label>
+                        <input type="text" value="${assetTypeText}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Asset Value</label>
+                        <input type="text" value="₹${assetValue}" readonly>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea readonly>${assetDescription || '—'}</textarea>
+                    </div>
+                </div>
+            `;
+
+            assetList.appendChild(assetItem);
+
+            document.getElementById('assetType').value = '';
+            document.getElementById('assetValue').value = '';
+            document.getElementById('assetDescription').value = '';
+            document.getElementById('assetDynamicFields').innerHTML = '';
+            document.getElementById('assetDynamicFields').style.display = 'none';
+
+            notifications.show('Asset added successfully!', 'success');
+
+            assetItem.querySelector('.remove-asset').addEventListener('click', function () {
+                assetItem.remove();
+                notifications.show('Asset removed.', 'info');
+            });
+        });
+
+        // Save draft – just a UI message for now (backend can implement later)
+        document.getElementById('saveDraft').addEventListener('click', function () {
+            notifications.show('Draft save in database will be implemented later by backend.', 'info');
+        });
+
+        // Final form submit – let it go to Flask if valid
+        const form = document.getElementById('loanApplicationForm');
+        form.addEventListener('submit', function (e) {
+            // Validate all sections
+            for (let i = 0; i < sections.length; i++) {
+                if (!validateSection(i)) {
+                    e.preventDefault();
+                    showSection(i);
+                    notifications.show('Please fill all mandatory fields correctly before submitting.', 'error');
+                    return;
+                }
+            }
+
+            // Age range check
+            const ageVal = parseInt(document.getElementById('age').value || '0', 10);
+            if (isNaN(ageVal) || ageVal < 21 || ageVal > 65) {
+                e.preventDefault();
+                notifications.show('Applicant age must be between 21 and 65 years to proceed.', 'error');
+                showSection(0);
+                return;
+            }
+
+            // CIBIL range check
+            const cibil = parseInt(document.getElementById('cibilScore').value || '0', 10);
+            if (isNaN(cibil) || cibil < 300 || cibil > 900) {
+                e.preventDefault();
+                notifications.show('Please provide a valid CIBIL score between 300 and 900.', 'error');
+                showSection(3);
+                return;
+            }
+
+            // Soft EMI vs income warning
+            const emiText = document.getElementById('suggestedEMI').textContent.replace('₹', '') || '0';
+            const emiVal = parseFloat(emiText) || 0;
+            const income = parseFloat(document.getElementById('monthlyIncome').value || '0') || 0;
+            if (emiVal > 0 && income > 0) {
+                const ratio = (emiVal / income) * 100;
+                if (ratio > 70) {
+                    const proceed = confirm(
+                        'Warning: EMI is more than 70% of your monthly income. This may affect approval. Do you still want to submit?'
+                    );
+                    if (!proceed) {
+                        e.preventDefault();
+                        return;
+                    }
+                }
+            }
+
+            // If we reached here, allow normal POST to Flask
+        });
+
+        // Start on section 0
+        showSection(0);
+    });
+
+
+    // Add this to your form submission handler
+document.getElementById('loanApplicationForm').addEventListener('submit', function(e) {
+    console.log('Form submitted!');
+    console.log('Form data:', new FormData(this));
+    
+    // Let it proceed to server
+});
+</script>
+</body>
+</html>

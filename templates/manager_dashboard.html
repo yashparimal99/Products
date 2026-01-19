@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DigiBank — Manager Dashboard</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css"/>
+
+    <style>
+        :root {
+            --brand: #0B4D83;      /* DigiBank primary */
+            --brand-alt: #97144D;  /* Accent */
+            --bg-page: #f1f5f9;
+            --border-soft: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+        }
+
+        body {
+            background: radial-gradient(circle at top left, #e3f2fd 0, #f1f5f9 40%, #ffffff 100%);
+            font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-main);
+        }
+
+        .page-shell {
+            max-width: 1200px;
+            margin: 24px auto 40px;
+        }
+
+        .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .top-row-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* Top Header */
+        .top-header {
+            background: linear-gradient(90deg, #0B4D83, #186cc4);
+            border-radius: 18px;
+            padding: 18px 22px;
+            color: #f9fafb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 16px 35px rgba(15, 23, 42, 0.18);
+            margin-bottom: 18px;
+        }
+
+        .top-header-left {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .top-icon-pill {
+            width: 42px;
+            height: 42px;
+            border-radius: 999px;
+            background: rgba(15,23,42,0.22);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .top-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .top-subtitle {
+            font-size: 13px;
+            font-weight: 500;
+            opacity: 0.95;
+        }
+
+        .badge-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.4);
+            background-color: rgba(15,23,42,0.18);
+            color: #e2f3ff;
+        }
+
+        .badge-chip i {
+            font-size: 14px;
+        }
+
+        .mini-metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 6px;
+            font-size: 11px;
+        }
+
+        .mini-metric-pill {
+            border-radius: 999px;
+            padding: 3px 8px;
+            border: 1px solid rgba(255,255,255,0.35);
+            background: rgba(15, 23, 42, 0.16);
+        }
+
+        /* Card */
+        .card-block {
+            background-color: #ffffff;
+            border-radius: 14px;
+            border: 1px solid var(--border-soft);
+            padding: 16px 20px 20px;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+            margin-bottom: 18px;
+        }
+
+        .card-header-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            gap: 12px;
+        }
+
+        .card-title-text {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title-text i {
+            font-size: 18px;
+            color: var(--brand);
+        }
+
+        .card-subtext {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .card-tag {
+            font-size: 11px;
+            border-radius: 999px;
+            padding: 3px 8px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: var(--text-muted);
+        }
+
+        /* Table styles */
+        table.dataTable thead th {
+            background-color: #0B4D83;
+            color: #ffffff !important;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        table.dataTable tbody td {
+            vertical-align: middle;
+            font-size: 13px;
+        }
+
+        .status-badge {
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background-color: #fff7e6;
+            color: #b45309;
+        }
+
+        .status-approved {
+            background-color: #e0f2f1;
+            color: #00695c;
+        }
+
+        .status-rejected {
+            background-color: #ffebee;
+            color: #b71c1c;
+        }
+
+        .final-approved {
+            background-color: #e0f7fa;
+            color: #006064;
+        }
+
+        .final-rejected {
+            background-color: #fce4ec;
+            color: #880e4f;
+        }
+
+        .final-pending {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+
+        .final-disbursed {
+            background-color: #ecfdf3;
+            color: #166534;
+        }
+
+        .status-active {
+            background-color: #ecfdf3;
+            color: #166534;
+        }
+
+        .status-closed {
+            background-color: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .status-defaulted {
+            background-color: #fef2f2;
+            color: #b91c1c;
+        }
+
+        .amount-cell {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .app-link {
+            font-weight: 600;
+            color: #0B4D83;
+            text-decoration: none;
+        }
+
+        .app-link:hover {
+            text-decoration: underline;
+        }
+
+        .btn-view {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-weight: 600;
+        }
+
+        .small-pill {
+            font-size: 11px;
+            border-radius: 999px;
+            padding: 3px 8px;
+        }
+
+        .badge-loan {
+            font-size: 11px;
+            border-radius: 999px;
+            padding: 3px 8px;
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        @media (max-width: 768px) {
+            .top-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page-shell">
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="mb-3">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+              <strong>{{ message }}</strong>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Top small row with brand + logout -->
+    <div class="top-row">
+        <div class="top-row-title">
+            DigiBank • Manager Console
+        </div>
+        <div>
+            <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- Gradient top header -->
+    <div class="top-header">
+        <div class="top-header-left">
+            <div class="top-icon-pill">
+                <i class="bi bi-speedometer2"></i>
+            </div>
+            <div>
+                <div class="top-title">Loan Applications Dashboard</div>
+                <div class="top-subtitle">
+                    Monitor end-to-end lifecycle — from application to disbursement & EMI performance — in one view.
+                </div>
+                <div class="mini-metrics">
+                    <span class="mini-metric-pill">
+                        <i class="bi bi-hourglass-split"></i>
+                        Pending Review: {{ applications_pending|length }}
+                    </span>
+                    <span class="mini-metric-pill">
+                        <i class="bi bi-check2-circle"></i>
+                        Manager Approved: {{ applications_approved|length }}
+                    </span>
+                    <span class="mini-metric-pill">
+                        <i class="bi bi-cash-stack"></i>
+                        Active EMI Loans: {{ emi_loans|length }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="text-end">
+            <span class="badge-chip mb-1">
+                <i class="bi bi-shield-lock"></i>
+                Role: Manager
+            </span>
+            <div style="font-size:11px; opacity:0.9;">
+                You can approve/reject applications, create loan accounts, disburse funds and track EMIs.
+            </div>
+        </div>
+    </div>
+
+    <!-- 1) Applications Awaiting Review -->
+    <div class="card-block">
+        <div class="card-header-line">
+            <div>
+                <div class="card-title-text">
+                    <i class="bi bi-inboxes"></i>
+                    Applications Awaiting Review
+                </div>
+                <div class="card-subtext">
+                    These applications are <strong>agent approved</strong> and waiting for your final decision.
+                </div>
+            </div>
+            <div>
+                <span class="card-tag">
+                    <i class="bi bi-info-circle"></i>
+                    Click "View" to open detailed risk analysis & documents.
+                </span>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table id="pendingTable" class="table table-striped table-bordered align-middle w-100">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Application No</th>
+                        <th>Customer</th>
+                        <th>Loan Type</th>
+                        <th>Amount (₹)</th>
+                        <th>Status</th>
+                        <th>Submitted On</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                {% for app in applications_pending %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+
+                        <td>
+                            <a href="{{ url_for('manager_review_loan', app_id=app.id) }}" class="app-link">
+                                {{ app.application_number }}
+                            </a>
+                        </td>
+
+                        <td>{{ app.full_name }}</td>
+                        <td>
+                            <span class="badge-loan">
+                                {{ app.loan_type|title }}
+                            </span>
+                        </td>
+
+                        <td class="amount-cell">
+                            {{ "{:,.0f}".format(app.loan_amount|float) if app.loan_amount is not none else app.loan_amount }}
+                        </td>
+
+                        <td>
+                            {% if app.application_status == "pending_manager" %}
+                                <span class="status-badge status-pending">Pending Manager</span>
+                            {% elif app.application_status == "manager_approved" %}
+                                <span class="status-badge final-approved">Approved</span>
+                            {% elif app.application_status == "rejected" %}
+                                <span class="status-badge final-rejected">Rejected</span>
+                            {% else %}
+                                <span class="status-badge final-pending">
+                                    {{ app.application_status|replace("_"," ")|title }}
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>{{ app.created_at }}</td>
+
+                        <td>
+                            <a href="{{ url_for('manager_review_loan', app_id=app.id) }}"
+                               class="btn btn-primary btn-sm btn-view">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 2) Manager Approved Loans + Loan Account Creation / Disbursement -->
+    <div class="card-block">
+        <div class="card-header-line">
+            <div>
+                <div class="card-title-text">
+                    <i class="bi bi-check2-square"></i>
+                    Manager Approved & Disbursed Loans
+                </div>
+                <div class="card-subtext">
+                    Loans where you have already taken a <strong>final decision</strong>.  
+                    Create loan accounts, disburse funds and confirm disbursal status here.
+                </div>
+            </div>
+            <div>
+                <span class="card-tag">
+                    <i class="bi bi-credit-card-2-front"></i>
+                    Use "Create Loan A/c & Disburse" for approved applications without a loan account.
+                </span>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table id="approvedTable" class="table table-striped table-bordered align-middle w-100">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Application No</th>
+                        <th>Customer</th>
+                        <th>Loan Type</th>
+                        <th>Amount (₹)</th>
+                        <th>Interest Rate (%)</th>
+                        <th>Sanctioned (₹)</th>
+                        <th>Loan Account No</th>
+                        <th>Manager Decision</th>
+                        <th>Approved / Disbursed On</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                {% for app in applications_approved %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+
+                        <td>
+                            <a href="{{ url_for('manager_review_loan', app_id=app.id) }}" class="app-link">
+                                {{ app.application_number }}
+                            </a>
+                        </td>
+
+                        <td>{{ app.full_name }}</td>
+                        <td>
+                            <span class="badge-loan">
+                                {{ app.loan_type|title }}
+                            </span>
+                        </td>
+
+                        <td class="amount-cell">
+                            {{ "{:,.0f}".format(app.loan_amount|float) if app.loan_amount is not none else "-" }}
+                        </td>
+
+                        <td class="amount-cell">
+                            {{ "{:.2f}".format(app.final_interest_rate|float) if app.final_interest_rate is not none else "-" }}
+                        </td>
+
+                        <td class="amount-cell">
+                            {{ "{:,.0f}".format(app.sanctioned_amount|float) if app.sanctioned_amount is not none else "-" }}
+                        </td>
+
+                        <!-- Loan Account No (from loan_accounts LEFT JOIN) -->
+                        <td>
+                            {% if app.loan_account_no %}
+                                <span class="small-pill bg-success-subtle text-success fw-semibold">
+                                    {{ app.loan_account_no }}
+                                </span>
+                            {% else %}
+                                <span class="text-muted">Not created</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Manager Decision based on application_status -->
+                        <td>
+                            {% if app.application_status == "manager_approved" %}
+                                <span class="status-badge final-approved">Approved</span>
+                            {% elif app.application_status == "disbursed" %}
+                                <span class="status-badge final-disbursed">Disbursed</span>
+                            {% elif app.application_status == "rejected" %}
+                                <span class="status-badge final-rejected">Rejected</span>
+                            {% else %}
+                                <span class="status-badge final-pending">
+                                    {{ app.application_status|replace("_"," ")|title }}
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Approved / Disbursed On -->
+                        <td>
+                            {% if app.manager_decided_at %}
+                                {{ app.manager_decided_at }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+
+                        <!-- Actions column -->
+                        <td>
+                            <!-- View button -->
+                            <a href="{{ url_for('manager_review_loan', app_id=app.id) }}"
+                               class="btn btn-outline-primary btn-sm mb-1">
+                                <i class="bi bi-eye"></i>
+                            </a>
+
+                            <!-- Create Loan A/c & Disburse button -->
+                            {% if app.application_status == 'manager_approved' and not app.loan_account_no %}
+                                <form method="POST"
+                                      action="{{ url_for('manager_create_loan_account_and_disburse', app_id=app.id) }}"
+                                      style="display:inline;">
+                                    <button type="submit"
+                                            class="btn btn-sm btn-success mb-1"
+                                            onclick="return confirm('Create loan account and disburse amount for this application?');">
+                                        <i class="bi bi-credit-card"></i> Disburse
+                                    </button>
+                                </form>
+                            {% elif app.application_status == 'disbursed' and app.loan_account_no %}
+                                <span class="badge bg-success-subtle text-success small-pill">
+                                    <i class="bi bi-check-circle"></i> Disbursed
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 3) Active Loans – EMI Tracking & Timeline -->
+    <div class="card-block">
+        <div class="card-header-line">
+            <div>
+                <div class="card-title-text">
+                    <i class="bi bi-graph-up-arrow"></i>
+                    Active Loans – EMI Tracking
+                </div>
+                <div class="card-subtext">
+                    Monitor EMI performance for all disbursed loans. Open the EMI timeline to see month-wise charts, 
+                    paid vs pending instalments and risk signals.
+                </div>
+            </div>
+            <div>
+                <span class="card-tag">
+                    <i class="bi bi-bar-chart-line"></i>
+                    Click "EMI Timeline" for per-loan details & graphs.
+                </span>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table id="emiTable" class="table table-striped table-bordered align-middle w-100">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Loan A/c No</th>
+                        <th>Customer</th>
+                        <th>Loan Type</th>
+                        <th>Sanctioned (₹)</th>
+                        <th>EMI (₹)</th>
+                        <th>Outstanding (₹)</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                {% for loan in emi_loans %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+
+                        <td>
+                            <span class="fw-semibold text-primary">
+                                {{ loan.loan_account_no }}
+                            </span>
+                        </td>
+
+                        <td>{{ loan.full_name }}</td>
+                        <td>
+                            <span class="badge-loan">
+                                {{ loan.loan_type|title }}
+                            </span>
+                        </td>
+
+                        <td class="amount-cell">
+                            {{ "{:,.0f}".format(loan.sanctioned_amount|float) if loan.sanctioned_amount is not none else "-" }}
+                        </td>
+
+                        <td class="amount-cell">
+                            {{ "{:,.0f}".format(loan.emi_amount|float) if loan.emi_amount is not none else "-" }}
+                        </td>
+
+                        <td class="amount-cell">
+                            {{ "{:,.0f}".format(loan.outstanding_principal|float) if loan.outstanding_principal is not none else "-" }}
+                        </td>
+
+                        <td>
+                            <a href="{{ url_for('manager_loan_detail', loan_account_id=loan.loan_account_id) }}"
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-graph-up-arrow"></i> EMI Timeline
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- JS -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#pendingTable').DataTable({
+            pageLength: 10,
+            order: [[0, 'asc']]
+        });
+
+        $('#approvedTable').DataTable({
+            pageLength: 10,
+            order: [[0, 'asc']]
+        });
+
+        $('#emiTable').DataTable({
+            pageLength: 10,
+            order: [[0, 'asc']]
+        });
+    });
+</script>
+
+</body>
+</html>

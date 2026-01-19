@@ -21,15 +21,281 @@
     .pin-input { letter-spacing:.4em; text-align:center; font-size:1.1rem; }
     footer.bg-custom { background-color:#0B4D83; }
   </style>
+  <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap');
+
+        .digi-bank-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+
+        .digi-bank-logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 6px 18px rgba(102, 126, 234, 0.3), 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+        }
+
+        .logo-icon::after {
+            content: 'D';
+            position: absolute;
+            color: transparent;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            background-clip: text;
+            -webkit-background-clip: text;
+            font-weight: 800;
+            font-size: 20px;
+            z-index: 2;
+        }
+
+        .logo-text {
+            color: #fff;
+        }
+
+        .main-text {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            line-height: 1;
+        }
+
+        .digi {
+            background: linear-gradient(135deg, #87CEEB 0%, #98D8E8 25%, #FFF8DC 50%, #87CEFA 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .bank {
+            color: #ffffff;
+            margin-left: 3px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .tagline {
+            font-size: 9px;
+            font-weight: 600;
+            color: #e8f4f8;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+    </style>
 </head>
 <body>
  
-  <!-- Simple top bar -->
+  <!-- Simple top bar
   <div class="top-bar d-flex align-items-center">
     <div class="fw-bold">DigiBank</div>
     <div class="text-center flex-grow-1">Security Check</div>
     <div></div>
+  </div> -->
+      
+<!-- Sidebar Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="sidebarMenuLabel">Welcome, {{ user.name }} ! </h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark active" href="{{ url_for('home') }}">
+            <i class="bi bi-speedometer2 me-2"></i> Home
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('viewaccounts') }}">
+            <i class="bi bi-person-lines-fill me-2"></i> View Accounts
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('userdashloan') }}">
+            <i class="bi bi-cash-coin me-2"></i> Loans
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('Txnhistory') }}">
+            <i class="bi bi-clock-history me-2"></i> Transaction History
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('accountbal') }}">
+            <i class="bi bi-wallet2 me-2"></i> Check Balance
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('profile') }}">
+            <i class="bi bi-gift-fill me-2"></i> Profile
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="{{ url_for('paybill') }}">
+            <i class="bi bi-credit-card me-2"></i> Pay Bill
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="#">
+            <i class="bi bi-person-rolodex me-2"></i> Get Contact
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a class="nav-link text-dark" href="#">
+            <i class="bi bi-shield-lock-fill me-2"></i> Privacy & Security
+          </a>
+        </li>
+ 
+      </ul>
+    </div>
   </div>
+ 
+  <!-- ---------------------------- -->
+  <div class="top-bar d-flex align-items-center">
+    <!-- left toggle -->
+    <button class="btn btn-outline-light btn-sm me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
+      aria-controls="sidebarMenu" aria-label="Toggle sidebar">
+      <i class="bi bi-list"></i>
+    </button>
+ 
+    <!-- 🔽 Custom DigiBank Logo -->
+    <a class="navbar-brand digi-bank-logo" href="{{ url_for('home') }}">
+      <div class="logo-icon"></div>
+      <div class="logo-text">
+        <div class="main-text">
+          <span class="digi">DiGi</span><span class="bank">Bank</span>
+        </div>
+        <div class="tagline">Smart Banking</div>
+      </div>
+    </a>
+ 
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+            aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0B4D83 !important; width: 100%;">
+      <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <!-- <li class="nav-item"><a class="nav-link active" href="{{ url_for('home') }}">Home</a></li> -->
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">My Activities</a>
+            </li>
+            <!-- Open Account Dropdown -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Open Account</a>
+              <ul class="dropdown-menu" aria-labelledby="accountDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Savings
+                    Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Salary Account</a>
+                </li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Current
+                    Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Safe Custody
+                    Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">Pension
+                    Account</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_account') }}">PMJDY Account</a>
+                </li>
+              </ul>
+            </li>
+            <!-- Deposits Dropdown -->
+            <li class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle" href="#" id="depositsDropdown" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false">Deposits</button>
+              <ul class="dropdown-menu" aria-labelledby="depositsDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Digital Fixed
+                    Deposits</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Fixed
+                    Deposits</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_deposits') }}">Recurring
+                    Deposits</a></li>
+              </ul>
+            </li>
+            <!-- Deposits Dropdown -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="loanDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Loans</a>
+              <ul class="dropdown-menu" aria-labelledby="loanDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('userdashloan') }}">Home Loan</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('userdashloan') }}">Personal Loan</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('userdashloan') }}">Busniness Loan</a></li>
+ 
+ 
+              </ul>
+            </li>
+            <!-- Deposits Dropdown -->
+            <li class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle" id="cardDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false" type="button">Cards</button>
+              <ul class="dropdown-menu" aria-labelledby="cardDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Credit Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Debit Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Prepaid Cards</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('open_cards') }}">Forex Cards</a></li>
+              </ul>
+            </li>
+            
+            <!-- Deposits Dropdown -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="investDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">Investments</a>
+              <ul class="dropdown-menu" aria-labelledby="investDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('userdashinvest') }}">Public Provident Fund</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('userdashinvest') }}">Floating Rate Saving Bonds</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('userdashinvest') }}">National Pension System</a></li>
+              </ul>
+            </li>
+          </ul>
+          <div class="d-flex align-items-center">
+            <h5 class="m-0 me-2 fs-6">Welcome, {{ user.name }} ! </h5>
+            <a href="{{ url_for('logout') }}" class="logout-btn btn btn-outline-light btn-sm">
+              Logout
+            </a>
+          </div>
+ 
+        </div>
+      </div>
+    </nav>
+    <!-- End of custom navbar -->
+ 
+  </div>
+ 
+ 
+ 
+  </div>
+
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="bg-light px-3 py-2 mt-3">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" style="color:#0B4D83;">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page" style="color:#0B4D83; font-weight:bold;">Check Balance</li>
+    </ol>
+  </nav>
  
   <!-- Flash messages + always-on info box -->
   <div class="container container-narrow mt-3">
@@ -145,6 +411,164 @@
       });
     })();
   </script>
+  <style>
+        body { font-family: Arial; margin: 0; background: #fff; }
+
+        #chatButton {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #0066ff;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            color: white;
+            font-size: 28px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+        }
+
+        #chatBox {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 360px;
+            height: 480px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.3);
+            display: none;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background: #0066ff;
+            color: white;
+            padding: 12px;
+            font-size: 18px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chat-body {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        .msg {
+            padding: 10px;
+            margin: 8px 0;
+            max-width: 80%;
+            border-radius: 8px;
+            font-size: 14px;
+            white-space: pre-wrap;
+            line-height: 1.4;
+        }
+
+        .user { background: #e3f0ff; margin-left: auto; }
+        .bot { background: #f1f1f1; margin-right: auto; }
+
+        .chat-inputBox {
+            padding: 8px;
+            display: flex;
+            border-top: 1px solid #ccc;
+        }
+
+        textarea {
+            flex: 1;
+            resize: none;
+            padding: 8px;
+        }
+
+        .sendBtn {
+            width: 60px;
+            background: #0066ff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+    </style>
+
+    <script>
+
+        /* ▶ FIXED: NEW CLEAN CHAT ON EVERY OPEN */
+        function toggleChat() {
+
+            // Remove old chat history
+            localStorage.removeItem("chatHistory");
+
+            // Clear UI messages
+            document.getElementById("chatMessages").innerHTML = "";
+
+            // Show chatbox
+            document.getElementById("chatBox").style.display = "flex";
+        }
+
+        function loadHistory() {
+            let history = JSON.parse(localStorage.getItem("chatHistory") || "[]");
+            let box = document.getElementById("chatMessages");
+            box.innerHTML = "";
+
+            history.forEach(m => {
+                box.innerHTML += `<div class='msg ${m.role}'>${m.text}</div>`;
+            });
+
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function saveMessage(role, text) {
+            let history = JSON.parse(localStorage.getItem("chatHistory") || "[]");
+            history.push({ role, text });
+            localStorage.setItem("chatHistory", JSON.stringify(history));
+        }
+
+        function sendMessage() {
+
+            let input = document.getElementById("userMessage");
+            let msg = input.value.trim();
+            if (!msg) return;
+
+            saveMessage("user", msg);
+            loadHistory();
+
+            input.value = "";
+
+            fetch("/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: msg })
+            })
+            .then(res => res.json())
+            .then(data => {
+                saveMessage("bot", data.answer);
+                loadHistory();
+            });
+        }
+    </script>
+</head>
+
+<body>
+
+<button id="chatButton" onclick="toggleChat()">💬</button>
+
+<div id="chatBox">
+    <div class="chat-header">
+        DigiBank Chatbot
+        <span onclick="document.getElementById('chatBox').style.display='none'" style="cursor:pointer;">❌</span>
+    </div>
+
+    <div class="chat-body" id="chatMessages"></div>
+
+    <div class="chat-inputBox">
+        <textarea id="userMessage" placeholder="Type message..."></textarea>
+        <button onclick="sendMessage()" class="sendBtn">Send</button>
+    </div>
+</div>
 </body>
 </html>
  
